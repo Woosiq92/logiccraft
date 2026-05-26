@@ -1,0 +1,42 @@
+---
+import Layout from '../layouts/Layout.astro';
+import AppCard from '../components/AppCard.astro';
+import { apps } from '../data/apps';
+
+const live = apps.filter((a) => a.status === 'live');
+const soon = apps.filter((a) => a.status === 'soon');
+---
+
+<Layout
+  title="앱 — 로직크래프트 LogicCraft"
+  description="로직크래프트가 만든 앱 모음. 로보트레일, 과학자 클럽, 커플맵로그, 불안한개미, 그리고 준비 중인 폴리톡."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">앱</p>
+    <h1>우리가 만든 앱</h1>
+    <p>작지만 또렷한 목적을 가진 도구들. 대부분 1인 개발로 기획·디자인·출시했습니다.</p>
+  </section>
+
+  <section class="wrap">
+    <div class="section-head"><h2>출시된 앱</h2></div>
+    <div class="app-grid">
+      {live.map((app) => <AppCard app={app} />)}
+    </div>
+  </section>
+
+  {soon.length > 0 && (
+    <section class="wrap">
+      <div class="section-head"><h2>준비 중</h2></div>
+      <div class="app-grid">
+        {soon.map((app) => <AppCard app={app} />)}
+      </div>
+    </section>
+  )}
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 1rem; }
+  .page-head h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; max-width: 50ch; }
+  section + section { padding-top: 1rem; }
+</style>

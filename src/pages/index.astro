@@ -1,0 +1,49 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero3D from '../components/Hero3D.astro';
+import AppCard from '../components/AppCard.astro';
+import { apps } from '../data/apps';
+
+const featured = apps.filter((a) => a.featured);
+---
+
+<Layout>
+  <Hero3D>
+    <p class="eyebrow" style="color: var(--accent-soft);">LOGICCRAFT</p>
+    <h1>생각하는 힘을 키우는<br />앱을 만듭니다.</h1>
+    <p class="lede">
+      로직크래프트는 사고력·판단력을 기르는 모바일 앱을 짓는 1인 앱 스튜디오입니다.
+      잘 만든 작은 도구가 매일의 생각을 바꾼다고 믿습니다.
+    </p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/apps">앱 둘러보기</a>
+      <a class="btn btn-ghost ghost-dark" href="/about">스튜디오 소개</a>
+    </div>
+  </Hero3D>
+
+  <section class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">우리가 만드는 것</p>
+      <h2>코딩·과학·기록·시세, 생각을 돕는 도구들</h2>
+      <p>화면을 채우는 앱이 아니라, 한 가지를 또렷하게 돕는 앱. App Store에 출시된 작업들입니다.</p>
+    </div>
+    <div class="app-grid">
+      {featured.map((app) => <AppCard app={app} />)}
+    </div>
+    <p class="more"><a href="/apps">모든 앱 보기 →</a></p>
+  </section>
+</Layout>
+
+<style>
+  h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; margin: 0; }
+  .lede {
+    margin: 1.4rem 0 0;
+    max-width: 36ch;
+    font-size: clamp(1rem, 2.2vw, 1.18rem);
+    color: rgba(255, 255, 255, 0.78);
+  }
+  .cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2.2rem; }
+  .ghost-dark { color: #fff; border-color: rgba(255, 255, 255, 0.28); }
+  .ghost-dark:hover { color: #fff; border-color: var(--accent-soft); }
+  .more { margin-top: 2rem; font-weight: 700; }
+</style>

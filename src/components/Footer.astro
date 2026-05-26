@@ -1,0 +1,48 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <div class="brand">로직크래프트 <span>LogicCraft</span></div>
+        <p class="claim">생각하는 힘을 키우는 앱을 만듭니다.</p>
+      </div>
+      <nav class="links" aria-label="푸터 메뉴">
+        <a href="/apps">앱</a>
+        <a href="/about">소개</a>
+        <a href="/contact">문의</a>
+        <a href="mailto:smartsikhye@gmail.com">smartsikhye@gmail.com</a>
+      </nav>
+    </div>
+    <div class="biz">
+      대표자 최우식 · 사업자등록번호 302-11-03141
+    </div>
+    <div class="copy">© {year} LogicCraft. All rights reserved.</div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    border-top: 1px solid var(--border);
+    background: var(--bg-alt);
+    padding: 3rem 0 2.5rem;
+    color: var(--muted);
+    font-size: 0.88rem;
+  }
+  .cols {
+    display: flex;
+    justify-content: space-between;
+    gap: 2rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.6rem;
+  }
+  .brand { font-weight: 800; color: var(--ink); font-size: 1.05rem; }
+  .brand span { color: var(--muted); font-size: 0.8rem; letter-spacing: 0.1em; margin-left: 0.3rem; }
+  .claim { margin: 0.4rem 0 0; color: var(--sub); }
+  .links { display: flex; flex-wrap: wrap; gap: 1.1rem; align-items: center; }
+  .links a { color: var(--sub); font-weight: 600; }
+  .biz { line-height: 1.8; }
+  .copy { margin-top: 0.4rem; }
+</style>

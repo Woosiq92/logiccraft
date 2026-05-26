@@ -1,0 +1,276 @@
+---
+// Interactive 3D "thinking network" hero.
+// Overlay content is provided via the default slot.
+---
+
+<section class="hero">
+  <canvas id="hero-canvas" aria-hidden="true"></canvas>
+  <div class="hero-overlay">
+    <div class="wrap">
+      <slot />
+    </div>
+  </div>
+  <div class="hero-fade" aria-hidden="true"></div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    background:
+      radial-gradient(120% 80% at 70% 10%, #10204a 0%, transparent 55%),
+      radial-gradient(100% 90% at 20% 90%, #0a1430 0%, transparent 60%),
+      var(--night);
+    color: #fff;
+  }
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hero-overlay { position: relative; z-index: 2; width: 100%; padding: 6rem 0; }
+  .hero-fade {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 120px;
+    z-index: 1;
+    background: linear-gradient(to bottom, transparent, var(--bg));
+  }
+</style>
+
+<script>
+  import * as THREE from 'three';
+
+  const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement | null;
+  if (canvas) {
+    let renderer: THREE.WebGLRenderer;
+    try {
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch {
+      // WebGL unavailable → the CSS gradient backdrop stands on its own.
+      throw new Error('skip');
+    }
+
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.position.z = 14;
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    // Two nested groups: inner auto-rotates, outer tilts toward the pointer.
+    const tilt = new THREE.Group();
+    const spin = new THREE.Group();
+    tilt.add(spin);
+    scene.add(tilt);
+
+    // --- nodes ---
+    const N = 150;
+    const BOX = { x: 11, y: 6.5, z: 7 };
+    const CONNECT = 2.7;
+
+    const base = new Float32Array(N * 3);
+    const vel = new Float32Array(N * 3);
+    const positions = new Float32Array(N * 3);
+    const colors = new Float32Array(N * 3);
+
+    const COL_DIM = new THREE.Color('#1e40af');
+    const COL_HOT = new THREE.Color('#bfdbfe');
+
+    for (let i = 0; i < N; i++) {
+      const j = i * 3;
+      base[j] = positions[j] = (Math.random() * 2 - 1) * BOX.x;
+      base[j + 1] = positions[j + 1] = (Math.random() * 2 - 1) * BOX.y;
+      base[j + 2] = positions[j + 2] = (Math.random() * 2 - 1) * BOX.z;
+      vel[j] = (Math.random() * 2 - 1) * 0.006;
+      vel[j + 1] = (Math.random() * 2 - 1) * 0.006;
+      vel[j + 2] = (Math.random() * 2 - 1) * 0.006;
+      COL_DIM.toArray(colors, j);
+    }
+
+    function makeDot() {
+      const c = document.createElement('canvas');
+      c.width = c.height = 64;
+      const ctx = c.getContext('2d')!;
+      const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(0.35, 'rgba(255,255,255,0.8)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(c);
+    }
+
+    const pointGeo = new THREE.BufferGeometry();
+    pointGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    pointGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const points = new THREE.Points(
+      pointGeo,
+      new THREE.PointsMaterial({
+        size: 0.42,
+        map: makeDot(),
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true,
+      })
+    );
+    spin.add(points);
+
+    // --- connections ---
+    const MAX_SEG = 4000;
+    const linePos = new Float32Array(MAX_SEG * 2 * 3);
+    const lineCol = new Float32Array(MAX_SEG * 2 * 3);
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
+    lineGeo.setAttribute('color', new THREE.BufferAttribute(lineCol, 3));
+    const lines = new THREE.LineSegments(
+      lineGeo,
+      new THREE.LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      })
+    );
+    spin.add(lines);
+
+    // --- pointer ---
+    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+    const mouseLocal = new THREE.Vector3();
+    const tmp = new THREE.Vector3();
+
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        pointer.tx = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.ty = -((e.clientY / window.innerHeight) * 2 - 1);
+      },
+      { passive: true }
+    );
+
+    function resize() {
+      const r = canvas!.getBoundingClientRect();
+      const w = r.width || window.innerWidth;
+      const h = r.height || window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function projectPointerToScene() {
+      tmp.set(pointer.x, pointer.y, 0.5).unproject(camera);
+      tmp.sub(camera.position).normalize();
+      const d = -camera.position.z / tmp.z;
+      tmp.copy(camera.position).addScaledVector(tmp, d); // world point on z=0 plane
+      spin.worldToLocal(mouseLocal.copy(tmp));
+    }
+
+    function buildConnections() {
+      let seg = 0;
+      const INF2 = 9; // mouse influence radius²
+      for (let i = 0; i < N && seg < MAX_SEG; i++) {
+        const a = i * 3;
+        for (let k = i + 1; k < N; k++) {
+          const b = k * 3;
+          const dx = positions[a] - positions[b];
+          const dy = positions[a + 1] - positions[b + 1];
+          const dz = positions[a + 2] - positions[b + 2];
+          const d2 = dx * dx + dy * dy + dz * dz;
+          if (d2 > CONNECT * CONNECT) continue;
+
+          const strength = 1 - Math.sqrt(d2) / CONNECT;
+          // midpoint distance to pointer boosts brightness
+          const mx = (positions[a] + positions[b]) * 0.5 - mouseLocal.x;
+          const my = (positions[a + 1] + positions[b + 1]) * 0.5 - mouseLocal.y;
+          const near = Math.max(0, 1 - (mx * mx + my * my) / INF2);
+          const v = strength * (0.4 + near * 1.6);
+
+          const s = seg * 6;
+          linePos[s] = positions[a];
+          linePos[s + 1] = positions[a + 1];
+          linePos[s + 2] = positions[a + 2];
+          linePos[s + 3] = positions[b];
+          linePos[s + 4] = positions[b + 1];
+          linePos[s + 5] = positions[b + 2];
+          for (let t = 0; t < 2; t++) {
+            lineCol[s + t * 3] = 0.22 * v;
+            lineCol[s + t * 3 + 1] = 0.5 * v;
+            lineCol[s + t * 3 + 2] = 1.0 * v;
+          }
+          if (++seg >= MAX_SEG) break;
+        }
+      }
+      lineGeo.setDrawRange(0, seg * 2);
+      (lineGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      (lineGeo.attributes.color as THREE.BufferAttribute).needsUpdate = true;
+    }
+
+    function step() {
+      // drift nodes within the box, bouncing at edges
+      for (let i = 0; i < N; i++) {
+        const j = i * 3;
+        positions[j] += vel[j];
+        positions[j + 1] += vel[j + 1];
+        positions[j + 2] += vel[j + 2];
+        if (Math.abs(positions[j]) > BOX.x) vel[j] *= -1;
+        if (Math.abs(positions[j + 1]) > BOX.y) vel[j + 1] *= -1;
+        if (Math.abs(positions[j + 2]) > BOX.z) vel[j + 2] *= -1;
+
+        // brighten nodes near the pointer
+        const dx = positions[j] - mouseLocal.x;
+        const dy = positions[j + 1] - mouseLocal.y;
+        const f = Math.max(0, 1 - (dx * dx + dy * dy) / 9);
+        COL_DIM.toArray(colors, j);
+        if (f > 0) {
+          colors[j] += (COL_HOT.r - colors[j]) * f;
+          colors[j + 1] += (COL_HOT.g - colors[j + 1]) * f;
+          colors[j + 2] += (COL_HOT.b - colors[j + 2]) * f;
+        }
+      }
+      (pointGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      (pointGeo.attributes.color as THREE.BufferAttribute).needsUpdate = true;
+      buildConnections();
+    }
+
+    function render() {
+      pointer.x += (pointer.tx - pointer.x) * 0.05;
+      pointer.y += (pointer.ty - pointer.y) * 0.05;
+      tilt.rotation.y += (pointer.x * 0.5 - tilt.rotation.y) * 0.05;
+      tilt.rotation.x += (-pointer.y * 0.35 - tilt.rotation.x) * 0.05;
+      spin.rotation.y += 0.0009;
+      projectPointerToScene();
+      step();
+      renderer.render(scene, camera);
+    }
+
+    if (reduceMotion) {
+      projectPointerToScene();
+      step();
+      renderer.render(scene, camera);
+    } else {
+      let raf = 0;
+      const loop = () => {
+        render();
+        raf = requestAnimationFrame(loop);
+      };
+      loop();
+      document.addEventListener('visibilitychange', () => {
+        cancelAnimationFrame(raf);
+        if (!document.hidden) loop();
+      });
+    }
+  }
+</script>

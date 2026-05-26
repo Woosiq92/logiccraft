@@ -1,0 +1,60 @@
+---
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = '로직크래프트 LogicCraft — 생각하는 힘을 키우는 앱',
+  description = '로직크래프트(LogicCraft)는 사고력·판단력을 키우는 모바일 앱을 만드는 1인 앱 스튜디오입니다. 로보트레일, 과학자 클럽, 커플맵로그, 불안한개미.',
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+
+const orgJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: '로직크래프트',
+  alternateName: 'LogicCraft',
+  url: 'https://logiccraft.co.kr',
+  email: 'smartsikhye@gmail.com',
+  description,
+  founder: { '@type': 'Person', name: '최우식' },
+};
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="로직크래프트" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL('/og.png', Astro.site).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:image" content={new URL('/og.png', Astro.site).href} />
+
+    <meta name="theme-color" content="#2563eb" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(orgJsonLd)} is:inline />
+  </head>
+  <body>
+    <Nav />
+    <main>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>
