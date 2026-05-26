@@ -1,7 +1,7 @@
 ---
-// Interactive 3D hero echoing the logo: a round discussion table with people
-// seated around it, raising questions ("?") — "탁자에서 질문하는" 느낌.
-// Overlay content is provided via the default slot.
+// Interactive 3D hero — a round council table with high-back chairs seated
+// around it ("원탁 회의"), people raising questions ("?"). Echoes the logo
+// (물음표 + 토론 탁자) in a refined, brand-toned style rather than photoreal wood.
 ---
 
 <section class="hero">
@@ -27,22 +27,11 @@
       var(--night);
     color: #fff;
   }
-  #hero-canvas {
-    position: absolute;
-    inset: 0;
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
+  #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
   .hero-overlay { position: relative; z-index: 2; width: 100%; padding: 6rem 0; pointer-events: none; }
   .hero-overlay :global(a) { pointer-events: auto; }
   .hero-fade {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    height: 120px;
-    z-index: 1;
+    position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 1;
     background: linear-gradient(to bottom, transparent, var(--bg));
   }
 </style>
@@ -52,289 +41,288 @@
 
   const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement | null;
   if (canvas) {
-    let renderer: THREE.WebGLRenderer;
     try {
-      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-    } catch {
-      throw new Error('skip'); // no WebGL → CSS gradient backdrop stands alone
-    }
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      renderer.toneMapping = THREE.ACESFilmicToneMapping;
+      renderer.toneMappingExposure = 1.15;
 
-    const BLUE = 0x2563eb;
-    const BLUE_SOFT = 0x60a5fa;
-    const LIGHT = 0xe5edff;
+      const BLUE = 0x2563eb;
+      const SLATE = 0x33405e;
+      const SLATE_DK = 0x222c44;
 
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
-    const camBase = new THREE.Vector3(0, 5.0, 11.5);
-    const target = new THREE.Vector3(0, -0.6, 0);
-    camera.position.copy(camBase);
-    camera.lookAt(target);
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
+      const camBase = new THREE.Vector3(0, 5.4, 11.5);
+      const target = new THREE.Vector3(0, 0.1, 0);
+      camera.position.copy(camBase);
+      camera.lookAt(target);
 
-    // table group rotates slowly (the discussion goes around)
-    const table = new THREE.Group();
-    scene.add(table);
+      // lights
+      scene.add(new THREE.AmbientLight(0x4a5a85, 0.7));
+      const key = new THREE.DirectionalLight(0xffffff, 1.15);
+      key.position.set(5, 10, 7);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0xffd9a8, 0.3); // subtle warm rim
+      rim.position.set(-6, 4, -6);
+      scene.add(rim);
+      const coreGlow = new THREE.PointLight(0x3b82f6, 22, 14, 2); // blue glow from table center
+      coreGlow.position.set(0, 0.7, 0);
+      scene.add(coreGlow);
 
-    const R = 4.3;
+      // table group (slow rotation + parallax)
+      const table = new THREE.Group();
+      scene.add(table);
 
-    // round table = ring lying flat in the xz-plane
-    const ring = new THREE.Mesh(
-      new THREE.TorusGeometry(R, 0.07, 12, 160),
-      new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.7 })
-    );
-    ring.rotation.x = Math.PI / 2;
-    table.add(ring);
+      const R_OUT = 3.3;
+      const R_IN = 1.15;
 
-    const glowRing = new THREE.Mesh(
-      new THREE.TorusGeometry(R, 0.28, 12, 160),
-      new THREE.MeshBasicMaterial({
-        color: BLUE,
-        transparent: true,
-        opacity: 0.1,
-        blending: THREE.AdditiveBlending,
-        depthWrite: false,
-      })
-    );
-    glowRing.rotation.x = Math.PI / 2;
-    table.add(glowRing);
-
-    // textures
-    function dotTexture() {
-      const c = document.createElement('canvas');
-      c.width = c.height = 64;
-      const x = c.getContext('2d')!;
-      const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-      g.addColorStop(0, 'rgba(255,255,255,1)');
-      g.addColorStop(0.4, 'rgba(255,255,255,0.7)');
-      g.addColorStop(1, 'rgba(255,255,255,0)');
-      x.fillStyle = g;
-      x.fillRect(0, 0, 64, 64);
-      return new THREE.CanvasTexture(c);
-    }
-    function questionTexture() {
-      const c = document.createElement('canvas');
-      c.width = c.height = 128;
-      const x = c.getContext('2d')!;
-      x.fillStyle = '#fff';
-      x.font = 'bold 96px -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-      x.textAlign = 'center';
-      x.textBaseline = 'middle';
-      x.fillText('?', 64, 72);
-      return new THREE.CanvasTexture(c);
-    }
-    const DOT = dotTexture();
-    const QMARK = questionTexture();
-
-    // people seated around the table
-    const SEATS = 9;
-    type Seat = {
-      mesh: THREE.Mesh;
-      mat: THREE.MeshBasicMaterial;
-      base: THREE.Color;
-      blue: boolean;
-      next: number; // seconds until this person next asks
-      glow: number; // 0..1 highlight
-      world: THREE.Vector3;
-    };
-    const seats: Seat[] = [];
-    const spokePos = new Float32Array(SEATS * 2 * 3);
-
-    for (let i = 0; i < SEATS; i++) {
-      const a = (i / SEATS) * Math.PI * 2;
-      const pos = new THREE.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R);
-      const blue = i % 4 === 0; // a few blue people, echoing the logo
-      const base = new THREE.Color(blue ? BLUE : LIGHT);
-      const mat = new THREE.MeshBasicMaterial({ color: base.clone() });
-      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 24), mat);
-      mesh.scale.set(1, 1.25, 1); // slightly upright, like the logo figures
-      mesh.position.copy(pos);
-      table.add(mesh);
-      spokePos.set([pos.x, pos.y, pos.z, 0, 0, 0], i * 6);
-      seats.push({ mesh, mat, base, blue, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
-    }
-
-    // faint spokes from each seat toward the table center
-    const spokes = new THREE.LineSegments(
-      new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(spokePos, 3)),
-      new THREE.LineBasicMaterial({ color: BLUE, transparent: true, opacity: 0.16 })
-    );
-    table.add(spokes);
-
-    // rising "?" sprite pool
-    type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
-    const qpool: Q[] = [];
-    for (let i = 0; i < 14; i++) {
-      const mat = new THREE.SpriteMaterial({
-        map: QMARK,
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
+      // table top: a ring slab with a hole in the middle (like the reference)
+      const ringShape = new THREE.Shape();
+      ringShape.absarc(0, 0, R_OUT, 0, Math.PI * 2, false);
+      const hole = new THREE.Path();
+      hole.absarc(0, 0, R_IN, 0, Math.PI * 2, true);
+      ringShape.holes.push(hole);
+      const topGeo = new THREE.ExtrudeGeometry(ringShape, {
+        depth: 0.32, bevelEnabled: true, bevelThickness: 0.07, bevelSize: 0.07,
+        bevelSegments: 3, steps: 1, curveSegments: 72,
       });
-      const sp = new THREE.Sprite(mat);
-      sp.scale.setScalar(0.95);
-      sp.visible = false;
-      scene.add(sp);
-      qpool.push({ sp, mat, life: 0, max: 1, from: new THREE.Vector3() });
-    }
+      topGeo.rotateX(-Math.PI / 2); // lay flat
+      const top = new THREE.Mesh(
+        topGeo,
+        new THREE.MeshStandardMaterial({ color: SLATE, roughness: 0.55, metalness: 0.15 })
+      );
+      top.position.y = 0;
+      table.add(top);
 
-    // discussion pulses (seat → center) pool
-    type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3 };
-    const ppool: P[] = [];
-    for (let i = 0; i < 18; i++) {
-      const mat = new THREE.SpriteMaterial({
-        map: DOT,
-        transparent: true,
-        opacity: 0,
-        depthWrite: false,
-        blending: THREE.AdditiveBlending,
+      // glowing inner edge of the hole
+      const innerGlow = new THREE.Mesh(
+        new THREE.TorusGeometry(R_IN, 0.05, 10, 80),
+        new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.85 })
+      );
+      innerGlow.rotation.x = Math.PI / 2;
+      innerGlow.position.y = 0.05;
+      table.add(innerGlow);
+
+      // central pedestal
+      const pedestal = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.9, 1.25, 1.4, 36),
+        new THREE.MeshStandardMaterial({ color: SLATE_DK, roughness: 0.6, metalness: 0.1 })
+      );
+      pedestal.position.y = -0.9;
+      table.add(pedestal);
+
+      // rounded-rect shape helper (for chair backs)
+      function roundedRect(w: number, h: number, r: number) {
+        const s = new THREE.Shape();
+        s.moveTo(-w / 2 + r, -h / 2);
+        s.lineTo(w / 2 - r, -h / 2);
+        s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
+        s.lineTo(w / 2, h / 2 - r);
+        s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+        s.lineTo(-w / 2 + r, h / 2);
+        s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
+        s.lineTo(-w / 2, -h / 2 + r);
+        s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
+        return s;
+      }
+      const backGeo = new THREE.ExtrudeGeometry(roundedRect(1.0, 1.7, 0.42), {
+        depth: 0.16, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 2,
       });
-      const sp = new THREE.Sprite(mat);
-      sp.scale.setScalar(0.5);
-      sp.visible = false;
-      scene.add(sp);
-      ppool.push({ sp, mat, t: 1, from: new THREE.Vector3() });
-    }
+      const seatGeo = new THREE.BoxGeometry(0.95, 0.16, 0.85);
 
-    const center = new THREE.Vector3(0, 0, 0);
+      // chairs + seated "people" around the table
+      const SEATS = 8;
+      const R_CHAIR = 4.15;
+      const R_PERSON = 3.55;
 
-    function ask(seat: Seat) {
-      const w = seat.world;
-      const color = seat.blue ? BLUE_SOFT : 0xffffff;
-      // rising question mark
-      const q = qpool.find((q) => q.life <= 0);
-      if (q) {
-        q.from.copy(w);
-        q.life = q.max = 2.4 + Math.random() * 0.8;
-        q.mat.color.set(color);
-        q.sp.visible = true;
+      type Seat = {
+        backMat: THREE.MeshStandardMaterial;
+        person: THREE.Mesh;
+        personMat: THREE.MeshStandardMaterial;
+        baseColor: THREE.Color;
+        accent: boolean;
+        next: number;
+        glow: number;
+        world: THREE.Vector3;
+      };
+      const seats: Seat[] = [];
+
+      for (let i = 0; i < SEATS; i++) {
+        const a = (i / SEATS) * Math.PI * 2;
+        const accent = i % 4 === 0; // a couple of blue seats, echoing the logo
+        const baseColor = new THREE.Color(accent ? BLUE : 0x55617f);
+
+        const chair = new THREE.Group();
+        chair.position.set(Math.sin(a) * R_CHAIR, 0, Math.cos(a) * R_CHAIR);
+        chair.rotation.y = a; // front (−Z) faces the center
+
+        const backMat = new THREE.MeshStandardMaterial({
+          color: accent ? BLUE : SLATE,
+          roughness: 0.5,
+          metalness: 0.2,
+          emissive: BLUE,
+          emissiveIntensity: 0,
+        });
+        const back = new THREE.Mesh(backGeo, backMat);
+        back.position.set(0, 0.95, 0.42); // standing panel behind the seat
+        chair.add(back);
+
+        const seat = new THREE.Mesh(seatGeo, new THREE.MeshStandardMaterial({ color: SLATE_DK, roughness: 0.6 }));
+        seat.position.set(0, 0.18, 0.0);
+        chair.add(seat);
+        table.add(chair);
+
+        // seated person orb
+        const personMat = new THREE.MeshStandardMaterial({
+          color: baseColor.clone(),
+          roughness: 0.35,
+          emissive: baseColor.clone(),
+          emissiveIntensity: 0.25,
+        });
+        const person = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 24), personMat);
+        person.scale.set(1, 1.2, 1);
+        person.position.set(Math.sin(a) * R_PERSON, 0.5, Math.cos(a) * R_PERSON);
+        table.add(person);
+
+        seats.push({ backMat, person, personMat, baseColor, accent, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
       }
-      // pulse toward the center of the table
-      const p = ppool.find((p) => p.t >= 1);
-      if (p) {
-        p.from.copy(w);
-        p.t = 0;
-        p.mat.color.set(color);
-        p.sp.visible = true;
-      }
-    }
 
-    // pointer
-    const pointer = { x: 0, y: 0, has: false };
-    window.addEventListener(
-      'pointermove',
-      (e) => {
+      // textures for ? marks and pulses
+      function dotTexture() {
+        const c = document.createElement('canvas'); c.width = c.height = 64;
+        const x = c.getContext('2d')!;
+        const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.4, 'rgba(255,255,255,0.7)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+        x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+        return new THREE.CanvasTexture(c);
+      }
+      function questionTexture() {
+        const c = document.createElement('canvas'); c.width = c.height = 128;
+        const x = c.getContext('2d')!;
+        x.fillStyle = '#fff'; x.font = 'bold 96px -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+        x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', 64, 72);
+        return new THREE.CanvasTexture(c);
+      }
+      const DOT = dotTexture();
+      const QMARK = questionTexture();
+
+      type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
+      const qpool: Q[] = [];
+      for (let i = 0; i < 14; i++) {
+        const mat = new THREE.SpriteMaterial({ map: QMARK, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.95); sp.visible = false; scene.add(sp);
+        qpool.push({ sp, mat, life: 0, max: 1, from: new THREE.Vector3() });
+      }
+      type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3 };
+      const ppool: P[] = [];
+      for (let i = 0; i < 18; i++) {
+        const mat = new THREE.SpriteMaterial({ map: DOT, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.5); sp.visible = false; scene.add(sp);
+        ppool.push({ sp, mat, t: 1, from: new THREE.Vector3() });
+      }
+      const center = new THREE.Vector3(0, 0.6, 0);
+
+      function ask(s: Seat) {
+        const w = s.world;
+        const color = s.accent ? 0x93c5fd : 0xffffff;
+        const q = qpool.find((q) => q.life <= 0);
+        if (q) { q.from.copy(w); q.life = q.max = 2.4 + Math.random() * 0.8; q.mat.color.set(color); q.sp.visible = true; }
+        const p = ppool.find((p) => p.t >= 1);
+        if (p) { p.from.copy(w); p.t = 0; p.mat.color.set(color); p.sp.visible = true; }
+      }
+
+      const pointer = { x: 0, y: 0, has: false };
+      window.addEventListener('pointermove', (e) => {
         pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
         pointer.y = -((e.clientY / window.innerHeight) * 2 - 1);
         pointer.has = true;
-      },
-      { passive: true }
-    );
-    window.addEventListener('pointerleave', () => (pointer.has = false));
+      }, { passive: true });
+      window.addEventListener('pointerleave', () => (pointer.has = false));
 
-    function resize() {
-      const r = canvas!.getBoundingClientRect();
-      const w = r.width || window.innerWidth;
-      const h = r.height || window.innerHeight;
-      renderer.setSize(w, h, false);
-      camera.aspect = w / h;
-      camera.updateProjectionMatrix();
-    }
-    window.addEventListener('resize', resize);
-    resize();
+      function resize() {
+        const r = canvas!.getBoundingClientRect();
+        const w = r.width || window.innerWidth;
+        const h = r.height || window.innerHeight;
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+      }
+      window.addEventListener('resize', resize);
+      resize();
 
-    const ndc = new THREE.Vector3();
-    const up = new THREE.Vector3(0, 1, 0);
+      const ndc = new THREE.Vector3();
+      const up = new THREE.Vector3(0, 1, 0);
+      const hot = new THREE.Color(0xffffff);
 
-    function update(dt: number) {
-      table.rotation.y += 0.16 * dt;
+      function update(dt: number) {
+        table.rotation.y += 0.12 * dt;
 
-      // gentle parallax
-      const px = pointer.has ? pointer.x : 0;
-      const py = pointer.has ? pointer.y : 0;
-      camera.position.x += (camBase.x + px * 2.2 - camera.position.x) * 0.05;
-      camera.position.y += (camBase.y - py * 1.2 - camera.position.y) * 0.05;
-      camera.lookAt(target);
+        const px = pointer.has ? pointer.x : 0;
+        const py = pointer.has ? pointer.y : 0;
+        camera.position.x += (camBase.x + px * 2.2 - camera.position.x) * 0.05;
+        camera.position.y += (camBase.y - py * 1.1 - camera.position.y) * 0.05;
+        camera.lookAt(target);
 
-      // find the seat nearest the pointer (screen space)
-      let nearest = -1;
-      let best = 0.22; // NDC threshold
-      for (let i = 0; i < SEATS; i++) {
-        seats[i].mesh.getWorldPosition(seats[i].world);
-        if (!pointer.has) continue;
-        ndc.copy(seats[i].world).project(camera);
-        const d = Math.hypot(ndc.x - pointer.x, ndc.y - pointer.y);
-        if (d < best) {
-          best = d;
-          nearest = i;
+        let nearest = -1, best = 0.24;
+        for (let i = 0; i < SEATS; i++) {
+          seats[i].person.getWorldPosition(seats[i].world);
+          if (!pointer.has) continue;
+          ndc.copy(seats[i].world).project(camera);
+          const d = Math.hypot(ndc.x - pointer.x, ndc.y - pointer.y);
+          if (d < best) { best = d; nearest = i; }
+        }
+
+        for (let i = 0; i < SEATS; i++) {
+          const s = seats[i];
+          s.glow += ((i === nearest ? 1 : 0) - s.glow) * 0.12;
+          s.personMat.color.copy(s.baseColor).lerp(hot, s.glow * 0.7);
+          s.personMat.emissiveIntensity = 0.25 + s.glow * 1.2;
+          s.backMat.emissiveIntensity = s.glow * 0.5;
+          const sc = 1 + s.glow * 0.4;
+          s.person.scale.set(sc, 1.2 * sc, sc);
+
+          s.next -= dt * (1 + s.glow * 5);
+          if (s.next <= 0) { ask(s); s.next = i === nearest ? 0.5 + Math.random() : 3 + Math.random() * 4; }
+        }
+
+        for (const q of qpool) {
+          if (q.life <= 0) continue;
+          q.life -= dt;
+          const t = 1 - q.life / q.max;
+          q.sp.position.copy(q.from).addScaledVector(up, 0.5 + t * 2.4);
+          q.sp.scale.setScalar(0.7 + t * 0.6);
+          q.mat.opacity = Math.sin(Math.min(t, 1) * Math.PI) * 0.95;
+          if (q.life <= 0) q.sp.visible = false;
+        }
+        for (const p of ppool) {
+          if (p.t >= 1) continue;
+          p.t += dt / 1.1;
+          const e = p.t * p.t * (3 - 2 * p.t);
+          p.sp.position.lerpVectors(p.from, center, e);
+          p.mat.opacity = (1 - p.t) * 0.9;
+          if (p.t >= 1) p.sp.visible = false;
         }
       }
 
-      for (let i = 0; i < SEATS; i++) {
-        const s = seats[i];
-        const targetGlow = i === nearest ? 1 : 0;
-        s.glow += (targetGlow - s.glow) * 0.12;
-
-        // color & scale respond to highlight
-        s.mat.color.copy(s.base).lerp(new THREE.Color(0xffffff), s.glow * 0.8);
-        const sc = 1 + s.glow * 0.5;
-        s.mesh.scale.set(sc, 1.25 * sc, sc);
-
-        // ask on a timer; the highlighted person asks much more often
-        s.next -= dt * (1 + s.glow * 5);
-        if (s.next <= 0) {
-          ask(s);
-          s.next = i === nearest ? 0.5 + Math.random() : 3 + Math.random() * 4;
-        }
+      const clock = new THREE.Clock();
+      if (reduce) {
+        for (let i = 0; i < SEATS; i++) seats[i].person.getWorldPosition(seats[i].world);
+        ask(seats[1]); ask(seats[5]);
+        update(0); renderer.render(scene, camera);
+      } else {
+        let raf = 0;
+        const loop = () => { update(Math.min(clock.getDelta(), 0.05)); renderer.render(scene, camera); raf = requestAnimationFrame(loop); };
+        loop();
+        document.addEventListener('visibilitychange', () => {
+          cancelAnimationFrame(raf);
+          if (!document.hidden) { clock.getDelta(); loop(); }
+        });
       }
-
-      // rising question marks
-      for (const q of qpool) {
-        if (q.life <= 0) continue;
-        q.life -= dt;
-        const t = 1 - q.life / q.max; // 0→1
-        q.sp.position.copy(q.from).addScaledVector(up, 0.6 + t * 2.4);
-        q.sp.scale.setScalar(0.7 + t * 0.6);
-        q.mat.opacity = Math.sin(Math.min(t, 1) * Math.PI) * 0.95;
-        if (q.life <= 0) q.sp.visible = false;
-      }
-
-      // pulses to center
-      for (const p of ppool) {
-        if (p.t >= 1) continue;
-        p.t += dt / 1.1;
-        const e = p.t * p.t * (3 - 2 * p.t); // smoothstep
-        p.sp.position.lerpVectors(p.from, center, e);
-        p.mat.opacity = (1 - p.t) * 0.9;
-        if (p.t >= 1) p.sp.visible = false;
-      }
-    }
-
-    const clock = new THREE.Clock();
-    if (reduce) {
-      // static frame: seats + a couple of held questions
-      for (let i = 0; i < SEATS; i++) seats[i].mesh.getWorldPosition(seats[i].world);
-      ask(seats[1]);
-      ask(seats[5]);
-      update(0);
-      renderer.render(scene, camera);
-    } else {
-      let raf = 0;
-      const loop = () => {
-        update(Math.min(clock.getDelta(), 0.05));
-        renderer.render(scene, camera);
-        raf = requestAnimationFrame(loop);
-      };
-      loop();
-      document.addEventListener('visibilitychange', () => {
-        cancelAnimationFrame(raf);
-        if (!document.hidden) {
-          clock.getDelta();
-          loop();
-        }
-      });
+    } catch (e) {
+      // WebGL/setup failure → the CSS gradient backdrop stands on its own.
+      console.warn('hero 3D disabled:', e);
     }
   }
 </script>
