@@ -1,5 +1,6 @@
 ---
-// Interactive 3D "thinking network" hero.
+// Interactive 3D hero echoing the logo: a round discussion table with people
+// seated around it, raising questions ("?") — "탁자에서 질문하는" 느낌.
 // Overlay content is provided via the default slot.
 ---
 
@@ -21,8 +22,8 @@
     align-items: center;
     overflow: hidden;
     background:
-      radial-gradient(120% 80% at 70% 10%, #10204a 0%, transparent 55%),
-      radial-gradient(100% 90% at 20% 90%, #0a1430 0%, transparent 60%),
+      radial-gradient(120% 80% at 70% 12%, #10204a 0%, transparent 55%),
+      radial-gradient(100% 90% at 20% 92%, #0a1430 0%, transparent 60%),
       var(--night);
     color: #fff;
   }
@@ -33,7 +34,8 @@
     height: 100%;
     display: block;
   }
-  .hero-overlay { position: relative; z-index: 2; width: 100%; padding: 6rem 0; }
+  .hero-overlay { position: relative; z-index: 2; width: 100%; padding: 6rem 0; pointer-events: none; }
+  .hero-overlay :global(a) { pointer-events: auto; }
   .hero-fade {
     position: absolute;
     left: 0;
@@ -54,110 +56,183 @@
     try {
       renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
     } catch {
-      // WebGL unavailable → the CSS gradient backdrop stands on its own.
-      throw new Error('skip');
+      throw new Error('skip'); // no WebGL → CSS gradient backdrop stands alone
     }
 
-    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
-    camera.position.z = 14;
-
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Two nested groups: inner auto-rotates, outer tilts toward the pointer.
-    const tilt = new THREE.Group();
-    const spin = new THREE.Group();
-    tilt.add(spin);
-    scene.add(tilt);
+    const BLUE = 0x2563eb;
+    const BLUE_SOFT = 0x60a5fa;
+    const LIGHT = 0xe5edff;
 
-    // --- nodes ---
-    const N = 150;
-    const BOX = { x: 11, y: 6.5, z: 7 };
-    const CONNECT = 2.7;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+    const camBase = new THREE.Vector3(0, 5.0, 11.5);
+    const target = new THREE.Vector3(0, -0.6, 0);
+    camera.position.copy(camBase);
+    camera.lookAt(target);
 
-    const base = new Float32Array(N * 3);
-    const vel = new Float32Array(N * 3);
-    const positions = new Float32Array(N * 3);
-    const colors = new Float32Array(N * 3);
+    // table group rotates slowly (the discussion goes around)
+    const table = new THREE.Group();
+    scene.add(table);
 
-    const COL_DIM = new THREE.Color('#1e40af');
-    const COL_HOT = new THREE.Color('#bfdbfe');
+    const R = 4.3;
 
-    for (let i = 0; i < N; i++) {
-      const j = i * 3;
-      base[j] = positions[j] = (Math.random() * 2 - 1) * BOX.x;
-      base[j + 1] = positions[j + 1] = (Math.random() * 2 - 1) * BOX.y;
-      base[j + 2] = positions[j + 2] = (Math.random() * 2 - 1) * BOX.z;
-      vel[j] = (Math.random() * 2 - 1) * 0.006;
-      vel[j + 1] = (Math.random() * 2 - 1) * 0.006;
-      vel[j + 2] = (Math.random() * 2 - 1) * 0.006;
-      COL_DIM.toArray(colors, j);
-    }
+    // round table = ring lying flat in the xz-plane
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(R, 0.07, 12, 160),
+      new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.7 })
+    );
+    ring.rotation.x = Math.PI / 2;
+    table.add(ring);
 
-    function makeDot() {
+    const glowRing = new THREE.Mesh(
+      new THREE.TorusGeometry(R, 0.28, 12, 160),
+      new THREE.MeshBasicMaterial({
+        color: BLUE,
+        transparent: true,
+        opacity: 0.1,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false,
+      })
+    );
+    glowRing.rotation.x = Math.PI / 2;
+    table.add(glowRing);
+
+    // textures
+    function dotTexture() {
       const c = document.createElement('canvas');
       c.width = c.height = 64;
-      const ctx = c.getContext('2d')!;
-      const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      const x = c.getContext('2d')!;
+      const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
       g.addColorStop(0, 'rgba(255,255,255,1)');
-      g.addColorStop(0.35, 'rgba(255,255,255,0.8)');
+      g.addColorStop(0.4, 'rgba(255,255,255,0.7)');
       g.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, 64, 64);
+      x.fillStyle = g;
+      x.fillRect(0, 0, 64, 64);
       return new THREE.CanvasTexture(c);
     }
+    function questionTexture() {
+      const c = document.createElement('canvas');
+      c.width = c.height = 128;
+      const x = c.getContext('2d')!;
+      x.fillStyle = '#fff';
+      x.font = 'bold 96px -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
+      x.textAlign = 'center';
+      x.textBaseline = 'middle';
+      x.fillText('?', 64, 72);
+      return new THREE.CanvasTexture(c);
+    }
+    const DOT = dotTexture();
+    const QMARK = questionTexture();
 
-    const pointGeo = new THREE.BufferGeometry();
-    pointGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-    pointGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-    const points = new THREE.Points(
-      pointGeo,
-      new THREE.PointsMaterial({
-        size: 0.42,
-        map: makeDot(),
-        vertexColors: true,
+    // people seated around the table
+    const SEATS = 9;
+    type Seat = {
+      mesh: THREE.Mesh;
+      mat: THREE.MeshBasicMaterial;
+      base: THREE.Color;
+      blue: boolean;
+      next: number; // seconds until this person next asks
+      glow: number; // 0..1 highlight
+      world: THREE.Vector3;
+    };
+    const seats: Seat[] = [];
+    const spokePos = new Float32Array(SEATS * 2 * 3);
+
+    for (let i = 0; i < SEATS; i++) {
+      const a = (i / SEATS) * Math.PI * 2;
+      const pos = new THREE.Vector3(Math.cos(a) * R, 0, Math.sin(a) * R);
+      const blue = i % 4 === 0; // a few blue people, echoing the logo
+      const base = new THREE.Color(blue ? BLUE : LIGHT);
+      const mat = new THREE.MeshBasicMaterial({ color: base.clone() });
+      const mesh = new THREE.Mesh(new THREE.SphereGeometry(0.28, 24, 24), mat);
+      mesh.scale.set(1, 1.25, 1); // slightly upright, like the logo figures
+      mesh.position.copy(pos);
+      table.add(mesh);
+      spokePos.set([pos.x, pos.y, pos.z, 0, 0, 0], i * 6);
+      seats.push({ mesh, mat, base, blue, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
+    }
+
+    // faint spokes from each seat toward the table center
+    const spokes = new THREE.LineSegments(
+      new THREE.BufferGeometry().setAttribute('position', new THREE.BufferAttribute(spokePos, 3)),
+      new THREE.LineBasicMaterial({ color: BLUE, transparent: true, opacity: 0.16 })
+    );
+    table.add(spokes);
+
+    // rising "?" sprite pool
+    type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
+    const qpool: Q[] = [];
+    for (let i = 0; i < 14; i++) {
+      const mat = new THREE.SpriteMaterial({
+        map: QMARK,
         transparent: true,
+        opacity: 0,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
-        sizeAttenuation: true,
-      })
-    );
-    spin.add(points);
+      });
+      const sp = new THREE.Sprite(mat);
+      sp.scale.setScalar(0.95);
+      sp.visible = false;
+      scene.add(sp);
+      qpool.push({ sp, mat, life: 0, max: 1, from: new THREE.Vector3() });
+    }
 
-    // --- connections ---
-    const MAX_SEG = 4000;
-    const linePos = new Float32Array(MAX_SEG * 2 * 3);
-    const lineCol = new Float32Array(MAX_SEG * 2 * 3);
-    const lineGeo = new THREE.BufferGeometry();
-    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
-    lineGeo.setAttribute('color', new THREE.BufferAttribute(lineCol, 3));
-    const lines = new THREE.LineSegments(
-      lineGeo,
-      new THREE.LineBasicMaterial({
-        vertexColors: true,
+    // discussion pulses (seat → center) pool
+    type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3 };
+    const ppool: P[] = [];
+    for (let i = 0; i < 18; i++) {
+      const mat = new THREE.SpriteMaterial({
+        map: DOT,
         transparent: true,
-        opacity: 0.55,
+        opacity: 0,
         depthWrite: false,
         blending: THREE.AdditiveBlending,
-      })
-    );
-    spin.add(lines);
+      });
+      const sp = new THREE.Sprite(mat);
+      sp.scale.setScalar(0.5);
+      sp.visible = false;
+      scene.add(sp);
+      ppool.push({ sp, mat, t: 1, from: new THREE.Vector3() });
+    }
 
-    // --- pointer ---
-    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
-    const mouseLocal = new THREE.Vector3();
-    const tmp = new THREE.Vector3();
+    const center = new THREE.Vector3(0, 0, 0);
 
+    function ask(seat: Seat) {
+      const w = seat.world;
+      const color = seat.blue ? BLUE_SOFT : 0xffffff;
+      // rising question mark
+      const q = qpool.find((q) => q.life <= 0);
+      if (q) {
+        q.from.copy(w);
+        q.life = q.max = 2.4 + Math.random() * 0.8;
+        q.mat.color.set(color);
+        q.sp.visible = true;
+      }
+      // pulse toward the center of the table
+      const p = ppool.find((p) => p.t >= 1);
+      if (p) {
+        p.from.copy(w);
+        p.t = 0;
+        p.mat.color.set(color);
+        p.sp.visible = true;
+      }
+    }
+
+    // pointer
+    const pointer = { x: 0, y: 0, has: false };
     window.addEventListener(
       'pointermove',
       (e) => {
-        pointer.tx = (e.clientX / window.innerWidth) * 2 - 1;
-        pointer.ty = -((e.clientY / window.innerHeight) * 2 - 1);
+        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.y = -((e.clientY / window.innerHeight) * 2 - 1);
+        pointer.has = true;
       },
       { passive: true }
     );
+    window.addEventListener('pointerleave', () => (pointer.has = false));
 
     function resize() {
       const r = canvas!.getBoundingClientRect();
@@ -170,106 +245,95 @@
     window.addEventListener('resize', resize);
     resize();
 
-    function projectPointerToScene() {
-      tmp.set(pointer.x, pointer.y, 0.5).unproject(camera);
-      tmp.sub(camera.position).normalize();
-      const d = -camera.position.z / tmp.z;
-      tmp.copy(camera.position).addScaledVector(tmp, d); // world point on z=0 plane
-      spin.worldToLocal(mouseLocal.copy(tmp));
-    }
+    const ndc = new THREE.Vector3();
+    const up = new THREE.Vector3(0, 1, 0);
 
-    function buildConnections() {
-      let seg = 0;
-      const INF2 = 9; // mouse influence radius²
-      for (let i = 0; i < N && seg < MAX_SEG; i++) {
-        const a = i * 3;
-        for (let k = i + 1; k < N; k++) {
-          const b = k * 3;
-          const dx = positions[a] - positions[b];
-          const dy = positions[a + 1] - positions[b + 1];
-          const dz = positions[a + 2] - positions[b + 2];
-          const d2 = dx * dx + dy * dy + dz * dz;
-          if (d2 > CONNECT * CONNECT) continue;
+    function update(dt: number) {
+      table.rotation.y += 0.16 * dt;
 
-          const strength = 1 - Math.sqrt(d2) / CONNECT;
-          // midpoint distance to pointer boosts brightness
-          const mx = (positions[a] + positions[b]) * 0.5 - mouseLocal.x;
-          const my = (positions[a + 1] + positions[b + 1]) * 0.5 - mouseLocal.y;
-          const near = Math.max(0, 1 - (mx * mx + my * my) / INF2);
-          const v = strength * (0.4 + near * 1.6);
+      // gentle parallax
+      const px = pointer.has ? pointer.x : 0;
+      const py = pointer.has ? pointer.y : 0;
+      camera.position.x += (camBase.x + px * 2.2 - camera.position.x) * 0.05;
+      camera.position.y += (camBase.y - py * 1.2 - camera.position.y) * 0.05;
+      camera.lookAt(target);
 
-          const s = seg * 6;
-          linePos[s] = positions[a];
-          linePos[s + 1] = positions[a + 1];
-          linePos[s + 2] = positions[a + 2];
-          linePos[s + 3] = positions[b];
-          linePos[s + 4] = positions[b + 1];
-          linePos[s + 5] = positions[b + 2];
-          for (let t = 0; t < 2; t++) {
-            lineCol[s + t * 3] = 0.22 * v;
-            lineCol[s + t * 3 + 1] = 0.5 * v;
-            lineCol[s + t * 3 + 2] = 1.0 * v;
-          }
-          if (++seg >= MAX_SEG) break;
+      // find the seat nearest the pointer (screen space)
+      let nearest = -1;
+      let best = 0.22; // NDC threshold
+      for (let i = 0; i < SEATS; i++) {
+        seats[i].mesh.getWorldPosition(seats[i].world);
+        if (!pointer.has) continue;
+        ndc.copy(seats[i].world).project(camera);
+        const d = Math.hypot(ndc.x - pointer.x, ndc.y - pointer.y);
+        if (d < best) {
+          best = d;
+          nearest = i;
         }
       }
-      lineGeo.setDrawRange(0, seg * 2);
-      (lineGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-      (lineGeo.attributes.color as THREE.BufferAttribute).needsUpdate = true;
-    }
 
-    function step() {
-      // drift nodes within the box, bouncing at edges
-      for (let i = 0; i < N; i++) {
-        const j = i * 3;
-        positions[j] += vel[j];
-        positions[j + 1] += vel[j + 1];
-        positions[j + 2] += vel[j + 2];
-        if (Math.abs(positions[j]) > BOX.x) vel[j] *= -1;
-        if (Math.abs(positions[j + 1]) > BOX.y) vel[j + 1] *= -1;
-        if (Math.abs(positions[j + 2]) > BOX.z) vel[j + 2] *= -1;
+      for (let i = 0; i < SEATS; i++) {
+        const s = seats[i];
+        const targetGlow = i === nearest ? 1 : 0;
+        s.glow += (targetGlow - s.glow) * 0.12;
 
-        // brighten nodes near the pointer
-        const dx = positions[j] - mouseLocal.x;
-        const dy = positions[j + 1] - mouseLocal.y;
-        const f = Math.max(0, 1 - (dx * dx + dy * dy) / 9);
-        COL_DIM.toArray(colors, j);
-        if (f > 0) {
-          colors[j] += (COL_HOT.r - colors[j]) * f;
-          colors[j + 1] += (COL_HOT.g - colors[j + 1]) * f;
-          colors[j + 2] += (COL_HOT.b - colors[j + 2]) * f;
+        // color & scale respond to highlight
+        s.mat.color.copy(s.base).lerp(new THREE.Color(0xffffff), s.glow * 0.8);
+        const sc = 1 + s.glow * 0.5;
+        s.mesh.scale.set(sc, 1.25 * sc, sc);
+
+        // ask on a timer; the highlighted person asks much more often
+        s.next -= dt * (1 + s.glow * 5);
+        if (s.next <= 0) {
+          ask(s);
+          s.next = i === nearest ? 0.5 + Math.random() : 3 + Math.random() * 4;
         }
       }
-      (pointGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
-      (pointGeo.attributes.color as THREE.BufferAttribute).needsUpdate = true;
-      buildConnections();
+
+      // rising question marks
+      for (const q of qpool) {
+        if (q.life <= 0) continue;
+        q.life -= dt;
+        const t = 1 - q.life / q.max; // 0→1
+        q.sp.position.copy(q.from).addScaledVector(up, 0.6 + t * 2.4);
+        q.sp.scale.setScalar(0.7 + t * 0.6);
+        q.mat.opacity = Math.sin(Math.min(t, 1) * Math.PI) * 0.95;
+        if (q.life <= 0) q.sp.visible = false;
+      }
+
+      // pulses to center
+      for (const p of ppool) {
+        if (p.t >= 1) continue;
+        p.t += dt / 1.1;
+        const e = p.t * p.t * (3 - 2 * p.t); // smoothstep
+        p.sp.position.lerpVectors(p.from, center, e);
+        p.mat.opacity = (1 - p.t) * 0.9;
+        if (p.t >= 1) p.sp.visible = false;
+      }
     }
 
-    function render() {
-      pointer.x += (pointer.tx - pointer.x) * 0.05;
-      pointer.y += (pointer.ty - pointer.y) * 0.05;
-      tilt.rotation.y += (pointer.x * 0.5 - tilt.rotation.y) * 0.05;
-      tilt.rotation.x += (-pointer.y * 0.35 - tilt.rotation.x) * 0.05;
-      spin.rotation.y += 0.0009;
-      projectPointerToScene();
-      step();
-      renderer.render(scene, camera);
-    }
-
-    if (reduceMotion) {
-      projectPointerToScene();
-      step();
+    const clock = new THREE.Clock();
+    if (reduce) {
+      // static frame: seats + a couple of held questions
+      for (let i = 0; i < SEATS; i++) seats[i].mesh.getWorldPosition(seats[i].world);
+      ask(seats[1]);
+      ask(seats[5]);
+      update(0);
       renderer.render(scene, camera);
     } else {
       let raf = 0;
       const loop = () => {
-        render();
+        update(Math.min(clock.getDelta(), 0.05));
+        renderer.render(scene, camera);
         raf = requestAnimationFrame(loop);
       };
       loop();
       document.addEventListener('visibilitychange', () => {
         cancelAnimationFrame(raf);
-        if (!document.hidden) loop();
+        if (!document.hidden) {
+          clock.getDelta();
+          loop();
+        }
       });
     }
   }
