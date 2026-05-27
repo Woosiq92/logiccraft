@@ -222,6 +222,51 @@
       );
       scene.add(bokeh);
 
+      // --- 4D: a tesseract (hypercube) hovering above the table — the emergent idea ---
+      const verts4: number[][] = [];
+      for (let i = 0; i < 16; i++) verts4.push([(i & 1) ? 1 : -1, (i & 2) ? 1 : -1, (i & 4) ? 1 : -1, (i & 8) ? 1 : -1]);
+      const tedges: [number, number][] = [];
+      for (let i = 0; i < 16; i++) for (let j = i + 1; j < 16; j++) {
+        let d = 0; for (let k = 0; k < 4; k++) if (verts4[i][k] !== verts4[j][k]) d++;
+        if (d === 1) tedges.push([i, j]);
+      }
+      const TESS = 1.15, W_DIST = 2.5;
+      const tGroup = new THREE.Group();
+      tGroup.position.set(0, 3.2, 0);
+      const tessPos = new Float32Array(tedges.length * 6);
+      const tessLineGeo = new THREE.BufferGeometry();
+      tessLineGeo.setAttribute('position', new THREE.BufferAttribute(tessPos, 3));
+      tGroup.add(new THREE.LineSegments(tessLineGeo, new THREE.LineBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending })));
+      const tvPos = new Float32Array(16 * 3);
+      const tessPtGeo = new THREE.BufferGeometry();
+      tessPtGeo.setAttribute('position', new THREE.BufferAttribute(tvPos, 3));
+      tGroup.add(new THREE.Points(tessPtGeo, new THREE.PointsMaterial({ map: DOT, color: 0xdbeafe, size: 0.3, transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true })));
+      const tessHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: SOFT, color: 0x3b82f6, transparent: true, opacity: 0.26, depthWrite: false, blending: THREE.AdditiveBlending }));
+      tessHalo.scale.setScalar(3.4);
+      tGroup.add(tessHalo);
+      table.add(tGroup);
+
+      function updateTesseract(t: number) {
+        const a = t * 0.4, b = t * 0.26;
+        const ca = Math.cos(a), sa = Math.sin(a), cb = Math.cos(b), sb = Math.sin(b);
+        const p: number[][] = [];
+        for (let i = 0; i < 16; i++) {
+          const v = verts4[i];
+          const x1 = v[0] * ca - v[3] * sa, w1 = v[0] * sa + v[3] * ca; // rotate x–w plane
+          const y1 = v[1] * cb - v[2] * sb, z1 = v[1] * sb + v[2] * cb; // rotate y–z plane
+          const k = TESS / (W_DIST - w1); // 4D → 3D perspective projection
+          p.push([x1 * k, y1 * k, z1 * k]);
+        }
+        for (let i = 0; i < 16; i++) { tvPos[i * 3] = p[i][0]; tvPos[i * 3 + 1] = p[i][1]; tvPos[i * 3 + 2] = p[i][2]; }
+        tedges.forEach(([i, j], e) => {
+          const o = e * 6;
+          tessPos[o] = p[i][0]; tessPos[o + 1] = p[i][1]; tessPos[o + 2] = p[i][2];
+          tessPos[o + 3] = p[j][0]; tessPos[o + 4] = p[j][1]; tessPos[o + 5] = p[j][2];
+        });
+        (tessPtGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+        (tessLineGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      }
+
       // --- rising "?" (brand blue) + pulse pools ---
       type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
       const qpool: Q[] = [];
@@ -279,6 +324,9 @@
         time += dt;
         table.rotation.y += 0.1 * dt;
         linkMat.opacity = 0.18 + Math.sin(time * 1.5) * 0.07; // network "breathes"
+        updateTesseract(time);
+        tGroup.position.y = 3.2 + Math.sin(time * 0.6) * 0.18; // gentle float
+        tGroup.rotation.y += 0.12 * dt;
 
         const px = pointer.has ? pointer.x : 0;
         const py = pointer.has ? pointer.y : 0;
