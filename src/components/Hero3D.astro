@@ -1,7 +1,7 @@
 ---
-// Interactive 3D hero — a round council table with high-back chairs seated
-// around it ("원탁 회의"), people raising questions ("?"). Echoes the logo
-// (물음표 + 토론 탁자) in a refined, brand-toned style rather than photoreal wood.
+// Interactive 3D hero — a warm golden-hour conference scene: a round meeting
+// table with modern office chairs, backlit by window sun, dust bokeh, lens
+// flare. People raise questions ("?") in brand blue — warm discussion, blue ideas.
 ---
 
 <section class="hero">
@@ -22,9 +22,9 @@
     align-items: center;
     overflow: hidden;
     background:
-      radial-gradient(120% 80% at 70% 12%, #10204a 0%, transparent 55%),
-      radial-gradient(100% 90% at 20% 92%, #0a1430 0%, transparent 60%),
-      var(--night);
+      radial-gradient(120% 95% at 78% 6%, #6a4a1e 0%, transparent 50%),
+      radial-gradient(100% 90% at 25% 96%, #1c1409 0%, transparent 55%),
+      #0d0a06;
     color: #fff;
   }
   #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
@@ -47,157 +47,113 @@
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
+      renderer.toneMappingExposure = 1.05;
 
-      const BLUE = 0x2563eb;
-      const SLATE = 0x33405e;
-      const SLATE_DK = 0x222c44;
+      const BLUE = 0x60a5fa;
+      const CREAM = 0xe9e1d2;
+      const WOOD = 0xd8c3a0;
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(52, 1, 0.1, 100);
-      const camBase = new THREE.Vector3(0, 5.4, 11.5);
-      const target = new THREE.Vector3(0, 0.1, 0);
+      const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
+      const camBase = new THREE.Vector3(0, 7.6, 9.6); // high 3/4 angle, like the photo
+      const target = new THREE.Vector3(0, -0.2, 0);
       camera.position.copy(camBase);
       camera.lookAt(target);
 
-      // lights
-      scene.add(new THREE.AmbientLight(0x4a5a85, 0.7));
-      const key = new THREE.DirectionalLight(0xffffff, 1.15);
-      key.position.set(5, 10, 7);
-      scene.add(key);
-      const rim = new THREE.DirectionalLight(0xffd9a8, 0.3); // subtle warm rim
-      rim.position.set(-6, 4, -6);
-      scene.add(rim);
-      const coreGlow = new THREE.PointLight(0x3b82f6, 22, 14, 2); // blue glow from table center
-      coreGlow.position.set(0, 0.7, 0);
+      // --- warm golden-hour lighting ---
+      scene.add(new THREE.AmbientLight(0x4a3826, 0.9));
+      const sun = new THREE.DirectionalLight(0xffd79a, 2.4); // strong warm backlight (window)
+      sun.position.set(7, 9, -6);
+      scene.add(sun);
+      const fill = new THREE.DirectionalLight(0xffe9cf, 0.55); // soft front fill
+      fill.position.set(-4, 5, 8);
+      scene.add(fill);
+      const tableGlow = new THREE.PointLight(0xffb867, 5.5, 12, 2); // warm pool on the table
+      tableGlow.position.set(0, 1.2, 0);
 
-      // table group (slow rotation + parallax), offset to the right of the headline
       const table = new THREE.Group();
       scene.add(table);
-      table.add(coreGlow); // glow travels with the table
-      let tableX = 2.4;
+      table.add(tableGlow);
+      let tableX = 2.2;
       table.position.x = tableX;
 
-      const R_OUT = 3.3;
-      const R_IN = 1.15;
-
-      // table top: a ring slab with a hole in the middle (like the reference)
-      const ringShape = new THREE.Shape();
-      ringShape.absarc(0, 0, R_OUT, 0, Math.PI * 2, false);
-      const hole = new THREE.Path();
-      hole.absarc(0, 0, R_IN, 0, Math.PI * 2, true);
-      ringShape.holes.push(hole);
-      const topGeo = new THREE.ExtrudeGeometry(ringShape, {
-        depth: 0.32, bevelEnabled: true, bevelThickness: 0.07, bevelSize: 0.07,
-        bevelSegments: 3, steps: 1, curveSegments: 72,
-      });
-      topGeo.rotateX(-Math.PI / 2); // lay flat
-      const top = new THREE.Mesh(
-        topGeo,
-        new THREE.MeshStandardMaterial({ color: SLATE, roughness: 0.55, metalness: 0.15 })
-      );
+      // --- round meeting table ---
+      const topMat = new THREE.MeshStandardMaterial({ color: WOOD, roughness: 0.45, metalness: 0.05 });
+      const top = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 3.2, 0.22, 64), topMat);
       top.position.y = 0;
       table.add(top);
-
-      // glowing inner edge of the hole
-      const innerGlow = new THREE.Mesh(
-        new THREE.TorusGeometry(R_IN, 0.05, 10, 80),
-        new THREE.MeshBasicMaterial({ color: BLUE, transparent: true, opacity: 0.85 })
-      );
-      innerGlow.rotation.x = Math.PI / 2;
-      innerGlow.position.y = 0.05;
-      table.add(innerGlow);
-
-      // central pedestal
       const pedestal = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.9, 1.25, 1.4, 36),
-        new THREE.MeshStandardMaterial({ color: SLATE_DK, roughness: 0.6, metalness: 0.1 })
+        new THREE.CylinderGeometry(0.5, 0.9, 1.5, 32),
+        new THREE.MeshStandardMaterial({ color: 0x6f5c44, roughness: 0.5, metalness: 0.2 })
       );
-      pedestal.position.y = -0.9;
+      pedestal.position.y = -0.85;
       table.add(pedestal);
 
-      // rounded-rect shape helper (for chair backs)
+      // --- shared geometries / materials for modern office chairs ---
       function roundedRect(w: number, h: number, r: number) {
         const s = new THREE.Shape();
         s.moveTo(-w / 2 + r, -h / 2);
-        s.lineTo(w / 2 - r, -h / 2);
-        s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
-        s.lineTo(w / 2, h / 2 - r);
-        s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
-        s.lineTo(-w / 2 + r, h / 2);
-        s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
-        s.lineTo(-w / 2, -h / 2 + r);
-        s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
+        s.lineTo(w / 2 - r, -h / 2); s.quadraticCurveTo(w / 2, -h / 2, w / 2, -h / 2 + r);
+        s.lineTo(w / 2, h / 2 - r); s.quadraticCurveTo(w / 2, h / 2, w / 2 - r, h / 2);
+        s.lineTo(-w / 2 + r, h / 2); s.quadraticCurveTo(-w / 2, h / 2, -w / 2, h / 2 - r);
+        s.lineTo(-w / 2, -h / 2 + r); s.quadraticCurveTo(-w / 2, -h / 2, -w / 2 + r, -h / 2);
         return s;
       }
-      const backGeo = new THREE.ExtrudeGeometry(roundedRect(1.0, 1.7, 0.42), {
-        depth: 0.16, bevelEnabled: true, bevelThickness: 0.04, bevelSize: 0.04, bevelSegments: 2,
+      const backGeo = new THREE.ExtrudeGeometry(roundedRect(0.95, 0.95, 0.3), {
+        depth: 0.14, bevelEnabled: true, bevelThickness: 0.03, bevelSize: 0.03, bevelSegments: 2,
       });
-      const seatGeo = new THREE.BoxGeometry(0.95, 0.16, 0.85);
+      const seatGeo = new THREE.BoxGeometry(0.9, 0.14, 0.85);
+      const stemGeo = new THREE.CylinderGeometry(0.06, 0.06, 0.95, 12);
+      const legGeo = new THREE.BoxGeometry(0.07, 0.05, 0.42);
+      const chairMat = new THREE.MeshStandardMaterial({ color: CREAM, roughness: 0.65, metalness: 0.05 });
+      const metalMat = new THREE.MeshStandardMaterial({ color: 0xaab0b8, roughness: 0.3, metalness: 0.8 });
 
-      // chairs + seated "people" around the table
+      function makeChair() {
+        const g = new THREE.Group();
+        const back = new THREE.Mesh(backGeo, chairMat); back.position.set(0, 0.62, 0.42); back.rotation.x = -0.14; g.add(back);
+        const seat = new THREE.Mesh(seatGeo, chairMat); seat.position.set(0, 0.12, 0.04); g.add(seat);
+        const stem = new THREE.Mesh(stemGeo, metalMat); stem.position.set(0, -0.4, 0.04); g.add(stem);
+        for (let k = 0; k < 5; k++) {
+          const leg = new THREE.Mesh(legGeo, metalMat);
+          const aa = (k / 5) * Math.PI * 2;
+          leg.position.set(Math.sin(aa) * 0.2, -0.85, 0.04 + Math.cos(aa) * 0.2);
+          leg.rotation.y = aa;
+          g.add(leg);
+        }
+        return g;
+      }
+
+      // --- people seated around the table ---
       const SEATS = 8;
-      const R_CHAIR = 4.15;
-      const R_PERSON = 3.55;
-
-      type Seat = {
-        backMat: THREE.MeshStandardMaterial;
-        person: THREE.Mesh;
-        personMat: THREE.MeshStandardMaterial;
-        baseColor: THREE.Color;
-        accent: boolean;
-        next: number;
-        glow: number;
-        world: THREE.Vector3;
-      };
+      const R_CHAIR = 4.0;
+      const R_PERSON = 3.35;
+      type Seat = { person: THREE.Mesh; mat: THREE.MeshStandardMaterial; base: THREE.Color; next: number; glow: number; world: THREE.Vector3 };
       const seats: Seat[] = [];
 
       for (let i = 0; i < SEATS; i++) {
         const a = (i / SEATS) * Math.PI * 2;
-        const accent = i % 4 === 0; // a couple of blue seats, echoing the logo
-        const baseColor = new THREE.Color(accent ? BLUE : 0x55617f);
-
-        const chair = new THREE.Group();
+        const chair = makeChair();
         chair.position.set(Math.sin(a) * R_CHAIR, 0, Math.cos(a) * R_CHAIR);
-        chair.rotation.y = a; // front (−Z) faces the center
-
-        const backMat = new THREE.MeshStandardMaterial({
-          color: accent ? BLUE : SLATE,
-          roughness: 0.5,
-          metalness: 0.2,
-          emissive: BLUE,
-          emissiveIntensity: 0,
-        });
-        const back = new THREE.Mesh(backGeo, backMat);
-        back.position.set(0, 0.95, 0.42); // standing panel behind the seat
-        chair.add(back);
-
-        const seat = new THREE.Mesh(seatGeo, new THREE.MeshStandardMaterial({ color: SLATE_DK, roughness: 0.6 }));
-        seat.position.set(0, 0.18, 0.0);
-        chair.add(seat);
+        chair.rotation.y = a; // front faces center
         table.add(chair);
 
-        // seated person orb
-        const personMat = new THREE.MeshStandardMaterial({
-          color: baseColor.clone(),
-          roughness: 0.35,
-          emissive: baseColor.clone(),
-          emissiveIntensity: 0.25,
-        });
-        const person = new THREE.Mesh(new THREE.SphereGeometry(0.26, 24, 24), personMat);
-        person.scale.set(1, 1.2, 1);
-        person.position.set(Math.sin(a) * R_PERSON, 0.5, Math.cos(a) * R_PERSON);
+        const base = new THREE.Color(0xf0d9b8);
+        const mat = new THREE.MeshStandardMaterial({ color: base.clone(), roughness: 0.5, emissive: 0x3a2a14, emissiveIntensity: 0.3 });
+        const person = new THREE.Mesh(new THREE.SphereGeometry(0.3, 24, 24), mat);
+        person.scale.set(1, 1.3, 1);
+        person.position.set(Math.sin(a) * R_PERSON, 0.55, Math.cos(a) * R_PERSON);
         table.add(person);
-
-        seats.push({ backMat, person, personMat, baseColor, accent, next: 1.5 + Math.random() * 5, glow: 0, world: new THREE.Vector3() });
+        seats.push({ person, mat, base, next: 1.5 + Math.random() * 5, glow: 0, world: new THREE.Vector3() });
       }
 
-      // textures for ? marks and pulses
-      function dotTexture() {
+      // --- textures ---
+      function dotTexture(soft = false) {
         const c = document.createElement('canvas'); c.width = c.height = 64;
         const x = c.getContext('2d')!;
         const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.4, 'rgba(255,255,255,0.7)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+        g.addColorStop(0, 'rgba(255,255,255,1)');
+        g.addColorStop(soft ? 0.5 : 0.4, 'rgba(255,255,255,0.6)');
+        g.addColorStop(1, 'rgba(255,255,255,0)');
         x.fillStyle = g; x.fillRect(0, 0, 64, 64);
         return new THREE.CanvasTexture(c);
       }
@@ -209,31 +165,59 @@
         return new THREE.CanvasTexture(c);
       }
       const DOT = dotTexture();
+      const SOFT = dotTexture(true);
       const QMARK = questionTexture();
 
+      // --- sun flare (fake, additive sprites) ---
+      function flare(scaleN: number, x: number, y: number, z: number, opacity: number, color: number) {
+        const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: SOFT, color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending }));
+        sp.scale.setScalar(scaleN); sp.position.set(x, y, z); scene.add(sp);
+      }
+      flare(11, 6.5, 6.5, -6, 0.5, 0xffe6b0);
+      flare(4, 3.5, 4.2, -3, 0.35, 0xffd9a0);
+      flare(1.6, 1.5, 2.6, -1, 0.3, 0xfff0d0);
+
+      // --- dust bokeh in the sunlight ---
+      const BOKEH = 28;
+      const bpos = new Float32Array(BOKEH * 3);
+      const bsiz = new Float32Array(BOKEH);
+      for (let i = 0; i < BOKEH; i++) {
+        bpos[i * 3] = (Math.random() * 2 - 1) * 8;
+        bpos[i * 3 + 1] = Math.random() * 7 - 1;
+        bpos[i * 3 + 2] = (Math.random() * 2 - 1) * 5 - 1;
+        bsiz[i] = 0.08 + Math.random() * 0.32;
+      }
+      const bgeo = new THREE.BufferGeometry();
+      bgeo.setAttribute('position', new THREE.BufferAttribute(bpos, 3));
+      bgeo.setAttribute('size', new THREE.BufferAttribute(bsiz, 1));
+      const bokeh = new THREE.Points(
+        bgeo,
+        new THREE.PointsMaterial({ map: DOT, color: 0xffdca0, size: 0.32, transparent: true, opacity: 0.5, depthWrite: false, blending: THREE.AdditiveBlending, sizeAttenuation: true })
+      );
+      scene.add(bokeh);
+
+      // --- rising "?" (brand blue) + pulse pools ---
       type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
       const qpool: Q[] = [];
       for (let i = 0; i < 10; i++) {
-        const mat = new THREE.SpriteMaterial({ map: QMARK, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.95); sp.visible = false; scene.add(sp);
+        const mat = new THREE.SpriteMaterial({ map: QMARK, color: BLUE, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+        const sp = new THREE.Sprite(mat); sp.scale.setScalar(1); sp.visible = false; scene.add(sp);
         qpool.push({ sp, mat, life: 0, max: 1, from: new THREE.Vector3() });
       }
       type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3 };
       const ppool: P[] = [];
-      for (let i = 0; i < 18; i++) {
-        const mat = new THREE.SpriteMaterial({ map: DOT, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.5); sp.visible = false; scene.add(sp);
+      for (let i = 0; i < 14; i++) {
+        const mat = new THREE.SpriteMaterial({ map: DOT, color: 0xffe6c0, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
+        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.45); sp.visible = false; scene.add(sp);
         ppool.push({ sp, mat, t: 1, from: new THREE.Vector3() });
       }
       const center = new THREE.Vector3(tableX, 0.6, 0);
 
       function ask(s: Seat) {
-        const w = s.world;
-        const color = s.accent ? 0x93c5fd : 0xffffff;
         const q = qpool.find((q) => q.life <= 0);
-        if (q) { q.from.copy(w); q.life = q.max = 2.4 + Math.random() * 0.8; q.mat.color.set(color); q.sp.visible = true; }
+        if (q) { q.from.copy(s.world); q.life = q.max = 2.4 + Math.random() * 0.8; q.sp.visible = true; }
         const p = ppool.find((p) => p.t >= 1);
-        if (p) { p.from.copy(w); p.t = 0; p.mat.color.set(color); p.sp.visible = true; }
+        if (p) { p.from.copy(s.world); p.t = 0; p.sp.visible = true; }
       }
 
       const pointer = { x: 0, y: 0, has: false };
@@ -250,8 +234,7 @@
         const h = r.height || window.innerHeight;
         renderer.setSize(w, h, false);
         camera.aspect = w / h; camera.updateProjectionMatrix();
-        // pull the table toward center on narrow/portrait screens so it stays in frame
-        tableX = camera.aspect < 0.95 ? 0.6 : 2.4;
+        tableX = camera.aspect < 0.95 ? 0.5 : 2.2;
         table.position.x = tableX;
         center.x = tableX;
       }
@@ -260,16 +243,26 @@
 
       const ndc = new THREE.Vector3();
       const up = new THREE.Vector3(0, 1, 0);
-      const hot = new THREE.Color(0xffffff);
+      const hot = new THREE.Color(0xfff2dc);
 
       function update(dt: number) {
-        table.rotation.y += 0.12 * dt;
+        table.rotation.y += 0.1 * dt;
 
         const px = pointer.has ? pointer.x : 0;
         const py = pointer.has ? pointer.y : 0;
-        camera.position.x += (camBase.x + px * 2.2 - camera.position.x) * 0.05;
-        camera.position.y += (camBase.y - py * 1.1 - camera.position.y) * 0.05;
+        camera.position.x += (camBase.x + px * 2.4 - camera.position.x) * 0.05;
+        camera.position.y += (camBase.y - py * 1.2 - camera.position.y) * 0.05;
         camera.lookAt(target);
+
+        // drifting dust
+        const bp = bgeo.attributes.position as THREE.BufferAttribute;
+        for (let i = 0; i < BOKEH; i++) {
+          let y = bp.getY(i) + dt * 0.25;
+          if (y > 6.5) y = -1;
+          bp.setY(i, y);
+          bp.setX(i, bp.getX(i) + Math.sin(y * 0.6 + i) * dt * 0.12);
+        }
+        bp.needsUpdate = true;
 
         let nearest = -1, best = 0.24;
         for (let i = 0; i < SEATS; i++) {
@@ -283,12 +276,10 @@
         for (let i = 0; i < SEATS; i++) {
           const s = seats[i];
           s.glow += ((i === nearest ? 1 : 0) - s.glow) * 0.12;
-          s.personMat.color.copy(s.baseColor).lerp(hot, s.glow * 0.7);
-          s.personMat.emissiveIntensity = 0.25 + s.glow * 1.2;
-          s.backMat.emissiveIntensity = s.glow * 0.5;
-          const sc = 1 + s.glow * 0.4;
-          s.person.scale.set(sc, 1.2 * sc, sc);
-
+          s.mat.color.copy(s.base).lerp(hot, s.glow * 0.6);
+          s.mat.emissiveIntensity = 0.3 + s.glow * 0.9;
+          const sc = 1 + s.glow * 0.35;
+          s.person.scale.set(sc, 1.3 * sc, sc);
           s.next -= dt * (1 + s.glow * 5);
           if (s.next <= 0) { ask(s); s.next = i === nearest ? 0.9 + Math.random() * 0.9 : 5 + Math.random() * 5; }
         }
@@ -307,7 +298,7 @@
           p.t += dt / 1.1;
           const e = p.t * p.t * (3 - 2 * p.t);
           p.sp.position.lerpVectors(p.from, center, e);
-          p.mat.opacity = (1 - p.t) * 0.9;
+          p.mat.opacity = (1 - p.t) * 0.85;
           if (p.t >= 1) p.sp.visible = false;
         }
       }
@@ -315,7 +306,6 @@
       const clock = new THREE.Clock();
       if (reduce) {
         for (let i = 0; i < SEATS; i++) seats[i].person.getWorldPosition(seats[i].world);
-        ask(seats[1]); ask(seats[5]);
         update(0); renderer.render(scene, camera);
       } else {
         let raf = 0;
@@ -327,7 +317,6 @@
         });
       }
     } catch (e) {
-      // WebGL/setup failure → the CSS gradient backdrop stands on its own.
       console.warn('hero 3D disabled:', e);
     }
   }
