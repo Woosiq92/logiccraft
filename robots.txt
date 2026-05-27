@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://logiccraft.co.kr/sitemap-index.xml
