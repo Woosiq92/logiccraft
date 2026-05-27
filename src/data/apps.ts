@@ -67,6 +67,15 @@ export const apps: AppInfo[] = [
     ],
   },
   {
+    name: '왜 그렇게 생각해?',
+    emoji: '🤔',
+    color: '#4F46E5',
+    blurb: '정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼 (웹).',
+    status: 'live',
+    featured: true,
+    links: [{ label: '바로가기', href: 'https://logicschool.co.kr' }],
+  },
+  {
     name: '폴리톡',
     emoji: '⚖️',
     color: '#0EA5E9',
