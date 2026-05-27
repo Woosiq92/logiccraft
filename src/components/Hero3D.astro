@@ -1,7 +1,7 @@
 ---
-// Interactive 3D hero — the LogicCraft logo, brought to life: a bold ring (the
-// table) with 4 lozenge nodes (top/bottom blue, left/right light) and the "?".
-// People at the table raise questions that flow into the question mark.
+// Interactive 3D hero — the LogicCraft logo as a volumetric 3D object: a glossy
+// ring (table) with 4 lozenge nodes (top/bottom blue, left/right light) and a
+// tube-built "?". PBR lighting + environment reflections + a real 3D tumble.
 ---
 
 <section class="hero">
@@ -22,7 +22,7 @@
     align-items: center;
     overflow: hidden;
     background:
-      radial-gradient(120% 95% at 76% 8%, #122a5e 0%, transparent 52%),
+      radial-gradient(120% 95% at 76% 8%, #14306a 0%, transparent 52%),
       radial-gradient(100% 90% at 22% 96%, #0a1226 0%, transparent 55%),
       #060912;
     color: #fff;
@@ -38,6 +38,7 @@
 
 <script>
   import * as THREE from 'three';
+  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
   const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement | null;
   if (canvas) {
@@ -46,25 +47,92 @@
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.12;
+      renderer.toneMappingExposure = 1.1;
 
       const BLUE = 0x2563eb;
       const LIGHT = 0xeaf2ff;
 
       const scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x060912, 13, 30);
+
+      // environment reflections → glossy, volumetric PBR look
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
       const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
       const camBase = new THREE.Vector3(0, 0.5, 12);
       const target = new THREE.Vector3(0, 0.4, 0);
       camera.position.copy(camBase);
       camera.lookAt(target);
 
-      // mark = the logo, living in 3D; gentle wobble + parallax keeps it readable
+      // lights for directional shading + a blue rim
+      scene.add(new THREE.AmbientLight(0x415073, 0.5));
+      const key = new THREE.DirectionalLight(0xffffff, 2.3);
+      key.position.set(-5, 6, 8);
+      scene.add(key);
+      const rim = new THREE.DirectionalLight(0x3b82f6, 1.8);
+      rim.position.set(6, -2, -6);
+      scene.add(rim);
+
       const mark = new THREE.Group();
       scene.add(mark);
       let markX = 2.4;
       mark.position.set(markX, 0.4, 0);
 
-      // textures
+      // --- the ring (table) — glossy 3D torus ---
+      const R = 2.05;
+      const ringCenter = new THREE.Vector3(1.3, 0, 0);
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(R, 0.3, 28, 160),
+        new THREE.MeshStandardMaterial({ color: LIGHT, metalness: 0.6, roughness: 0.18, envMapIntensity: 1.2 })
+      );
+      ring.position.copy(ringCenter);
+      mark.add(ring);
+
+      // --- 4 lozenge nodes outside the ring (top/bottom blue, left/right light) ---
+      const nodeGeo = new THREE.CapsuleGeometry(0.27, 0.64, 10, 22);
+      const NR = R + 0.5;
+      const nodeDefs = [
+        { ang: Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },
+        { ang: -Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },
+        { ang: 0, color: 0xe6eefc, rotZ: 0 },
+        { ang: Math.PI, color: 0xe6eefc, rotZ: 0 },
+      ];
+      type Node = { mesh: THREE.Mesh; mat: THREE.MeshStandardMaterial; base: THREE.Color; emi: number; next: number; glow: number; world: THREE.Vector3 };
+      const nodes: Node[] = [];
+      for (const d of nodeDefs) {
+        const local = new THREE.Vector3(ringCenter.x + Math.cos(d.ang) * NR, Math.sin(d.ang) * NR, 0);
+        const base = new THREE.Color(d.color);
+        const blue = d.color === BLUE;
+        const mat = new THREE.MeshStandardMaterial({ color: base.clone(), metalness: 0.45, roughness: 0.28, emissive: new THREE.Color(blue ? 0x1d4ed8 : 0x223052), emissiveIntensity: 0.18, envMapIntensity: 1.1 });
+        const mesh = new THREE.Mesh(nodeGeo, mat);
+        mesh.position.copy(local);
+        mesh.rotation.z = d.rotZ;
+        mark.add(mesh);
+        nodes.push({ mesh, mat, base, emi: 0.18, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
+      }
+
+      // --- the "?" — built from tube/sphere primitives, sits in front-left ---
+      const qMark = new THREE.Group();
+      qMark.position.set(-2.4, 0.05, 0.5); // slight +z depth → parallax separation
+      qMark.scale.setScalar(1.25);
+      const qMat = new THREE.MeshStandardMaterial({ color: LIGHT, metalness: 0.5, roughness: 0.22, emissive: new THREE.Color(0x60a5fa), emissiveIntensity: 0.25, envMapIntensity: 1.2 });
+      const hook = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.16, 18, 64, Math.PI * 1.5), qMat);
+      hook.position.set(0, 0.5, 0);
+      hook.rotation.z = -Math.PI * 0.78; // turn the gap to the lower-right
+      qMark.add(hook);
+      const stemCurve = new THREE.QuadraticBezierCurve3(
+        new THREE.Vector3(0.16, 0.12, 0), new THREE.Vector3(0.02, -0.05, 0), new THREE.Vector3(0, -0.32, 0)
+      );
+      qMark.add(new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 24, 0.16, 14, false), qMat));
+      const qDot = new THREE.Mesh(new THREE.SphereGeometry(0.19, 24, 24), qMat);
+      qDot.position.set(0, -0.74, 0);
+      qMark.add(qDot);
+      mark.add(qMark);
+      let qPulse = 0;
+      const qWorld = new THREE.Vector3();
+
+      // --- idea pulses: node → "?" ---
       function dotTexture() {
         const c = document.createElement('canvas'); c.width = c.height = 64;
         const x = c.getContext('2d')!;
@@ -73,76 +141,14 @@
         x.fillStyle = g; x.fillRect(0, 0, 64, 64);
         return new THREE.CanvasTexture(c);
       }
-      function questionTexture() {
-        const c = document.createElement('canvas'); c.width = c.height = 160;
-        const x = c.getContext('2d')!;
-        x.strokeStyle = '#fff'; x.fillStyle = '#fff';
-        x.lineWidth = 16; x.lineCap = 'round'; x.lineJoin = 'round';
-        x.beginPath();
-        x.arc(80, 58, 30, Math.PI * 0.86, Math.PI * 0.18, false);
-        x.quadraticCurveTo(105, 100, 80, 108);
-        x.stroke();
-        x.beginPath(); x.arc(80, 134, 9, 0, Math.PI * 2); x.fill();
-        return new THREE.CanvasTexture(c);
-      }
       const DOT = dotTexture();
-      const QMARK = questionTexture();
-
-      // --- the ring (table) ---
-      const R = 2.15;
-      const ringCenter = new THREE.Vector3(1.3, 0, 0); // ring sits on the right of the mark
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(R, 0.26, 20, 140),
-        new THREE.MeshBasicMaterial({ color: LIGHT })
-      );
-      ring.position.copy(ringCenter);
-      mark.add(ring);
-      // soft halo behind the ring
-      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0x3b82f6, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending }));
-      halo.scale.setScalar(7); halo.position.copy(ringCenter);
-      mark.add(halo);
-
-      // --- 4 lozenge nodes (top/bottom blue, left/right light) ---
-      const nodeGeo = new THREE.CapsuleGeometry(0.26, 0.62, 8, 18);
-      const NR = R + 0.46; // nodes sit just OUTSIDE the ring, like the logo's tabs
-      const nodeDefs = [
-        { ang: Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },   // top — horizontal lozenge
-        { ang: -Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },  // bottom — horizontal
-        { ang: 0, color: LIGHT, rotZ: 0 },                      // right — vertical
-        { ang: Math.PI, color: LIGHT, rotZ: 0 },                // left — vertical
-      ];
-      type Node = { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; base: THREE.Color; local: THREE.Vector3; next: number; glow: number; world: THREE.Vector3 };
-      const nodes: Node[] = [];
-      for (const d of nodeDefs) {
-        const local = new THREE.Vector3(ringCenter.x + Math.cos(d.ang) * NR, Math.sin(d.ang) * NR, 0);
-        const base = new THREE.Color(d.color);
-        const mat = new THREE.MeshBasicMaterial({ color: base.clone() });
-        const mesh = new THREE.Mesh(nodeGeo, mat);
-        mesh.position.copy(local);
-        mesh.rotation.z = d.rotZ;
-        mark.add(mesh);
-        nodes.push({ mesh, mat, base, local, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
-      }
-
-      // --- the question mark (left element of the logo) ---
-      const qPos = new THREE.Vector3(-2.4, 0.15, 0);
-      const bigQMat = new THREE.SpriteMaterial({ map: QMARK, color: LIGHT, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending });
-      const bigQ = new THREE.Sprite(bigQMat);
-      bigQ.scale.setScalar(3.0);
-      bigQ.position.copy(qPos);
-      mark.add(bigQ);
-      let qPulse = 0; // brightens when a question arrives
-      const qWorld = new THREE.Vector3();
-
-      // --- idea pulses: node → question mark ---
       type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3; to: THREE.Vector3 };
       const ppool: P[] = [];
       for (let i = 0; i < 12; i++) {
         const mat = new THREE.SpriteMaterial({ map: DOT, color: 0x93c5fd, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.5); sp.visible = false; scene.add(sp);
+        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.55); sp.visible = false; scene.add(sp);
         ppool.push({ sp, mat, t: 1, from: new THREE.Vector3(), to: new THREE.Vector3() });
       }
-
       function ask(n: Node) {
         const p = ppool.find((p) => p.t >= 1);
         if (p) { p.from.copy(n.world); p.to.copy(qWorld); p.t = 0; p.sp.visible = true; }
@@ -175,18 +181,17 @@
       function update(dt: number) {
         time += dt;
 
-        // gentle 3D wobble (keeps the logo readable) + parallax
+        // stronger 3D tumble (reveals volume) + parallax, but never fully edge-on
         const px = pointer.has ? pointer.x : 0;
         const py = pointer.has ? pointer.y : 0;
-        const wobY = Math.sin(time * 0.5) * 0.28;
-        const wobX = Math.sin(time * 0.37) * 0.12;
-        mark.rotation.y += (wobY + px * 0.25 - mark.rotation.y) * 0.06;
-        mark.rotation.x += (wobX - py * 0.15 - mark.rotation.x) * 0.06;
+        const wobY = Math.sin(time * 0.42) * 0.6;
+        const wobX = Math.sin(time * 0.31) * 0.22;
+        mark.rotation.y += (wobY + px * 0.3 - mark.rotation.y) * 0.05;
+        mark.rotation.x += (wobX - py * 0.18 - mark.rotation.x) * 0.05;
 
-        bigQ.getWorldPosition(qWorld);
+        qMark.getWorldPosition(qWorld);
         qPulse = Math.max(0, qPulse - dt * 1.6);
-        bigQMat.opacity = 0.55 + Math.sin(time * 1.4) * 0.08 + qPulse * 0.4;
-        bigQ.scale.setScalar(3.0 + qPulse * 0.5);
+        qMat.emissiveIntensity = 0.22 + Math.sin(time * 1.4) * 0.07 + qPulse * 0.9;
 
         let nearest = -1, best = 0.22;
         for (let i = 0; i < nodes.length; i++) {
@@ -201,6 +206,7 @@
           const n = nodes[i];
           n.glow += ((i === nearest ? 1 : 0) - n.glow) * 0.12;
           n.mat.color.copy(n.base).lerp(hot, n.glow * 0.7);
+          n.mat.emissiveIntensity = n.emi + n.glow * 0.8;
           const sc = 1 + n.glow * 0.3;
           n.mesh.scale.set(sc, sc, sc);
           n.next -= dt * (1 + n.glow * 5);
@@ -212,9 +218,9 @@
           p.t += dt / 1.2;
           const e = p.t * p.t * (3 - 2 * p.t);
           p.sp.position.lerpVectors(p.from, p.to, e);
-          p.sp.position.y += Math.sin(e * Math.PI) * 0.5; // arc across the mark
+          p.sp.position.z += Math.sin(e * Math.PI) * 0.6; // arc toward the camera
           p.mat.opacity = Math.sin(Math.min(p.t, 1) * Math.PI) * 0.95;
-          if (p.t >= 1) { p.sp.visible = false; qPulse = Math.min(1, qPulse + 0.7); } // arrival lights the "?"
+          if (p.t >= 1) { p.sp.visible = false; qPulse = Math.min(1, qPulse + 0.7); }
         }
       }
 
