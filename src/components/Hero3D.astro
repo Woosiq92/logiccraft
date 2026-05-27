@@ -70,11 +70,13 @@
       scene.add(rim);
       const coreGlow = new THREE.PointLight(0x3b82f6, 22, 14, 2); // blue glow from table center
       coreGlow.position.set(0, 0.7, 0);
-      scene.add(coreGlow);
 
-      // table group (slow rotation + parallax)
+      // table group (slow rotation + parallax), offset to the right of the headline
       const table = new THREE.Group();
       scene.add(table);
+      table.add(coreGlow); // glow travels with the table
+      let tableX = 2.4;
+      table.position.x = tableX;
 
       const R_OUT = 3.3;
       const R_IN = 1.15;
@@ -187,7 +189,7 @@
         person.position.set(Math.sin(a) * R_PERSON, 0.5, Math.cos(a) * R_PERSON);
         table.add(person);
 
-        seats.push({ backMat, person, personMat, baseColor, accent, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
+        seats.push({ backMat, person, personMat, baseColor, accent, next: 0.3 + Math.random() * 2.2, glow: 0, world: new THREE.Vector3() });
       }
 
       // textures for ? marks and pulses
@@ -211,7 +213,7 @@
 
       type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
       const qpool: Q[] = [];
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 20; i++) {
         const mat = new THREE.SpriteMaterial({ map: QMARK, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
         const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.95); sp.visible = false; scene.add(sp);
         qpool.push({ sp, mat, life: 0, max: 1, from: new THREE.Vector3() });
@@ -223,7 +225,7 @@
         const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.5); sp.visible = false; scene.add(sp);
         ppool.push({ sp, mat, t: 1, from: new THREE.Vector3() });
       }
-      const center = new THREE.Vector3(0, 0.6, 0);
+      const center = new THREE.Vector3(tableX, 0.6, 0);
 
       function ask(s: Seat) {
         const w = s.world;
@@ -248,6 +250,10 @@
         const h = r.height || window.innerHeight;
         renderer.setSize(w, h, false);
         camera.aspect = w / h; camera.updateProjectionMatrix();
+        // pull the table toward center on narrow/portrait screens so it stays in frame
+        tableX = camera.aspect < 0.95 ? 0.6 : 2.4;
+        table.position.x = tableX;
+        center.x = tableX;
       }
       window.addEventListener('resize', resize);
       resize();
@@ -284,16 +290,16 @@
           s.person.scale.set(sc, 1.2 * sc, sc);
 
           s.next -= dt * (1 + s.glow * 5);
-          if (s.next <= 0) { ask(s); s.next = i === nearest ? 0.5 + Math.random() : 3 + Math.random() * 4; }
+          if (s.next <= 0) { ask(s); s.next = i === nearest ? 0.35 + Math.random() * 0.6 : 1.4 + Math.random() * 2.2; }
         }
 
         for (const q of qpool) {
           if (q.life <= 0) continue;
           q.life -= dt;
           const t = 1 - q.life / q.max;
-          q.sp.position.copy(q.from).addScaledVector(up, 0.5 + t * 2.4);
-          q.sp.scale.setScalar(0.7 + t * 0.6);
-          q.mat.opacity = Math.sin(Math.min(t, 1) * Math.PI) * 0.95;
+          q.sp.position.copy(q.from).addScaledVector(up, 0.6 + t * 2.8);
+          q.sp.scale.setScalar(1.0 + t * 0.9);
+          q.mat.opacity = Math.sin(Math.min(t, 1) * Math.PI);
           if (q.life <= 0) q.sp.visible = false;
         }
         for (const p of ppool) {
