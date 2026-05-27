@@ -36,7 +36,7 @@ img { max-width: 100%; display: block; }
 
 h1, h2, h3 { letter-spacing: -0.025em; line-height: 1.2; }
 
-.wrap { max-width: var(--max); margin: 0 auto; padding: 0 1.5rem; }
+.wrap { max-width: var(--max); margin: 0 auto; padding-inline: 1.5rem; }
 
 .eyebrow {
   font-size: 0.78rem;
