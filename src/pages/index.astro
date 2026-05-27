@@ -4,33 +4,59 @@ import Hero3D from '../components/Hero3D.astro';
 import AppCard from '../components/AppCard.astro';
 import { apps } from '../data/apps';
 
-const featured = apps.filter((a) => a.featured);
+const live = apps.filter((a) => a.status === 'live');
+const soon = apps.filter((a) => a.status === 'soon');
 ---
 
 <Layout>
   <Hero3D>
     <p class="eyebrow" style="color: var(--accent-soft);">LOGICCRAFT</p>
-    <h1>생각하는 힘을 키우는<br />앱을 만듭니다.</h1>
+    <h1>생각하는 힘을 키우는<br />제품을 만듭니다.</h1>
     <p class="lede">
-      로직크래프트는 사고력·판단력을 기르는 모바일 앱을 짓습니다.
+      로직크래프트는 사고력·판단력을 기르는 앱과 학습 플랫폼을 만듭니다.
       잘 만든 작은 도구가 매일의 생각을 바꾼다고 믿습니다.
     </p>
     <div class="cta">
-      <a class="btn btn-primary" href="/apps">앱 둘러보기</a>
+      <a class="btn btn-primary" href="#products">제품 보기</a>
       <a class="btn btn-ghost ghost-dark" href="/about">스튜디오 소개</a>
     </div>
   </Hero3D>
 
-  <section class="wrap">
+  <section class="wrap intro">
+    <p class="eyebrow">우리가 만드는 것</p>
+    <h2>한 가지를 또렷하게 돕는 도구</h2>
+    <p>
+      코딩·과학·기록·시세·학습 — 분야는 달라도 "사람의 생각을 한 뼘 거든다"는
+      한 방향을 봅니다. 화면을 채우기보다, 매일 쓰는 작은 도구가 생각하는 방식을
+      바꾸도록 만듭니다.
+    </p>
+  </section>
+
+  <section id="products" class="wrap">
     <div class="section-head">
-      <p class="eyebrow">우리가 만드는 것</p>
-      <h2>생각을 돕는 제품들</h2>
-      <p>화면을 채우는 제품이 아니라, 한 가지를 또렷하게 돕는 제품. 앱과 웹으로 출시했습니다.</p>
+      <p class="eyebrow">제품</p>
+      <h2>출시된 제품</h2>
     </div>
     <div class="app-grid">
-      {featured.map((app) => <AppCard app={app} />)}
+      {live.map((app) => <AppCard app={app} />)}
     </div>
-    <p class="more"><a href="/apps">모든 제품 보기 →</a></p>
+
+    {soon.length > 0 && (
+      <>
+        <div class="section-head soon-head"><h2>준비 중</h2></div>
+        <div class="app-grid">
+          {soon.map((app) => <AppCard app={app} />)}
+        </div>
+      </>
+    )}
+  </section>
+
+  <section class="wrap cta-band">
+    <div class="cta-inner">
+      <h2>함께 만들 이야기가 있다면</h2>
+      <p>제휴 제안, 앱 지원 요청, 그 밖의 문의를 환영합니다.</p>
+      <a class="btn btn-primary" href="/contact">문의하기</a>
+    </div>
   </section>
 </Layout>
 
@@ -38,12 +64,28 @@ const featured = apps.filter((a) => a.featured);
   h1 { font-size: clamp(2.2rem, 6vw, 3.6rem); font-weight: 800; margin: 0; }
   .lede {
     margin: 1.4rem 0 0;
-    max-width: 36ch;
+    max-width: 38ch;
     font-size: clamp(1rem, 2.2vw, 1.18rem);
     color: rgba(255, 255, 255, 0.78);
   }
   .cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2.2rem; }
   .ghost-dark { color: #fff; border-color: rgba(255, 255, 255, 0.28); }
   .ghost-dark:hover { color: #fff; border-color: var(--accent-soft); }
-  .more { margin-top: 2rem; font-weight: 700; }
+
+  .intro { padding-top: 4.5rem; padding-bottom: 1.5rem; }
+  .intro h2 { font-size: clamp(1.6rem, 4vw, 2.2rem); margin: 0.3rem 0 0; }
+  .intro p { color: var(--sub); margin: 1rem 0 0; max-width: 56ch; font-size: 1.05rem; }
+
+  .soon-head { margin-top: 3rem; }
+
+  .cta-band { padding: 4.5rem 1.5rem 5.5rem; }
+  .cta-inner {
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    background: var(--bg-alt);
+    padding: 3rem 2rem;
+    text-align: center;
+  }
+  .cta-inner h2 { font-size: clamp(1.5rem, 4vw, 2rem); margin: 0; }
+  .cta-inner p { color: var(--sub); margin: 0.8rem 0 1.8rem; }
 </style>

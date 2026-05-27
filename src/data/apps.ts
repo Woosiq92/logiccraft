@@ -5,21 +5,19 @@ export interface AppLink {
 
 export interface AppInfo {
   name: string;
-  emoji: string;
-  color: string; // accent for the card icon tile
+  icon: string; // /icons/*.png — real app/product icon
   blurb: string;
   status: 'live' | 'soon';
   featured?: boolean;
   links: AppLink[];
 }
 
-// App support/privacy pages remain hosted on woosiq92.github.io (the apps' own
-// infrastructure). The company site links out to them — it does not host them.
+// Icons are the real product icons copied from each project. App support/privacy
+// pages stay on woosiq92.github.io; the company site only links out to them.
 export const apps: AppInfo[] = [
   {
     name: '로보트레일',
-    emoji: '🤖',
-    color: '#F59E0B',
+    icon: '/icons/robotrail.png',
     blurb: '코드 없이 로봇을 움직이며 코딩 사고력을 훈련하는 퍼즐 앱.',
     status: 'live',
     featured: true,
@@ -30,8 +28,7 @@ export const apps: AppInfo[] = [
   },
   {
     name: '과학자 클럽',
-    emoji: '🔭',
-    color: '#7C3AED',
+    icon: '/icons/science-club.png',
     blurb: '추측·발견·분기·회고 4단계로 매일 한 별씩 켜는 과학 사고 게임.',
     status: 'live',
     featured: true,
@@ -43,8 +40,7 @@ export const apps: AppInfo[] = [
   },
   {
     name: '커플맵로그',
-    emoji: '💞',
-    color: '#EC4899',
+    icon: '/icons/ourfootprint.png',
     blurb: '둘이 다녀온 동네가 색으로 칠해지는 커플 데이트 점령 지도.',
     status: 'live',
     featured: true,
@@ -56,8 +52,7 @@ export const apps: AppInfo[] = [
   },
   {
     name: '불안한개미',
-    emoji: '📈',
-    color: '#2563EB',
+    icon: '/icons/stockwatch.png',
     blurb: '매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.',
     status: 'live',
     featured: true,
@@ -68,8 +63,7 @@ export const apps: AppInfo[] = [
   },
   {
     name: '왜 그렇게 생각해?',
-    emoji: '🤔',
-    color: '#4F46E5',
+    icon: '/icons/scienceapp.png',
     blurb: '정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼 (웹).',
     status: 'live',
     featured: true,
@@ -77,8 +71,7 @@ export const apps: AppInfo[] = [
   },
   {
     name: '폴리톡',
-    emoji: '⚖️',
-    color: '#0EA5E9',
+    icon: '/icons/polytalk.png',
     blurb: '뉴스를 30초로 파악하고 내 의견을 정리하는 정치 리터러시 앱.',
     status: 'soon',
     links: [],
