@@ -1,7 +1,6 @@
 ---
-// Interactive 3D hero — the LogicCraft logo as a volumetric 3D object: a glossy
-// ring (table) with 4 lozenge nodes (top/bottom blue, left/right light) and a
-// tube-built "?". PBR lighting + environment reflections + a real 3D tumble.
+// Interactive 3D "thinking network" hero.
+// Overlay content is provided via the default slot.
 ---
 
 <section class="hero">
@@ -22,223 +21,256 @@
     align-items: center;
     overflow: hidden;
     background:
-      radial-gradient(120% 95% at 76% 8%, #14306a 0%, transparent 52%),
-      radial-gradient(100% 90% at 22% 96%, #0a1226 0%, transparent 55%),
-      #060912;
+      radial-gradient(120% 80% at 70% 10%, #10204a 0%, transparent 55%),
+      radial-gradient(100% 90% at 20% 90%, #0a1430 0%, transparent 60%),
+      var(--night);
     color: #fff;
   }
-  #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
-  .hero-overlay { position: relative; z-index: 2; width: 100%; padding: 6rem 0; pointer-events: none; }
-  .hero-overlay :global(a) { pointer-events: auto; }
+  #hero-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+  .hero-overlay { position: relative; z-index: 2; width: 100%; padding: 6rem 0; }
   .hero-fade {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 120px; z-index: 1;
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 120px;
+    z-index: 1;
     background: linear-gradient(to bottom, transparent, var(--bg));
   }
 </style>
 
 <script>
   import * as THREE from 'three';
-  import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
   const canvas = document.getElementById('hero-canvas') as HTMLCanvasElement | null;
   if (canvas) {
+    let renderer: THREE.WebGLRenderer;
     try {
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-      renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
+      renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    } catch {
+      // WebGL unavailable → the CSS gradient backdrop stands on its own.
+      throw new Error('skip');
+    }
 
-      const BLUE = 0x2563eb;
-      const LIGHT = 0xeaf2ff;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      const scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(0x060912, 13, 30);
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 100);
+    camera.position.z = 14;
 
-      // environment reflections → glossy, volumetric PBR look
-      const pmrem = new THREE.PMREMGenerator(renderer);
-      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-      const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
-      const camBase = new THREE.Vector3(0, 0.5, 12);
-      const target = new THREE.Vector3(0, 0.4, 0);
-      camera.position.copy(camBase);
-      camera.lookAt(target);
+    // Two nested groups: inner auto-rotates, outer tilts toward the pointer.
+    const tilt = new THREE.Group();
+    const spin = new THREE.Group();
+    tilt.add(spin);
+    scene.add(tilt);
 
-      // lights for directional shading + a blue rim
-      scene.add(new THREE.AmbientLight(0x415073, 0.5));
-      const key = new THREE.DirectionalLight(0xffffff, 2.3);
-      key.position.set(-5, 6, 8);
-      scene.add(key);
-      const rim = new THREE.DirectionalLight(0x3b82f6, 1.8);
-      rim.position.set(6, -2, -6);
-      scene.add(rim);
+    // --- nodes ---
+    const N = 150;
+    const BOX = { x: 11, y: 6.5, z: 7 };
+    const CONNECT = 2.7;
 
-      const mark = new THREE.Group();
-      scene.add(mark);
-      let markX = 2.4;
-      mark.position.set(markX, 0.4, 0);
+    const base = new Float32Array(N * 3);
+    const vel = new Float32Array(N * 3);
+    const positions = new Float32Array(N * 3);
+    const colors = new Float32Array(N * 3);
 
-      // --- the ring (table) — glossy 3D torus ---
-      const R = 2.05;
-      const ringCenter = new THREE.Vector3(1.3, 0, 0);
-      const ring = new THREE.Mesh(
-        new THREE.TorusGeometry(R, 0.3, 28, 160),
-        new THREE.MeshStandardMaterial({ color: LIGHT, metalness: 0.6, roughness: 0.18, envMapIntensity: 1.2 })
-      );
-      ring.position.copy(ringCenter);
-      mark.add(ring);
+    const COL_DIM = new THREE.Color('#1e40af');
+    const COL_HOT = new THREE.Color('#bfdbfe');
 
-      // --- 4 lozenge nodes outside the ring (top/bottom blue, left/right light) ---
-      const nodeGeo = new THREE.CapsuleGeometry(0.27, 0.64, 10, 22);
-      const NR = R + 0.5;
-      const nodeDefs = [
-        { ang: Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },
-        { ang: -Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },
-        { ang: 0, color: 0xe6eefc, rotZ: 0 },
-        { ang: Math.PI, color: 0xe6eefc, rotZ: 0 },
-      ];
-      type Node = { mesh: THREE.Mesh; mat: THREE.MeshStandardMaterial; base: THREE.Color; emi: number; next: number; glow: number; world: THREE.Vector3 };
-      const nodes: Node[] = [];
-      for (const d of nodeDefs) {
-        const local = new THREE.Vector3(ringCenter.x + Math.cos(d.ang) * NR, Math.sin(d.ang) * NR, 0);
-        const base = new THREE.Color(d.color);
-        const blue = d.color === BLUE;
-        const mat = new THREE.MeshStandardMaterial({ color: base.clone(), metalness: 0.45, roughness: 0.28, emissive: new THREE.Color(blue ? 0x1d4ed8 : 0x223052), emissiveIntensity: 0.18, envMapIntensity: 1.1 });
-        const mesh = new THREE.Mesh(nodeGeo, mat);
-        mesh.position.copy(local);
-        mesh.rotation.z = d.rotZ;
-        mark.add(mesh);
-        nodes.push({ mesh, mat, base, emi: 0.18, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
-      }
+    for (let i = 0; i < N; i++) {
+      const j = i * 3;
+      base[j] = positions[j] = (Math.random() * 2 - 1) * BOX.x;
+      base[j + 1] = positions[j + 1] = (Math.random() * 2 - 1) * BOX.y;
+      base[j + 2] = positions[j + 2] = (Math.random() * 2 - 1) * BOX.z;
+      vel[j] = (Math.random() * 2 - 1) * 0.006;
+      vel[j + 1] = (Math.random() * 2 - 1) * 0.006;
+      vel[j + 2] = (Math.random() * 2 - 1) * 0.006;
+      COL_DIM.toArray(colors, j);
+    }
 
-      // --- the "?" — built from tube/sphere primitives, sits in front-left ---
-      const qMark = new THREE.Group();
-      qMark.position.set(-2.4, 0.05, 0.5); // slight +z depth → parallax separation
-      qMark.scale.setScalar(1.25);
-      const qMat = new THREE.MeshStandardMaterial({ color: LIGHT, metalness: 0.5, roughness: 0.22, emissive: new THREE.Color(0x60a5fa), emissiveIntensity: 0.25, envMapIntensity: 1.2 });
-      const hook = new THREE.Mesh(new THREE.TorusGeometry(0.52, 0.16, 18, 64, Math.PI * 1.5), qMat);
-      hook.position.set(0, 0.5, 0);
-      hook.rotation.z = -Math.PI * 0.78; // turn the gap to the lower-right
-      qMark.add(hook);
-      const stemCurve = new THREE.QuadraticBezierCurve3(
-        new THREE.Vector3(0.16, 0.12, 0), new THREE.Vector3(0.02, -0.05, 0), new THREE.Vector3(0, -0.32, 0)
-      );
-      qMark.add(new THREE.Mesh(new THREE.TubeGeometry(stemCurve, 24, 0.16, 14, false), qMat));
-      const qDot = new THREE.Mesh(new THREE.SphereGeometry(0.19, 24, 24), qMat);
-      qDot.position.set(0, -0.74, 0);
-      qMark.add(qDot);
-      mark.add(qMark);
-      let qPulse = 0;
-      const qWorld = new THREE.Vector3();
+    function makeDot() {
+      const c = document.createElement('canvas');
+      c.width = c.height = 64;
+      const ctx = c.getContext('2d')!;
+      const g = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+      g.addColorStop(0, 'rgba(255,255,255,1)');
+      g.addColorStop(0.35, 'rgba(255,255,255,0.8)');
+      g.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, 64, 64);
+      return new THREE.CanvasTexture(c);
+    }
 
-      // --- idea pulses: node → "?" ---
-      function dotTexture() {
-        const c = document.createElement('canvas'); c.width = c.height = 64;
-        const x = c.getContext('2d')!;
-        const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.4, 'rgba(255,255,255,0.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
-        x.fillStyle = g; x.fillRect(0, 0, 64, 64);
-        return new THREE.CanvasTexture(c);
-      }
-      const DOT = dotTexture();
-      type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3; to: THREE.Vector3 };
-      const ppool: P[] = [];
-      for (let i = 0; i < 12; i++) {
-        const mat = new THREE.SpriteMaterial({ map: DOT, color: 0x93c5fd, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.55); sp.visible = false; scene.add(sp);
-        ppool.push({ sp, mat, t: 1, from: new THREE.Vector3(), to: new THREE.Vector3() });
-      }
-      function ask(n: Node) {
-        const p = ppool.find((p) => p.t >= 1);
-        if (p) { p.from.copy(n.world); p.to.copy(qWorld); p.t = 0; p.sp.visible = true; }
-      }
+    const pointGeo = new THREE.BufferGeometry();
+    pointGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    pointGeo.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+    const points = new THREE.Points(
+      pointGeo,
+      new THREE.PointsMaterial({
+        size: 0.42,
+        map: makeDot(),
+        vertexColors: true,
+        transparent: true,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+        sizeAttenuation: true,
+      })
+    );
+    spin.add(points);
 
-      const pointer = { x: 0, y: 0, has: false };
-      window.addEventListener('pointermove', (e) => {
-        pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
-        pointer.y = -((e.clientY / window.innerHeight) * 2 - 1);
-        pointer.has = true;
-      }, { passive: true });
-      window.addEventListener('pointerleave', () => (pointer.has = false));
+    // --- connections ---
+    const MAX_SEG = 4000;
+    const linePos = new Float32Array(MAX_SEG * 2 * 3);
+    const lineCol = new Float32Array(MAX_SEG * 2 * 3);
+    const lineGeo = new THREE.BufferGeometry();
+    lineGeo.setAttribute('position', new THREE.BufferAttribute(linePos, 3));
+    lineGeo.setAttribute('color', new THREE.BufferAttribute(lineCol, 3));
+    const lines = new THREE.LineSegments(
+      lineGeo,
+      new THREE.LineBasicMaterial({
+        vertexColors: true,
+        transparent: true,
+        opacity: 0.55,
+        depthWrite: false,
+        blending: THREE.AdditiveBlending,
+      })
+    );
+    spin.add(lines);
 
-      function resize() {
-        const r = canvas!.getBoundingClientRect();
-        const w = r.width || window.innerWidth;
-        const h = r.height || window.innerHeight;
-        renderer.setSize(w, h, false);
-        camera.aspect = w / h; camera.updateProjectionMatrix();
-        markX = camera.aspect < 0.95 ? 0.6 : 2.4;
-        mark.position.x = markX;
-      }
-      window.addEventListener('resize', resize);
-      resize();
+    // --- pointer ---
+    const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
+    const mouseLocal = new THREE.Vector3();
+    const tmp = new THREE.Vector3();
 
-      const ndc = new THREE.Vector3();
-      const hot = new THREE.Color(0xffffff);
-      let time = 0;
+    window.addEventListener(
+      'pointermove',
+      (e) => {
+        pointer.tx = (e.clientX / window.innerWidth) * 2 - 1;
+        pointer.ty = -((e.clientY / window.innerHeight) * 2 - 1);
+      },
+      { passive: true }
+    );
 
-      function update(dt: number) {
-        time += dt;
+    function resize() {
+      const r = canvas!.getBoundingClientRect();
+      const w = r.width || window.innerWidth;
+      const h = r.height || window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+    }
+    window.addEventListener('resize', resize);
+    resize();
 
-        // stronger 3D tumble (reveals volume) + parallax, but never fully edge-on
-        const px = pointer.has ? pointer.x : 0;
-        const py = pointer.has ? pointer.y : 0;
-        const wobY = Math.sin(time * 0.42) * 0.6;
-        const wobX = Math.sin(time * 0.31) * 0.22;
-        mark.rotation.y += (wobY + px * 0.3 - mark.rotation.y) * 0.05;
-        mark.rotation.x += (wobX - py * 0.18 - mark.rotation.x) * 0.05;
+    function projectPointerToScene() {
+      tmp.set(pointer.x, pointer.y, 0.5).unproject(camera);
+      tmp.sub(camera.position).normalize();
+      const d = -camera.position.z / tmp.z;
+      tmp.copy(camera.position).addScaledVector(tmp, d); // world point on z=0 plane
+      spin.worldToLocal(mouseLocal.copy(tmp));
+    }
 
-        qMark.getWorldPosition(qWorld);
-        qPulse = Math.max(0, qPulse - dt * 1.6);
-        qMat.emissiveIntensity = 0.22 + Math.sin(time * 1.4) * 0.07 + qPulse * 0.9;
+    function buildConnections() {
+      let seg = 0;
+      const INF2 = 9; // mouse influence radius²
+      for (let i = 0; i < N && seg < MAX_SEG; i++) {
+        const a = i * 3;
+        for (let k = i + 1; k < N; k++) {
+          const b = k * 3;
+          const dx = positions[a] - positions[b];
+          const dy = positions[a + 1] - positions[b + 1];
+          const dz = positions[a + 2] - positions[b + 2];
+          const d2 = dx * dx + dy * dy + dz * dz;
+          if (d2 > CONNECT * CONNECT) continue;
 
-        let nearest = -1, best = 0.22;
-        for (let i = 0; i < nodes.length; i++) {
-          nodes[i].mesh.getWorldPosition(nodes[i].world);
-          if (!pointer.has) continue;
-          ndc.copy(nodes[i].world).project(camera);
-          const d = Math.hypot(ndc.x - pointer.x, ndc.y - pointer.y);
-          if (d < best) { best = d; nearest = i; }
-        }
+          const strength = 1 - Math.sqrt(d2) / CONNECT;
+          // midpoint distance to pointer boosts brightness
+          const mx = (positions[a] + positions[b]) * 0.5 - mouseLocal.x;
+          const my = (positions[a + 1] + positions[b + 1]) * 0.5 - mouseLocal.y;
+          const near = Math.max(0, 1 - (mx * mx + my * my) / INF2);
+          const v = strength * (0.4 + near * 1.6);
 
-        for (let i = 0; i < nodes.length; i++) {
-          const n = nodes[i];
-          n.glow += ((i === nearest ? 1 : 0) - n.glow) * 0.12;
-          n.mat.color.copy(n.base).lerp(hot, n.glow * 0.7);
-          n.mat.emissiveIntensity = n.emi + n.glow * 0.8;
-          const sc = 1 + n.glow * 0.3;
-          n.mesh.scale.set(sc, sc, sc);
-          n.next -= dt * (1 + n.glow * 5);
-          if (n.next <= 0) { ask(n); n.next = i === nearest ? 0.7 + Math.random() * 0.7 : 3.5 + Math.random() * 4; }
-        }
-
-        for (const p of ppool) {
-          if (p.t >= 1) continue;
-          p.t += dt / 1.2;
-          const e = p.t * p.t * (3 - 2 * p.t);
-          p.sp.position.lerpVectors(p.from, p.to, e);
-          p.sp.position.z += Math.sin(e * Math.PI) * 0.6; // arc toward the camera
-          p.mat.opacity = Math.sin(Math.min(p.t, 1) * Math.PI) * 0.95;
-          if (p.t >= 1) { p.sp.visible = false; qPulse = Math.min(1, qPulse + 0.7); }
+          const s = seg * 6;
+          linePos[s] = positions[a];
+          linePos[s + 1] = positions[a + 1];
+          linePos[s + 2] = positions[a + 2];
+          linePos[s + 3] = positions[b];
+          linePos[s + 4] = positions[b + 1];
+          linePos[s + 5] = positions[b + 2];
+          for (let t = 0; t < 2; t++) {
+            lineCol[s + t * 3] = 0.22 * v;
+            lineCol[s + t * 3 + 1] = 0.5 * v;
+            lineCol[s + t * 3 + 2] = 1.0 * v;
+          }
+          if (++seg >= MAX_SEG) break;
         }
       }
+      lineGeo.setDrawRange(0, seg * 2);
+      (lineGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      (lineGeo.attributes.color as THREE.BufferAttribute).needsUpdate = true;
+    }
 
-      const clock = new THREE.Clock();
-      if (reduce) {
-        for (let i = 0; i < nodes.length; i++) nodes[i].mesh.getWorldPosition(nodes[i].world);
-        update(0); renderer.render(scene, camera);
-      } else {
-        let raf = 0;
-        const loop = () => { update(Math.min(clock.getDelta(), 0.05)); renderer.render(scene, camera); raf = requestAnimationFrame(loop); };
-        loop();
-        document.addEventListener('visibilitychange', () => {
-          cancelAnimationFrame(raf);
-          if (!document.hidden) { clock.getDelta(); loop(); }
-        });
+    function step() {
+      // drift nodes within the box, bouncing at edges
+      for (let i = 0; i < N; i++) {
+        const j = i * 3;
+        positions[j] += vel[j];
+        positions[j + 1] += vel[j + 1];
+        positions[j + 2] += vel[j + 2];
+        if (Math.abs(positions[j]) > BOX.x) vel[j] *= -1;
+        if (Math.abs(positions[j + 1]) > BOX.y) vel[j + 1] *= -1;
+        if (Math.abs(positions[j + 2]) > BOX.z) vel[j + 2] *= -1;
+
+        // brighten nodes near the pointer
+        const dx = positions[j] - mouseLocal.x;
+        const dy = positions[j + 1] - mouseLocal.y;
+        const f = Math.max(0, 1 - (dx * dx + dy * dy) / 9);
+        COL_DIM.toArray(colors, j);
+        if (f > 0) {
+          colors[j] += (COL_HOT.r - colors[j]) * f;
+          colors[j + 1] += (COL_HOT.g - colors[j + 1]) * f;
+          colors[j + 2] += (COL_HOT.b - colors[j + 2]) * f;
+        }
       }
-    } catch (e) {
-      console.warn('hero 3D disabled:', e);
+      (pointGeo.attributes.position as THREE.BufferAttribute).needsUpdate = true;
+      (pointGeo.attributes.color as THREE.BufferAttribute).needsUpdate = true;
+      buildConnections();
+    }
+
+    function render() {
+      pointer.x += (pointer.tx - pointer.x) * 0.05;
+      pointer.y += (pointer.ty - pointer.y) * 0.05;
+      tilt.rotation.y += (pointer.x * 0.5 - tilt.rotation.y) * 0.05;
+      tilt.rotation.x += (-pointer.y * 0.35 - tilt.rotation.x) * 0.05;
+      spin.rotation.y += 0.0009;
+      projectPointerToScene();
+      step();
+      renderer.render(scene, camera);
+    }
+
+    if (reduceMotion) {
+      projectPointerToScene();
+      step();
+      renderer.render(scene, camera);
+    } else {
+      let raf = 0;
+      const loop = () => {
+        render();
+        raf = requestAnimationFrame(loop);
+      };
+      loop();
+      document.addEventListener('visibilitychange', () => {
+        cancelAnimationFrame(raf);
+        if (!document.hidden) loop();
+      });
     }
   }
 </script>
