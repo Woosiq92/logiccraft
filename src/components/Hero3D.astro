@@ -1,7 +1,7 @@
 ---
-// Interactive 3D hero — the geometry of a round table + a thinking network.
-// Concentric rings, 12 nodes on a circle, a {12/5} star web, spokes to a glowing
-// core, questions ("?") rising and idea-pulses flowing inward. Brand blue/white.
+// Interactive 3D hero — the LogicCraft logo, brought to life: a bold ring (the
+// table) with 4 lozenge nodes (top/bottom blue, left/right light) and the "?".
+// People at the table raise questions that flow into the question mark.
 ---
 
 <section class="hero">
@@ -46,135 +46,106 @@
       const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.1;
+      renderer.toneMappingExposure = 1.12;
+
+      const BLUE = 0x2563eb;
+      const LIGHT = 0xeaf2ff;
 
       const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100);
-      const camBase = new THREE.Vector3(0, 5.8, 10.6); // elevated → rings read as a round table
-      const target = new THREE.Vector3(0, 0, 0);
+      const camera = new THREE.PerspectiveCamera(48, 1, 0.1, 100);
+      const camBase = new THREE.Vector3(0, 0.5, 12);
+      const target = new THREE.Vector3(0, 0.4, 0);
       camera.position.copy(camBase);
       camera.lookAt(target);
 
-      // rig: tilts/parallax; spin: continuous rotation of the geometry
-      const rig = new THREE.Group();
-      const spin = new THREE.Group();
-      rig.add(spin);
-      scene.add(rig);
-      let tableX = 2.2;
-      rig.position.x = tableX;
+      // mark = the logo, living in 3D; gentle wobble + parallax keeps it readable
+      const mark = new THREE.Group();
+      scene.add(mark);
+      let markX = 2.4;
+      mark.position.set(markX, 0.4, 0);
 
-      // --- textures ---
+      // textures
       function dotTexture() {
         const c = document.createElement('canvas'); c.width = c.height = 64;
         const x = c.getContext('2d')!;
         const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
-        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.4, 'rgba(255,255,255,0.65)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+        g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.4, 'rgba(255,255,255,0.6)'); g.addColorStop(1, 'rgba(255,255,255,0)');
         x.fillStyle = g; x.fillRect(0, 0, 64, 64);
         return new THREE.CanvasTexture(c);
       }
       function questionTexture() {
-        // geometric monoline "?" — matches the glowing wireframe aesthetic
-        const c = document.createElement('canvas'); c.width = c.height = 128;
+        const c = document.createElement('canvas'); c.width = c.height = 160;
         const x = c.getContext('2d')!;
         x.strokeStyle = '#fff'; x.fillStyle = '#fff';
-        x.lineWidth = 9; x.lineCap = 'round'; x.lineJoin = 'round';
+        x.lineWidth = 16; x.lineCap = 'round'; x.lineJoin = 'round';
         x.beginPath();
-        x.arc(64, 46, 22, Math.PI * 0.86, Math.PI * 0.18, false); // upper hook (open circle)
-        x.quadraticCurveTo(82, 78, 64, 84); // sweep down-right into a centered stem
+        x.arc(80, 58, 30, Math.PI * 0.86, Math.PI * 0.18, false);
+        x.quadraticCurveTo(105, 100, 80, 108);
         x.stroke();
-        x.beginPath(); x.arc(64, 104, 6, 0, Math.PI * 2); x.fill(); // dot
+        x.beginPath(); x.arc(80, 134, 9, 0, Math.PI * 2); x.fill();
         return new THREE.CanvasTexture(c);
       }
       const DOT = dotTexture();
       const QMARK = questionTexture();
 
-      // --- concentric rings (the round table, as pure geometry) ---
-      const R_OUT = 4.2;
-      function ring(r: number, tube: number, opacity: number, color: number) {
-        const m = new THREE.Mesh(
-          new THREE.TorusGeometry(r, tube, 12, 160),
-          new THREE.MeshBasicMaterial({ color, transparent: true, opacity, depthWrite: false, blending: THREE.AdditiveBlending })
-        );
-        m.rotation.x = Math.PI / 2;
-        spin.add(m);
-        return m;
-      }
-      ring(R_OUT, 0.018, 0.55, 0x60a5fa);
-      ring(2.7, 0.012, 0.3, 0x3b82f6);
-      ring(1.25, 0.012, 0.35, 0x3b82f6);
-
-      // --- 12 nodes evenly on the outer circle ---
-      const N = 12;
-      type Node = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; base: THREE.Color; r0: number; local: THREE.Vector3; next: number; glow: number; world: THREE.Vector3 };
-      const nodes: Node[] = [];
-      for (let i = 0; i < N; i++) {
-        const a = (i / N) * Math.PI * 2;
-        const local = new THREE.Vector3(Math.cos(a) * R_OUT, 0, Math.sin(a) * R_OUT);
-        const accent = i % 3 === 0;
-        const base = new THREE.Color(accent ? 0x3b82f6 : 0xdbeafe);
-        const mat = new THREE.SpriteMaterial({ map: DOT, color: base.clone(), transparent: true, opacity: 0.95, depthWrite: false, blending: THREE.AdditiveBlending });
-        const r0 = accent ? 0.5 : 0.4;
-        const sp = new THREE.Sprite(mat);
-        sp.scale.setScalar(r0);
-        sp.position.copy(local);
-        spin.add(sp);
-        nodes.push({ sp, mat, base, r0, local, next: 1.5 + Math.random() * 5, glow: 0, world: new THREE.Vector3() });
-      }
-
-      // --- network: {12/5} star web + spokes to the core ---
-      const segs: number[] = [];
-      const seen = new Set<string>();
-      for (let i = 0; i < N; i++) {
-        const j = (i + 5) % N; // {12/5} star polygon
-        const key = i < j ? `${i}-${j}` : `${j}-${i}`;
-        if (!seen.has(key)) { seen.add(key); const a = nodes[i].local, b = nodes[j].local; segs.push(a.x, a.y, a.z, b.x, b.y, b.z); }
-      }
-      const starGeo = new THREE.BufferGeometry();
-      starGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(segs), 3));
-      const starMat = new THREE.LineBasicMaterial({ color: 0x60a5fa, transparent: true, opacity: 0.32, depthWrite: false, blending: THREE.AdditiveBlending });
-      spin.add(new THREE.LineSegments(starGeo, starMat));
-
-      const spokeArr: number[] = [];
-      for (let i = 0; i < N; i++) { const a = nodes[i].local; spokeArr.push(a.x, a.y, a.z, 0, 0, 0); }
-      const spokeGeo = new THREE.BufferGeometry();
-      spokeGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(spokeArr), 3));
-      spin.add(new THREE.LineSegments(spokeGeo, new THREE.LineBasicMaterial({ color: 0x2563eb, transparent: true, opacity: 0.16, depthWrite: false, blending: THREE.AdditiveBlending })));
-
-      // --- glowing core + rotating octahedron at the center ---
-      const core = new THREE.Group();
-      spin.add(core);
-      const coreDot = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0xeaf2ff, transparent: true, opacity: 1, depthWrite: false, blending: THREE.AdditiveBlending }));
-      coreDot.scale.setScalar(0.7); core.add(coreDot);
-      const coreHalo = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0x3b82f6, transparent: true, opacity: 0.4, depthWrite: false, blending: THREE.AdditiveBlending }));
-      coreHalo.scale.setScalar(2.2); core.add(coreHalo);
-      const octa = new THREE.LineSegments(
-        new THREE.EdgesGeometry(new THREE.OctahedronGeometry(0.6)),
-        new THREE.LineBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.85, depthWrite: false, blending: THREE.AdditiveBlending })
+      // --- the ring (table) ---
+      const R = 2.15;
+      const ringCenter = new THREE.Vector3(1.3, 0, 0); // ring sits on the right of the mark
+      const ring = new THREE.Mesh(
+        new THREE.TorusGeometry(R, 0.26, 20, 140),
+        new THREE.MeshBasicMaterial({ color: LIGHT })
       );
-      core.add(octa);
+      ring.position.copy(ringCenter);
+      mark.add(ring);
+      // soft halo behind the ring
+      const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: DOT, color: 0x3b82f6, transparent: true, opacity: 0.35, depthWrite: false, blending: THREE.AdditiveBlending }));
+      halo.scale.setScalar(7); halo.position.copy(ringCenter);
+      mark.add(halo);
 
-      // --- rising "?" + idea-pulse pools ---
-      type Q = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; life: number; max: number; from: THREE.Vector3 };
-      const qpool: Q[] = [];
-      for (let i = 0; i < 10; i++) {
-        const mat = new THREE.SpriteMaterial({ map: QMARK, color: 0xdbeafe, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-        const sp = new THREE.Sprite(mat); sp.scale.setScalar(1); sp.visible = false; scene.add(sp);
-        qpool.push({ sp, mat, life: 0, max: 1, from: new THREE.Vector3() });
+      // --- 4 lozenge nodes (top/bottom blue, left/right light) ---
+      const nodeGeo = new THREE.CapsuleGeometry(0.26, 0.62, 8, 18);
+      const NR = R + 0.46; // nodes sit just OUTSIDE the ring, like the logo's tabs
+      const nodeDefs = [
+        { ang: Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },   // top — horizontal lozenge
+        { ang: -Math.PI / 2, color: BLUE, rotZ: Math.PI / 2 },  // bottom — horizontal
+        { ang: 0, color: LIGHT, rotZ: 0 },                      // right — vertical
+        { ang: Math.PI, color: LIGHT, rotZ: 0 },                // left — vertical
+      ];
+      type Node = { mesh: THREE.Mesh; mat: THREE.MeshBasicMaterial; base: THREE.Color; local: THREE.Vector3; next: number; glow: number; world: THREE.Vector3 };
+      const nodes: Node[] = [];
+      for (const d of nodeDefs) {
+        const local = new THREE.Vector3(ringCenter.x + Math.cos(d.ang) * NR, Math.sin(d.ang) * NR, 0);
+        const base = new THREE.Color(d.color);
+        const mat = new THREE.MeshBasicMaterial({ color: base.clone() });
+        const mesh = new THREE.Mesh(nodeGeo, mat);
+        mesh.position.copy(local);
+        mesh.rotation.z = d.rotZ;
+        mark.add(mesh);
+        nodes.push({ mesh, mat, base, local, next: 1 + Math.random() * 4, glow: 0, world: new THREE.Vector3() });
       }
+
+      // --- the question mark (left element of the logo) ---
+      const qPos = new THREE.Vector3(-2.4, 0.15, 0);
+      const bigQMat = new THREE.SpriteMaterial({ map: QMARK, color: LIGHT, transparent: true, opacity: 0.6, depthWrite: false, blending: THREE.AdditiveBlending });
+      const bigQ = new THREE.Sprite(bigQMat);
+      bigQ.scale.setScalar(3.0);
+      bigQ.position.copy(qPos);
+      mark.add(bigQ);
+      let qPulse = 0; // brightens when a question arrives
+      const qWorld = new THREE.Vector3();
+
+      // --- idea pulses: node → question mark ---
       type P = { sp: THREE.Sprite; mat: THREE.SpriteMaterial; t: number; from: THREE.Vector3; to: THREE.Vector3 };
       const ppool: P[] = [];
-      for (let i = 0; i < 14; i++) {
+      for (let i = 0; i < 12; i++) {
         const mat = new THREE.SpriteMaterial({ map: DOT, color: 0x93c5fd, transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending });
-        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.42); sp.visible = false; scene.add(sp);
+        const sp = new THREE.Sprite(mat); sp.scale.setScalar(0.5); sp.visible = false; scene.add(sp);
         ppool.push({ sp, mat, t: 1, from: new THREE.Vector3(), to: new THREE.Vector3() });
       }
-      const coreWorld = new THREE.Vector3();
 
       function ask(n: Node) {
-        const q = qpool.find((q) => q.life <= 0);
-        if (q) { q.from.copy(n.world); q.life = q.max = 2.4 + Math.random() * 0.8; q.sp.visible = true; }
-        const p = ppool.find((p) => p.t >= 1); // idea flows inward to the core
-        if (p) { p.from.copy(n.world); p.to.copy(coreWorld); p.t = 0; p.sp.visible = true; }
+        const p = ppool.find((p) => p.t >= 1);
+        if (p) { p.from.copy(n.world); p.to.copy(qWorld); p.t = 0; p.sp.visible = true; }
       }
 
       const pointer = { x: 0, y: 0, has: false };
@@ -191,74 +162,65 @@
         const h = r.height || window.innerHeight;
         renderer.setSize(w, h, false);
         camera.aspect = w / h; camera.updateProjectionMatrix();
-        tableX = camera.aspect < 0.95 ? 0.4 : 2.2;
-        rig.position.x = tableX;
+        markX = camera.aspect < 0.95 ? 0.6 : 2.4;
+        mark.position.x = markX;
       }
       window.addEventListener('resize', resize);
       resize();
 
       const ndc = new THREE.Vector3();
-      const up = new THREE.Vector3(0, 1, 0);
       const hot = new THREE.Color(0xffffff);
       let time = 0;
 
       function update(dt: number) {
         time += dt;
-        spin.rotation.y += 0.12 * dt;
-        core.rotation.y += 0.5 * dt;
-        core.rotation.x = 0.4;
-        coreDot.scale.setScalar(0.6 + Math.sin(time * 2) * 0.12);
-        starMat.opacity = 0.26 + Math.sin(time * 1.3) * 0.08; // web breathes
 
-        // parallax tilt
+        // gentle 3D wobble (keeps the logo readable) + parallax
         const px = pointer.has ? pointer.x : 0;
         const py = pointer.has ? pointer.y : 0;
-        rig.rotation.y += (px * 0.35 - rig.rotation.y) * 0.05;
-        rig.rotation.x += (-py * 0.2 - rig.rotation.x) * 0.05;
+        const wobY = Math.sin(time * 0.5) * 0.28;
+        const wobX = Math.sin(time * 0.37) * 0.12;
+        mark.rotation.y += (wobY + px * 0.25 - mark.rotation.y) * 0.06;
+        mark.rotation.x += (wobX - py * 0.15 - mark.rotation.x) * 0.06;
 
-        core.getWorldPosition(coreWorld);
+        bigQ.getWorldPosition(qWorld);
+        qPulse = Math.max(0, qPulse - dt * 1.6);
+        bigQMat.opacity = 0.55 + Math.sin(time * 1.4) * 0.08 + qPulse * 0.4;
+        bigQ.scale.setScalar(3.0 + qPulse * 0.5);
 
         let nearest = -1, best = 0.22;
-        for (let i = 0; i < N; i++) {
-          nodes[i].sp.getWorldPosition(nodes[i].world);
+        for (let i = 0; i < nodes.length; i++) {
+          nodes[i].mesh.getWorldPosition(nodes[i].world);
           if (!pointer.has) continue;
           ndc.copy(nodes[i].world).project(camera);
           const d = Math.hypot(ndc.x - pointer.x, ndc.y - pointer.y);
           if (d < best) { best = d; nearest = i; }
         }
 
-        for (let i = 0; i < N; i++) {
+        for (let i = 0; i < nodes.length; i++) {
           const n = nodes[i];
           n.glow += ((i === nearest ? 1 : 0) - n.glow) * 0.12;
-          n.mat.color.copy(n.base).lerp(hot, n.glow * 0.8);
-          n.sp.scale.setScalar(n.r0 + n.glow * 0.5);
+          n.mat.color.copy(n.base).lerp(hot, n.glow * 0.7);
+          const sc = 1 + n.glow * 0.3;
+          n.mesh.scale.set(sc, sc, sc);
           n.next -= dt * (1 + n.glow * 5);
-          if (n.next <= 0) { ask(n); n.next = i === nearest ? 0.8 + Math.random() * 0.8 : 4 + Math.random() * 5; }
+          if (n.next <= 0) { ask(n); n.next = i === nearest ? 0.7 + Math.random() * 0.7 : 3.5 + Math.random() * 4; }
         }
 
-        for (const q of qpool) {
-          if (q.life <= 0) continue;
-          q.life -= dt;
-          const t = 1 - q.life / q.max;
-          q.sp.position.copy(q.from).addScaledVector(up, 0.4 + t * 2.6);
-          q.sp.scale.setScalar(1.0 + t * 0.9);
-          q.mat.opacity = Math.sin(Math.min(t, 1) * Math.PI);
-          if (q.life <= 0) q.sp.visible = false;
-        }
         for (const p of ppool) {
           if (p.t >= 1) continue;
           p.t += dt / 1.2;
           const e = p.t * p.t * (3 - 2 * p.t);
           p.sp.position.lerpVectors(p.from, p.to, e);
-          p.sp.position.y += Math.sin(e * Math.PI) * 0.4;
+          p.sp.position.y += Math.sin(e * Math.PI) * 0.5; // arc across the mark
           p.mat.opacity = Math.sin(Math.min(p.t, 1) * Math.PI) * 0.95;
-          if (p.t >= 1) p.sp.visible = false;
+          if (p.t >= 1) { p.sp.visible = false; qPulse = Math.min(1, qPulse + 0.7); } // arrival lights the "?"
         }
       }
 
       const clock = new THREE.Clock();
       if (reduce) {
-        for (let i = 0; i < N; i++) nodes[i].sp.getWorldPosition(nodes[i].world);
+        for (let i = 0; i < nodes.length; i++) nodes[i].mesh.getWorldPosition(nodes[i].world);
         update(0); renderer.render(scene, camera);
       } else {
         let raf = 0;
