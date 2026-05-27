@@ -2,10 +2,11 @@
 import Layout from '../layouts/Layout.astro';
 import Hero3D from '../components/Hero3D.astro';
 import AppCard from '../components/AppCard.astro';
-import { apps } from '../data/apps';
+import { apps, categories } from '../data/apps';
 
 const live = apps.filter((a) => a.status === 'live');
 const soon = apps.filter((a) => a.status === 'soon');
+const BOOK_URL = 'https://product.kyobobook.co.kr/detail/S000219252300';
 ---
 
 <Layout>
@@ -35,11 +36,16 @@ const soon = apps.filter((a) => a.status === 'soon');
   <section id="products" class="wrap">
     <div class="section-head">
       <p class="eyebrow">제품</p>
-      <h2>출시된 제품</h2>
     </div>
-    <div class="app-grid">
-      {live.map((app) => <AppCard app={app} />)}
-    </div>
+    {categories.map((cat) => {
+      const items = live.filter((a) => a.category === cat);
+      return items.length > 0 ? (
+        <div class="cat-block">
+          <h3 class="cat-label">{cat}</h3>
+          <div class="app-grid">{items.map((app) => <AppCard app={app} />)}</div>
+        </div>
+      ) : null;
+    })}
 
     {soon.length > 0 && (
       <>
@@ -49,6 +55,27 @@ const soon = apps.filter((a) => a.status === 'soon');
         </div>
       </>
     )}
+  </section>
+
+  <section class="wrap book">
+    <div class="section-head">
+      <p class="eyebrow">도서</p>
+    </div>
+    <article class="book-card">
+      <a class="cover" href={BOOK_URL} target="_blank" rel="noopener">
+        <img src="/book-cover.jpg" alt="당연함을 의심하는 연습 표지" width="170" height="255" loading="lazy" />
+      </a>
+      <div class="book-meta">
+        <h3>당연함을 의심하는 연습</h3>
+        <p class="byline">최우식 지음 · 수필·자기계발 · 2026 · 132쪽</p>
+        <p class="book-blurb">
+          자기·사랑·사회·일상·배움 — 5가지 영역의 당연함을 49편의 짧은 에세이로 의심합니다.
+          정답을 제시하지 않고 질문을 남겨, 읽는 사람이 스스로 답을 찾게 합니다.
+          로직크래프트가 지향하는 "생각하는 힘"의 출발점입니다.
+        </p>
+        <a class="btn btn-primary" href={BOOK_URL} target="_blank" rel="noopener">교보문고에서 보기</a>
+      </div>
+    </article>
   </section>
 
   <section class="wrap cta-band">
@@ -77,6 +104,32 @@ const soon = apps.filter((a) => a.status === 'soon');
   .intro p { color: var(--sub); margin: 1rem 0 0; max-width: 56ch; font-size: 1.05rem; }
 
   .soon-head { margin-top: 3rem; }
+
+  .book { padding-top: 4.5rem; }
+  .book-card {
+    display: flex;
+    gap: 1.8rem;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--bg);
+    padding: 1.8rem;
+  }
+  .book .cover {
+    flex-shrink: 0;
+    display: block;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(20, 22, 28, 0.16);
+    transition: transform 0.16s ease;
+  }
+  .book .cover:hover { transform: translateY(-3px); }
+  .book .cover img { display: block; width: 170px; height: auto; }
+  .book-meta { flex: 1; min-width: 260px; }
+  .book-meta h3 { margin: 0; font-size: 1.3rem; font-weight: 800; }
+  .byline { margin: 0.5rem 0 0; color: var(--muted); font-size: 0.9rem; }
+  .book-blurb { margin: 1rem 0 1.5rem; color: var(--sub); font-size: 0.98rem; line-height: 1.75; max-width: 54ch; }
 
   .cta-band { padding: 4.5rem 1.5rem 5.5rem; }
   .cta-inner {

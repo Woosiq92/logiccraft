@@ -1,7 +1,7 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AppCard from '../components/AppCard.astro';
-import { apps } from '../data/apps';
+import { apps, categories } from '../data/apps';
 
 const live = apps.filter((a) => a.status === 'live');
 const soon = apps.filter((a) => a.status === 'soon');
@@ -19,9 +19,15 @@ const soon = apps.filter((a) => a.status === 'soon');
 
   <section class="wrap">
     <div class="section-head"><h2>출시된 제품</h2></div>
-    <div class="app-grid">
-      {live.map((app) => <AppCard app={app} />)}
-    </div>
+    {categories.map((cat) => {
+      const items = live.filter((a) => a.category === cat);
+      return items.length > 0 ? (
+        <div class="cat-block">
+          <h3 class="cat-label">{cat}</h3>
+          <div class="app-grid">{items.map((app) => <AppCard app={app} />)}</div>
+        </div>
+      ) : null;
+    })}
   </section>
 
   {soon.length > 0 && (

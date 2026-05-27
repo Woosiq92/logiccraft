@@ -3,14 +3,19 @@ export interface AppLink {
   href: string;
 }
 
+export type Category = '교육' | '일상';
+
 export interface AppInfo {
   name: string;
   icon: string; // /icons/*.png — real app/product icon
   blurb: string;
+  category: Category;
   status: 'live' | 'soon';
   featured?: boolean;
   links: AppLink[];
 }
+
+export const categories: Category[] = ['교육', '일상'];
 
 // Icons are the real product icons copied from each project. App support/privacy
 // pages stay on woosiq92.github.io; the company site only links out to them.
@@ -19,6 +24,7 @@ export const apps: AppInfo[] = [
     name: '로보트레일',
     icon: '/icons/robotrail.png',
     blurb: '코드 없이 로봇을 움직이며 코딩 사고력을 훈련하는 퍼즐 앱.',
+    category: '교육',
     status: 'live',
     featured: true,
     links: [
@@ -30,6 +36,7 @@ export const apps: AppInfo[] = [
     name: '과학자 클럽',
     icon: '/icons/science-club.png',
     blurb: '추측·발견·분기·회고 4단계로 매일 한 별씩 켜는 과학 사고 게임.',
+    category: '교육',
     status: 'live',
     featured: true,
     links: [
@@ -39,9 +46,19 @@ export const apps: AppInfo[] = [
     ],
   },
   {
+    name: '왜 그렇게 생각해?',
+    icon: '/icons/scienceapp.png',
+    blurb: '정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼 (웹).',
+    category: '교육',
+    status: 'live',
+    featured: true,
+    links: [{ label: '바로가기', href: 'https://logicschool.co.kr' }],
+  },
+  {
     name: '커플맵로그',
     icon: '/icons/ourfootprint.png',
     blurb: '둘이 다녀온 동네가 색으로 칠해지는 커플 데이트 점령 지도.',
+    category: '일상',
     status: 'live',
     featured: true,
     links: [
@@ -54,26 +71,12 @@ export const apps: AppInfo[] = [
     name: '불안한개미',
     icon: '/icons/stockwatch.png',
     blurb: '매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.',
+    category: '일상',
     status: 'live',
     featured: true,
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6772662894' },
       { label: '개인정보', href: 'https://woosiq92.github.io/stockwatch/privacy.html' },
     ],
-  },
-  {
-    name: '왜 그렇게 생각해?',
-    icon: '/icons/scienceapp.png',
-    blurb: '정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼 (웹).',
-    status: 'live',
-    featured: true,
-    links: [{ label: '바로가기', href: 'https://logicschool.co.kr' }],
-  },
-  {
-    name: '폴리톡',
-    icon: '/icons/polytalk.png',
-    blurb: '뉴스를 30초로 파악하고 내 의견을 정리하는 정치 리터러시 앱.',
-    status: 'soon',
-    links: [],
   },
 ];
