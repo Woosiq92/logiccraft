@@ -73,10 +73,16 @@
         return new THREE.CanvasTexture(c);
       }
       function questionTexture() {
+        // geometric monoline "?" — matches the glowing wireframe aesthetic
         const c = document.createElement('canvas'); c.width = c.height = 128;
         const x = c.getContext('2d')!;
-        x.fillStyle = '#fff'; x.font = 'bold 96px -apple-system, BlinkMacSystemFont, system-ui, sans-serif';
-        x.textAlign = 'center'; x.textBaseline = 'middle'; x.fillText('?', 64, 72);
+        x.strokeStyle = '#fff'; x.fillStyle = '#fff';
+        x.lineWidth = 9; x.lineCap = 'round'; x.lineJoin = 'round';
+        x.beginPath();
+        x.arc(64, 46, 22, Math.PI * 0.86, Math.PI * 0.18, false); // upper hook (open circle)
+        x.quadraticCurveTo(82, 78, 64, 84); // sweep down-right into a centered stem
+        x.stroke();
+        x.beginPath(); x.arc(64, 104, 6, 0, Math.PI * 2); x.fill(); // dot
         return new THREE.CanvasTexture(c);
       }
       const DOT = dotTexture();
