@@ -17,8 +17,9 @@ export interface AppInfo {
 
 export const categories: Category[] = ['교육', '일상'];
 
-// Icons are the real product icons copied from each project. App support/privacy
-// pages stay on woosiq92.github.io; the company site only links out to them.
+// Icons are the real product icons copied from each project. Newer apps host their
+// support/privacy pages on this site under /apps/<app>/… ; older apps still link out
+// to woosiq92.github.io.
 export const apps: AppInfo[] = [
   {
     name: '로보트레일',
@@ -85,6 +86,9 @@ export const apps: AppInfo[] = [
     blurb: '정치 몰라도 OK. 친구처럼 알려주는 정치·시사 한 토막과 우리 동네 후보·의원 정리.',
     category: '교육',
     status: 'soon',
-    links: [],
+    links: [
+      { label: '지원', href: '/apps/sedolal/support' },
+      { label: '개인정보', href: '/apps/sedolal/privacy' },
+    ],
   },
 ];

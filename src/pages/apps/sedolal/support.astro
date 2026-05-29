@@ -1,0 +1,79 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '로그인 없이 써볼 수 있나요?',
+    a: '네. "로그인 없이 둘러보기"를 누르면 🏠 홈 화면을 자유롭게 둘러볼 수 있어요. 배우기·오늘·우리 동네·MY 탭은 가입(카카오 또는 Apple로 시작하기) 후 이용할 수 있습니다.',
+  },
+  {
+    q: '어떻게 가입하나요?',
+    a: '첫 화면에서 "카카오로 시작하기" 또는 "Apple로 시작하기"를 누르면 됩니다. 별도의 비밀번호 입력 없이 소셜 로그인만으로 가입·로그인이 완료돼요.',
+  },
+  {
+    q: "'이게 뭐야?' 버튼은 뭔가요?",
+    a: '뉴스 카드나 모듈에 나오는 어려운 정치·시사 용어를 한 줄로 쉽게 풀어주는 용어 사전 기능입니다. 모르는 단어가 보이면 눌러보세요.',
+  },
+  {
+    q: "'오늘' 탭은 어떻게 보나요?",
+    a: '같은 이슈를 여러 매체가 어떻게 다르게 표현하는지 헤드라인으로 비교해 볼 수 있어요. 제목을 누르면 원문 기사로 이동합니다. 특정 진영을 자동으로 라벨하지 않으며, 판단은 사용자의 몫으로 둡니다.',
+  },
+  {
+    q: "'우리 동네' 정보는 어떻게 설정하나요?",
+    a: '시·도(지역)를 설정하면 내 지역의 후보·의원·다음 선거 정보를 볼 수 있습니다. 후보 정보는 중앙선거관리위원회 공공데이터를 기반으로 합니다.',
+  },
+  {
+    q: '계정을 삭제하고 싶어요.',
+    a: '앱 내 👤 MY 탭 → 계정 → "계정 삭제"에서 직접 탈퇴할 수 있습니다. 탈퇴 시 닉네임·기록 등 계정에 연결된 데이터가 삭제되며 되돌릴 수 없습니다. 화면에서 진행이 어려우시면 아래 이메일로 가입한 계정을 알려주시면 처리해 드립니다.',
+  },
+];
+---
+
+<Layout
+  title="세상돌아가는거알아버리기 — 고객 지원 · 로직크래프트"
+  description="세상돌아가는거알아버리기 고객 지원. 자주 묻는 질문과 문의 안내."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>세상돌아가는거알아버리기</h1>
+    <p>뉴스가 어려운 사람도, 친구가 옆에서 풀어주듯 쉽게.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 기능 제안, 계정·탈퇴, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:smartsikhye@gmail.com?subject=[세상돌아가는거알아버리기] 문의">smartsikhye@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/sedolal/privacy">개인정보 처리방침</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
