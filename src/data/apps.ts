@@ -85,8 +85,10 @@ export const apps: AppInfo[] = [
     icon: '/icons/sedolal.png',
     blurb: '정치 몰라도 OK. 친구처럼 알려주는 정치·시사 한 토막과 우리 동네 후보·의원 정리.',
     category: '교육',
-    status: 'soon',
+    status: 'live',
+    featured: true,
     links: [
+      { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6770908480' },
       { label: '지원', href: '/apps/sedolal/support' },
       { label: '개인정보', href: '/apps/sedolal/privacy' },
     ],
