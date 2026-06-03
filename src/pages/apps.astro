@@ -1,7 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import AppCard from '../components/AppCard.astro';
+import LineCard from '../components/LineCard.astro';
 import { apps, categories } from '../data/apps';
+import { lines } from '../data/synergeion';
 
 const live = apps.filter((a) => a.status === 'live');
 const soon = apps.filter((a) => a.status === 'soon');
@@ -9,16 +11,26 @@ const soon = apps.filter((a) => a.status === 'soon');
 
 <Layout
   title="제품 — 로직크래프트 LogicCraft"
-  description="로직크래프트가 만든 제품 모음. 앱(로보트레일·과학자 클럽·커플맵로그·불안한개미)과 웹 학습 플랫폼 '왜 그렇게 생각해?'."
+  description="로직크래프트가 만든 제품 모음. 사고력 EdTech 시리즈 Synergeion과 단독 앱(로보트레일·과학자 클럽·커플맵로그·불안한개미 등), 웹 학습 플랫폼."
 >
   <section class="wrap page-head">
     <p class="eyebrow">제품</p>
     <h1>우리가 만든 제품</h1>
-    <p>작지만 또렷한 목적을 가진 도구들. 기획·디자인·출시까지 직접 만들었습니다.</p>
+    <p>기획·디자인·출시까지 직접 만들었습니다. 사고력 시리즈와 작고 또렷한 도구들.</p>
   </section>
 
   <section class="wrap">
-    <div class="section-head"><h2>출시된 제품</h2></div>
+    <div class="section-head">
+      <h2>Synergeion 시리즈</h2>
+      <p>3세부터 18세까지 이어 타는 사고력 EdTech 라인업. <a href="/synergeion">시리즈 보기 →</a></p>
+    </div>
+    <div class="lines">
+      {lines.map((line, i) => <LineCard line={line} index={i} />)}
+    </div>
+  </section>
+
+  <section class="wrap">
+    <div class="section-head"><h2>스튜디오 제품</h2></div>
     {categories.map((cat) => {
       const items = live.filter((a) => a.category === cat);
       return items.length > 0 ? (
@@ -45,4 +57,5 @@ const soon = apps.filter((a) => a.status === 'soon');
   .page-head h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0.3rem 0 0; }
   .page-head p { color: var(--sub); margin: 0.8rem 0 0; max-width: 50ch; }
   section + section { padding-top: 1rem; }
+  .lines { display: grid; gap: 0.8rem; }
 </style>

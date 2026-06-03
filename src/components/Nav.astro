@@ -1,6 +1,7 @@
 ---
 const links = [
   { href: '/', label: '홈' },
+  { href: '/synergeion', label: 'Synergeion' },
   { href: '/apps', label: '제품' },
   { href: '/about', label: '소개' },
   { href: '/contact', label: '문의' },
@@ -57,5 +58,5 @@ const path = Astro.url.pathname.replace(/\/$/, '') || '/';
     border-radius: 8px;
   }
   nav a:hover { color: var(--ink); background: var(--bg-alt); text-decoration: none; }
-  nav a[aria-current='page'] { color: var(--accent); }
+  nav a[aria-current='page'] { color: var(--accent-deep); }
 </style>

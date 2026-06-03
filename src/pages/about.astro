@@ -27,8 +27,9 @@ const principles = [
     <h1>작은 도구가<br />생각을 바꾼다고 믿습니다.</h1>
     <p class="intro">
       로직크래프트(LogicCraft)는 사고력·판단력을 키우는 앱과 학습 플랫폼을 만듭니다.
-      코딩 퍼즐부터 과학 사고 게임, 기록 도구, 시세 모니터까지 — 분야는 달라도
-      "사람의 생각을 한 뼘 거든다"는 한 방향을 봅니다.
+      대표 시리즈는 3세부터 18세까지 이어 가는 사고력 EdTech <a href="/synergeion">Synergeion</a>이며,
+      그 곁에 코딩 퍼즐·과학 사고 게임·기록 도구·시세 모니터 같은 작고 또렷한 도구들이 있습니다.
+      분야는 달라도 "사람의 생각을 한 뼘 거든다"는 한 방향을 봅니다.
     </p>
     <p class="logo-note">
       로고는 <strong>물음표</strong>와 <strong>둘러앉아 토론하는 탁자</strong>를 형상화했습니다 —
@@ -39,7 +40,7 @@ const principles = [
   <section class="wrap">
     <div class="principles">
       {principles.map((p, i) => (
-        <div class="principle">
+        <div class="card principle">
           <span class="num">{String(i + 1).padStart(2, '0')}</span>
           <h3>{p.title}</h3>
           <p>{p.body}</p>
@@ -49,7 +50,7 @@ const principles = [
   </section>
 
   <section class="wrap">
-    <div class="biz-card">
+    <div class="card biz-card">
       <h2>사업자 정보</h2>
       <dl>
         <div><dt>상호</dt><dd>로직크래프트 (LogicCraft)</dd></div>
@@ -76,23 +77,14 @@ const principles = [
   }
   .logo-note strong { color: var(--sub); }
 
-  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.3rem; }
+  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
   @media (max-width: 720px) { .principles { grid-template-columns: 1fr; } }
-  .principle {
-    padding: 1.6rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--bg-alt);
-  }
-  .principle .num { font-weight: 800; color: var(--accent); font-size: 0.9rem; letter-spacing: 0.05em; }
+  .principle .num { font-weight: 800; color: var(--accent-deep); font-size: 0.9rem; letter-spacing: 0.05em; }
   .principle h3 { margin: 0.5rem 0 0.5rem; font-size: 1.15rem; }
   .principle p { margin: 0; color: var(--sub); font-size: 0.94rem; }
 
-  .biz-card {
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 2rem;
-  }
+  .biz-card { padding: var(--space-7); }
+  .biz-card:hover { transform: none; box-shadow: var(--shadow-sm); }
   .biz-card h2 { margin: 0 0 1.2rem; font-size: 1.3rem; }
   dl { margin: 0; display: grid; gap: 0.8rem; }
   dl > div { display: flex; gap: 1rem; }

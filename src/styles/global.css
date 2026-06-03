@@ -1,22 +1,47 @@
+/* ───────────────────────────────────────────────────────────
+   LogicCraft 디자인 시스템
+   = Synergeion 앱 디자인 시스템(DESIGN_SYSTEM.md §12)을 사이트에 채택.
+   navy 잉크 + 청동 액센트 · 8px 간격 · ui-rounded · .card/.kicker 골격.
+   전 제품과 같은 시각 언어를 공유하기 위한 단일 토큰 소스.
+─────────────────────────────────────────────────────────── */
 :root {
-  --accent: #2563eb;
-  --accent-soft: #60a5fa;
-  --ink: #14161c;
-  --sub: #4b5563;
-  --muted: #8b919c;
-  --bg: #ffffff;
-  --bg-alt: #faf9f7;
-  --border: #ececf0;
-  --night: #0a0b0f;
+  /* ── 우산 토큰 (전 제품 공유) ── */
+  --ink: #14161c;        /* 본문·앵커·footer (초기 버전) */
+  --sub: #4b5563;        /* 보조 텍스트 */
+  --muted: #8b919c;      /* 약한 텍스트 */
+  --accent: #2563eb;     /* 블루 — 액센트·강조 (초기 버전) */
+  --accent-deep: #2563eb;/* 링크 텍스트 */
+  --accent-soft: #60a5fa;/* 블루 라이트 */
+  --series-soft: #e8ecf5;/* 회청 구분 배경 */
 
-  --max: 960px;
-  --radius: 16px;
-  --font: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard",
-    system-ui, "Segoe UI", Roboto, sans-serif;
+  --bg: #ffffff;
+  --bg-alt: #f6f8fb;     /* 쿨 페이퍼 */
+  --mascot-bg: #eef2f7;  /* 마스코트 컷 배경 (쿨톤, 이미지 fill과 일치) */
+  --border: #e5e8f1;     /* navy-tinted 보더 */
+  --night: #16224a;      /* 다크 섹션 상단 */
+
+  /* ── 간격 (8px 베이스) ── */
+  --space-1: 4px;  --space-2: 8px;  --space-3: 12px; --space-4: 16px;
+  --space-5: 20px; --space-6: 24px; --space-7: 32px; --space-8: 40px; --space-9: 56px;
+
+  /* ── radius ── */
+  --radius-sm: 10px; --radius: 16px; --radius-lg: 20px; --radius-xl: 24px; --radius-pill: 999px;
+
+  /* ── shadow (navy 톤) ── */
+  --shadow-sm: 0 2px 8px rgba(26, 39, 84, 0.05);
+  --shadow-md: 0 8px 24px rgba(26, 39, 84, 0.08);
+  --shadow-lg: 0 16px 42px rgba(26, 39, 84, 0.13);
+
+  /* ── 모션 ── */
+  --duration-fast: 120ms; --duration-normal: 220ms; --duration-slow: 360ms;
+  --easing-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  --max: 980px;
+  --font: ui-rounded, "SF Pro Rounded", -apple-system, BlinkMacSystemFont,
+    "Apple SD Gothic Neo", "Pretendard", "Noto Sans KR", system-ui, "Segoe UI", Roboto, sans-serif;
 }
 
 * { box-sizing: border-box; }
-
 html { scroll-behavior: smooth; }
 
 body {
@@ -24,63 +49,80 @@ body {
   font-family: var(--font);
   color: var(--ink);
   background: var(--bg);
-  line-height: 1.65;
+  line-height: 1.62;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-a { color: var(--accent); text-decoration: none; }
+a { color: var(--accent-deep); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 img { max-width: 100%; display: block; }
 
-h1, h2, h3 { letter-spacing: -0.025em; line-height: 1.2; }
+h1, h2, h3 { letter-spacing: -0.02em; line-height: 1.18; }
 
-.wrap { max-width: var(--max); margin: 0 auto; padding-inline: 1.5rem; }
+.wrap { max-width: var(--max); margin: 0 auto; padding-inline: var(--space-6); }
 
+section { padding: var(--space-9) 0; }
+
+/* ── Kicker / eyebrow ── */
 .eyebrow {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: var(--accent);
-  margin: 0 0 0.8rem;
+  color: var(--accent-deep);
+  margin: 0 0 var(--space-3);
 }
 
+/* ── Buttons ── */
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: var(--space-2);
+  font-family: inherit;
   font-weight: 700;
   font-size: 0.95rem;
-  padding: 0.7rem 1.3rem;
-  border-radius: 999px;
+  padding: 0.72rem 1.35rem;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: transform var(--duration-fast) var(--easing-out),
+    box-shadow var(--duration-normal) var(--easing-out), background var(--duration-fast) var(--easing-out);
 }
 .btn:hover { text-decoration: none; transform: translateY(-1px); }
 .btn-primary { background: var(--accent); color: #fff; }
 .btn-primary:hover { box-shadow: 0 10px 28px rgba(37, 99, 235, 0.32); }
+.btn-accent { background: var(--accent); color: #fff; }
+.btn-accent:hover { box-shadow: 0 10px 28px rgba(37, 99, 235, 0.32); }
 .btn-ghost { border-color: var(--border); color: var(--ink); }
-.btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+.btn-ghost:hover { border-color: var(--accent); color: var(--accent-deep); }
 
-section { padding: 4.5rem 0; }
+/* ── Card (단일 골격 — 모든 카드 공유) ── */
+.card {
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-normal) var(--easing-out),
+    box-shadow var(--duration-normal) var(--easing-out), border-color var(--duration-normal) var(--easing-out);
+}
+.card:hover { transform: translateY(-3px); box-shadow: var(--shadow-md); border-color: #d8dcea; }
 
+/* ── 제품 그리드 ── */
 .app-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1.1rem;
+  gap: var(--space-4);
 }
-@media (max-width: 620px) {
-  .app-grid { grid-template-columns: 1fr; }
-}
+@media (max-width: 620px) { .app-grid { grid-template-columns: 1fr; } }
 
-.cat-block + .cat-block { margin-top: 2.6rem; }
+.cat-block + .cat-block { margin-top: var(--space-8); }
 .cat-label {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  margin: 0 0 1rem;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-4);
   font-size: 0.98rem;
   font-weight: 800;
   color: var(--ink);
@@ -93,9 +135,9 @@ section { padding: 4.5rem 0; }
   background: var(--accent);
 }
 
-.section-head { margin-bottom: 1.8rem; }
-.section-head h2 { font-size: 1.7rem; margin: 0.2rem 0 0; }
-.section-head p { color: var(--sub); margin: 0.6rem 0 0; max-width: 46ch; }
+.section-head { margin-bottom: var(--space-6); }
+.section-head h2 { font-size: 1.7rem; margin: var(--space-1) 0 0; }
+.section-head p { color: var(--sub); margin: var(--space-2) 0 0; max-width: 50ch; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }

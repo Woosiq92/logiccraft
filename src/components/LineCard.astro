@@ -1,0 +1,58 @@
+---
+import type { SeriesLine } from '../data/synergeion';
+interface Props { line: SeriesLine; index: number; }
+const { line, index } = Astro.props;
+---
+
+<article class="card line" style={`--c:${line.color}; --soft:${line.soft}`}>
+  <span class="step">{String(index + 1).padStart(2, '0')}</span>
+  <span class="emoji">{line.emoji}</span>
+  <div class="body">
+    <div class="head">
+      <h3>{line.name}</h3>
+      <span class="age">{line.age}</span>
+      <span class="status">{line.status}</span>
+    </div>
+    <p class="narrative">{line.narrative}</p>
+    <p class="motif">{line.motif}</p>
+  </div>
+</article>
+
+<style>
+  .line {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: var(--space-5);
+    padding: var(--space-5) var(--space-6);
+    border-left: 4px solid var(--c);
+  }
+  .step { font-weight: 800; color: var(--c); font-size: 0.85rem; }
+  .emoji {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    background: var(--soft);
+  }
+  .head { display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap; }
+  .head h3 { margin: 0; font-size: 1.15rem; font-weight: 800; }
+  .age { font-size: 0.82rem; color: var(--muted); font-weight: 700; }
+  .status {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--c);
+    background: var(--soft);
+    border-radius: var(--radius-pill);
+    padding: 2px 9px;
+  }
+  .narrative { margin: var(--space-2) 0 0; color: var(--sub); font-size: 0.96rem; }
+  .motif { margin: 2px 0 0; color: var(--muted); font-size: 0.84rem; }
+
+  @media (max-width: 520px) {
+    .line { grid-template-columns: auto 1fr; }
+    .step { display: none; }
+  }
+</style>

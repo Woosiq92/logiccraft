@@ -1,0 +1,10 @@
+<!-- Synergeion 마스터 마크 — 거꾸로 삼각형(▽), 바닥에 작은 갭.
+     의미: συνεργεῖον "함께 일·성취하는 장소" — 수렴하되 닫히지 않음(열린 끝). -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 75" role="img" aria-label="Synergeion">
+  <!-- 상단 가로 -->
+  <line x1="5" y1="5" x2="95" y2="5"  stroke="#1a2754" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- 좌측 대각 (top-left → near-bottom-center, 갭 직전까지) -->
+  <line x1="5" y1="5" x2="47" y2="70" stroke="#1a2754" stroke-width="1.6" stroke-linecap="round"/>
+  <!-- 우측 대각 (top-right → near-bottom-center, 갭 직전까지) -->
+  <line x1="95" y1="5" x2="53" y2="70" stroke="#1a2754" stroke-width="1.6" stroke-linecap="round"/>
+</svg>
