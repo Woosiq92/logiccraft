@@ -4,7 +4,7 @@ import Layout from '../../../layouts/Layout.astro';
 
 <Layout
   title="불안한개미 — 개인정보 처리방침 · 로직크래프트"
-  description="불안한개미 개인정보 처리방침. 회원가입·로그인이 없으며 개인 식별 정보를 수집하지 않고, 광고나 사용자 추적도 하지 않습니다."
+  description="불안한개미 개인정보 처리방침. 회원가입·로그인이 없으며 개인 식별 정보를 수집하지 않고, 비개인화 광고만 표시하며 사용자 추적은 하지 않습니다."
 >
   <section class="wrap page-head">
     <p class="eyebrow">개인정보 처리방침</p>
@@ -13,7 +13,7 @@ import Layout from '../../../layouts/Layout.astro';
       앱 이름: 불안한개미<br />
       개발/운영: 로직크래프트 (사업자등록번호 302-11-03141, 대표 최우식)<br />
       연락처: smartsikhye@gmail.com<br />
-      최종 개정일: 2026년 6월 6일
+      최종 개정일: 2026년 6월 7일
     </p>
   </section>
 
@@ -35,13 +35,14 @@ import Layout from '../../../layouts/Layout.astro';
     <ul>
       <li><b>네이버 증권 시세 API</b>: 사용자가 등록한 종목 코드를 보내고 시세 정보를 받습니다.</li>
       <li><b>잠금화면 실시간 갱신 서버(자체 운영)</b>: 잠금화면 카드(Live Activity) 기능을 활성화한 경우, Apple이 발급한 푸시 토큰과 종목 코드를 자체 서버에 등록하여 시세 갱신 푸시를 전송합니다. 이 토큰은 기능 비활성화 시 즉시 삭제됩니다.</li>
+      <li><b>Google AdMob(광고)</b>: 앱 운영을 위해 홈 화면 하단에 배너 광고를 표시합니다. 본 앱은 <b>비개인화 광고만</b> 요청하므로 사용자를 추적하지 않으며, 광고 식별자(IDFA)를 통한 맞춤형 광고나 App Tracking Transparency 권한 요청을 하지 않습니다. AdMob 정책: <a href="https://policies.google.com/privacy">https://policies.google.com/privacy</a></li>
     </ul>
 
     <h2>4. 푸시 알림</h2>
     <p>잠금화면 카드(Live Activity) 기능을 사용하는 경우 Apple Push Notification service(APNs)를 통해 시세 갱신 푸시가 전송됩니다. 이는 시세 갱신 외 다른 목적으로 사용되지 않습니다.</p>
 
     <h2>5. 광고 및 추적</h2>
-    <p>본 앱은 광고를 표시하지 않으며, 어떠한 형태의 사용자 추적도 수행하지 않습니다.</p>
+    <p>본 앱은 Google AdMob을 통해 홈 화면 하단에 배너 광고를 표시합니다. 단, <b>비개인화 광고만</b> 사용하므로 이용자의 행동을 추적하거나 맞춤형 광고를 위한 프로파일링을 하지 않습니다. 시세를 확인하는 핵심 화면(거치대 모드·위젯·잠금화면 카드)에는 광고가 표시되지 않습니다.</p>
 
     <h2>6. 제3자 제공</h2>
     <p>본 앱이 자체 수집하는 개인정보가 없으므로 제3자에게 제공되는 개인정보 또한 없습니다.</p>
@@ -58,7 +59,7 @@ import Layout from '../../../layouts/Layout.astro';
     <h2>10. 문의</h2>
     <p>개인정보 관련 문의: <a href="mailto:smartsikhye@gmail.com">smartsikhye@gmail.com</a></p>
 
-    <p class="en-summary">English summary: 불안한개미 (Anxious Ant) is a read-only Korean stock price viewer. It has no account or login and collects no personal or identifying information. It shows no ads and performs no user tracking. Saved tickers and settings are stored only on your device. To display prices it sends ticker codes (only) to Naver Finance's public endpoints; if you enable the Lock Screen Live Activity, the Apple push token and ticker code are registered with our own server solely to deliver price updates, and are deleted when the feature is turned off. Contact: smartsikhye@gmail.com</p>
+    <p class="en-summary">English summary: 불안한개미 (Anxious Ant) is a read-only Korean stock price viewer. It has no account or login and collects no personal or identifying information. It shows a banner ad (Google AdMob, non-personalized only) at the bottom of the home screen and performs no user tracking — no IDFA-based personalization and no App Tracking Transparency prompt. The price-viewing screens (dock mode, widget, Lock Screen card) show no ads. Saved tickers and settings are stored only on your device. To display prices it sends ticker codes (only) to Naver Finance's public endpoints; if you enable the Lock Screen Live Activity, the Apple push token and ticker code are registered with our own server solely to deliver price updates, and are deleted when the feature is turned off. Contact: smartsikhye@gmail.com</p>
 
     <p class="links"><a href="/apps/stockwatch/support">고객 지원</a> · <a href="/apps">← 제품 목록</a></p>
   </section>
