@@ -64,8 +64,8 @@ export const apps: AppInfo[] = [
     featured: true,
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6769797672' },
-      { label: '개인정보', href: 'https://woosiq92.github.io/ourfootprint/privacy.html' },
-      { label: '지원', href: 'https://woosiq92.github.io/ourfootprint/support.html' },
+      { label: '지원', href: '/apps/ourfootprint/support' },
+      { label: '개인정보', href: '/apps/ourfootprint/privacy' },
     ],
   },
   {
@@ -77,7 +77,8 @@ export const apps: AppInfo[] = [
     featured: true,
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6772662894' },
-      { label: '개인정보', href: 'https://woosiq92.github.io/stockwatch/privacy.html' },
+      { label: '지원', href: '/apps/stockwatch/support' },
+      { label: '개인정보', href: '/apps/stockwatch/privacy' },
     ],
   },
   {

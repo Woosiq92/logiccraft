@@ -1,0 +1,78 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="불안한개미 — 개인정보 처리방침 · 로직크래프트"
+  description="불안한개미 개인정보 처리방침. 회원가입·로그인이 없으며 개인 식별 정보를 수집하지 않고, 광고나 사용자 추적도 하지 않습니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">개인정보 처리방침</p>
+    <h1>불안한개미 개인정보처리방침</h1>
+    <p class="meta">
+      앱 이름: 불안한개미<br />
+      개발/운영: 로직크래프트 (사업자등록번호 302-11-03141, 대표 최우식)<br />
+      연락처: smartsikhye@gmail.com<br />
+      최종 개정일: 2026년 6월 6일
+    </p>
+  </section>
+
+  <section class="wrap doc">
+    <p>로직크래프트(이하 "회사")는 불안한개미(이하 "본 앱") 이용자의 개인정보를 소중히 다루며 「개인정보 보호법」 및 관련 법령을 준수합니다. 본 방침은 앱이 어떤 정보를 처리하는지 설명합니다.</p>
+
+    <h2>1. 수집하는 개인정보</h2>
+    <p><b>본 앱은 개인을 식별할 수 있는 정보를 수집하지 않습니다.</b> 회원 가입·로그인 절차가 없으며, 이름·이메일·전화번호·주소·생년월일 등 어떠한 식별 정보도 수집·저장하지 않습니다. 광고 식별자(IDFA)를 수집하지 않으며 행동 기반 추적도 하지 않습니다.</p>
+
+    <h2>2. 기기에만 저장되는 정보</h2>
+    <p>다음 정보는 이용자의 기기에만 저장되며 외부로 전송되지 않습니다. 앱 삭제 시 함께 삭제됩니다.</p>
+    <ul>
+      <li>이용자가 등록한 관심 종목 코드 및 이름</li>
+      <li>화면 자동 전환 간격 등 앱 설정값</li>
+    </ul>
+
+    <h2>3. 외부 서비스 호출</h2>
+    <p>실시간 시세 표시를 위해 다음 외부 서비스에 종목 코드만 전송합니다. 개인 식별 정보는 함께 전송되지 않습니다.</p>
+    <ul>
+      <li><b>네이버 증권 시세 API</b>: 사용자가 등록한 종목 코드를 보내고 시세 정보를 받습니다.</li>
+      <li><b>잠금화면 실시간 갱신 서버(자체 운영)</b>: 잠금화면 카드(Live Activity) 기능을 활성화한 경우, Apple이 발급한 푸시 토큰과 종목 코드를 자체 서버에 등록하여 시세 갱신 푸시를 전송합니다. 이 토큰은 기능 비활성화 시 즉시 삭제됩니다.</li>
+    </ul>
+
+    <h2>4. 푸시 알림</h2>
+    <p>잠금화면 카드(Live Activity) 기능을 사용하는 경우 Apple Push Notification service(APNs)를 통해 시세 갱신 푸시가 전송됩니다. 이는 시세 갱신 외 다른 목적으로 사용되지 않습니다.</p>
+
+    <h2>5. 광고 및 추적</h2>
+    <p>본 앱은 광고를 표시하지 않으며, 어떠한 형태의 사용자 추적도 수행하지 않습니다.</p>
+
+    <h2>6. 제3자 제공</h2>
+    <p>본 앱이 자체 수집하는 개인정보가 없으므로 제3자에게 제공되는 개인정보 또한 없습니다.</p>
+
+    <h2>7. 만 14세 미만 아동</h2>
+    <p>본 앱은 만 14세 미만 아동의 개인정보를 의도적으로 수집하지 않습니다.</p>
+
+    <h2>8. 이용자의 권리</h2>
+    <p>본 앱은 식별 정보를 수집하지 않으므로 별도의 열람·정정·삭제 요청 대상이 없습니다. 기기에 저장된 종목 목록 및 설정은 앱 내에서 직접 삭제하거나 앱을 제거하여 일괄 삭제할 수 있습니다.</p>
+
+    <h2>9. 정책 변경</h2>
+    <p>본 방침이 변경될 경우 본 페이지에 변경 내용을 게시합니다. 중대한 변경 시 앱 내 공지를 통해 안내합니다.</p>
+
+    <h2>10. 문의</h2>
+    <p>개인정보 관련 문의: <a href="mailto:smartsikhye@gmail.com">smartsikhye@gmail.com</a></p>
+
+    <p class="en-summary">English summary: 불안한개미 (Anxious Ant) is a read-only Korean stock price viewer. It has no account or login and collects no personal or identifying information. It shows no ads and performs no user tracking. Saved tickers and settings are stored only on your device. To display prices it sends ticker codes (only) to Naver Finance's public endpoints; if you enable the Lock Screen Live Activity, the Apple push token and ticker code are registered with our own server solely to deliver price updates, and are deleted when the feature is turned off. Contact: smartsikhye@gmail.com</p>
+
+    <p class="links"><a href="/apps/stockwatch/support">고객 지원</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.6rem, 4.5vw, 2.3rem); margin: 0.3rem 0 0.8rem; }
+  .meta { color: var(--sub); font-size: 0.95rem; line-height: 1.8; }
+  .doc { padding-top: 1rem; padding-bottom: 4rem; max-width: 760px; }
+  .doc h2 { font-size: 1.2rem; margin: 2rem 0 0.6rem; }
+  .doc p { line-height: 1.75; margin: 0.5rem 0; }
+  .doc ul { line-height: 1.75; margin: 0.5rem 0; padding-left: 1.4rem; }
+  .doc li { margin: 0.3rem 0; }
+  .en-summary { margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid #eee; color: var(--sub); font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>

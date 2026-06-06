@@ -1,0 +1,83 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '불안한개미는 어떤 앱인가요?',
+    a: '매매 기능 없이 한국 주식(KOSPI/KOSDAQ) 시세만 보여주는 읽기 전용 앱입니다. 거치대 모드, 홈/잠금화면 위젯, 잠금화면 카드(Live Activity)로 가장 손쉽게 시세를 확인할 수 있어요. 주문·거래·계좌 관리 기능은 없습니다.',
+  },
+  {
+    q: '종목은 어떻게 추가하나요?',
+    a: '검색 화면에서 종목 이름 또는 6자리 코드(예: 005930 삼성전자, 035420 NAVER)를 입력해 관심 종목에 추가합니다. 추가한 종목을 탭하면 큰 글씨로 시세가 표시되는 전체화면 거치대 모드로 들어갑니다.',
+  },
+  {
+    q: '로그인이나 회원가입이 필요한가요?',
+    a: '아니요. 로그인·회원가입·결제 없이 첫 실행부터 모든 기능을 바로 사용할 수 있습니다.',
+  },
+  {
+    q: '시세는 얼마나 자주 갱신되나요?',
+    a: '전체화면 거치대 모드에서는 화면이 켜진 상태로 약 7초마다 자동 갱신됩니다. 잠금화면 카드(Live Activity)를 켜면 약 10~15초 간격으로 갱신되며 약 8시간 후 자동 종료됩니다.',
+  },
+  {
+    q: '위젯과 잠금화면 카드는 어떻게 켜나요?',
+    a: '홈/잠금화면을 길게 눌러 위젯을 추가한 뒤 저장한 종목을 선택하면 됩니다. 잠금화면 카드는 종목을 연 다음 Live Activity 화면에서 켤 수 있습니다.',
+  },
+  {
+    q: '시세 데이터는 어디서 오나요?',
+    a: '네이버 증권의 공개 시세 데이터를 사용합니다. 본 앱은 공개된 시장 시세 정보를 표시할 뿐, 증권사가 아니며 투자 자문이나 매매 기능을 제공하지 않습니다.',
+  },
+  {
+    q: '관심 종목과 설정을 초기화하고 싶어요.',
+    a: '관심 종목과 설정값은 기기 내부에만 저장됩니다. 앱 내에서 직접 삭제하거나 앱을 제거하면 모든 데이터가 함께 삭제됩니다.',
+  },
+];
+---
+
+<Layout
+  title="불안한개미 — 고객 지원 · 로직크래프트"
+  description="불안한개미 고객 지원. 자주 묻는 질문과 문의 안내. 매매 없이 시세만 보는 한국 주식 시세 앱."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>불안한개미</h1>
+    <p>매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:smartsikhye@gmail.com?subject=[불안한개미] 문의">smartsikhye@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/stockwatch/privacy">개인정보 처리방침</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>

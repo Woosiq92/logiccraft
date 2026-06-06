@@ -1,0 +1,83 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '둘이 같은 데이터를 공유하려면?',
+    a: '한쪽이 앱을 처음 실행하면 6자리 커플 코드가 생성됩니다. 상대가 그 코드를 입력하면 즉시 같은 데이터를 공유해요. 한 코드에 두 기기까지 연결됩니다.',
+  },
+  {
+    q: '다른 폰으로 바꿨어요. 기록이 사라졌어요.',
+    a: '새 기기에서 같은 커플 코드를 입력하면 즉시 모든 기록이 복원됩니다. 설정 → 데이터 → "🔄 지금 동기화" 버튼으로 강제 동기화도 가능해요.',
+  },
+  {
+    q: '광고 제거는 영구 적용되나요?',
+    a: '네. 한 번 구매하면 같은 Apple ID로 로그인한 모든 기기에서 광고가 사라집니다. 앱 재설치 후에도 설정 → "구매 복원"으로 즉시 복원돼요.',
+  },
+  {
+    q: '위치 권한을 거부했는데 사용할 수 있나요?',
+    a: '네. 위치 권한은 "현재 동네 자동 찾기"에만 사용되며 거부해도 모든 기능을 사용할 수 있습니다. 검색으로 동을 직접 선택하면 돼요.',
+  },
+  {
+    q: '데이터를 내보낼 수 있나요?',
+    a: '네. 설정 → 데이터 → "📤 데이터 내보내기"로 다녀온 모든 곳을 JSON 파일로 받을 수 있습니다.',
+  },
+  {
+    q: '모든 기록을 지우고 싶어요.',
+    a: '설정 → 데이터 → "🗑 모든 데이터 초기화"를 누르면 이 기기와 상대 기기의 모든 데이터가 영구 삭제됩니다. 되돌릴 수 없으니 주의하세요.',
+  },
+  {
+    q: '동네 점령 게임 규칙이 궁금해요.',
+    a: '한 동네에 1곳 이상 방문하면 "발자국", 3곳 이상이면 "정복", 5곳 이상이면 "지배자" 단계가 됩니다. 지도에서 동네 색이 진해지는 걸로 확인할 수 있어요.',
+  },
+];
+---
+
+<Layout
+  title="커플맵로그 — 고객 지원 · 로직크래프트"
+  description="커플맵로그 고객 지원. 자주 묻는 질문과 문의 안내. 둘이 다녀온 동네가 색으로 칠해지는 커플 데이트 점령 지도."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>커플맵로그</h1>
+    <p>둘이 다녀온 곳, 다음 갈 곳 — 커플 데이트 점령 지도.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:smartsikhye@gmail.com?subject=[커플맵로그] 문의">smartsikhye@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/ourfootprint/privacy">개인정보 처리방침</a> · <a href="/apps/ourfootprint/terms">이용약관</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
