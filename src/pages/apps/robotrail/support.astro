@@ -1,0 +1,83 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: 'RoboTrail은 어떤 앱인가요?',
+    a: '코드를 직접 타이핑하지 않고 ↑(앞으로)·↺(왼쪽)·↻(오른쪽) 같은 명령 블록을 슬롯에 놓아 로봇을 움직이는 퍼즐 게임입니다. 분해·패턴·추상화 같은 코딩의 바탕이 되는 사고력을 측정하고 훈련할 수 있어요.',
+  },
+  {
+    q: '인터넷 연결이나 로그인이 필요한가요?',
+    a: '대부분의 기능은 오프라인으로 즐길 수 있습니다. Game Center(iOS) 또는 Play 게임(Android)에 로그인하면 진행 기록이 클라우드에 저장돼 기기를 바꿔도 이어집니다.',
+  },
+  {
+    q: '한국어와 영어를 바꿀 수 있나요?',
+    a: '네. 설정 화면의 "언어" 항목 또는 상단 헤더의 KO/EN 칩에서 한국어/English를 즉시 전환할 수 있습니다. 처음 실행 시 기기 언어에 맞춰 자동으로 설정됩니다.',
+  },
+  {
+    q: '결제나 구독이 있나요?',
+    a: '없습니다. 모든 캠페인·측정·트레이닝 콘텐츠를 무료로 이용할 수 있습니다.',
+  },
+  {
+    q: '진행 기록을 초기화하고 싶어요.',
+    a: '설정 → "진행 기록 초기화"에서 학습 클리어·측정 결과·메달 기록을 삭제할 수 있습니다. 이 작업은 되돌릴 수 없으니 주의해 주세요.',
+  },
+  {
+    q: '기기를 바꾸면 기록이 사라지나요?',
+    a: 'Game Center(iOS) 또는 Play 게임(Android)에 로그인한 상태라면 클라우드 동기화로 새 기기에서도 기록이 이어집니다. 로그인하지 않은 경우 기록은 해당 기기에만 저장됩니다.',
+  },
+  {
+    q: '퍼즐이 너무 어려워요.',
+    a: '각 퍼즐에는 단계별 힌트가 준비돼 있어요. 막힐 땐 힌트를 펼쳐 보거나, 같은 화면의 풀이 팁 게시판에서 다른 사람들의 접근법을 참고해 보세요. 입문 단계부터 차근차근 풀면 자연스럽게 익숙해집니다.',
+  },
+];
+---
+
+<Layout
+  title="RoboTrail — 고객 지원 · 로직크래프트"
+  description="RoboTrail 고객 지원. 자주 묻는 질문과 문의 안내. 코드 없이 명령 퍼즐로 코딩 사고력을 훈련하는 앱."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>RoboTrail</h1>
+    <p>코드 없이 로봇을 움직이며 코딩 사고력을 훈련하는 퍼즐 앱.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:smartsikhye@gmail.com?subject=[RoboTrail] 문의">smartsikhye@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/robotrail/privacy">개인정보 처리방침</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
