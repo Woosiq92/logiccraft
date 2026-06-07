@@ -22,6 +22,20 @@ export const categories: Category[] = ['교육', '일상'];
 // to woosiq92.github.io.
 export const apps: AppInfo[] = [
   {
+    name: 'Synergeion Wonder',
+    icon: '/icons/wonder.png',
+    blurb: '3–6세 아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알, 부모도 자랍니다.',
+    category: '교육',
+    status: 'live',
+    featured: true,
+    links: [
+      { label: 'App Store', href: 'https://apps.apple.com/kr/app/synergeion-wonder/id6774041352' },
+      { label: '지원', href: '/apps/wonder/support' },
+      { label: '개인정보', href: '/apps/wonder/privacy' },
+      { label: '약관', href: '/apps/wonder/terms' },
+    ],
+  },
+  {
     name: '로보트레일',
     icon: '/icons/robotrail.png',
     blurb: '코드 없이 로봇을 움직이며 코딩 사고력을 훈련하는 퍼즐 앱.',

@@ -12,7 +12,8 @@ export interface SeriesLine {
   motif: string; // 발달 모티프
   color: string; // 라인 primary
   soft: string; // 라인 soft 배경
-  status: '개발 중' | '예정';
+  status: '출시' | '개발 중' | '예정';
+  href?: string; // App Store 링크 (출시 라인만)
 }
 
 export const series = {
@@ -30,9 +31,10 @@ export const lines: SeriesLine[] = [
     emoji: '🌱',
     narrative: '새싹을 길러 자라는 걸 관찰합니다.',
     motif: '경이감 · 이야기 · 부모도 함께 자람',
-    color: '#8b5cf6',
-    soft: '#f3edff',
-    status: '개발 중',
+    color: '#2e9e63',
+    soft: '#e6f4ec',
+    status: '출시',
+    href: 'https://apps.apple.com/kr/app/synergeion-wonder/id6774041352',
   },
   {
     key: 'build',

@@ -15,6 +15,9 @@ const { line, index } = Astro.props;
     </div>
     <p class="narrative">{line.narrative}</p>
     <p class="motif">{line.motif}</p>
+    {line.href && (
+      <a class="store" href={line.href} target="_blank" rel="noopener">App Store에서 받기 →</a>
+    )}
   </div>
 </article>
 
@@ -50,6 +53,15 @@ const { line, index } = Astro.props;
   }
   .narrative { margin: var(--space-2) 0 0; color: var(--sub); font-size: 0.96rem; }
   .motif { margin: 2px 0 0; color: var(--muted); font-size: 0.84rem; }
+  .store {
+    display: inline-block;
+    margin: var(--space-3) 0 0;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--c);
+    text-decoration: none;
+  }
+  .store:hover { text-decoration: underline; }
 
   @media (max-width: 520px) {
     .line { grid-template-columns: auto 1fr; }
