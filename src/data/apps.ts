@@ -30,6 +30,7 @@ export const apps: AppInfo[] = [
     featured: true,
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6764465655' },
+      { label: 'Google Play', href: 'https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail' },
       { label: '지원', href: 'https://woosiq92.github.io/robotrail/support.html' },
     ],
   },
