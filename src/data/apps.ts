@@ -92,6 +92,7 @@ export const apps: AppInfo[] = [
     featured: true,
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6772662894' },
+      { label: 'Google Play', href: 'https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch' },
       { label: '지원', href: '/apps/stockwatch/support' },
       { label: '개인정보', href: '/apps/stockwatch/privacy' },
     ],
