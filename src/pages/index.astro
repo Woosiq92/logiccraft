@@ -88,6 +88,21 @@ const YT_URL = 'https://www.youtube.com/@logiccraftmovie';
     )}
   </section>
 
+  <section class="wrap youtube">
+    <h3 class="cat-label">영상</h3>
+    <a class="yt-card" href={YT_URL} target="_blank" rel="noopener" aria-label="로직크래프트 YouTube 채널 열기">
+      <span class="yt-play" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="34" height="34" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
+      </span>
+      <span class="yt-meta">
+        <span class="yt-name">로직크래프트 YouTube</span>
+        <span class="yt-handle">@logiccraftmovie</span>
+        <span class="yt-blurb">제품 이야기와 사고력 콘텐츠를 영상으로 만나보세요.</span>
+      </span>
+      <span class="yt-go">채널 보기 →</span>
+    </a>
+  </section>
+
   <section class="wrap book">
     <h3 class="cat-label">도서</h3>
     <article class="card book-card">
@@ -103,21 +118,6 @@ const YT_URL = 'https://www.youtube.com/@logiccraftmovie';
         <a class="btn btn-primary" href={BOOK_URL} target="_blank" rel="noopener">교보문고에서 보기</a>
       </div>
     </article>
-  </section>
-
-  <section class="wrap youtube">
-    <h3 class="cat-label">영상</h3>
-    <a class="yt-card" href={YT_URL} target="_blank" rel="noopener" aria-label="로직크래프트 YouTube 채널 열기">
-      <span class="yt-play" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="34" height="34" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
-      </span>
-      <span class="yt-meta">
-        <span class="yt-name">로직크래프트 YouTube</span>
-        <span class="yt-handle">@logiccraftmovie</span>
-        <span class="yt-blurb">제품 이야기와 사고력 콘텐츠를 영상으로 만나보세요.</span>
-      </span>
-      <span class="yt-go">채널 보기 →</span>
-    </a>
   </section>
 
 </Layout>
