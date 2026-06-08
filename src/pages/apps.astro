@@ -32,7 +32,7 @@ const soon = apps.filter((a) => a.status === 'soon');
   <section class="wrap">
     <div class="section-head"><h2>스튜디오 제품</h2></div>
     {categories.map((cat) => {
-      const items = live.filter((a) => a.category === cat);
+      const items = live.filter((a) => a.category === cat && !a.series);
       return items.length > 0 ? (
         <div class="cat-block">
           <h3 class="cat-label">{cat}</h3>

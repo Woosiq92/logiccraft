@@ -8,6 +8,7 @@ const { app } = Astro.props;
   <img class="icon" src={app.icon} alt="" width="56" height="56" loading="lazy" />
   <div class="head">
     <h3>{app.name}</h3>
+    {app.domain && <span class="tag">{app.domain}</span>}
     {app.status === 'soon' && <span class="badge">준비 중</span>}
   </div>
   <p class="blurb">{app.blurb}</p>
@@ -43,6 +44,15 @@ const { app } = Astro.props;
     background: #f3f4f6;
     border-radius: var(--radius-pill);
     padding: 2px 9px;
+  }
+  .tag {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--accent-deep);
+    background: var(--series-soft, #eef1fb);
+    border-radius: var(--radius-pill);
+    padding: 2px 9px;
+    white-space: nowrap;
   }
   .blurb { margin: 0; color: var(--sub); font-size: 0.94rem; flex: 1; }
   .links { display: flex; flex-wrap: wrap; gap: var(--space-4); font-size: 0.86rem; font-weight: 700; }

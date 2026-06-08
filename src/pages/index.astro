@@ -56,10 +56,23 @@ const BOOK_URL = 'https://product.kyobobook.co.kr/detail/S000219252300';
     </div>
     {categories.map((cat) => {
       const items = live.filter((a) => a.category === cat);
+      const seriesItems = items.filter((a) => a.series);
+      const studioItems = items.filter((a) => !a.series);
       return items.length > 0 ? (
         <div class="cat-block">
           <h3 class="cat-label">{cat}</h3>
-          <div class="app-grid">{items.map((app) => <AppCard app={app} />)}</div>
+          {seriesItems.length > 0 && (
+            <div class="series-sub">
+              <p class="sub-label">Synergeion 시리즈</p>
+              <div class="app-grid">{seriesItems.map((app) => <AppCard app={app} />)}</div>
+            </div>
+          )}
+          {studioItems.length > 0 && (
+            <div class="series-sub">
+              {seriesItems.length > 0 && <p class="sub-label studio">단독 앱</p>}
+              <div class="app-grid">{studioItems.map((app) => <AppCard app={app} />)}</div>
+            </div>
+          )}
         </div>
       ) : null;
     })}
@@ -168,6 +181,16 @@ const BOOK_URL = 'https://product.kyobobook.co.kr/detail/S000219252300';
 
   /* ── 제품 ── */
   .section-head .sub { color: var(--sub); margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .series-sub { margin-bottom: var(--space-5); }
+  .sub-label {
+    margin: 0 0 var(--space-3);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-deep);
+  }
+  .sub-label.studio { color: var(--muted); }
   .soon-head { margin-top: 3rem; }
   #products { padding-bottom: 1.5rem; }
 

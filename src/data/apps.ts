@@ -12,6 +12,8 @@ export interface AppInfo {
   category: Category;
   status: 'live' | 'soon';
   featured?: boolean;
+  series?: 'Synergeion'; // 시리즈 라인업 소속 (단독 스튜디오 제품과 구분)
+  domain?: string; // 카드 도메인 태그 (예: 컴퓨팅 사고력·과학)
   links: AppLink[];
 }
 
@@ -28,6 +30,7 @@ export const apps: AppInfo[] = [
     category: '교육',
     status: 'live',
     featured: true,
+    series: 'Synergeion',
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/synergeion-wonder/id6774041352' },
       { label: '지원', href: '/apps/wonder/support' },
@@ -42,6 +45,7 @@ export const apps: AppInfo[] = [
     category: '교육',
     status: 'live',
     featured: true,
+    domain: '컴퓨팅 사고력',
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6764465655' },
       { label: 'Google Play', href: 'https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail' },
@@ -55,6 +59,7 @@ export const apps: AppInfo[] = [
     category: '교육',
     status: 'live',
     featured: true,
+    domain: '과학',
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6771675434' },
       { label: '개인정보', href: 'https://woosiq92.github.io/science-club/privacy.html' },
@@ -68,6 +73,7 @@ export const apps: AppInfo[] = [
     category: '교육',
     status: 'live',
     featured: true,
+    domain: '융합 사고력',
     links: [{ label: '바로가기', href: 'https://logicschool.co.kr' }],
   },
   {
@@ -105,6 +111,7 @@ export const apps: AppInfo[] = [
     category: '교육',
     status: 'live',
     featured: true,
+    domain: '시사·사회',
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6770908480' },
       { label: '지원', href: '/apps/sedolal/support' },
