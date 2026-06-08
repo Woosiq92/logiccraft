@@ -79,6 +79,7 @@ export const apps: AppInfo[] = [
     featured: true,
     links: [
       { label: 'App Store', href: 'https://apps.apple.com/kr/app/id6769797672' },
+      { label: 'Google Play', href: 'https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint' },
       { label: '지원', href: '/apps/ourfootprint/support' },
       { label: '개인정보', href: '/apps/ourfootprint/privacy' },
     ],
