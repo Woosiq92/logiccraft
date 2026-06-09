@@ -1,93 +1,76 @@
 ---
 import Layout from '../layouts/Layout.astro';
-
-const principles = [
-  {
-    title: '한 가지를 또렷하게',
-    body: '기능을 늘리기보다 하나의 쓸모를 정확히 해결합니다. 군더더기 없는 제품이 오래 쓰입니다.',
-  },
-  {
-    title: '생각을 돕는 쪽으로',
-    body: '시간을 빼앗는 제품이 아니라, 사고력·판단력을 한 뼘 키우는 제품을 지향합니다.',
-  },
-  {
-    title: '직접 만들고 끝까지 책임',
-    body: '기획·디자인·개발·출시·운영을 직접 합니다. 만든 사람이 끝까지 돌봅니다.',
-  },
-];
 ---
 
 <Layout
   title="소개 — 로직크래프트 LogicCraft"
-  description="로직크래프트(LogicCraft)는 사고력을 키우는 앱과 학습 플랫폼을 만듭니다. 대표자 최우식."
+  description="로직크래프트(LogicCraft)는 사고력·판단력을 키우는 앱과 학습 플랫폼을 만드는 스튜디오입니다."
 >
-  <section class="wrap page-head">
-    <img class="logo-full" src="/logo-full.png" alt="로직크래프트 LogicCraft 로고" width="200" />
-    <p class="eyebrow">소개</p>
-    <h1>작은 도구가<br />생각을 바꾼다고 믿습니다.</h1>
-    <p class="intro">
-      로직크래프트(LogicCraft)는 사고력·판단력을 키우는 앱과 학습 플랫폼을 만듭니다.
-      대표 시리즈는 3세부터 18세까지 이어 가는 사고력 EdTech <a href="/synergeion">Synergeion</a>이며,
-      그 곁에 코딩 퍼즐·과학 사고 게임·기록 도구·시세 모니터 같은 작고 또렷한 도구들이 있습니다.
-      분야는 달라도 "사람의 생각을 한 뼘 거든다"는 한 방향을 봅니다.
-    </p>
-    <p class="logo-note">
-      로고는 <strong>물음표</strong>와 <strong>둘러앉아 토론하는 탁자</strong>를 형상화했습니다 —
-      질문을 던지고, 함께 생각한다는 뜻입니다.
-    </p>
-  </section>
-
-  <section class="wrap">
-    <div class="principles">
-      {principles.map((p, i) => (
-        <div class="card principle">
-          <span class="num">{String(i + 1).padStart(2, '0')}</span>
-          <h3>{p.title}</h3>
-          <p>{p.body}</p>
-        </div>
-      ))}
+  <!-- ============ PAGE HERO ============ -->
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow on-dark">ABOUT · 우리가 믿는 것</p>
+      <h1>작은 도구가<br />생각을 바꾼다고 믿습니다.</h1>
+      <p class="lead">로직크래프트(LogicCraft)는 사고력·판단력을 키우는 앱과 학습 플랫폼을 만듭니다. 대표 시리즈는 3세부터 18세까지 이어지는 사고력 EdTech <a href="/synergeion">Synergeion</a>이며, 그 곁에 코딩 퍼즐·과학 사고 게임·기록 도구 같은 작고 또렷한 도구들이 있습니다.</p>
     </div>
   </section>
 
-  <section class="wrap">
-    <div class="card biz-card">
-      <h2>사업자 정보</h2>
-      <dl>
-        <div><dt>상호</dt><dd>로직크래프트 (LogicCraft)</dd></div>
-        <div><dt>대표자</dt><dd>최우식</dd></div>
-        <div><dt>사업자등록번호</dt><dd>302-11-03141</dd></div>
-        <div><dt>문의</dt><dd><a href="mailto:smartsikhye@gmail.com">smartsikhye@gmail.com</a></dd></div>
-      </dl>
+  <!-- ============ INTRO + LOGO MEANING ============ -->
+  <section class="section">
+    <div class="wrap about-intro">
+      <div class="logo-lockup reveal">
+        <img src="/logo-full.png" alt="로직크래프트 로고" onerror="this.onerror=null;this.src='/logo-mark.png';" />
+      </div>
+      <div class="copy reveal">
+        <p class="eyebrow">우리의 방향</p>
+        <h2 class="section-title">분야는 달라도, 한 방향을 봅니다.</h2>
+        <p>“사람의 생각을 한 뼘 거든다.” 시간을 빼앗는 제품이 아니라, 스스로 묻고 풀어내는 힘을 길러주는 제품을 만듭니다.</p>
+        <div class="pullquote">
+          <p>로고는 <strong>물음표</strong>와 <strong>둘러앉아 토론하는 탁자</strong>를 형상화했습니다 — 질문을 던지고, 함께 생각한다는 뜻입니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ PRINCIPLES ============ -->
+  <section class="section tint">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">PRINCIPLES · 일하는 방식</p>
+        <h2 class="section-title">우리가 제품을 만드는 세 가지 원칙.</h2>
+      </div>
+      <div class="principle-grid" style="margin-top: clamp(32px,4vw,48px)">
+        <div class="principle reveal">
+          <p class="pn">01</p>
+          <h3>한 가지를 또렷하게</h3>
+          <p>기능을 늘리기보다 하나의 쓸모를 정확히 해결합니다. 군더더기 없는 제품이 오래 쓰입니다.</p>
+        </div>
+        <div class="principle reveal">
+          <p class="pn">02</p>
+          <h3>생각을 돕는 쪽으로</h3>
+          <p>시간을 빼앗는 제품이 아니라, 사고력·판단력을 한 뼘 키우는 제품을 지향합니다.</p>
+        </div>
+        <div class="principle reveal">
+          <p class="pn">03</p>
+          <h3>직접 만들고 끝까지 책임</h3>
+          <p>기획·디자인·개발·출시·운영을 직접 합니다. 만든 사람이 끝까지 돌봅니다.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ BUSINESS INFO ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="bizcard reveal">
+        <h2>사업자 정보</h2>
+        <dl>
+          <dt>상호</dt><dd>로직크래프트 (LogicCraft)</dd>
+          <dt>대표자</dt><dd>최우식</dd>
+          <dt>사업자등록번호</dt><dd>302-11-03141</dd>
+          <dt>문의</dt><dd><a href="mailto:smartsikhye@gmail.com">smartsikhye@gmail.com</a></dd>
+        </dl>
+      </div>
     </div>
   </section>
 </Layout>
-
-<style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 1rem; }
-  .logo-full { width: 200px; height: auto; margin-bottom: 1.6rem; }
-  .page-head h1 { font-size: clamp(2rem, 5vw, 2.9rem); margin: 0.3rem 0 0; }
-  .intro { color: var(--sub); margin: 1.2rem 0 0; max-width: 58ch; font-size: 1.05rem; }
-  .logo-note {
-    margin: 1.4rem 0 0;
-    max-width: 52ch;
-    color: var(--muted);
-    font-size: 0.95rem;
-    border-left: 3px solid var(--accent);
-    padding-left: 0.9rem;
-  }
-  .logo-note strong { color: var(--sub); }
-
-  .principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-4); }
-  @media (max-width: 720px) { .principles { grid-template-columns: 1fr; } }
-  .principle .num { font-weight: 800; color: var(--accent-deep); font-size: 0.9rem; letter-spacing: 0.05em; }
-  .principle h3 { margin: 0.5rem 0 0.5rem; font-size: 1.15rem; }
-  .principle p { margin: 0; color: var(--sub); font-size: 0.94rem; }
-
-  .biz-card { padding: var(--space-7); }
-  .biz-card:hover { transform: none; box-shadow: var(--shadow-sm); }
-  .biz-card h2 { margin: 0 0 1.2rem; font-size: 1.3rem; }
-  dl { margin: 0; display: grid; gap: 0.8rem; }
-  dl > div { display: flex; gap: 1rem; }
-  dt { width: 130px; flex-shrink: 0; color: var(--muted); font-weight: 600; }
-  dd { margin: 0; font-weight: 600; }
-</style>

@@ -1,62 +1,37 @@
 ---
 const links = [
-  { href: '/', label: '홈' },
-  { href: '/synergeion', label: 'Synergeion' },
-  { href: '/apps', label: '제품' },
-  { href: '/about', label: '소개' },
-  { href: '/contact', label: '문의' },
+  { href: '/', label: '홈', meta: 'HOME' },
+  { href: '/synergeion', label: 'Synergeion', meta: '3–18' },
+  { href: '/apps', label: '제품', meta: 'APPS' },
+  { href: '/about', label: '소개', meta: 'ABOUT' },
+  { href: '/contact', label: '문의', meta: 'CONTACT' },
 ];
 const path = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+// contextual CTA: product pages push to 문의, everywhere else pushes to 제품
+const cta = path === '/apps' || path === '/about'
+  ? { href: '/contact', label: '문의하기' }
+  : { href: '/apps', label: '제품 보기' };
 ---
 
-<header class="nav">
-  <div class="wrap nav-inner">
-    <a href="/" class="logo" aria-label="로직크래프트 홈">
-      <img class="mark" src="/logo-mark.png" alt="" width="32" height="26" />
-      <span class="logo-text">로직크래프트</span>
+<header class="site-header" id="header">
+  <div class="wrap nav">
+    <a class="brand" href="/" aria-label="로직크래프트 홈">
+      <img src="/logo-mark.png" alt="" />
+      <b>로직크래프트</b>
     </a>
-    <nav aria-label="주요 메뉴">
-      <ul>
-        {links.map((l) => (
-          <li>
-            <a href={l.href} aria-current={path === l.href.replace(/\/$/, '') ? 'page' : undefined}>
-              {l.label}
-            </a>
-          </li>
-        ))}
-      </ul>
+    <nav class="nav-links" aria-label="주요 메뉴">
+      {links.map((l) => (
+        <a href={l.href} class={isActive(l.href) ? 'active' : undefined}>{l.label}</a>
+      ))}
+      <a href={cta.href} class="nav-cta">{cta.label}</a>
     </nav>
+    <button class="menu-btn" id="menuBtn" aria-label="메뉴 열기" aria-expanded="false"><span></span></button>
   </div>
 </header>
 
-<style>
-  .nav {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: rgba(255, 255, 255, 0.78);
-    backdrop-filter: saturate(180%) blur(14px);
-    -webkit-backdrop-filter: saturate(180%) blur(14px);
-    border-bottom: 1px solid var(--border);
-  }
-  .nav-inner {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 60px;
-  }
-  .logo { display: inline-flex; align-items: center; gap: 0.55rem; color: var(--ink); font-weight: 800; }
-  .logo:hover { text-decoration: none; }
-  .mark { height: 26px; width: auto; display: block; }
-  .logo-text { font-size: 1.05rem; letter-spacing: -0.02em; }
-  nav ul { list-style: none; display: flex; gap: 0.4rem; margin: 0; padding: 0; }
-  nav a {
-    color: var(--sub);
-    font-weight: 600;
-    font-size: 0.92rem;
-    padding: 0.4rem 0.7rem;
-    border-radius: 8px;
-  }
-  nav a:hover { color: var(--ink); background: var(--bg-alt); text-decoration: none; }
-  nav a[aria-current='page'] { color: var(--accent-deep); }
-</style>
+<nav class="mobile-menu" id="mobileMenu" aria-label="모바일 메뉴">
+  {links.map((l) => (
+    <a href={l.href}>{l.label} <span>{l.meta}</span></a>
+  ))}
+</nav>

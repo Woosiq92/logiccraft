@@ -1,147 +1,108 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import LineCard from '../components/LineCard.astro';
-import { series, lines } from '../data/synergeion';
-
-const principles = [
-  {
-    title: '사고력 → 문제해결력',
-    body: 'AI가 답을 주는 시대에 아이에게 필요한 건 외우는 힘이 아니라 스스로 푸는 힘입니다. 사고력은 수단이고, 문제해결력이 목적입니다.',
-  },
-  {
-    title: '분해하고 다시 짓는 한 가지 루프',
-    body: '문제를 근본까지 분해하고, 가설로 다시 짓고, 현실에서 직접 해보고, 현실의 답을 받아 고칩니다. 모든 라인이 같은 골격을 나이에 맞게 반복합니다.',
-  },
-];
 ---
 
 <Layout
-  title="Synergeion — 로직크래프트 사고력 EdTech 시리즈"
-  description="Synergeion은 3세부터 18세까지 한 아이가 이어 가는 사고력 EdTech 시리즈입니다. 기르기 → 만들기 → 찾기 → 집 짓기 → 마을 짓기. 제작 로직크래프트."
+  title="Synergeion — 로직크래프트 LogicCraft"
+  description="3세부터 18세까지 이어지는 사고력 EdTech 시리즈, Synergeion."
 >
-  <!-- 히어로 -->
-  <section class="syn-hero">
+  <!-- ============ PAGE HERO ============ -->
+  <section class="page-hero">
     <div class="wrap">
-      <img class="mark" src="/synergeion-mark.svg" alt="Synergeion 마크" width="52" height="39" />
-      <p class="brandline">SYNERGEION</p>
-      <h1>{series.name}</h1>
-      <p class="etym">{series.etymology}</p>
-      <p class="vision">“{series.vision}”</p>
-      <p class="value">{series.value}</p>
+      <p class="eyebrow on-dark">SYNERGEION · 대표 시리즈</p>
+      <h1>Synergeion</h1>
+      <p class="lead">συνεργεῖον — “함께 일하고 성취하는 장소”. 3세부터 18세까지, 사고력과 문제해결력이 하나의 여정으로 이어집니다.</p>
     </div>
   </section>
 
-  <!-- 서사 -->
-  <section class="wrap">
-    <div class="section-head">
-      <p class="eyebrow">하나의 이야기</p>
-      <h2>아이가 이어 타는 하나의 배</h2>
+  <!-- ============ JOURNEY ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">하나의 이야기</p>
+        <h2 class="section-title">아이가 이어 타는 하나의 배.</h2>
+      </div>
+      <div class="journey reveal" style="margin-top: clamp(36px,5vw,56px); max-width: 880px">
+        <div class="spine"><div class="spine-fill" id="spineFill"></div></div>
+        <div class="stage" style="--st: var(--st-wonder)">
+          <span class="num">01</span>
+          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>새싹을 길러 자라는 걸 관찰합니다. · 경이감 · 이야기 · 부모도 함께 자람</p></div>
+          <span class="tag live">출시</span>
+        </div>
+        <div class="stage" style="--st: var(--st-build)">
+          <span class="num">02</span>
+          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>그 나무로 집과 배를 만듭니다. · 손 · 도구 · 만들기</p></div>
+          <span class="tag dev">개발 중</span>
+        </div>
+        <div class="stage" style="--st: var(--st-voyage)">
+          <span class="num">03</span>
+          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>그 배를 타고 새 땅을 찾아 나섭니다. · 탐험 · 조사 · 발표</p></div>
+          <span class="tag dev">개발 중</span>
+        </div>
+        <div class="stage" style="--st: var(--st-forge)">
+          <span class="num">04</span>
+          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>단조한 도구로 자기만의 집을 짓습니다. · 사고 도구 · 자기 정체성</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+        <div class="stage" style="--st: var(--st-village)">
+          <span class="num">05</span>
+          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>여러 사람과 모여 사는 마을을 짓습니다. · 관계망 · 기여 · 진로</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+      </div>
+      <div class="pullquote reveal" style="margin-top: clamp(32px,4vw,44px); max-width: 72ch">
+        <p>현재 라인들은 학교를 대체하는 도구가 아니라 <strong>곁에서 사고력과 문제해결력을 기르는 보조·동반 도구</strong>입니다. 첫 라인 <strong>Wonder</strong>가 App Store에 출시되었고, 나머지 라인은 순차적으로 준비 중입니다. 출시 소식은 <a href="/contact" style="color:var(--blue);font-weight:700">문의</a>로 받아보실 수 있습니다.</p>
+      </div>
     </div>
-    <div class="lines">
-      {lines.map((line, i) => <LineCard line={line} index={i} />)}
-    </div>
-    <p class="honest">
-      현재 라인들은 학교를 대체하는 도구가 아니라 <b>곁에서 사고력과 문제해결력을 기르는 보조·동반 도구</b>입니다.
-      첫 라인 <b>Wonder</b>가 App Store에 출시되었고, 나머지 라인은 순차적으로 준비 중입니다. 출시 소식은 <a href="/contact">문의</a>로 받아보실 수 있습니다.
-    </p>
   </section>
 
-  <!-- 마스코트 -->
-  <section class="wrap mascot-sec">
-    <div class="section-head">
-      <p class="eyebrow">마스코트</p>
-      <h2>나루와 느티</h2>
-    </div>
-    <div class="mascots">
-      <article class="m-card">
-        <img src="/mascots/naru.png" alt="나루 — 아기 비버" width="160" loading="lazy" />
-        <div>
-          <h3>나루 <span>NARU</span></h3>
-          <p class="m-role">아기 비버 · 만드는 손</p>
-          <p>배에 물음표를 안고 다니는 호기심 많은 아기 비버. 통나무로 집과 배를 만드는 “만들기”의 얼굴입니다.</p>
+  <!-- ============ MASCOTS ============ -->
+  <section class="section tint">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow warm">MASCOTS · 마스코트</p>
+        <h2 class="section-title">나루와 느티.</h2>
+      </div>
+      <div class="mascot-bios" style="margin-top: clamp(32px,4vw,48px)">
+        <div class="bio reveal">
+          <img src="/mascots/naru.png" alt="나루" />
+          <div class="who">
+            <span class="nm"><b>나루</b><span>NARU</span></span>
+            <p class="role">아기 비버 · 만드는 손</p>
+            <p>배에 물음표를 안고 다니는 호기심 많은 아기 비버. 통나무로 집과 배를 만드는 “만들기”의 얼굴입니다.</p>
+          </div>
         </div>
-      </article>
-      <article class="m-card">
-        <img src="/mascots/neti.png" alt="느티 — 새싹 정령" width="160" loading="lazy" />
-        <div>
-          <h3>느티 <span>NETI</span></h3>
-          <p class="m-role">새싹 정령 · 자라남</p>
-          <p>막 흙을 밀고 올라온 새싹 정령. 매일 조금씩 자라는 “기르기”의 얼굴이자, 아이와 함께 자라는 마음입니다.</p>
+        <div class="bio reveal">
+          <img src="/mascots/neti.png" alt="느티" />
+          <div class="who">
+            <span class="nm"><b>느티</b><span>NETI</span></span>
+            <p class="role">새싹 정령 · 자라남</p>
+            <p>막 흙을 밀고 올라온 새싹 정령. 매일 조금씩 자라는 “기르기”의 얼굴이자, 아이와 함께 자라는 마음입니다.</p>
+          </div>
         </div>
-      </article>
+      </div>
     </div>
   </section>
 
-  <!-- 철학 -->
-  <section class="wrap">
-    <div class="section-head">
-      <p class="eyebrow">우리가 믿는 것</p>
-      <h2>무엇을 키우려 하나</h2>
-    </div>
-    <div class="principles">
-      {principles.map((p, i) => (
-        <div class="card principle">
-          <span class="num">{String(i + 1).padStart(2, '0')}</span>
-          <h3>{p.title}</h3>
-          <p>{p.body}</p>
+  <!-- ============ BELIEFS ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">우리가 믿는 것</p>
+        <h2 class="section-title">무엇을 키우려 하나.</h2>
+      </div>
+      <div class="principle-grid" style="margin-top: clamp(32px,4vw,48px)">
+        <div class="principle reveal">
+          <p class="pn">01</p>
+          <h3>사고력 → 문제해결력</h3>
+          <p>AI가 답을 주는 시대에 아이에게 필요한 건 외우는 힘이 아니라 스스로 푸는 힘입니다. 사고력은 수단이고, 문제해결력이 목적입니다.</p>
         </div>
-      ))}
+        <div class="principle reveal">
+          <p class="pn">02</p>
+          <h3>분해하고 다시 짓는 한 가지 루프</h3>
+          <p>문제를 근본까지 분해하고, 가설로 다시 짓고, 현실에서 직접 해보고, 현실의 답을 받아 고칩니다. 모든 라인이 같은 골격을 나이에 맞게 반복합니다.</p>
+        </div>
+      </div>
     </div>
   </section>
 </Layout>
-
-<style>
-  /* 히어로 */
-  .syn-hero {
-    background:
-      radial-gradient(130% 95% at 85% -10%, rgba(37, 99, 235, 0.10), transparent 55%),
-      linear-gradient(180deg, #ffffff, var(--series-soft));
-    color: var(--ink);
-    text-align: center;
-    border-bottom: 1px solid var(--border);
-  }
-  .syn-hero .mark { margin: 0 auto 1.2rem; opacity: 0.9; }
-  .brandline { font-size: 0.8rem; font-weight: 800; letter-spacing: 0.28em; color: var(--accent-deep); margin: 0; }
-  .syn-hero h1 { font-size: clamp(2.4rem, 7vw, 3.6rem); margin: 0.6rem 0 0; font-weight: 800; }
-  .etym { margin: 0.8rem 0 0; color: var(--sub); font-size: 0.98rem; }
-  .syn-hero .vision { margin: 2rem 0 0; font-size: clamp(1.3rem, 4vw, 1.8rem); font-weight: 800; color: var(--accent-deep); }
-  .syn-hero .value { margin: 0.5rem 0 0; color: var(--sub); }
-
-  /* 서사 */
-  .section-head h2 { font-size: clamp(1.6rem, 4vw, 2.1rem); margin: 0.2rem 0 0; }
-  .lines { display: grid; gap: 0.8rem; }
-  .honest {
-    margin: 1.8rem 0 0;
-    padding: 1.1rem 1.3rem;
-    background: var(--series-soft);
-    border-radius: var(--radius);
-    color: var(--sub);
-    font-size: 0.92rem;
-    line-height: 1.7;
-  }
-  .honest b { color: var(--ink); }
-
-  /* 마스코트 */
-  .mascot-sec { background: var(--mascot-bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 2.2rem; }
-  .mascots { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-  .m-card { display: flex; gap: 1.2rem; align-items: center; }
-  .m-card img { width: 130px; height: auto; flex-shrink: 0; }
-  .m-card h3 { margin: 0; font-size: 1.2rem; font-weight: 800; }
-  .m-card h3 span { color: var(--accent); font-size: 0.7rem; letter-spacing: 0.1em; margin-left: 0.35rem; }
-  .m-role { margin: 0.2rem 0 0.5rem; color: var(--accent); font-weight: 700; font-size: 0.85rem; }
-  .m-card p { margin: 0; color: var(--sub); font-size: 0.92rem; }
-
-  /* 철학 */
-  .principles { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
-  .principle .num { font-weight: 800; color: var(--accent-deep); font-size: 0.9rem; letter-spacing: 0.05em; }
-  .principle h3 { margin: 0.5rem 0 0.5rem; font-size: 1.1rem; }
-  .principle p { margin: 0; color: var(--sub); font-size: 0.92rem; }
-
-  @media (max-width: 720px) {
-    .principles { grid-template-columns: 1fr; }
-    .mascots { grid-template-columns: 1fr; }
-  }
-  @media (max-width: 460px) {
-    .m-card { flex-direction: column; text-align: center; }
-  }
-</style>

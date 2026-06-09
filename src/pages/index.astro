@@ -1,266 +1,236 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Hero3D from '../components/Hero3D.astro';
-import AppCard from '../components/AppCard.astro';
-import { apps, categories } from '../data/apps';
-import { series } from '../data/synergeion';
-
-const live = apps.filter((a) => a.status === 'live');
-const soon = apps.filter((a) => a.status === 'soon');
-const BOOK_URL = 'https://product.kyobobook.co.kr/detail/S000219252300';
-const YT_URL = 'https://www.youtube.com/@logiccraftmovie';
 ---
 
 <Layout>
-  <Hero3D>
-    <p class="eyebrow" style="color: var(--accent-soft);">LOGICCRAFT</p>
-    <h1>생각하는 힘을 키우는<br />제품을 만듭니다.</h1>
-    <div class="cta">
-      <a class="btn btn-primary" href="#products">제품 보기</a>
-      <a class="btn btn-ghost ghost-dark" href="/about">스튜디오 소개</a>
-    </div>
-  </Hero3D>
-
-  <!-- Synergeion 피처 -->
-  <section id="series" class="syn-feature">
+  <!-- ============ HERO ============ -->
+  <section class="hero">
     <div class="wrap">
-      <p class="brandline">SYNERGEION</p>
-      <div class="syn-top">
-        <div class="syn-copy">
-          <h2>3세부터 18세까지,<br />하나의 여정으로 이어집니다.</h2>
-          <p class="vision">“{series.vision}”</p>
-          <p class="value">{series.value}</p>
-          <a class="btn btn-accent syn-cta" href="/synergeion">시리즈 자세히 보기 →</a>
+      <div class="hero-inner">
+        <div class="hero-text reveal">
+          <p class="eyebrow on-dark">LOGICCRAFT · 사고력 EdTech 스튜디오</p>
+          <h1>생각하는 힘을 키우는 <em>제품</em>을 만듭니다.</h1>
+          <div class="hero-cta">
+            <a href="/apps" class="btn btn-primary">제품 보기 <span class="arr">→</span></a>
+            <a href="/about" class="btn btn-ghost">스튜디오 소개</a>
+          </div>
         </div>
-        <div class="mascots">
-          <figure class="mascot">
-            <img src="/mascots/naru.png" alt="나루 — 아기 비버 마스코트" width="150" loading="lazy" />
-            <figcaption>나루 <span>NARU</span></figcaption>
-          </figure>
-          <figure class="mascot">
-            <img src="/mascots/neti.png" alt="느티 — 새싹 정령 마스코트" width="150" loading="lazy" />
-            <figcaption>느티 <span>NETI</span></figcaption>
-          </figure>
+        <div class="hero-art reveal">
+          <div class="mascot-float">
+            <div class="mascot-panel" id="mascotPanel">
+              <div class="glare"></div>
+              <div class="mascot-row">
+                <img class="naru" src="/mascots/naru.png" alt="나루 — 아기 비버 마스코트" />
+                <img class="neti" src="/mascots/neti.png" alt="느티 — 새싹 정령 마스코트" />
+              </div>
+              <div class="mascot-caption">
+                <div class="m"><b>나루</b><span>NARU</span></div>
+                <div class="m"><b>느티</b><span>NETI</span></div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   </section>
 
-  <section id="products" class="wrap">
-    <div class="section-head">
-      <p class="eyebrow">스튜디오 제품</p>
-      <p class="sub">시리즈와 별개로, 작고 또렷한 목적을 가진 도구들.</p>
-    </div>
-    {categories.map((cat) => {
-      const items = live.filter((a) => a.category === cat);
-      const seriesItems = items.filter((a) => a.series);
-      const studioItems = items.filter((a) => !a.series);
-      return items.length > 0 ? (
-        <div class="cat-block">
-          <h3 class="cat-label">{cat}</h3>
-          {seriesItems.length > 0 && (
-            <div class="series-sub">
-              <p class="sub-label">Synergeion 시리즈</p>
-              <div class="app-grid">{seriesItems.map((app) => <AppCard app={app} />)}</div>
-            </div>
-          )}
-          {studioItems.length > 0 && (
-            <div class="series-sub">
-              {seriesItems.length > 0 && <p class="sub-label studio">단독 앱</p>}
-              <div class="app-grid">{studioItems.map((app) => <AppCard app={app} />)}</div>
-            </div>
-          )}
-        </div>
-      ) : null;
-    })}
-
-    {soon.length > 0 && (
-      <>
-        <div class="section-head soon-head"><h2>준비 중</h2></div>
-        <div class="app-grid">
-          {soon.map((app) => <AppCard app={app} />)}
-        </div>
-      </>
-    )}
-  </section>
-
-  <section class="wrap youtube">
-    <h3 class="cat-label">영상</h3>
-    <a class="yt-card" href={YT_URL} target="_blank" rel="noopener" aria-label="로직크래프트 YouTube 채널 열기">
-      <span class="yt-play" aria-hidden="true">
-        <svg viewBox="0 0 24 24" width="34" height="34" fill="#fff"><path d="M8 5v14l11-7z" /></svg>
-      </span>
-      <span class="yt-meta">
-        <span class="yt-name">로직크래프트 YouTube</span>
-        <span class="yt-handle">@logiccraftmovie</span>
-        <span class="yt-blurb">제품 이야기와 사고력 콘텐츠를 영상으로 만나보세요.</span>
-      </span>
-      <span class="yt-go">채널 보기 →</span>
-    </a>
-  </section>
-
-  <section class="wrap book">
-    <h3 class="cat-label">도서</h3>
-    <article class="card book-card">
-      <a class="cover" href={BOOK_URL} target="_blank" rel="noopener">
-        <img src="/book-cover.jpg" alt="당연함을 의심하는 연습 표지" width="170" height="255" loading="lazy" />
-      </a>
-      <div class="book-meta">
-        <h3>당연함을 의심하는 연습</h3>
-        <p class="byline">최우식 지음 · 수필·자기계발 · 2026 · 132쪽</p>
-        <p class="book-blurb">
-          자기·사랑·사회·일상·배움 — 5가지 영역의 당연함을 49편의 짧은 에세이로 의심합니다.
-        </p>
-        <a class="btn btn-primary" href={BOOK_URL} target="_blank" rel="noopener">교보문고에서 보기</a>
+  <!-- ============ SYNERGEION ============ -->
+  <section class="synergeion" id="synergeion">
+    <div class="wrap syn-grid">
+      <div class="syn-copy reveal">
+        <p class="eyebrow">SYNERGEION · 대표 시리즈</p>
+        <h2 class="section-title">3세부터 18세까지,<br />하나의 여정으로 이어집니다.</h2>
+        <a href="/synergeion" class="btn btn-dark">시리즈 자세히 보기 <span class="arr">→</span></a>
       </div>
-    </article>
+      <div class="journey reveal">
+        <div class="spine"><div class="spine-fill" id="spineFill"></div></div>
+        <div class="stage" style="--st: var(--st-wonder)">
+          <span class="num">01</span>
+          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>새싹을 길러 자라는 걸 관찰합니다.</p></div>
+          <span class="tag live">출시</span>
+        </div>
+        <div class="stage" style="--st: var(--st-build)">
+          <span class="num">02</span>
+          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>그 나무로 집과 배를 만듭니다.</p></div>
+          <span class="tag dev">개발 중</span>
+        </div>
+        <div class="stage" style="--st: var(--st-voyage)">
+          <span class="num">03</span>
+          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>그 배를 타고 새 땅을 찾아 나섭니다.</p></div>
+          <span class="tag dev">개발 중</span>
+        </div>
+        <div class="stage" style="--st: var(--st-forge)">
+          <span class="num">04</span>
+          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>단조한 도구로 자기만의 집을 짓습니다.</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+        <div class="stage" style="--st: var(--st-village)">
+          <span class="num">05</span>
+          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>여러 사람과 모여 사는 마을을 짓습니다.</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+      </div>
+    </div>
   </section>
 
+  <!-- ============ PRODUCTS ============ -->
+  <section class="products" id="products">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">PRODUCTS · 우리가 만든 도구</p>
+        <h2 class="section-title">작고 또렷한 목적을 가진 도구들.</h2>
+      </div>
+
+      <!-- 교육 -->
+      <div class="section-block" style="margin-top: clamp(40px,5vw,64px)">
+        <div class="cat-head reveal">
+          <span class="label">교육</span>
+          <span class="rule"></span>
+          <span class="count">04</span>
+        </div>
+        <div class="card-grid">
+
+          <!-- Featured: Wonder -->
+          <article class="pcard feature reveal">
+            <div class="feat-art">
+              <div class="feat-mascots">
+                <img src="/mascots/naru.png" alt="나루 마스코트" />
+                <img class="neti" src="/mascots/neti.png" alt="느티 마스코트" />
+              </div>
+            </div>
+            <div class="feat-body">
+              <p class="eyebrow warm">SYNERGEION 시리즈 · 출시</p>
+              <div class="name-row"><h3>Synergeion Wonder</h3><span class="chip">3–6세</span></div>
+              <p class="desc">아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알, 부모도 같이 자랍니다.</p>
+              <div class="links">
+                <a href="https://apps.apple.com/kr/app/synergeion-wonder/id6774041352">App Store</a>
+                <a class="muted" href="/apps/wonder/support">지원</a>
+                <a class="muted" href="/apps/wonder/privacy">개인정보</a>
+                <a class="muted" href="/apps/wonder/terms">약관</a>
+              </div>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/robotrail.png" alt="" />
+              <div><div class="name-row"><h3>로보트레일</h3><span class="chip">컴퓨팅 사고력</span></div></div>
+            </div>
+            <p class="desc">코드 없이 로봇을 움직이며 코딩 사고력을 훈련하는 퍼즐 앱.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6764465655">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail">Google Play</a>
+              <a class="muted" href="https://woosiq92.github.io/robotrail/support.html">지원</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/science-club.png" alt="" />
+              <div><div class="name-row"><h3>과학자 클럽</h3><span class="chip">과학</span></div></div>
+            </div>
+            <p class="desc">추측·발견·분기·회고 4단계로 매일 한 별씩 켜는 과학 사고 게임.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6771675434">App Store</a>
+              <a class="muted" href="https://woosiq92.github.io/science-club/privacy.html">개인정보</a>
+              <a class="muted" href="https://woosiq92.github.io/science-club/terms.html">약관</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/scienceapp.png" alt="" />
+              <div><div class="name-row"><h3>왜 그렇게 생각해?</h3><span class="chip">융합 사고력</span></div></div>
+            </div>
+            <p class="desc">정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼(웹).</p>
+            <div class="links">
+              <a href="https://logicschool.co.kr">바로가기 →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- 일상 -->
+      <div class="section-block">
+        <div class="cat-head daily reveal">
+          <span class="label">일상</span>
+          <span class="rule"></span>
+          <span class="count">03</span>
+        </div>
+        <div class="card-grid">
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/ourfootprint.png" alt="" />
+              <div><div class="name-row"><h3>커플맵로그</h3><span class="chip warm">지도</span></div></div>
+            </div>
+            <p class="desc">둘이 다녀온 동네가 색으로 칠해지는 커플 데이트 점령 지도.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6769797672">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint">Google Play</a>
+              <a class="muted" href="/apps/ourfootprint/support">지원</a>
+              <a class="muted" href="/apps/ourfootprint/privacy">개인정보</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/stockwatch.png" alt="" />
+              <div><div class="name-row"><h3>불안한개미</h3><span class="chip warm">주식 시세</span></div></div>
+            </div>
+            <p class="desc">매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6772662894">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch">Google Play</a>
+              <a class="muted" href="/apps/stockwatch/support">지원</a>
+              <a class="muted" href="/apps/stockwatch/privacy">개인정보</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/sedolal.png" alt="" />
+              <div><div class="name-row"><h3>세상돌아가는거알아버리기</h3><span class="chip warm">시사·사회</span></div></div>
+            </div>
+            <p class="desc">정치 몰라도 OK. 친구처럼 알려주는 정치·시사 한 토막과 우리 동네 후보·의원 정리.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6770908480">App Store</a>
+              <a class="muted" href="/apps/sedolal/support">지원</a>
+              <a class="muted" href="/apps/sedolal/privacy">개인정보</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ MEDIA + BOOK ============ -->
+  <section class="media-band">
+    <div class="wrap">
+      <div class="reveal" style="margin-bottom: 30px">
+        <p class="eyebrow">MORE · 영상과 글</p>
+        <h2 class="section-title" style="color:#fff">제품 너머의 이야기.</h2>
+      </div>
+      <div class="media-grid">
+        <a class="tile youtube reveal" href="https://www.youtube.com/@logiccraftmovie">
+          <div class="yt-mark"></div>
+          <h3>로직크래프트 YouTube</h3>
+          <p class="handle">@logiccraftmovie</p>
+          <p>제품 이야기와 사고력 콘텐츠를 영상으로 만나보세요.</p>
+          <span class="go">채널 보기 <span class="arr">→</span></span>
+        </a>
+        <a class="tile book reveal" href="https://product.kyobobook.co.kr/detail/S000219252300">
+          <div class="book-cover">
+            <img src="/book-cover.jpg" alt="당연함을 의심하는 연습 표지" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+            <div class="cover-fallback" style="display:none"><b>당연함을<br />의심하는 연습</b><span>최우식 지음</span></div>
+          </div>
+          <div>
+            <p class="meta">최우식 지음 · 수필·자기계발 · 2026 · 132쪽</p>
+            <h3>당연함을 의심하는 연습</h3>
+            <p>자기·사랑·사회·일상·배움 — 5가지 영역의 당연함을 49편의 짧은 에세이로 의심합니다.</p>
+            <span class="go">교보문고에서 보기 <span class="arr">→</span></span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
 </Layout>
-
-<style>
-  h1 { font-size: clamp(1.8rem, 4.5vw, 2.7rem); font-weight: 800; margin: 0; }
-  .lede {
-    margin: 1.4rem 0 0;
-    max-width: 40ch;
-    font-size: clamp(1rem, 2.2vw, 1.18rem);
-    color: rgba(255, 255, 255, 0.82);
-  }
-  .lede b { color: #fff; }
-  .cta { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 2.2rem; }
-  .ghost-dark { color: #fff; border-color: rgba(255, 255, 255, 0.28); }
-  .ghost-dark:hover { color: #fff; border-color: var(--accent-soft); }
-
-  /* ── Synergeion 피처 (밝은 톤) ── */
-  .syn-feature {
-    padding: var(--space-7) 0;
-    background:
-      radial-gradient(130% 95% at 85% -10%, rgba(37, 99, 235, 0.10), transparent 55%),
-      linear-gradient(180deg, #ffffff, var(--series-soft));
-    color: var(--ink);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-  .brandline {
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.22em;
-    color: var(--accent-deep);
-    margin: 0 0 1rem;
-  }
-  .syn-top {
-    display: grid;
-    grid-template-columns: 1fr 1.1fr;
-    gap: 2.5rem;
-    align-items: center;
-  }
-  .syn-copy h2 { font-size: clamp(1.45rem, 3vw, 1.95rem); margin: 0; font-weight: 800; line-height: 1.3; }
-  .vision {
-    margin: 1rem 0 0;
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--accent-deep);
-  }
-  .value { margin: 0.3rem 0 0; color: var(--muted); font-size: 0.95rem; }
-  .syn-cta { margin-top: var(--space-6); }
-
-  .mascots { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-  .mascot { margin: 0; text-align: center; }
-  .mascot img {
-    width: 210px;
-    height: auto;
-    background: var(--mascot-bg);
-    border-radius: 24px;
-    box-shadow: var(--shadow-lg);
-  }
-  .mascot figcaption {
-    margin-top: 0.6rem;
-    font-weight: 800;
-    font-size: 0.95rem;
-    color: var(--ink);
-  }
-  .mascot figcaption span {
-    color: var(--accent-deep);
-    font-size: 0.72rem;
-    letter-spacing: 0.1em;
-    margin-left: 0.3rem;
-  }
-
-  @media (max-width: 760px) {
-    .syn-top { grid-template-columns: 1fr; gap: 1.8rem; }
-    .mascots { order: -1; }
-    .mascot img { width: 160px; }
-  }
-
-  /* ── 제품 ── */
-  .section-head .sub { color: var(--sub); margin: 0.4rem 0 0; font-size: 0.95rem; }
-  .series-sub { margin-bottom: var(--space-5); }
-  .sub-label {
-    margin: 0 0 var(--space-3);
-    font-size: 0.78rem;
-    font-weight: 800;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--accent-deep);
-  }
-  .sub-label.studio { color: var(--muted); }
-  .soon-head { margin-top: 3rem; }
-  #products { padding-bottom: 1.5rem; }
-
-  /* ── 도서 ── */
-  .book { padding-top: 1rem; }
-  .book-card {
-    display: flex;
-    gap: var(--space-7);
-    flex-wrap: wrap;
-    align-items: flex-start;
-  }
-  .book-card:hover { transform: none; }
-  .book .cover {
-    flex-shrink: 0;
-    display: block;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(20, 22, 28, 0.16);
-    transition: transform 0.16s ease;
-  }
-  .book .cover:hover { transform: translateY(-3px); }
-  .book .cover img { display: block; width: 170px; height: auto; }
-  .book-meta { flex: 1; min-width: 260px; }
-  .book-meta h3 { margin: 0; font-size: 1.3rem; font-weight: 800; }
-  .byline { margin: 0.5rem 0 0; color: var(--muted); font-size: 0.9rem; }
-  .book-blurb { margin: 1rem 0 1.5rem; color: var(--sub); font-size: 0.98rem; line-height: 1.75; max-width: 54ch; }
-
-  /* ── 영상 (YouTube) ── */
-  .youtube { padding-top: 1rem; }
-  .yt-card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-6);
-    flex-wrap: wrap;
-    padding: var(--space-6) var(--space-7);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    background: linear-gradient(180deg, #fff, #fdf2f2);
-    text-decoration: none;
-    color: var(--ink);
-    transition: transform 0.16s ease, box-shadow 0.16s ease;
-  }
-  .yt-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
-  .yt-play {
-    flex-shrink: 0;
-    display: grid;
-    place-items: center;
-    width: 64px;
-    height: 64px;
-    border-radius: 16px;
-    background: #ff0033;
-    box-shadow: 0 8px 22px rgba(255, 0, 51, 0.32);
-  }
-  .yt-meta { display: flex; flex-direction: column; gap: 0.15rem; flex: 1; min-width: 220px; }
-  .yt-name { font-size: 1.2rem; font-weight: 800; }
-  .yt-handle { font-size: 0.85rem; font-weight: 700; color: #d3002b; }
-  .yt-blurb { margin-top: 0.3rem; color: var(--sub); font-size: 0.95rem; }
-  .yt-go { font-weight: 800; color: var(--accent-deep); white-space: nowrap; }
-</style>

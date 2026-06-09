@@ -1,61 +1,164 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import AppCard from '../components/AppCard.astro';
-import LineCard from '../components/LineCard.astro';
-import { apps, categories } from '../data/apps';
-import { lines } from '../data/synergeion';
-
-const live = apps.filter((a) => a.status === 'live');
-const soon = apps.filter((a) => a.status === 'soon');
 ---
 
 <Layout
   title="제품 — 로직크래프트 LogicCraft"
-  description="로직크래프트가 만든 제품 모음. 사고력 EdTech 시리즈 Synergeion과 단독 앱(로보트레일·과학자 클럽·커플맵로그·불안한개미 등), 웹 학습 플랫폼."
+  description="로직크래프트가 기획·디자인·출시까지 직접 만든 사고력 시리즈와 일상 도구들."
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">제품</p>
-    <h1>우리가 만든 제품</h1>
-    <p>기획·디자인·출시까지 직접 만들었습니다. 사고력 시리즈와 작고 또렷한 도구들.</p>
-  </section>
-
-  <section class="wrap">
-    <div class="section-head">
-      <h2>Synergeion 시리즈</h2>
-      <p>3세부터 18세까지 이어 타는 사고력 EdTech 라인업. <a href="/synergeion">시리즈 보기 →</a></p>
-    </div>
-    <div class="lines">
-      {lines.map((line, i) => <LineCard line={line} index={i} />)}
+  <!-- ============ PAGE HERO ============ -->
+  <section class="page-hero">
+    <div class="wrap">
+      <p class="eyebrow on-dark">PRODUCTS · 우리가 만든 도구</p>
+      <h1>우리가 만든 제품.</h1>
+      <p class="lead">기획·디자인·출시까지 직접 만들었습니다. 사고력 시리즈와, 일상을 거드는 작고 또렷한 도구들.</p>
     </div>
   </section>
 
-  <section class="wrap">
-    <div class="section-head"><h2>스튜디오 제품</h2></div>
-    {categories.map((cat) => {
-      const items = live.filter((a) => a.category === cat && !a.series);
-      return items.length > 0 ? (
-        <div class="cat-block">
-          <h3 class="cat-label">{cat}</h3>
-          <div class="app-grid">{items.map((app) => <AppCard app={app} />)}</div>
-        </div>
-      ) : null;
-    })}
-  </section>
-
-  {soon.length > 0 && (
-    <section class="wrap">
-      <div class="section-head"><h2>준비 중</h2></div>
-      <div class="app-grid">
-        {soon.map((app) => <AppCard app={app} />)}
+  <!-- ============ SYNERGEION SERIES ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">SYNERGEION 시리즈</p>
+        <h2 class="section-title">3세부터 18세까지 이어 타는 사고력 라인업.</h2>
+        <p class="section-lead">하나의 골격을 나이에 맞게 반복합니다. <a href="/synergeion" style="color:var(--blue);font-weight:700">시리즈 자세히 보기 →</a></p>
       </div>
-    </section>
-  )}
-</Layout>
+      <div class="journey reveal" style="margin-top: clamp(36px,5vw,56px); max-width: 880px">
+        <div class="spine"><div class="spine-fill" id="spineFill"></div></div>
+        <div class="stage" style="--st: var(--st-wonder)">
+          <span class="num">01</span>
+          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>새싹을 길러 자라는 걸 관찰합니다. · 경이감 · 이야기 · 부모도 함께 자람</p></div>
+          <span class="tag live">출시</span>
+        </div>
+        <div class="stage" style="--st: var(--st-build)">
+          <span class="num">02</span>
+          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>그 나무로 집과 배를 만듭니다. · 손 · 도구 · 만들기</p></div>
+          <span class="tag dev">개발 중</span>
+        </div>
+        <div class="stage" style="--st: var(--st-voyage)">
+          <span class="num">03</span>
+          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>그 배를 타고 새 땅을 찾아 나섭니다. · 탐험 · 조사 · 발표</p></div>
+          <span class="tag dev">개발 중</span>
+        </div>
+        <div class="stage" style="--st: var(--st-forge)">
+          <span class="num">04</span>
+          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>단조한 도구로 자기만의 집을 짓습니다. · 사고 도구 · 자기 정체성</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+        <div class="stage" style="--st: var(--st-village)">
+          <span class="num">05</span>
+          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>여러 사람과 모여 사는 마을을 짓습니다. · 관계망 · 기여 · 진로</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-<style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 1rem; }
-  .page-head h1 { font-size: clamp(2rem, 5vw, 2.8rem); margin: 0.3rem 0 0; }
-  .page-head p { color: var(--sub); margin: 0.8rem 0 0; max-width: 50ch; }
-  section + section { padding-top: 1rem; }
-  .lines { display: grid; gap: 0.8rem; }
-</style>
+  <!-- ============ STUDIO PRODUCTS ============ -->
+  <section class="products" style="padding-top:0">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow">STUDIO · 스튜디오 제품</p>
+        <h2 class="section-title">작고 또렷한 목적을 가진 앱들.</h2>
+      </div>
+
+      <!-- 교육 -->
+      <div class="section-block" style="margin-top: clamp(40px,5vw,64px)">
+        <div class="cat-head reveal">
+          <span class="label">교육</span>
+          <span class="rule"></span>
+          <span class="count">03</span>
+        </div>
+        <div class="card-grid">
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/robotrail.png" alt="" />
+              <div><div class="name-row"><h3>로보트레일</h3><span class="chip">컴퓨팅 사고력</span></div></div>
+            </div>
+            <p class="desc">코드 없이 로봇을 움직이며 코딩 사고력을 훈련하는 퍼즐 앱.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6764465655">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail">Google Play</a>
+              <a class="muted" href="https://woosiq92.github.io/robotrail/support.html">지원</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/science-club.png" alt="" />
+              <div><div class="name-row"><h3>과학자 클럽</h3><span class="chip">과학</span></div></div>
+            </div>
+            <p class="desc">추측·발견·분기·회고 4단계로 매일 한 별씩 켜는 과학 사고 게임.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6771675434">App Store</a>
+              <a class="muted" href="https://woosiq92.github.io/science-club/privacy.html">개인정보</a>
+              <a class="muted" href="https://woosiq92.github.io/science-club/terms.html">약관</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/scienceapp.png" alt="" />
+              <div><div class="name-row"><h3>왜 그렇게 생각해?</h3><span class="chip">융합 사고력</span></div></div>
+            </div>
+            <p class="desc">정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼(웹).</p>
+            <div class="links">
+              <a href="https://logicschool.co.kr">바로가기 →</a>
+            </div>
+          </article>
+        </div>
+      </div>
+
+      <!-- 일상 -->
+      <div class="section-block">
+        <div class="cat-head daily reveal">
+          <span class="label">일상</span>
+          <span class="rule"></span>
+          <span class="count">03</span>
+        </div>
+        <div class="card-grid">
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/ourfootprint.png" alt="" />
+              <div><div class="name-row"><h3>커플맵로그</h3><span class="chip warm">지도</span></div></div>
+            </div>
+            <p class="desc">둘이 다녀온 동네가 색으로 칠해지는 커플 데이트 점령 지도.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6769797672">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint">Google Play</a>
+              <a class="muted" href="/apps/ourfootprint/support">지원</a>
+              <a class="muted" href="/apps/ourfootprint/privacy">개인정보</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/stockwatch.png" alt="" />
+              <div><div class="name-row"><h3>불안한개미</h3><span class="chip warm">주식 시세</span></div></div>
+            </div>
+            <p class="desc">매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6772662894">App Store</a>
+              <a href="https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch">Google Play</a>
+              <a class="muted" href="/apps/stockwatch/support">지원</a>
+              <a class="muted" href="/apps/stockwatch/privacy">개인정보</a>
+            </div>
+          </article>
+
+          <article class="pcard reveal">
+            <div class="top">
+              <img class="icon" src="/icons/sedolal.png" alt="" />
+              <div><div class="name-row"><h3>세상돌아가는거알아버리기</h3><span class="chip warm">시사·사회</span></div></div>
+            </div>
+            <p class="desc">정치 몰라도 OK. 친구처럼 알려주는 정치·시사 한 토막과 우리 동네 후보·의원 정리.</p>
+            <div class="links">
+              <a href="https://apps.apple.com/kr/app/id6770908480">App Store</a>
+              <a class="muted" href="/apps/sedolal/support">지원</a>
+              <a class="muted" href="/apps/sedolal/privacy">개인정보</a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </section>
+</Layout>

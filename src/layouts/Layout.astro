@@ -36,6 +36,17 @@ const orgJsonLd = {
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
 
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
     <meta name="naver-site-verification" content="b7885929178d4fd414be2ec0c64781930b23c3c9" />
 
     <meta property="og:type" content="website" />
@@ -58,5 +69,6 @@ const orgJsonLd = {
       <slot />
     </main>
     <Footer />
+    <script src="/site.js" is:inline></script>
   </body>
 </html>
