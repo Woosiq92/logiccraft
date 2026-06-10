@@ -5,6 +5,7 @@ import Layout from '../layouts/Layout.astro';
 <Layout>
   <!-- ============ HERO ============ -->
   <section class="hero">
+    <canvas class="hero-net" id="heroNet" aria-hidden="true"></canvas>
     <div class="wrap">
       <div class="hero-inner">
         <div class="hero-text reveal">
@@ -233,4 +234,6 @@ import Layout from '../layouts/Layout.astro';
       </div>
     </div>
   </section>
+
+  <script src="/constellation.js" is:inline></script>
 </Layout>
