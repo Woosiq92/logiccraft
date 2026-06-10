@@ -518,18 +518,6 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .section { padding: clamp(60px, 8vw, 104px) 0; }
 .section.tint { background: #fff; border-block: 1px solid var(--line); }
 
-/* principle cards (about / synergeion beliefs) */
-.principle-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
-.principle {
-  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius);
-  padding: 28px 26px; box-shadow: var(--shadow-sm);
-  transition: transform .25s var(--ease), box-shadow .25s var(--ease);
-}
-.principle:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
-.principle .pn { font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 14px; color: var(--blue); }
-.principle h3 { font-size: 20px; font-weight: 800; margin: 12px 0 0; letter-spacing: -0.025em; }
-.principle p { color: var(--muted); font-size: 15px; margin: 12px 0 0; line-height: 1.65; }
-
 /* pull-quote / logo meaning */
 .pullquote {
   border-left: 4px solid var(--blue); padding: 6px 0 6px 22px;
