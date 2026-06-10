@@ -433,7 +433,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 /* ============================================================
    Media + Book band
    ============================================================ */
-.media-band { background: var(--ink); color: #fff; padding: clamp(64px, 8vw, 104px) 0; }
+.media-band { background: linear-gradient(160deg, #223462 0%, #171f45 100%); color: #fff; padding: clamp(64px, 8vw, 104px) 0; }
 .media-band .eyebrow { color: #8fb0ff; }
 .media-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
 
@@ -443,7 +443,8 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   transition: transform .25s var(--ease);
 }
 .tile:hover { transform: translateY(-4px); }
-.tile.youtube { background: linear-gradient(150deg, #2a1010 0%, #3a1414 100%); border: 1px solid rgba(255,255,255,.08); }
+.tile.youtube { background: linear-gradient(150deg, #7e2727 0%, #5d1c1c 100%); border: 1px solid rgba(255,255,255,.1); }
+.tile.youtube p, .tile.youtube .handle { color: #e7c9c5; }
 .tile .yt-mark { width: 56px; height: 40px; border-radius: 11px; background: #ff3b30; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px -8px rgba(255,59,48,.7); }
 .tile .yt-mark::after { content: ""; width: 0; height: 0; border-left: 13px solid #fff; border-top: 8px solid transparent; border-bottom: 8px solid transparent; margin-left: 3px; }
 .tile h3 { font-size: 23px; margin-top: 22px; }
@@ -453,10 +454,13 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .tile .go .arr { transition: transform .2s var(--ease); }
 .tile:hover .go .arr { transform: translateX(4px); }
 
-.tile.book { background: linear-gradient(150deg, #17204a 0%, #1d2a5e 100%); border: 1px solid rgba(255,255,255,.08); flex-direction: row; gap: 26px; align-items: center; }
+.tile.book { background: linear-gradient(155deg, #faf9f5 0%, #f1efe8 100%); border: 1px solid var(--line-strong); flex-direction: row; gap: 26px; align-items: center; color: var(--ink); }
+.tile.book p { color: var(--muted); }
+.tile.book .meta { color: var(--muted-2); }
+.tile.book .go { color: var(--blue); }
 .book-cover {
   flex: 0 0 132px; height: 188px; border-radius: 8px; overflow: hidden;
-  box-shadow: 0 24px 50px -18px rgba(0,0,0,.7); background: #0d1430;
+  box-shadow: 0 22px 44px -20px rgba(17,24,58,.45); background: #0d1430;
   position: relative;
 }
 .book-cover img { width: 100%; height: 100%; object-fit: cover; }
