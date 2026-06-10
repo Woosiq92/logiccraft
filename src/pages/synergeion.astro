@@ -8,6 +8,7 @@ import Layout from '../layouts/Layout.astro';
 >
   <!-- ============ PAGE HERO ============ -->
   <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
     <div class="wrap">
       <p class="eyebrow on-dark">SYNERGEION · 대표 시리즈</p>
       <h1>Synergeion</h1>
@@ -20,37 +21,37 @@ import Layout from '../layouts/Layout.astro';
     <div class="wrap">
       <div class="reveal">
         <p class="eyebrow">하나의 이야기</p>
+        <div class="pullquote" style="margin: 18px 0 0; max-width: 72ch">
+          <p><strong>분해하고 조립하면서 사고력과 문제해결력을 길러 줍니다.</strong></p>
+        </div>
       </div>
       <div class="journey reveal" style="margin-top: clamp(36px,5vw,56px); max-width: 880px">
         <div class="spine"><div class="spine-fill" id="spineFill"></div></div>
         <div class="stage" style="--st: var(--st-wonder)">
           <span class="num">01</span>
-          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>새싹을 길러 자라는 걸 관찰합니다. · 경이감 · 이야기 · 부모도 함께 자람</p></div>
+          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>씨앗을 심고 매일 자라는 걸 지켜봅니다. 세상의 작은 것들이 궁금해지는 때입니다.</p></div>
           <span class="tag live">출시</span>
         </div>
         <div class="stage" style="--st: var(--st-build)">
           <span class="num">02</span>
-          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>그 나무로 집과 배를 만듭니다. · 손 · 도구 · 만들기</p></div>
+          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>자란 나무로 집과 배를 만듭니다. 직접 손으로 만들고 부수며 원리를 익힙니다.</p></div>
           <span class="tag dev">개발 중</span>
         </div>
         <div class="stage" style="--st: var(--st-voyage)">
           <span class="num">03</span>
-          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>그 배를 타고 새 땅을 찾아 나섭니다. · 탐험 · 조사 · 발표</p></div>
+          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>배를 타고 새 땅을 찾아 나섭니다. 궁금한 것을 직접 조사하고 자기 말로 설명합니다.</p></div>
           <span class="tag dev">개발 중</span>
         </div>
         <div class="stage" style="--st: var(--st-forge)">
           <span class="num">04</span>
-          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>직접 벼린 도구로 자기만의 집을 짓습니다. · 사고 도구 · 자기 정체성</p></div>
+          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>내가 만든 도구로 자기만의 집을 짓습니다. 자신만의 생각하는 방식을 갖추는 단계입니다.</p></div>
           <span class="tag soon">예정</span>
         </div>
         <div class="stage" style="--st: var(--st-village)">
           <span class="num">05</span>
-          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>여러 사람과 모여 사는 마을을 짓습니다. · 관계망 · 기여 · 진로</p></div>
+          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>사람들과 함께 마을을 이룹니다. 관계 속에서 자기 역할과 갈 길을 찾습니다.</p></div>
           <span class="tag soon">예정</span>
         </div>
-      </div>
-      <div class="pullquote reveal" style="margin-top: clamp(32px,4vw,44px); max-width: 72ch">
-        <p>현재 라인들은 학교를 대체하지 않습니다. <strong>아이 곁에서 사고력과 문제해결력을 길러 주는 동반 도구</strong>입니다. 첫 라인 <strong>Wonder</strong>가 App Store에 출시되었고, 나머지 라인도 순차적으로 선보일 예정입니다. 새 소식은 <a href="/contact" style="color:var(--blue);font-weight:700">문의</a>로 받아보실 수 있습니다.</p>
       </div>
     </div>
   </section>
@@ -68,7 +69,7 @@ import Layout from '../layouts/Layout.astro';
           <div class="who">
             <span class="nm"><b>나루</b><span>NARU</span></span>
             <p class="role">아기 비버 · 만드는 손</p>
-            <p>배에 물음표를 안고 다니는 호기심 많은 아기 비버. 통나무로 집과 배를 만드는 “만들기”의 얼굴입니다.</p>
+            <p>배에 물음표를 안고 다니는 호기심 많은 아기 비버.</p>
           </div>
         </div>
         <div class="bio reveal">
@@ -76,21 +77,11 @@ import Layout from '../layouts/Layout.astro';
           <div class="who">
             <span class="nm"><b>느티</b><span>NETI</span></span>
             <p class="role">새싹 정령 · 자라남</p>
-            <p>막 흙을 밀고 올라온 새싹 정령. 매일 조금씩 자라는 “기르기”의 얼굴이자, 아이와 함께 자라는 마음입니다.</p>
+            <p>막 흙을 밀고 올라온 새싹 정령. 날마다 조금씩 자라며, 아이와 함께 크는 마음을 담았습니다.</p>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- ============ THE LOOP ============ -->
-  <section class="section">
-    <div class="wrap">
-      <div class="reveal">
-        <p class="eyebrow">하나의 방식</p>
-        <h2 class="section-title">분해하고, 다시 짓는다.</h2>
-        <p class="section-lead">큰 문제를 잘게 쪼개 봅니다. 가설을 세워 다시 만들고, 직접 해본 뒤 그 결과를 보고 고칩니다. 나이만 다를 뿐, 모든 라인이 이 과정을 똑같이 반복합니다.</p>
-      </div>
-    </div>
-  </section>
 </Layout>
