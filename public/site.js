@@ -71,6 +71,32 @@
     });
   })();
 
+  /* ---- Home: series strip pointer-parallax 3D tilt ---- */
+  (function stripTilt() {
+    if (reduceMotion || !finePointer) return;
+    const strip = document.getElementById('synStrip');
+    if (!strip) return;
+    const MAX = 8;
+    let raf = null, nx = 0, ny = 0;
+    const apply = () => {
+      raf = null;
+      strip.style.setProperty('--ry', (nx * MAX).toFixed(2) + 'deg');
+      strip.style.setProperty('--rx', (-ny * MAX * 0.55).toFixed(2) + 'deg');
+    };
+    strip.addEventListener('pointermove', (e) => {
+      const r = strip.getBoundingClientRect();
+      nx = (e.clientX - r.left) / r.width - 0.5;
+      ny = (e.clientY - r.top) / r.height - 0.5;
+      strip.classList.add('is-tilting');
+      if (!raf) raf = requestAnimationFrame(apply);
+    });
+    strip.addEventListener('pointerleave', () => {
+      strip.classList.remove('is-tilting');
+      strip.style.setProperty('--rx', '0deg');
+      strip.style.setProperty('--ry', '0deg');
+    });
+  })();
+
   /* ---- Synergeion: scroll-linked journey spine + node activation ---- */
   (function journeyTrack() {
     const journey = document.querySelector('.journey');

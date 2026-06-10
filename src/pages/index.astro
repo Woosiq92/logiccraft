@@ -36,40 +36,33 @@ import Layout from '../layouts/Layout.astro';
   </section>
 
   <!-- ============ SYNERGEION ============ -->
-  <section class="synergeion" id="synergeion">
-    <div class="wrap syn-grid">
-      <div class="syn-copy reveal">
+  <section class="synergeion" id="synergeion" style="padding-block: clamp(35px, 4.5vw, 60px)">
+    <div class="wrap">
+      <div class="syn-copy reveal" style="text-align:center; max-width:720px; margin:0 auto">
         <p class="eyebrow">SYNERGEION · 대표 시리즈</p>
-        <h2 class="section-title">3세부터 18세까지,<br />하나의 여정으로 이어집니다.</h2>
-        <a href="/synergeion" class="btn btn-dark">시리즈 자세히 보기 <span class="arr">→</span></a>
+        <h2 class="section-title">3세부터 18세까지, 하나의 여정으로 이어집니다.</h2>
       </div>
-      <div class="journey reveal">
-        <div class="spine"><div class="spine-fill" id="spineFill"></div></div>
-        <div class="stage" style="--st: var(--st-wonder)">
-          <span class="num">01</span>
-          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>새싹을 길러 자라는 걸 관찰합니다.</p></div>
-          <span class="tag live">출시</span>
+      <div class="syn-strip-wrap reveal">
+        <div class="syn-strip" id="synStrip">
+          <div class="syn-step" style="--st: var(--st-wonder)">
+            <span class="dot">01</span><span class="ln">Wonder</span><span class="ag">3–6세</span><span class="tag live">출시</span>
+          </div>
+          <div class="syn-step" style="--st: var(--st-build)">
+            <span class="dot">02</span><span class="ln">Build</span><span class="ag">6–9세</span><span class="tag soon">예정</span>
+          </div>
+          <div class="syn-step" style="--st: var(--st-voyage)">
+            <span class="dot">03</span><span class="ln">Voyage</span><span class="ag">9–12세</span><span class="tag soon">예정</span>
+          </div>
+          <div class="syn-step" style="--st: var(--st-forge)">
+            <span class="dot">04</span><span class="ln">Forge</span><span class="ag">12–15세</span><span class="tag soon">예정</span>
+          </div>
+          <div class="syn-step" style="--st: var(--st-village)">
+            <span class="dot">05</span><span class="ln">Village</span><span class="ag">15–18세</span><span class="tag soon">예정</span>
+          </div>
         </div>
-        <div class="stage" style="--st: var(--st-build)">
-          <span class="num">02</span>
-          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>그 나무로 집과 배를 만듭니다.</p></div>
-          <span class="tag dev">개발 중</span>
-        </div>
-        <div class="stage" style="--st: var(--st-voyage)">
-          <span class="num">03</span>
-          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>그 배를 타고 새 땅을 찾아 나섭니다.</p></div>
-          <span class="tag dev">개발 중</span>
-        </div>
-        <div class="stage" style="--st: var(--st-forge)">
-          <span class="num">04</span>
-          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>직접 벼린 도구로 자기만의 집을 짓습니다.</p></div>
-          <span class="tag soon">예정</span>
-        </div>
-        <div class="stage" style="--st: var(--st-village)">
-          <span class="num">05</span>
-          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>여러 사람과 모여 사는 마을을 짓습니다.</p></div>
-          <span class="tag soon">예정</span>
-        </div>
+      </div>
+      <div class="reveal" style="text-align:center; margin-top: clamp(32px,4vw,44px)">
+        <a href="/synergeion" class="btn btn-dark">시리즈 자세히 보기 <span class="arr">→</span></a>
       </div>
     </div>
   </section>

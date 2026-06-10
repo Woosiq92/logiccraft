@@ -312,6 +312,40 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .syn-copy .section-title + .btn { margin-top: 28px; }
 .syn-copy .qsub { color: var(--muted); margin: 0 0 26px; }
 
+/* horizontal series strip — compact lineup teaser on the home page (pointer-parallax 3D) */
+.syn-strip-wrap { perspective: 1100px; max-width: 940px; margin: clamp(40px, 5vw, 60px) auto 0; }
+.syn-strip {
+  display: grid; grid-template-columns: repeat(5, 1fr);
+  position: relative;
+  transform-style: preserve-3d;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition: transform .5s var(--ease);
+}
+.syn-strip.is-tilting { transition: transform .08s linear; }
+.syn-strip::before {
+  content: ""; position: absolute; left: 10%; right: 10%; top: 21px; height: 2px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--st-wonder), var(--st-build) 28%, var(--st-voyage) 55%, var(--st-forge) 78%, var(--st-village));
+}
+.syn-step { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 9px; padding: 0 6px; position: relative; transform-style: preserve-3d; transition: transform .3s var(--ease); }
+.syn-step .dot {
+  width: 44px; height: 44px; border-radius: 50%; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  font-family: "IBM Plex Mono", monospace; font-weight: 600; font-size: 14px; color: var(--st);
+  background: var(--card); border: 2px solid color-mix(in srgb, var(--st) 45%, var(--line-strong));
+  box-shadow: 0 1px 3px rgba(17,24,58,.08);
+  transform: translateZ(30px);
+  transition: transform .3s var(--ease), color .3s var(--ease), background .3s var(--ease), border-color .3s var(--ease), box-shadow .3s var(--ease);
+}
+.syn-step .ln { font-weight: 800; font-size: 16px; letter-spacing: -0.02em; color: var(--ink); transform: translateZ(18px); }
+.syn-step .ag { font-size: 12.5px; font-weight: 600; color: var(--muted-2); transform: translateZ(12px); }
+.syn-step .tag { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 999px; white-space: nowrap; letter-spacing: -0.01em; transform: translateZ(12px); }
+.syn-step:hover { transform: translateZ(22px); }
+.syn-step:hover .dot {
+  color: #fff; background: var(--st); border-color: var(--st);
+  transform: translateZ(48px) scale(1.08);
+  box-shadow: 0 12px 26px -6px color-mix(in srgb, var(--st) 60%, transparent), 0 0 0 6px color-mix(in srgb, var(--st) 14%, transparent);
+}
+
 /* journey rail — numbered timeline nodes on a scroll-filling spine */
 .journey { display: flex; flex-direction: column; gap: 14px; position: relative; padding-left: 66px; }
 .spine { position: absolute; left: 23px; top: 30px; bottom: 30px; width: 2px; background: var(--line-strong); border-radius: 3px; overflow: hidden; }
@@ -620,6 +654,12 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   .hero-strip ul { gap: 8px 20px; }
   .bio { flex-direction: column; text-align: center; }
   .bio .who .nm { justify-content: center; }
+  .syn-strip { gap: 2px; }
+  .syn-strip .dot { width: 36px; height: 36px; font-size: 12px; }
+  .syn-strip::before { top: 17px; }
+  .syn-step .ln { font-size: 13px; }
+  .syn-step .ag { font-size: 11px; }
+  .syn-step .tag { font-size: 10px; padding: 3px 7px; }
 }
 
 /* ============================================================
