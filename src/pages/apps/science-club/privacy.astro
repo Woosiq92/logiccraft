@@ -1,0 +1,116 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="과학자 클럽 — 개인정보 처리방침 · 로직크래프트"
+  description="과학자 클럽 개인정보 처리방침. 일기·학습 기록은 기기 내부에 저장되며, 학회·클럽 등 공유 기능을 이용한 경우에만 백엔드에 저장됩니다. 광고 추적은 하지 않습니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">개인정보 처리방침</p>
+    <h1>과학자 클럽 개인정보처리방침</h1>
+    <p class="meta">
+      앱 이름: 과학자 클럽<br />
+      개발/운영: 로직크래프트 (LOGIC CRAFT, 사업자등록번호 302-11-03141, 대표 최우식)<br />
+      연락처: smartsikhye@gmail.com<br />
+      발효일: 2026년 5월 21일
+    </p>
+  </section>
+
+  <section class="wrap doc">
+    <h2>1. 수집 항목</h2>
+    <p><b>(가) 기기 내 로컬 저장</b> — 외부 서버에 전송되지 않음</p>
+    <ul>
+      <li>일기·메모·내 우주(별·다리·그림)·음성·사진</li>
+      <li>학습 진행 상태·추측·회고·SRS 데이터</li>
+    </ul>
+    <p><b>(나) 백엔드 서버 저장</b> — 사용자가 게재·공유한 경우에만</p>
+    <ul>
+      <li>식별자: 닉네임, 아바타, 계정 ID</li>
+      <li>사용자 콘텐츠: 학회에 게재한 연구글·댓글·평점, 클럽 위키·별자리·공동 연구, 발견 공유</li>
+      <li>사용 데이터: 클럽 활동(방문한 별, 클럽 미션 참여 등)</li>
+      <li>푸시 알림 식별자(허용한 경우): 디바이스 푸시 endpoint</li>
+    </ul>
+
+    <h2>2. 수집 목적</h2>
+    <ul>
+      <li>학습 진도·우주맵·SRS 알고리즘 (로컬)</li>
+      <li>학회·클럽 등 다른 사용자와의 공유 기능 제공 (백엔드)</li>
+      <li>푸시 알림 발송 (허용한 경우)</li>
+      <li>부적절 콘텐츠 신고·중재</li>
+    </ul>
+    <p>광고 추적·마케팅·외부 데이터 결합 목적은 일체 사용하지 않습니다.</p>
+
+    <h2>3. 보관 기간</h2>
+    <ul>
+      <li>기기 내 로컬: 앱 삭제 시 영구 삭제</li>
+      <li>백엔드 게재 콘텐츠(학회 글·댓글·클럽 데이터): 사용자가 삭제하거나 계정을 탈퇴할 때까지</li>
+      <li>계정 탈퇴 시: 30일 내 영구 삭제 (백업 보존 기간 포함)</li>
+    </ul>
+
+    <h2>4. 제3자 제공 및 외부 통신</h2>
+    <p>사용자 데이터를 광고·마케팅 목적의 제3자에게 제공하지 않습니다. 다음 외부 서비스와는 앱 기능 제공을 위해 통신합니다.</p>
+    <ul>
+      <li>NASA APOD API: 오늘의 우주 사진을 가져옵니다. 사용자 데이터는 전송되지 않습니다.</li>
+      <li>Apple Push Notification Service(APNs): 푸시 알림 허용 시 디바이스 토큰을 전송합니다.</li>
+      <li>호스팅 인프라(Railway): 백엔드 서버 운영을 위한 인프라 제공자.</li>
+    </ul>
+
+    <h2>5. 사용자 권리</h2>
+    <ul>
+      <li>열람·수정·삭제: 앱 내 "MY → 데이터 관리"</li>
+      <li>게재한 학회 글·댓글·클럽 데이터 삭제: 해당 화면에서 개별 삭제 가능</li>
+      <li>데이터 백업 내려받기 (앱 내 "백업" 기능)</li>
+      <li>계정 탈퇴: "MY → 계정 삭제" — 백엔드 데이터 30일 내 영구 삭제</li>
+      <li>푸시 거부: 시스템 설정 또는 앱 내 설정</li>
+    </ul>
+
+    <h2>6. 어린이 데이터 (정보통신망법 제31조)</h2>
+    <ul>
+      <li>만 14세 미만은 보호자 동의 필수</li>
+      <li>광고·마케팅 추적 없음</li>
+      <li>외부 광고 SDK·분석 도구 사용 없음</li>
+    </ul>
+
+    <h2>7. 보안 조치</h2>
+    <ul>
+      <li>백엔드 통신은 모두 HTTPS(TLS)로 암호화</li>
+      <li>음성·사진·일기는 사용자 기기에만 저장</li>
+      <li>비밀번호 등 인증 정보는 사용하지 않음(닉네임 기반 식별)</li>
+    </ul>
+
+    <h2>8. 사업자 정보</h2>
+    <ul>
+      <li>상호: LOGIC CRAFT</li>
+      <li>대표자: 최우식</li>
+      <li>사업자등록번호: 302-11-03141</li>
+      <li>사업장 주소: 대한민국</li>
+      <li>고객센터: <a href="mailto:smartsikhye@gmail.com">smartsikhye@gmail.com</a></li>
+    </ul>
+
+    <h2>9. 개인정보 보호 책임자</h2>
+    <p>운영 책임자에게 문의는 위 이메일로 연락 부탁드립니다.</p>
+
+    <h2>10. 이의 제기</h2>
+    <ul>
+      <li>한국 개인정보보호위원회: 1833-6972</li>
+      <li>한국인터넷진흥원 개인정보침해신고센터: 118</li>
+    </ul>
+
+    <h2>11. 약관·정책 변경</h2>
+    <p>중요한 변경 시 앱 내 공지로 안내합니다.</p>
+
+    <p class="links"><a href="/apps/science-club/terms">이용약관</a> · <a href="/apps/science-club/support">고객 지원</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.6rem, 4.5vw, 2.3rem); margin: 0.3rem 0 0.8rem; }
+  .meta { color: var(--sub); font-size: 0.95rem; line-height: 1.8; }
+  .doc { padding-top: 1rem; padding-bottom: 4rem; max-width: 760px; }
+  .doc h2 { font-size: 1.2rem; margin: 2rem 0 0.6rem; }
+  .doc p { line-height: 1.75; margin: 0.5rem 0; }
+  .doc ul { line-height: 1.8; }
+  .links { margin-top: 2rem; font-size: 0.95rem; }
+</style>

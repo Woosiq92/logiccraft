@@ -1,0 +1,73 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '과학자 클럽은 어떤 앱인가요?',
+    a: '과학 사고력을 기르는 학습 앱입니다. 관찰·가설·회고를 기록하고, 학회·클럽에서 다른 사용자와 연구글·발견을 공유하며 사고력을 훈련합니다.',
+  },
+  {
+    q: '결제나 광고가 있나요?',
+    a: '없습니다. 모든 학습 콘텐츠와 기능을 무료로 이용할 수 있으며, 광고·인앱 구매·구독이 없습니다.',
+  },
+  {
+    q: '로그인이 필요한가요?',
+    a: '학습·일기 등 대부분의 기능은 가입 없이 사용할 수 있습니다. 학회·클럽 등 공유 기능을 이용할 때만 닉네임 기반 계정이 필요합니다. 실명은 사용하지 않습니다.',
+  },
+  {
+    q: '만 14세 미만도 사용할 수 있나요?',
+    a: '네. 단, 정보통신망법 제31조에 따라 만 14세 미만은 보호자 동의가 필요합니다. 광고·마케팅 추적은 하지 않습니다.',
+  },
+  {
+    q: '내 데이터를 삭제하고 싶어요.',
+    a: '앱 내 "MY → 데이터 관리"에서 열람·수정·삭제할 수 있고, "MY → 계정 삭제"로 탈퇴하면 백엔드 데이터가 30일 내 영구 삭제됩니다. 앱을 삭제하면 기기 내 데이터는 즉시 사라집니다.',
+  },
+];
+---
+
+<Layout
+  title="과학자 클럽 — 고객 지원 · 로직크래프트"
+  description="과학자 클럽 고객 지원. 자주 묻는 질문과 문의 안내."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>과학자 클럽</h1>
+    <p>과학 사고력을 기록하고 함께 나누며 훈련하는 학습 앱.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:smartsikhye@gmail.com?subject=[과학자 클럽] 문의">smartsikhye@gmail.com</a>
+    <p class="links"><a href="/apps/science-club/privacy">개인정보 처리방침</a> · <a href="/apps/science-club/terms">이용약관</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
