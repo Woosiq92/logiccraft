@@ -1,0 +1,87 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '브레인블레이드는 어떤 앱인가요?',
+    a: '팽이 배틀과 학습 퀴즈를 합친 두뇌 게임입니다. 문제를 빠르고 정확하게 맞힐수록 더 센 일격이 나가고, 상대 팽이의 체력을 0으로 만들면 이깁니다. 공부가 곧 전투력이 되는 구조예요.',
+  },
+  {
+    q: '어떤 과목을 배우나요?',
+    a: '구구단·곱셈, 영단어, 한자, 세계(수도·국기), 바른말(맞춤법) 다섯 과목을 다룹니다. 과목별로 약 100개 스테이지의 모험 맵과 매일 도전이 있어요.',
+  },
+  {
+    q: '로그인이나 결제가 필요한가요?',
+    a: '아니요. 회원가입·로그인 없이 첫 실행부터 학습과 26종 팽이를 전부 무료로 즐길 수 있습니다. 결제(젬)는 팽이 외형을 꾸미는 스킨에만 쓰이며, 어른 확인 절차를 거칩니다.',
+  },
+  {
+    q: '젬과 스킨은 게임을 유리하게 하나요?',
+    a: '아니요. 스킨은 외형 꾸미기 전용이라 전투력에 전혀 영향을 주지 않습니다. 확률형(가챠)이 없고, 공부를 건너뛰는 결제도 없습니다.',
+  },
+  {
+    q: '친구와 대전은 어떻게 하나요?',
+    a: '친구 대전에서 방 코드를 만들어 친구에게 알려주면 둘부터 넷까지 함께 겨룰 수 있습니다. 모르는 사람과 매칭되지 않고 채팅 기능도 없어 안전합니다.',
+  },
+  {
+    q: '팽이를 키우고 진화시킬 수 있나요?',
+    a: '네. 팽이는 사용할수록 경험치가 쌓여 레벨이 오르고, 일정 단계마다 모습이 더 화려하게 진화합니다. 공격·방어·콤보·균형 타입의 상성을 활용해 전략을 짜 보세요.',
+  },
+  {
+    q: '학습 자료의 정확성은 보장되나요?',
+    a: '문제는 학습 참고용으로 제공되며 성적을 보장하지 않습니다. 오류를 발견하시면 알려주시면 확인해 반영하겠습니다.',
+  },
+  {
+    q: '내 기록을 초기화하거나 옮기고 싶어요.',
+    a: '진행도·팽이·스킨·칭호 등 모든 기록은 기기 내부에만 저장됩니다. 앱을 제거하면 함께 삭제됩니다.',
+  },
+];
+---
+
+<Layout
+  title="브레인블레이드 — 고객 지원 · 로직크래프트"
+  description="브레인블레이드 고객 지원. 자주 묻는 질문과 문의 안내. 팽이 배틀로 즐기는 초등 두뇌 학습 퀴즈 게임."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>브레인블레이드</h1>
+    <p>문제를 맞힐수록 팽이가 강해진다 — 팽이 배틀로 즐기는 두뇌 학습 퀴즈.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 문제 오류 제보, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:logiccraftmarketing@gmail.com?subject=[브레인블레이드] 문의">logiccraftmarketing@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/topbattle/privacy">개인정보 처리방침</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
