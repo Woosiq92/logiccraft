@@ -447,7 +447,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   border: 1px dashed var(--line-strong); cursor: default; white-space: nowrap;
   display: inline-flex; align-items: center; gap: 5px;
 }
-.pcard .links .legal { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0; margin-left: auto; }
+.pcard .links .legal { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 0; margin-left: 4px; }
 .pcard .links a.muted { display: inline; color: var(--muted); background: transparent; padding: 4px 0; white-space: nowrap; }
 .pcard .links .legal a.muted + a.muted::before { content: "·"; color: var(--muted); opacity: .5; margin: 0 7px; }
 .pcard .links a.muted:hover { color: var(--blue); background: transparent; }
