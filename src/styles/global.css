@@ -433,7 +433,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 }
 .chip.warm { background: var(--clay-soft); color: #a8632f; }
 .pcard p.desc { margin: 14px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; flex: 1; }
-.pcard .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+.pcard .links { display: flex; flex-wrap: wrap; gap: 12px 8px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
 .pcard .links a {
   font-size: 13px; font-weight: 700; color: var(--ink-soft);
   padding: 7px 12px; border-radius: 9px; background: var(--paper-2);
@@ -441,7 +441,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   display: inline-flex; align-items: center; gap: 5px;
 }
 .pcard .links a:hover { background: var(--blue); color: #fff; }
-.pcard .links .legal { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; margin-left: -6px; }
+.pcard .links .legal { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; margin-left: 6px; }
 .pcard .links a.muted { color: var(--muted); background: transparent; padding-inline: 6px; }
 .pcard .links a.muted:hover { color: var(--blue); background: transparent; }
 
