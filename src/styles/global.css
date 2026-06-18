@@ -441,6 +441,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   display: inline-flex; align-items: center; gap: 5px;
 }
 .pcard .links a:hover { background: var(--blue); color: #fff; }
+.pcard .links .legal { flex-basis: 100%; display: flex; flex-wrap: wrap; gap: 8px; margin-left: -6px; }
 .pcard .links a.muted { color: var(--muted); background: transparent; padding-inline: 6px; }
 .pcard .links a.muted:hover { color: var(--blue); background: transparent; }
 
