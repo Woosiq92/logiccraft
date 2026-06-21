@@ -1,0 +1,83 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '데일리 PSAT는 어떤 앱인가요?',
+    a: 'PSAT(공직적격성평가)를 위한 자기조절·트리아지 훈련 앱입니다. 단순 문제은행이 아니라, 시간 압박 속에서 한 문제를 언제 붙잡고 언제 버릴지를 측정하고 훈련합니다. 문항별 소요시간·버리기 결정·매몰비용을 기록해 행동 성향을 진단하고, 자료해석 기초 감각을 단계로 단련합니다.',
+  },
+  {
+    q: '실제 기출을 그대로 풀 수 있나요?',
+    a: '앱 안의 문항은 기출을 그대로 옮긴 것이 아니라, 기출의 유형·난이도를 분석해 만든 원본 문항입니다. 실제 기출은 이미 무료로 공개되어 있어, 앱의 "기출 자료실"에서 연도별로 사이버국가고시센터·공공데이터포털·전자문제집 CBT 같은 공식·무료 출처로 바로 연결해 드립니다. 이 앱은 기출을 대체하는 것이 아니라, 기출만으로는 길러지지 않는 "어떻게 푸는가(시간 배분·버리기·감각)"를 훈련하는 도구입니다.',
+  },
+  {
+    q: '로그인이나 인터넷이 필요한가요?',
+    a: '아니요. 회원가입·로그인이 없고, 문항 풀이·진단·훈련은 인터넷 없이 동작합니다. 기출 자료실의 외부 링크를 열 때만 인터넷이 필요합니다.',
+  },
+  {
+    q: '결제는 어떻게 되나요?',
+    a: '한 번 구매하면 모든 기능(진단·약점 드릴·모의고사·감각 훈련·오답노트)이 열립니다. 광고나 추가 결제, 구독은 없습니다. 결제·환불은 App Store / Google Play를 통해 처리됩니다.',
+  },
+  {
+    q: '"행동 성향"은 무엇을 보여주나요?',
+    a: '풀이 기록이 쌓이면 매몰비용형·성급한 버림형·시간 과투자형·균형형 중 하나로 현재 성향을 짚어 줍니다. 충분한 표본이 모이기 전에는 "측정 중"으로 표시되어 섣부르게 단정하지 않습니다.',
+  },
+  {
+    q: '그림판과 메모는 저장되나요?',
+    a: '풀이 화면의 메모와 그림판은 그 문항에서만 쓰는 임시 메모라 문항을 넘기면 사라집니다. 시험지 여백에 끄적이는 용도입니다. 오답에 남긴 "내 정리"는 영구 저장되어 복습할 때 다시 볼 수 있습니다.',
+  },
+  {
+    q: '내 학습 기록을 초기화하고 싶어요.',
+    a: '모든 기록은 기기 내부에만 저장됩니다. 기록 탭에서 누적 기록을 초기화하거나, 오답노트에서 문항을 개별 삭제할 수 있고, 앱을 제거하면 전체가 함께 삭제됩니다. 기기를 바꾸기 전에는 나 탭의 "백업 코드 복사"로 데이터를 옮길 수 있습니다.',
+  },
+];
+---
+
+<Layout
+  title="데일리 PSAT — 고객 지원 · 로직크래프트"
+  description="데일리 PSAT 고객 지원. 자주 묻는 질문과 문의 안내. 시간 압박 속 판단력을 훈련하는 PSAT 자기조절 트레이너."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>데일리 PSAT</h1>
+    <p>기출은 무료다. 부족한 건 점수가 아니라, 시간 안에 결정하는 힘.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 문항 오류 제보, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:logiccraftmarketing@gmail.com?subject=[데일리 PSAT] 문의">logiccraftmarketing@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/psattriage/privacy">개인정보 처리방침</a> · <a href="/apps/psattriage/terms">이용약관</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
