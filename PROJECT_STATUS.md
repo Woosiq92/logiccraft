@@ -1,7 +1,7 @@
 # 로직크래프트 사이트 — PROJECT STATUS
 
-회사 공식 사이트 `logiccraft.co.kr`의 구현 스냅샷(= 단일 진실원). 앱 광고 인프라
-`woosiq92.github.io`와는 **별개·평행 운영**(이 사이트는 광고 없음, `app-ads.txt` 미포함).
+회사 공식 사이트 `logiccraft.co.kr`의 구현 스냅샷(= 단일 진실원). 사이트 자체는 광고 없음.
+앱 광고 인프라(AdMob `app-ads.txt`)도 이제 이 사이트가 호스팅(`public/app-ads.txt` → `logiccraft.co.kr/app-ads.txt`). 구 `woosiq92.github.io`는 2026-06-11 삭제·은퇴.
 
 ---
 
