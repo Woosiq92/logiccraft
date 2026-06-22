@@ -1,0 +1,80 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const stores = [
+  { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6771675434' },
+  { name: 'Google Play', url: null },
+];
+---
+
+<Layout
+  title="과학자 클럽 — 관찰·가설·회고로 기르는 과학 사고력 · 로직크래프트"
+  description="과학자 클럽은 관찰·가설·회고를 기록하며 과학적으로 사고하는 습관을 기르는 앱입니다. 학회·클럽에서 다른 사용자와 연구글을 공유하고, 광고 없이 매일 무료로 학습합니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 과학자 클럽</p>
+    <h1>정답 대신, 과학자의 생각 순서.</h1>
+    <p class="lede">
+      과학자 클럽은 지식을 외우는 앱이 아니라, 과학자처럼 생각하는 순서를 기르는 앱입니다.
+      무언가를 관찰하고, 가설을 세우고, 결과를 회고하는 과정을 매일 기록하며 사고의 근육을
+      단련합니다.
+    </p>
+    <div class="stores">
+      {stores.map((s) => (s.url
+        ? <a class="store" href={s.url}>{s.name}</a>
+        : <span class="store soon">{s.name}</span>)) }
+    </div>
+  </section>
+
+  <section class="wrap body">
+    <h2>관찰 · 가설 · 회고</h2>
+    <p>
+      좋은 과학은 “왜 그럴까?”라는 관찰에서 시작해, “이렇지 않을까?”라는 가설로 나아가고,
+      “정말 그랬나?”라는 회고로 닫힙니다. 과학자 클럽은 이 세 단계를 매일의 기록 습관으로
+      만듭니다. 정해진 정답을 맞히는 대신, 스스로 던진 질문과 추측, 그리고 그것을 돌아본
+      흔적이 차곡차곡 쌓입니다.
+    </p>
+
+    <h2>학회와 클럽</h2>
+    <p>
+      혼자만의 기록에 머물지 않도록, 학회와 클럽에서 다른 사용자의 연구글과 발견을 보고
+      내 생각을 나눌 수 있습니다. 다른 사람이 같은 현상을 어떻게 다르게 관찰하고 추론했는지
+      견주어 보며 사고의 폭을 넓힙니다. 실명은 쓰지 않고 닉네임으로 활동합니다.
+    </p>
+
+    <h2>누가, 어떻게 쓰나요</h2>
+    <p>
+      과학에 호기심 있는 전 연령 누구나 쓸 수 있습니다. 학습과 일기 등 대부분의 기능은
+      가입 없이 바로 사용할 수 있고, 학회·클럽 같은 공유 기능을 이용할 때만 닉네임 기반
+      계정이 필요합니다. 개인정보를 서버에 수집하지 않고, 광고·마케팅 추적도 하지 않습니다.
+    </p>
+
+    <h2>광고 없이, 원하면 무제한</h2>
+    <p>
+      광고가 없습니다. 매일 무료로 학습할 수 있고, 더 많이 학습하고 싶다면 무제한 이용권을
+      한 번만 구매하면 됩니다(구독이 아닙니다). 기기 내 데이터는 앱을 삭제하면 즉시 사라지고,
+      공유 기능으로 백엔드에 저장된 데이터는 계정 삭제 시 30일 내 영구 삭제됩니다.
+    </p>
+
+    <p class="links">
+      <a href="/apps/science-club/support">고객 지원 · 자주 묻는 질문</a> ·
+      <a href="/apps/science-club/privacy">개인정보 처리방침</a> ·
+      <a href="/apps/science-club/terms">이용약관</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .stores { margin-top: 1.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .store { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #fff; }
+  .store.soon { background: #eee; color: #999; }
+  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
+  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
+  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>

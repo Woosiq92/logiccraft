@@ -1,0 +1,104 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const stores = [
+  { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6769797672' },
+  { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint' },
+];
+---
+
+<Layout
+  title="커플맵로그 — 둘이 다녀온 동네가 색으로 칠해지는 데이트 지도 · 로직크래프트"
+  description="커플맵로그는 두 사람이 함께 다녀온 곳을 기록하면 동네가 색으로 칠해지고, 다음 갈 곳을 찾게 해 주는 커플 지도 앱입니다. 6자리 커플 코드로 두 기기가 같은 기록을 실시간 공유합니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 커플맵로그</p>
+    <h1>둘이 다녀온 곳, 다음 갈 곳.</h1>
+    <p class="lede">
+      커플맵로그는 두 사람이 함께 다녀온 장소를 기록하면 그 동네가 지도 위에서 점점 진한
+      색으로 칠해지는 커플 전용 지도 앱입니다. 추억을 한 장의 지도로 모으고, 아직 가 보지
+      않은 동네를 다음 데이트 코스로 삼게 됩니다.
+    </p>
+    <div class="stores">
+      {stores.map((s) => (s.url
+        ? <a class="store" href={s.url}>{s.name}</a>
+        : <span class="store soon">{s.name}</span>)) }
+    </div>
+  </section>
+
+  <section class="wrap body">
+    <h2>두 기기, 같은 기록</h2>
+    <p>
+      한쪽이 앱을 처음 실행하면 6자리 커플 코드가 만들어집니다. 상대가 그 코드를 입력하면
+      두 기기가 즉시 같은 데이터를 공유합니다. 한 사람이 장소를 추가하면 상대 폰에도
+      반영되고, 폰을 바꿔도 같은 코드를 입력하면 모든 기록이 그대로 복원됩니다.
+      설정의 동기화 버튼으로 언제든 강제로 맞출 수도 있습니다.
+    </p>
+
+    <h2>주요 기능</h2>
+
+    <h3>동네 점령 게임</h3>
+    <p>
+      함께 방문한 곳이 쌓일수록 동네의 단계가 올라갑니다. 한 동네에 1곳 이상 방문하면
+      “발자국”, 3곳 이상이면 “정복”, 5곳 이상이면 “지배자” 단계가 되고, 지도에서 동네 색이
+      점점 진해집니다. 어느 동네를 아직 비워 뒀는지 한눈에 보이니, 다음 주말 행선지를
+      정하는 일이 게임처럼 즐거워집니다.
+    </p>
+
+    <h3>평점과 우리의 시네마</h3>
+    <p>
+      다녀온 장소마다 두 사람이 각자 평점을 남길 수 있어, 같은 곳을 어떻게 다르게 느꼈는지
+      비교하는 재미가 있습니다. 함께 본 영화에 평점을 매기는 “우리의 시네마” 기능으로
+      장소뿐 아니라 함께한 시간 전반을 기록할 수 있습니다.
+    </p>
+
+    <h3>맛집·미슐랭 가이드</h3>
+    <p>
+      어디를 갈지 막막할 때 참고할 수 있도록 미슐랭 가이드 정보를 함께 담았습니다.
+      추억을 기록하는 일과 다음 코스를 찾는 일을 한 앱 안에서 끝낼 수 있습니다.
+    </p>
+
+    <h3>스토리 카드로 공유</h3>
+    <p>
+      다녀온 기록을 예쁜 카드 이미지로 만들어 SNS 스토리에 공유할 수 있습니다.
+      우리만의 지도를 친구들에게 자랑하거나, 기념일에 한 해를 돌아보기 좋습니다.
+    </p>
+
+    <h2>위치 권한과 데이터</h2>
+    <p>
+      위치 권한은 “현재 동네 자동 찾기”에만 사용되며, 거부해도 검색으로 동네를 직접 선택해
+      모든 기능을 그대로 쓸 수 있습니다. 다녀온 모든 곳은 설정에서 JSON 파일로 내보낼 수
+      있고, 모든 데이터 초기화를 누르면 두 기기의 기록이 영구 삭제됩니다(되돌릴 수 없습니다).
+    </p>
+
+    <h2>무료로 쓰고, 원하면 광고 제거</h2>
+    <p>
+      기본 기능은 모두 무료입니다. 광고 없이 쓰고 싶다면 광고 제거를 한 번 구매하면 되고,
+      같은 Apple ID·계정으로 로그인한 기기 전체에 영구 적용됩니다. 앱을 다시 설치해도
+      “구매 복원”으로 즉시 되살릴 수 있습니다.
+    </p>
+
+    <p class="links">
+      <a href="/apps/ourfootprint/support">고객 지원 · 자주 묻는 질문</a> ·
+      <a href="/apps/ourfootprint/privacy">개인정보 처리방침</a> ·
+      <a href="/apps/ourfootprint/terms">이용약관</a> ·
+      <a href="/apps/ourfootprint/delete-data">데이터 삭제</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .stores { margin-top: 1.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .store { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #fff; }
+  .store.soon { background: #eee; color: #999; }
+  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
+  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
+  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>

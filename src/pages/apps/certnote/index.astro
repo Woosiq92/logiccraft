@@ -1,0 +1,96 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const stores = [
+  { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6779944719' },
+  { name: 'Google Play', url: null },
+];
+---
+
+<Layout
+  title="모두의 자격증 — 자격증 공부를 한 곳에서, 무료 학습 앱 · 로직크래프트"
+  description="모두의 자격증은 필기·실기 정리, 모의고사, 암기카드, 진도·D-day 관리를 한 앱에서 무료로 제공하는 자격증 학습 앱입니다. 조리·식음료부터 IT·전문직까지 다양한 과목을 다룹니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 모두의 자격증</p>
+    <h1>자격증 공부, 한 곳에서 끝내기.</h1>
+    <p class="lede">
+      모두의 자격증은 흩어진 자격증 공부를 하나로 모은 무료 학습 앱입니다. 정리 글을 읽고,
+      모의고사로 점검하고, 암기카드로 외우고, 진도와 시험일(D-day)까지 한 화면에서
+      관리합니다. 회원가입도 결제도 없이 첫 실행부터 모든 기능을 씁니다.
+    </p>
+    <div class="stores">
+      {stores.map((s) => (s.url
+        ? <a class="store" href={s.url}>{s.name}</a>
+        : <span class="store soon">{s.name}</span>)) }
+    </div>
+  </section>
+
+  <section class="wrap body">
+    <h2>다루는 자격증</h2>
+    <p>
+      제과제빵·한식·양식·중식·일식·바리스타·조주 같은 조리·식음료 분야부터, 정보처리·네트워크·전기
+      같은 IT·기술 분야, 공인중개사·감정평가사·세무사·노무사·변리사 같은 전문직까지 폭넓게
+      다룹니다. 과목은 계속 추가·보강하고 있으며, 보강 중인 과목은 “업데이트 중”으로 표시해
+      혼동이 없도록 했습니다.
+    </p>
+
+    <h2>네 가지 학습 도구</h2>
+
+    <h3>정리 글로 개념 잡기</h3>
+    <p>
+      과목마다 필기·실기 핵심을 정리한 글을 읽으며 큰 흐름을 먼저 잡습니다. 처음 보는
+      과목도 무엇부터 봐야 할지 길을 잡을 수 있도록 구성했습니다.
+    </p>
+
+    <h3>모의고사로 점검하기</h3>
+    <p>
+      모의고사 탭에서 10문제·20문제·전체 중 골라 객관식·OX 문제를 랜덤으로 풉니다. 풀고 나면
+      즉시 채점과 해설이 나오고 60% 합격선 판정을 보여 주며, 틀린 문제는 오답노트에 모여
+      약한 부분만 다시 풀 수 있습니다.
+    </p>
+
+    <h3>암기카드로 외우기</h3>
+    <p>
+      홈에서 “암기카드 넘겨보기”로 앞면을 보고 정답을 떠올린 뒤 넘겨 확인하며 외웁니다.
+      기본 제공 카드 외에 MY 탭에서 나만의 카드를 직접 만들어 약점만 집중해서 반복할 수
+      있습니다.
+    </p>
+
+    <h3>진도와 시험일 관리</h3>
+    <p>
+      메모, 진도, 시험일까지 한 곳에서 관리해 “어디까지 봤더라”를 매번 떠올릴 필요가
+      없습니다. 모든 학습 기록은 기기 내부에만 저장되며, 앱을 제거하면 함께 삭제됩니다.
+    </p>
+
+    <h2>정확성에 대한 안내</h2>
+    <p>
+      자료와 문제는 학습 참고용으로 제공되며 합격이나 점수를 보장하지 않습니다. 시험 범위·
+      출제 기준·법령은 바뀔 수 있으니, 최신 정보는 큐넷 등 시험 주관처의 공식 자료로 꼭
+      확인해 주세요. 오류를 발견해 알려 주시면 확인 후 반영하겠습니다.
+    </p>
+
+    <p class="links">
+      <a href="/apps/certnote/support">고객 지원 · 자주 묻는 질문</a> ·
+      <a href="/apps/certnote/privacy">개인정보 처리방침</a> ·
+      <a href="/apps/certnote/terms">이용약관</a> ·
+      <a href="/apps/certnote/delete-data">데이터 삭제</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .stores { margin-top: 1.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .store { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #fff; }
+  .store.soon { background: #eee; color: #999; }
+  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
+  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
+  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>

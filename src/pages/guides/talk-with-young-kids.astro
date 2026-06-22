@@ -1,0 +1,77 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="3~6세 아이와 '왜?'를 나누는 대화법 · 로직크래프트 가이드"
+  description="정답을 알려 주는 대화는 호기심을 닫고, 되묻는 대화는 호기심을 엽니다. 매일 몇 분이면 되는, 아이의 생각을 한 걸음 더 밀어 주는 질문법을 정리했습니다."
+>
+  <article class="wrap article">
+    <p class="cat">부모-아이</p>
+    <h1>3~6세 아이와 “왜?”를 나누는 대화법</h1>
+    <p class="lede">
+      이 나이의 아이는 하루에도 수십 번 “왜?”를 묻습니다. 그 질문에 어떻게 답하느냐가
+      아이의 생각하는 힘을 키우기도 하고 닫기도 합니다. 똑똑한 답을 주는 것이 목표가
+      아닙니다. 아이가 스스로 한 번 더 생각하게 만드는 것이 목표입니다.
+    </p>
+
+    <h2>정답을 미루고, 되물어 주세요</h2>
+    <p>
+      아이가 “하늘은 왜 파래?”라고 물으면, 정확한 과학적 설명을 서두르지 마세요. 먼저
+      “그러게, 왜 파랄까? 너는 어떻게 생각해?”라고 되물어 주세요. 아이는 엉뚱한 답을 내놓을
+      겁니다. 그 엉뚱함이 바로 사고의 출발점입니다. 답을 받아 적기만 하는 아이가 아니라,
+      가설을 세우는 아이가 됩니다.
+    </p>
+
+    <h2>“만약에”로 상상의 문을 열기</h2>
+    <p>
+      “만약에 비가 위로 내린다면 어떨까?”, “만약에 동물이 말을 할 수 있다면?” 같은 질문은
+      정답이 없습니다. 정답이 없기 때문에 아이는 마음껏 상상하고, 그 상상에 이유를 붙이기
+      시작합니다. 이유를 붙이는 연습이 곧 논리의 씨앗입니다.
+    </p>
+
+    <h2>아이의 말을 받아 “한 걸음 더”</h2>
+    <p>
+      아이가 어떤 생각을 말하면, “맞아/틀려”로 끝내지 말고 “그래서 어떻게 될 것 같아?”,
+      “그럼 이건 어때?”처럼 한 걸음 더 밀어 주세요. 대화가 한 번의 문답으로 끝나지 않고
+      이어질 때, 아이는 생각을 깊게 끌고 가는 법을 배웁니다. 부모가 정답을 쥐고 있지 않아도
+      됩니다. 같이 모르는 것을 궁금해하는 모습이 가장 좋은 본보기입니다.
+    </p>
+
+    <h2>직접 확인해 보게 하기</h2>
+    <p>
+      말로만 끝내지 말고 가끔은 “그럼 우리 같이 해볼까?”로 이어 보세요. 얼음이 녹는지,
+      물에 뜨는지, 그림자가 어떻게 움직이는지 직접 해보면, 아이는 생각이 현실에서 확인되는
+      경험을 합니다. 이 경험이 “나도 알아낼 수 있다”는 자신감으로 자랍니다.
+    </p>
+
+    <h2>정답보다 중요한 것</h2>
+    <p>
+      이 나이의 목표는 지식을 넣어 주는 것이 아니라, 묻고 상상하고 확인하는 습관을 함께
+      들이는 것입니다. 하루 몇 분, 잠들기 전 한 가지 질문이면 충분합니다. 아이를 똑똑하게
+      “만들어” 주려 애쓰기보다, 옆에서 같이 궁금해해 주세요. 그 시간에 사실은 부모도 함께
+      자랍니다.
+    </p>
+
+    <div class="related">
+      <p>매일 한 가지 생각 놀이를 부모와 아이가 함께 나누도록 만든 앱이 있습니다.</p>
+      <a href="/apps/wonder/">Synergeion Wonder — 3~6세, 부모도 함께 자라는 생각 놀이 →</a>
+    </div>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
+  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
+  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
+  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
+  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

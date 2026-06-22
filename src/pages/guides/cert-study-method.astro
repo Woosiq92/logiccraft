@@ -1,0 +1,84 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="자격증, 짧게 붙는 사람들의 5단계 공부법 · 로직크래프트 가이드"
+  description="시험을 빨리 통과하는 사람은 더 오래 공부하는 사람이 아니라 순서가 다른 사람입니다. 출제 기준에서 시작해 기출로 끝나는 자격증 5단계 공부법을 정리했습니다."
+>
+  <article class="wrap article">
+    <p class="cat">학습법</p>
+    <h1>자격증, 짧게 붙는 사람들의 5단계 공부법</h1>
+    <p class="lede">
+      같은 시험을 누구는 한 달 만에 붙고 누구는 반년을 붙잡습니다. 차이는 머리가 아니라
+      순서입니다. 오래 붙잡는 사람은 보통 첫 페이지부터 차례로 읽다가 시험 범위 전체를
+      “한 번 더” 보려다 지칩니다. 짧게 붙는 사람은 시험이 무엇을 묻는지부터 거꾸로 짚어
+      들어갑니다. 다섯 단계로 정리했습니다.
+    </p>
+
+    <h2>1. 출제 기준을 먼저 읽는다</h2>
+    <p>
+      교재가 아니라 주관처가 공개한 출제 기준(시험 과목·세부 항목·배점)을 가장 먼저 읽으세요.
+      여기에 “무엇이 나오는지”가 다 적혀 있습니다. 출제 기준 한 장을 옆에 두고 공부하면,
+      교재에서 깊이 파야 할 곳과 가볍게 넘길 곳이 보입니다. 시험에 안 나오는 내용을 붙잡고
+      있는 시간이 합격을 가장 많이 늦춥니다.
+    </p>
+
+    <h2>2. 전체를 빠르게 한 바퀴 훑는다</h2>
+    <p>
+      처음부터 완벽하게 이해하려 하지 마세요. 이해 안 되는 부분은 표시만 하고 끝까지 한 바퀴
+      돕니다. 시험의 지형도를 먼저 머릿속에 그리는 단계입니다. 한 바퀴를 돌고 나면 “이 과목은
+      여기가 핵심이구나”가 잡히고, 두 번째 회독부터 속도가 붙습니다.
+    </p>
+
+    <h2>3. 기출로 출제 패턴을 익힌다</h2>
+    <p>
+      자격증 시험은 출제 범위가 정해져 있어 같은 유형이 반복됩니다. 개념을 완벽히 외운 뒤
+      문제를 푸는 것이 아니라, 기출을 풀면서 자주 나오는 함정과 표현을 익히는 편이 훨씬
+      빠릅니다. 틀린 문제는 “왜 틀렸는지”를 한 줄로 적어 두세요. 그 한 줄이 다음 회독의
+      우선순위가 됩니다.
+    </p>
+
+    <h2>4. 오답만 모아 두 번 더 돈다</h2>
+    <p>
+      모든 문제를 똑같이 반복하는 것은 비효율입니다. 한 번 맞힌 문제는 다시 볼 필요가
+      적습니다. 틀린 문제만 모아 두 번 더 돌리면, 적은 시간으로 약점을 집중적으로 메울 수
+      있습니다. 시험 직전에는 이 오답 묶음만 봐도 됩니다.
+    </p>
+
+    <h2>5. 시험 일주일 전, 시간을 재고 푼다</h2>
+    <p>
+      마지막 단계는 실전 감각입니다. 실제 시험 시간에 맞춰 모의고사를 풀어 보세요. 아는
+      문제를 시간 안에 끝내는 연습이 안 되어 있으면, 실력과 무관하게 점수를 잃습니다.
+      합격선(보통 60점)을 넘기는지 점검하고, 모자란 과목만 마지막으로 보강합니다.
+    </p>
+
+    <h2>정리</h2>
+    <p>
+      출제 기준 → 빠른 한 바퀴 → 기출 패턴 → 오답 반복 → 실전 모의고사. 공부량을 늘리는
+      대신 순서를 바꾸는 것만으로 합격까지의 거리가 크게 줄어듭니다. 시험 범위·합격선·법령은
+      바뀔 수 있으니, 최신 정보는 큐넷 등 주관처 공식 자료로 꼭 확인하세요.
+    </p>
+
+    <div class="related">
+      <p>이 방법대로 공부할 수 있게 만든 앱이 있습니다.</p>
+      <a href="/apps/certnote/">모두의 자격증 — 정리·모의고사·암기카드·오답노트를 한 곳에서 →</a>
+    </div>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
+  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
+  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
+  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
+  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

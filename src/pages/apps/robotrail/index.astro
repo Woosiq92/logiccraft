@@ -1,0 +1,101 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const stores = [
+  { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6764465655' },
+  { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail' },
+];
+---
+
+<Layout
+  title="RoboTrail — 코드 없이 코딩 사고력을 키우는 명령 퍼즐 · 로직크래프트"
+  description="RoboTrail은 코드를 타이핑하지 않고 방향·반복 명령 블록을 놓아 로봇을 움직이는 퍼즐 앱입니다. 분해·패턴·추상화 같은 코딩의 바탕이 되는 사고력을 학습 108판과 측정 36문제로 훈련합니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · RoboTrail</p>
+    <h1>코드는 아직, 사고력은 먼저.</h1>
+    <p class="lede">
+      RoboTrail은 키보드로 코드를 치는 대신 ↑(앞으로)·↺(왼쪽)·↻(오른쪽) 같은 명령 블록을
+      슬롯에 놓아 로봇을 목적지까지 움직이는 퍼즐 게임입니다. 프로그래밍 언어를 몰라도,
+      “문제를 잘게 나누고, 반복되는 규칙을 찾고, 순서를 설계하는” 코딩의 진짜 바탕을
+      놀이로 익힐 수 있습니다.
+    </p>
+    <div class="stores">
+      {stores.map((s) => (s.url
+        ? <a class="store" href={s.url}>{s.name}</a>
+        : <span class="store soon">{s.name}</span>)) }
+    </div>
+  </section>
+
+  <section class="wrap body">
+    <h2>무엇을 기르나요</h2>
+    <p>
+      코딩 교육의 핵심은 문법 암기가 아니라 사고의 순서입니다. 큰 문제를 작은 단계로
+      쪼개는 분해, 같은 동작이 반복되는 규칙을 알아채는 패턴 인식, 그 규칙을 하나의
+      명령으로 묶는 추상화 — RoboTrail의 모든 퍼즐은 이 세 가지 사고를 자연스럽게
+      쓰도록 설계돼 있습니다. 로봇이 벽에 부딪히면 어디서 순서가 틀렸는지 스스로
+      되짚게 되고, 더 적은 블록으로 같은 길을 가도록 다듬으며 “더 좋은 풀이”를 고민하게
+      됩니다.
+    </p>
+
+    <h2>구성</h2>
+
+    <h3>학습 — 108판의 캠페인</h3>
+    <p>
+      가장 단순한 한 칸 이동부터 시작해 반복 블록, 갈림길, 조건에 따른 분기까지 난이도가
+      촘촘하게 올라가는 108개의 퍼즐이 준비돼 있습니다. 막힐 때는 각 퍼즐에 마련된 단계별
+      힌트를 펼쳐 보거나, 풀이 팁 게시판에서 다른 사람들의 접근법을 참고할 수 있습니다.
+    </p>
+
+    <h3>측정 — 36문제로 보는 사고력</h3>
+    <p>
+      학습으로 다진 감각을 36개의 측정 문제로 점검합니다. 정답 여부뿐 아니라 풀이 과정을
+      통해 지금의 사고력 수준을 가늠하고, 약한 유형을 다시 연습할 수 있도록 도와줍니다.
+    </p>
+
+    <h3>도전 모드와 데일리 챌린지</h3>
+    <p>
+      더 어려운 퍼즐에 도전하는 모드와, 매일 새로 열리는 데일리 챌린지로 꾸준히 머리를
+      쓰는 습관을 만들 수 있습니다. 학습과 측정은 인터넷 없이 오프라인으로 즐길 수 있고,
+      데일리 챌린지·게시판 등 일부 기능만 인터넷을 사용합니다.
+    </p>
+
+    <h2>한국어와 영어, 그리고 무료</h2>
+    <p>
+      설정 화면의 “언어” 항목이나 상단 헤더의 KO/EN 칩에서 한국어와 영어를 즉시 전환할 수
+      있고, 처음 실행 시 기기 언어에 맞춰 자동으로 설정됩니다. 회원가입·로그인 없이 바로
+      시작하며, 모든 캠페인·측정·트레이닝 콘텐츠를 무료로 이용할 수 있습니다. 진행 기록은
+      기기 내부에 저장되므로, 기기를 바꾸거나 앱을 삭제하면 기록이 사라질 수 있습니다.
+      중요한 기록은 같은 기기에서 이어가시길 권장합니다.
+    </p>
+
+    <h2>이런 분께</h2>
+    <p>
+      코딩을 처음 접하는 어린이와 학생, 자녀와 함께 사고력 놀이를 하고 싶은 부모,
+      그리고 짬짬이 머리를 쓰는 퍼즐을 즐기는 어른 모두에게 어울립니다. 정답을 외우는
+      학습이 아니라, 스스로 길을 설계하고 다듬는 과정 자체가 재미가 되도록 만들었습니다.
+    </p>
+
+    <p class="links">
+      <a href="/apps/robotrail/support">고객 지원 · 자주 묻는 질문</a> ·
+      <a href="/apps/robotrail/privacy">개인정보 처리방침</a> ·
+      <a href="/apps/robotrail/terms">이용약관</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .stores { margin-top: 1.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .store { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #fff; }
+  .store.soon { background: #eee; color: #999; }
+  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
+  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
+  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>

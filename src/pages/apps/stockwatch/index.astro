@@ -1,0 +1,107 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const stores = [
+  { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6772662894' },
+  { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch' },
+];
+---
+
+<Layout
+  title="불안한개미 — 매매 없이 시세만 보는 한국 주식 앱 · 로직크래프트"
+  description="불안한개미는 주문·거래 기능 없이 한국 주식(KOSPI/KOSDAQ) 시세만 크게 보여주는 읽기 전용 앱입니다. 거치대 모드, 홈·잠금화면 위젯, 잠금화면 카드로 가장 손쉽게 시세를 확인하세요."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 불안한개미</p>
+    <h1>매매는 빼고, 시세만 크게.</h1>
+    <p class="lede">
+      불안한개미는 주문·거래·계좌 관리 기능이 전혀 없는 읽기 전용 한국 주식 시세 앱입니다.
+      차트 분석 도구도, 매수·매도 버튼도 없습니다. 오직 내가 담아 둔 종목의 가격을
+      가장 크고 빠르게 확인하는 한 가지 일에만 집중했습니다.
+    </p>
+    <div class="stores">
+      {stores.map((s) => (s.url
+        ? <a class="store" href={s.url}>{s.name}</a>
+        : <span class="store soon">{s.name}</span>)) }
+    </div>
+  </section>
+
+  <section class="wrap body">
+    <h2>왜 만들었나요</h2>
+    <p>
+      장중에 주식 앱을 열면 매수·매도 버튼이 먼저 눈에 들어옵니다. 시세만 잠깐 보려다
+      충동적으로 주문을 넣게 되는 경험은 누구에게나 익숙합니다. 불안한개미는 그 버튼을
+      아예 없앴습니다. 거래는 증권사 앱에서 하고, 시세를 “지켜보는” 일은 이 앱에서 하도록
+      역할을 나눈 것입니다. 그래서 로그인도, 회원가입도, 증권 계좌 연결도 필요하지 않습니다.
+      앱을 처음 켠 순간부터 종목을 검색해 바로 시세를 볼 수 있습니다.
+    </p>
+
+    <h2>핵심 기능</h2>
+
+    <h3>전체화면 거치대 모드</h3>
+    <p>
+      관심 종목을 탭하면 가격이 화면 가득 큰 글씨로 표시되는 거치대 모드로 들어갑니다.
+      책상 위 거치대에 폰을 세워 두고 일하면서, 또는 멀리서도 한눈에 등락을 확인할 수
+      있습니다. 화면이 켜져 있는 동안 약 7초마다 시세가 자동으로 갱신됩니다.
+    </p>
+
+    <h3>홈·잠금화면 위젯</h3>
+    <p>
+      홈 화면이나 잠금화면을 길게 눌러 위젯을 추가하고, 저장해 둔 종목을 선택하면
+      앱을 열지 않아도 바탕화면에서 바로 시세를 볼 수 있습니다. 하루에도 여러 번
+      앱을 여닫는 수고를 덜어 줍니다.
+    </p>
+
+    <h3>잠금화면 카드(Live Activity)</h3>
+    <p>
+      특정 종목을 열고 잠금화면 카드를 켜면, 폰을 깨우기만 해도 잠금화면에서 실시간에
+      가까운 시세가 보입니다. 약 10~15초 간격으로 갱신되며, 배터리 보호를 위해 약 8시간
+      후 자동으로 종료됩니다.
+    </p>
+
+    <h3>관심 종목 · 시장 탭</h3>
+    <p>
+      검색 화면에서 종목 이름이나 6자리 코드(예: 005930 삼성전자, 035420 NAVER)를 입력해
+      관심 종목을 담아 둘 수 있습니다. 별도의 시장 탭에서는 코스피·코스닥 지수와 주요 환율을
+      한 화면에서 확인할 수 있어, 시장 분위기를 빠르게 가늠할 수 있습니다.
+    </p>
+
+    <h2>시작하기</h2>
+    <p>
+      앱을 설치하고 처음 실행하면 안내에 따라 관심 종목을 검색해 추가하기만 하면 됩니다.
+      추가한 종목을 탭하면 거치대 모드로, 길게 누른 홈·잠금화면에서는 위젯으로 시세를
+      볼 수 있습니다. 관심 종목과 설정값은 모두 기기 내부에만 저장되며, 앱을 삭제하면
+      함께 삭제됩니다.
+    </p>
+
+    <h2>데이터와 정책</h2>
+    <p>
+      시세는 네이버 증권의 공개 시장 데이터를 사용합니다. 불안한개미는 증권사가 아니며,
+      투자 자문이나 매매 기능을 제공하지 않고 공개된 시세 정보를 표시할 뿐입니다.
+      표시되는 가격은 지연될 수 있으므로 투자 판단의 단독 근거로 삼지 마세요.
+      앱 운영을 위해 화면 하단에 비개인화 배너 광고 1개가 표시될 수 있습니다.
+    </p>
+
+    <p class="links">
+      <a href="/apps/stockwatch/support">고객 지원 · 자주 묻는 질문</a> ·
+      <a href="/apps/stockwatch/privacy">개인정보 처리방침</a> ·
+      <a href="/apps/stockwatch/terms">이용약관</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .stores { margin-top: 1.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
+  .store { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #fff; }
+  .store.soon { background: #eee; color: #999; }
+  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
+  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
+  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>
