@@ -20,46 +20,68 @@ import Layout from '../layouts/Layout.astro';
   <section class="section">
     <div class="wrap">
       <div class="reveal">
-        <p class="eyebrow">SYNERGEION 시리즈</p>
-        <h2 class="section-title">3세부터 18세까지 이어 타는 사고력 라인업.</h2>
-        <p class="section-lead"><a href="/synergeion" style="color:var(--blue);font-weight:700">시리즈 이야기 보기 →</a></p>
+        <p class="eyebrow">SYNERGEION · 대표 시리즈</p>
+        <h2 class="section-title">3세부터 18세까지, 하나의 여정.</h2>
+        <p class="section-lead">συνεργεῖον — “함께 일하고 성취하는 장소”. 사고력과 문제해결력이 하나의 여정으로 이어집니다.</p>
+        <div class="pullquote" style="margin: 18px 0 0; max-width: 72ch">
+          <p><strong>분해하고 조립하면서 사고력과 문제해결력을 길러 줍니다.</strong></p>
+        </div>
       </div>
-      <div class="card-grid" style="margin-top: clamp(28px,3.5vw,40px)">
-        <article class="pcard reveal">
-          <div class="top">
-            <img class="icon" src="/icons/wonder.png" alt="" />
-            <div><div class="name-row"><h3>Synergeion Wonder</h3><span class="chip">3–6세</span></div></div>
-          </div>
-          <p class="desc">아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알, 부모도 같이 자랍니다.</p>
-          <div class="links">
-            <a href="https://apps.apple.com/kr/app/id6774041352">App Store</a>
-            <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.wonder">Google Play</a>
-            <div class="legal">
-            <a class="muted" href="/apps/wonder/">자세히</a>
-            <a class="muted" href="/apps/wonder/support">지원</a>
-            <a class="muted" href="/apps/wonder/privacy">개인정보</a>
-            <a class="muted" href="/apps/wonder/terms">약관</a>
-            </div>
-          </div>
-        </article>
+      <div class="journey reveal" style="margin-top: clamp(36px,5vw,56px); max-width: 880px">
+        <div class="spine"><div class="spine-fill" id="spineFill"></div></div>
+        <div class="stage" style="--st: var(--st-wonder)">
+          <span class="num">01</span>
+          <div class="body"><h4>Wonder <span class="age">3–6세</span></h4><p>씨앗을 심고 매일 자라는 걸 지켜봅니다. 세상의 작은 것들이 궁금해지는 때입니다. <a href="/apps/wonder/" style="color:var(--blue);font-weight:700;white-space:nowrap">자세히 →</a> <a href="https://apps.apple.com/kr/app/id6774041352" style="color:var(--blue);font-weight:700;white-space:nowrap">App Store ↗</a> <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.wonder" style="color:var(--blue);font-weight:700;white-space:nowrap">Google Play ↗</a></p></div>
+          <span class="tag live">출시</span>
+        </div>
+        <div class="stage" style="--st: var(--st-build)">
+          <span class="num">02</span>
+          <div class="body"><h4>Build <span class="age">6–9세</span></h4><p>자란 나무로 집과 배를 만듭니다. 직접 손으로 만들고 부수며 원리를 익힙니다. <a href="/apps/build/" style="color:var(--blue);font-weight:700;white-space:nowrap">자세히 →</a> <a href="https://apps.apple.com/kr/app/id6777975502" style="color:var(--blue);font-weight:700;white-space:nowrap">App Store ↗</a></p></div>
+          <span class="tag live">출시</span>
+        </div>
+        <div class="stage" style="--st: var(--st-voyage)">
+          <span class="num">03</span>
+          <div class="body"><h4>Voyage <span class="age">9–12세</span></h4><p>배를 타고 새 땅을 찾아 나섭니다. 궁금한 것을 직접 조사하고 자기 말로 설명합니다.</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+        <div class="stage" style="--st: var(--st-forge)">
+          <span class="num">04</span>
+          <div class="body"><h4>Forge <span class="age">12–15세</span></h4><p>내가 만든 도구로 자기만의 집을 짓습니다. 자신만의 생각하는 방식을 갖추는 단계입니다.</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+        <div class="stage" style="--st: var(--st-village)">
+          <span class="num">05</span>
+          <div class="body"><h4>Village <span class="age">15–18세</span></h4><p>사람들과 함께 마을을 이룹니다. 관계 속에서 자기 역할과 갈 길을 찾습니다.</p></div>
+          <span class="tag soon">예정</span>
+        </div>
+      </div>
+    </div>
+  </section>
 
-        <article class="pcard reveal">
-          <div class="top">
-            <img class="icon" src="/icons/build.png" alt="" />
-            <div><div class="name-row"><h3>Synergeion Build</h3><span class="chip">6–9세</span></div></div>
+  <!-- ============ MASCOTS ============ -->
+  <section class="section tint">
+    <div class="wrap">
+      <div class="reveal">
+        <p class="eyebrow warm">MASCOTS · 마스코트</p>
+        <h2 class="section-title">나루와 느티.</h2>
+      </div>
+      <div class="mascot-bios" style="margin-top: clamp(32px,4vw,48px)">
+        <div class="bio reveal">
+          <img src="/mascots/naru.png" alt="나루" />
+          <div class="who">
+            <span class="nm"><b>나루</b><span>NARU</span></span>
+            <p class="role">아기 비버 · 만드는 손</p>
+            <p>배에 물음표를 안고 다니는 호기심 많은 아기 비버.</p>
           </div>
-          <p class="desc">자란 나무로 집과 배를 만들 듯, 직접 손으로 만들고 부수며 원리를 익히는 사고력 놀이.</p>
-          <div class="links">
-            <a href="https://apps.apple.com/kr/app/synergeion-build-%EC%82%AC%EA%B3%A0%EB%A0%A5-%EB%86%80%EC%9D%B4/id6777975502">App Store</a>
-            <span class="soon-btn">Google Play (예정)</span>
-            <div class="legal">
-            <a class="muted" href="/apps/build/">자세히</a>
-            <a class="muted" href="/apps/build/support">지원</a>
-            <a class="muted" href="/apps/build/privacy">개인정보</a>
-            <a class="muted" href="/apps/build/terms">약관</a>
-            </div>
+        </div>
+        <div class="bio reveal">
+          <img src="/mascots/neti.png" alt="느티" />
+          <div class="who">
+            <span class="nm"><b>느티</b><span>NETI</span></span>
+            <p class="role">새싹 정령 · 자라남</p>
+            <p>막 흙을 밀고 올라온 새싹 정령. 날마다 조금씩 자라며, 아이와 함께 크는 마음을 담았습니다.</p>
           </div>
-        </article>
+        </div>
       </div>
     </div>
   </section>
