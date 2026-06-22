@@ -6,14 +6,20 @@ import Layout from '../../layouts/Layout.astro';
   title="실기 시험, 아는데도 깎이는 곳 — 점수를 지키는 법 · 로직크래프트 가이드"
   description="조리·제과제빵 같은 실기 시험에서는 실력만큼이나 위생·시간·지시 준수가 점수를 가릅니다. 아는데도 흔히 깎이는 지점과 그것을 막는 습관을 정리했습니다."
 >
-  <article class="wrap article">
-    <p class="cat">시험 전략</p>
-    <h1>실기 시험, 아는데도 깎이는 곳 — 점수를 지키는 법</h1>
-    <p class="lede">
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">시험 전략</p>
+      <h1>실기 시험, 아는데도 깎이는 곳 — 점수를 지키는 법</h1>
+      <p class="lead">
       조리나 제과제빵 같은 실기 시험에서 떨어지는 사람의 상당수는 “만들 줄 몰라서”가 아니라
       “알면서도 깎여서” 떨어집니다. 실기는 결과물의 완성도뿐 아니라, 과정에서 지켜야 할
       규칙을 함께 봅니다. 실력 외에 점수를 잃는 지점을 미리 알면 합격이 훨씬 가까워집니다.
-    </p>
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
 
     <h2>위생에서 먼저 무너진다</h2>
     <p>
@@ -63,15 +69,14 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
-  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
-  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
-  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
-  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
-  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
   .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
   .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
   .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
   .back { margin-top: 2.5rem; font-size: 0.95rem; }
   .back a { color: var(--accent); }
 </style>
+

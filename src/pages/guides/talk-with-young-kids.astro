@@ -6,14 +6,20 @@ import Layout from '../../layouts/Layout.astro';
   title="3~6세 아이와 '왜?'를 나누는 대화법 · 로직크래프트 가이드"
   description="정답을 알려 주는 대화는 호기심을 닫고, 되묻는 대화는 호기심을 엽니다. 매일 몇 분이면 되는, 아이의 생각을 한 걸음 더 밀어 주는 질문법을 정리했습니다."
 >
-  <article class="wrap article">
-    <p class="cat">부모-아이</p>
-    <h1>3~6세 아이와 “왜?”를 나누는 대화법</h1>
-    <p class="lede">
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">부모-아이</p>
+      <h1>3~6세 아이와 “왜?”를 나누는 대화법</h1>
+      <p class="lead">
       이 나이의 아이는 하루에도 수십 번 “왜?”를 묻습니다. 그 질문에 어떻게 답하느냐가
       아이의 생각하는 힘을 키우기도 하고 닫기도 합니다. 똑똑한 답을 주는 것이 목표가
       아닙니다. 아이가 스스로 한 번 더 생각하게 만드는 것이 목표입니다.
-    </p>
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
 
     <h2>정답을 미루고, 되물어 주세요</h2>
     <p>
@@ -63,15 +69,14 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
-  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
-  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
-  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
-  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
-  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
   .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
   .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
   .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
   .back { margin-top: 2.5rem; font-size: 0.95rem; }
   .back a { color: var(--accent); }
 </style>
+

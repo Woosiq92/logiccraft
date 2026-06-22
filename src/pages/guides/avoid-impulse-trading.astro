@@ -6,15 +6,21 @@ import Layout from '../../layouts/Layout.astro';
   title="매일 시세를 보는 사람을 위한, 충동을 줄이는 습관 · 로직크래프트 가이드"
   description="시세를 자주 본다고 손실이 줄지는 않습니다. 오히려 충동 매매를 부르기 쉽습니다. 보는 것과 거래하는 것을 분리하고, 충동에 휘둘리지 않는 습관을 정리했습니다."
 >
-  <article class="wrap article">
-    <p class="cat">생활 습관</p>
-    <h1>매일 시세를 보는 사람을 위한, 충동을 줄이는 습관</h1>
-    <p class="lede">
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">생활 습관</p>
+      <h1>매일 시세를 보는 사람을 위한, 충동을 줄이는 습관</h1>
+      <p class="lead">
       시세를 자주 들여다본다고 해서 수익이 늘지는 않습니다. 오히려 가격이 출렁일 때마다
       “지금 사야 하나, 팔아야 하나” 하는 충동이 따라붙어 손해로 이어지기 쉽습니다. 시세를
       자주 보는 사람일수록, 충동과 거리를 두는 자기만의 장치가 필요합니다. (투자 권유가
       아니라 습관에 대한 이야기입니다.)
-    </p>
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
 
     <h2>‘보는 것’과 ‘거래하는 것’을 분리한다</h2>
     <p>
@@ -64,15 +70,14 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
-  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
-  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
-  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
-  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
-  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
   .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
   .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
   .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
   .back { margin-top: 2.5rem; font-size: 0.95rem; }
   .back a { color: var(--accent); }
 </style>
+

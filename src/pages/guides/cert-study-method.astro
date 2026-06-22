@@ -6,15 +6,21 @@ import Layout from '../../layouts/Layout.astro';
   title="자격증, 짧게 붙는 사람들의 5단계 공부법 · 로직크래프트 가이드"
   description="시험을 빨리 통과하는 사람은 더 오래 공부하는 사람이 아니라 순서가 다른 사람입니다. 출제 기준에서 시작해 기출로 끝나는 자격증 5단계 공부법을 정리했습니다."
 >
-  <article class="wrap article">
-    <p class="cat">학습법</p>
-    <h1>자격증, 짧게 붙는 사람들의 5단계 공부법</h1>
-    <p class="lede">
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">학습법</p>
+      <h1>자격증, 짧게 붙는 사람들의 5단계 공부법</h1>
+      <p class="lead">
       같은 시험을 누구는 한 달 만에 붙고 누구는 반년을 붙잡습니다. 차이는 머리가 아니라
       순서입니다. 오래 붙잡는 사람은 보통 첫 페이지부터 차례로 읽다가 시험 범위 전체를
       “한 번 더” 보려다 지칩니다. 짧게 붙는 사람은 시험이 무엇을 묻는지부터 거꾸로 짚어
       들어갑니다. 다섯 단계로 정리했습니다.
-    </p>
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
 
     <h2>1. 출제 기준을 먼저 읽는다</h2>
     <p>
@@ -70,15 +76,14 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
-  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
-  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
-  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
-  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
-  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
   .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
   .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
   .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
   .back { margin-top: 2.5rem; font-size: 0.95rem; }
   .back a { color: var(--accent); }
 </style>
+

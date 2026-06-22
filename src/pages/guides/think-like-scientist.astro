@@ -6,14 +6,20 @@ import Layout from '../../layouts/Layout.astro';
   title="과학적으로 생각한다는 것 — 관찰에서 검증까지 · 로직크래프트 가이드"
   description="과학적 사고는 지식의 양이 아니라 생각의 순서입니다. 관찰·질문·가설·검증·수정이라는 다섯 단계를, 실험실 없이 일상에서 익히는 법을 정리했습니다."
 >
-  <article class="wrap article">
-    <p class="cat">사고력</p>
-    <h1>과학적으로 생각한다는 것 — 관찰에서 검증까지</h1>
-    <p class="lede">
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">사고력</p>
+      <h1>과학적으로 생각한다는 것 — 관찰에서 검증까지</h1>
+      <p class="lead">
       “과학적으로 생각하라”는 말을 자주 듣지만, 그게 정확히 무엇인지는 애매합니다. 과학적
       사고는 어려운 지식을 많이 아는 것이 아니라, 어떤 주장 앞에서 거치는 생각의 순서입니다.
       이 순서는 실험실이 아니어도, 일상의 모든 판단에 그대로 쓸 수 있습니다.
-    </p>
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
 
     <h2>관찰 — 있는 그대로 보기</h2>
     <p>
@@ -63,15 +69,14 @@ import Layout from '../../layouts/Layout.astro';
 </Layout>
 
 <style>
-  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
-  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
-  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
-  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
-  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
-  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
   .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
   .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
   .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
   .back { margin-top: 2.5rem; font-size: 0.95rem; }
   .back a { color: var(--accent); }
 </style>
+
