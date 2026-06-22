@@ -1,0 +1,81 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="아이와 함께 하는 주말 '탐정 놀이' 만드는 법 · 로직크래프트 가이드"
+  description="장난감도 화면도 없이, 집과 동네를 무대로 아이의 생각하는 힘을 기르는 탐정 놀이를 만드는 법입니다. 6~9세 아이가 직접 가설을 세우고 확인하게 돕는 다섯 단계."
+>
+  <article class="wrap article">
+    <p class="cat">부모-아이</p>
+    <h1>아이와 함께 하는 주말 “탐정 놀이” 만드는 법</h1>
+    <p class="lede">
+      비싼 교구도, 화면도 필요 없습니다. 집과 동네에 있는 평범한 것들이 아이에게는 훌륭한
+      탐구 거리입니다. 핵심은 답을 가르치는 게 아니라, 아이가 직접 “왜 그럴까?”를 묻고
+      확인하게 만드는 것. 6~9세 아이와 할 수 있는 주말 탐정 놀이를 다섯 단계로 정리했습니다.
+    </p>
+
+    <h2>1. 작은 ‘사건’을 던진다</h2>
+    <p>
+      거창할 필요 없습니다. “왜 아침엔 그림자가 길까?”, “냉장고 문을 열면 왜 시원한 바람이
+      나올까?”, “개미들은 어디로 줄지어 갈까?” 같은 일상의 의문이 사건입니다. 아이가
+      그냥 지나치던 것에 물음표를 붙여 주세요.
+    </p>
+
+    <h2>2. 아이에게 먼저 추측하게 한다</h2>
+    <p>
+      답을 알려 주기 전에 “너는 왜 그럴 것 같아?”라고 물어보세요. 틀려도 괜찮습니다.
+      추측(가설)을 말로 꺼내는 순간 아이는 수동적 구경꾼에서 탐정이 됩니다. 추측이 엉뚱할수록
+      좋습니다. 다음 단계에서 직접 확인할 거리가 생기니까요.
+    </p>
+
+    <h2>3. 직접 확인하러 나간다</h2>
+    <p>
+      추측을 말로 끝내지 말고 실제로 해 봅니다. 그림자는 시간을 두고 다시 보고, 개미는
+      따라가 보고, 얼음은 두 곳에 두고 어디가 빨리 녹는지 봅니다. 아이가 찾은 단서를
+      사진이나 그림, 한두 마디 말로 남기게 하면 “내가 알아냈다”는 성취가 또렷해집니다.
+    </p>
+
+    <h2>4. 추측과 결과를 맞춰 본다</h2>
+    <p>
+      확인이 끝나면 “처음 네 생각이랑 같았어, 달랐어?”를 물어보세요. 추측이 맞았는지보다,
+      추측과 현실을 견주어 보는 그 행위가 과학적 사고의 핵심입니다. 틀렸다면 “그럼 진짜
+      이유는 뭘까?” 하고 한 번 더 탐정 놀이가 이어집니다.
+    </p>
+
+    <h2>5. 다음 사건을 아이가 고르게 한다</h2>
+    <p>
+      한 번 재미를 붙이면 아이가 스스로 “이건 왜 그래?”를 가져오기 시작합니다. 그때부터는
+      부모가 사건을 던지지 않아도 됩니다. 아이가 던진 물음을 함께 탐정 놀이로 만들어 주면,
+      호기심이 습관이 됩니다.
+    </p>
+
+    <h2>정리</h2>
+    <p>
+      사건 던지기 → 추측하기 → 직접 확인 → 추측과 결과 맞추기 → 다음 사건 고르기. 이 다섯
+      단계는 아이가 세상을 “외우는 대상”이 아니라 “알아낼 수 있는 대상”으로 보게 만듭니다.
+      주말에 한 번, 십 분이면 충분합니다.
+    </p>
+
+    <div class="related">
+      <p>매일의 “정말 그래?”와 주말 탐정 놀이를 담은 앱이 있습니다.</p>
+      <a href="/apps/build/">Synergeion Build — 6~9세, 스스로 묻고 확인하는 생각 놀이 →</a>
+    </div>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
+  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
+  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
+  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
+  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

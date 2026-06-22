@@ -1,0 +1,76 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="구구단·연산, 외우게 하지 말고 익히게 하는 법 · 로직크래프트 가이드"
+  description="연산을 무작정 외우게 하면 수학이 싫어집니다. 규칙을 발견하게 하고, 짧게 자주 연습하고, 놀이로 반복하는 — 아이가 수에 친해지는 연산 학습법을 정리했습니다."
+>
+  <article class="wrap article">
+    <p class="cat">학습법</p>
+    <h1>구구단·연산, 외우게 하지 말고 익히게 하는 법</h1>
+    <p class="lede">
+      구구단을 통째로 외우게 하면 빠르게 외우는 아이도 있지만, 그만큼 수학을 빨리 싫어하게
+      되는 아이도 있습니다. 연산의 목표는 “빨리 외우기”가 아니라 “수와 친해지기”입니다.
+      외우게 하는 대신 익히게 하는 몇 가지 방법을 정리했습니다.
+    </p>
+
+    <h2>규칙을 먼저 발견하게 한다</h2>
+    <p>
+      구구단에는 숨은 규칙이 가득합니다. 2단은 짝수, 5단은 끝이 0과 5, 9단은 십의 자리와
+      일의 자리를 더하면 늘 9. 이런 규칙을 아이가 스스로 찾게 하면, 81개를 따로 외우는 게
+      아니라 몇 개의 규칙으로 묶어 기억합니다. “여기서 뭔가 반복되는 거 안 보여?”라고 물어
+      발견의 재미를 주세요.
+    </p>
+
+    <h2>짧게, 자주</h2>
+    <p>
+      한 번에 30분 붙잡고 외우게 하는 것보다, 하루에 3분씩 여러 번이 훨씬 효과적입니다.
+      기억은 짧은 간격으로 자주 떠올릴 때 단단해지기 때문입니다. 등굣길, 밥 먹기 전, 자기
+      전처럼 자투리 시간에 가볍게 묻고 답하는 편이 길게 앉히는 것보다 오래갑니다.
+    </p>
+
+    <h2>틀린 것만 다시</h2>
+    <p>
+      이미 잘 아는 단을 매번 처음부터 반복하면 시간이 아깝고 지루합니다. 자주 막히는 몇
+      개(보통 6·7·8단)만 따로 모아 더 자주 연습하세요. 약한 곳에 시간을 몰아주는 것이
+      전체를 한 번 더 도는 것보다 빠릅니다.
+    </p>
+
+    <h2>놀이로 반복한다</h2>
+    <p>
+      반복은 지루하지만, 게임이 되면 아이가 먼저 하자고 합니다. 빨리 맞히면 이기는 카드
+      뒤집기, 주사위로 곱셈 대결, 맞힐 때마다 한 칸 전진하는 보드 같은 형태로 바꾸면, 같은
+      반복도 즐거운 도전이 됩니다. 정답의 속도와 정확도가 보상으로 이어질 때 아이는 스스로
+      더 빨라지려 합니다.
+    </p>
+
+    <h2>정리</h2>
+    <p>
+      규칙 발견 → 짧게 자주 → 틀린 것만 → 놀이로 반복. 연산을 “외워야 하는 숙제”가 아니라
+      “맞히면 신나는 놀이”로 바꾸면, 아이는 수를 두려워하지 않게 됩니다. 빠른 암기보다
+      오래가는 친숙함이 결국 수학을 끌고 가는 힘입니다.
+    </p>
+
+    <div class="related">
+      <p>연산·어휘를 배틀 게임으로 즐기며 반복하도록 만든 앱이 있습니다.</p>
+      <a href="/apps/topbattle/">브레인블레이드 — 구구단·영단어·한자를 배틀로 익히는 게임 →</a>
+    </div>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
+  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
+  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
+  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
+  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

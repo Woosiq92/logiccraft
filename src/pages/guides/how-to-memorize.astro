@@ -1,0 +1,78 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="외운 게 자꾸 새는 사람을 위한 암기의 과학 · 로직크래프트 가이드"
+  description="암기는 머리가 좋고 나쁨의 문제가 아니라 방법의 문제입니다. 간격 반복과 인출 연습이라는 두 가지 원리로 더 적게 보고 더 오래 기억하는 법을 정리했습니다."
+>
+  <article class="wrap article">
+    <p class="cat">학습법</p>
+    <h1>외운 게 자꾸 새는 사람을 위한 암기의 과학</h1>
+    <p class="lede">
+      분명히 외웠는데 며칠 지나면 사라집니다. 그래서 시험 전날 몰아서 외우고, 시험이 끝나면
+      통째로 잊습니다. 암기가 잘 안 되는 건 머리 탓이 아니라 방법 탓인 경우가 대부분입니다.
+      뇌가 기억을 붙잡는 방식에 맞춘 두 가지 원리만 알면 훨씬 적게 보고 오래 기억할 수
+      있습니다.
+    </p>
+
+    <h2>다시 읽기는 가짜 공부다</h2>
+    <p>
+      교재를 여러 번 다시 읽으면 “익숙해서” 안다고 착각하게 됩니다. 하지만 눈으로 훑는
+      것과 머릿속에서 꺼내는 것은 전혀 다른 일입니다. 시험은 꺼내는 능력을 묻는데, 다시
+      읽기는 넣기만 반복합니다. 그래서 “책을 덮으면 아무것도 생각 안 나는” 일이 생깁니다.
+    </p>
+
+    <h2>원리 1 — 인출 연습</h2>
+    <p>
+      가장 강력한 암기법은 “보지 않고 떠올려 보기”입니다. 한 단원을 읽었으면 책을 덮고
+      방금 본 내용을 백지에 적거나 소리 내어 말해 보세요. 떠오르지 않는 부분이 바로 아직
+      안 외워진 곳입니다. 떠올리는 행위 자체가 기억을 강하게 만들기 때문에, 같은 시간이면
+      다시 읽기보다 떠올리기가 몇 배 효율적입니다. 암기카드의 “앞면 보고 정답 떠올리기”가
+      바로 이 원리입니다.
+    </p>
+
+    <h2>원리 2 — 간격 반복</h2>
+    <p>
+      기억은 잊기 직전에 다시 떠올릴 때 가장 단단해집니다. 그래서 한 번에 열 번 보는 것보다,
+      간격을 두고 다섯 번 보는 편이 훨씬 오래갑니다. 오늘 외운 것을 내일, 사흘 뒤, 일주일
+      뒤로 점점 간격을 늘려 다시 떠올려 보세요. 한 번 맞힌 것은 간격을 늘리고, 틀린 것은
+      간격을 좁히면 약한 부분만 자연스럽게 더 자주 보게 됩니다.
+    </p>
+
+    <h2>틀린 것만 모아라</h2>
+    <p>
+      모든 항목을 똑같은 횟수로 반복하는 것은 시간 낭비입니다. 이미 잘 떠오르는 것은
+      덜 보고, 자꾸 막히는 것만 따로 모아 집중하세요. 오답을 모아 두는 습관 하나가 같은
+      시간 대비 점수를 가장 크게 올립니다.
+    </p>
+
+    <h2>정리</h2>
+    <p>
+      다시 읽기를 줄이고, 책을 덮고 떠올리고(인출), 간격을 두고 반복하고(간격 반복),
+      틀린 것만 다시 보세요. 이 네 가지는 시험 공부뿐 아니라 외국어 단어, 자격증 용어,
+      업무 지식 어디에나 통합니다. 암기는 재능이 아니라 설계입니다.
+    </p>
+
+    <div class="related">
+      <p>인출 연습과 오답 반복을 그대로 담은 학습 앱이 있습니다.</p>
+      <a href="/apps/certnote/">모두의 자격증 — 암기카드·모의고사·오답노트를 한 곳에서 →</a>
+    </div>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
+  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
+  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
+  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
+  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

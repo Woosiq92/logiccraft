@@ -1,0 +1,78 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="매일 시세를 보는 사람을 위한, 충동을 줄이는 습관 · 로직크래프트 가이드"
+  description="시세를 자주 본다고 손실이 줄지는 않습니다. 오히려 충동 매매를 부르기 쉽습니다. 보는 것과 거래하는 것을 분리하고, 충동에 휘둘리지 않는 습관을 정리했습니다."
+>
+  <article class="wrap article">
+    <p class="cat">생활 습관</p>
+    <h1>매일 시세를 보는 사람을 위한, 충동을 줄이는 습관</h1>
+    <p class="lede">
+      시세를 자주 들여다본다고 해서 수익이 늘지는 않습니다. 오히려 가격이 출렁일 때마다
+      “지금 사야 하나, 팔아야 하나” 하는 충동이 따라붙어 손해로 이어지기 쉽습니다. 시세를
+      자주 보는 사람일수록, 충동과 거리를 두는 자기만의 장치가 필요합니다. (투자 권유가
+      아니라 습관에 대한 이야기입니다.)
+    </p>
+
+    <h2>‘보는 것’과 ‘거래하는 것’을 분리한다</h2>
+    <p>
+      가장 흔한 함정은, 시세를 보려고 켠 거래 앱에서 매수·매도 버튼을 마주치는 순간입니다.
+      잠깐 확인하려다 충동적으로 주문을 넣게 됩니다. 시세 확인은 거래 기능이 없는 도구로,
+      실제 거래는 별도의 시점에 계획을 갖고 — 이렇게 역할을 나누면 “보다가 지르는” 패턴이
+      줄어듭니다.
+    </p>
+
+    <h2>확인 횟수를 정해 둔다</h2>
+    <p>
+      시세는 1분마다 봐도 의미 있는 정보가 새로 생기지 않습니다. 하루에 몇 번, 정해진
+      시간에만 확인한다고 정해 두세요. 가격의 짧은 출렁임에 반응하지 않는 것만으로도
+      불필요한 매매가 크게 줄어듭니다. 거치대나 위젯으로 “수동적으로” 보는 것은 괜찮지만,
+      그때마다 행동하지 않는 것이 핵심입니다.
+    </p>
+
+    <h2>‘왜 샀는지’를 미리 적어 둔다</h2>
+    <p>
+      충동 매매는 대개 이유 없이 분위기에 휩쓸려 일어납니다. 무언가를 사거나 팔기 전에
+      “왜, 어떤 조건에서, 언제까지”를 한 줄로 적어 두세요. 적어 둔 이유가 사라졌을 때만
+      행동하기로 정하면, 단순한 가격 출렁임에 흔들리지 않게 됩니다.
+    </p>
+
+    <h2>손실 뒤의 ‘복수’를 경계한다</h2>
+    <p>
+      손해를 본 직후가 가장 위험합니다. 빨리 만회하려는 마음이 더 큰 충동 매매를 부릅니다.
+      손실을 봤다면 그날은 거래를 멈추고, 적어 둔 원칙을 다시 읽는 편이 낫습니다. 만회는
+      급할수록 멀어집니다.
+    </p>
+
+    <h2>정리</h2>
+    <p>
+      보기와 거래 분리하기 → 확인 횟수 정하기 → 이유 미리 적기 → 손실 뒤 멈추기. 시세를
+      자주 보는 것 자체는 문제가 아닙니다. 볼 때마다 행동하려는 충동이 문제입니다. 보는 일과
+      거래하는 일 사이에 한 박자 거리를 두는 습관이, 잦은 확인을 손해가 아닌 무해한 일로
+      바꿔 줍니다.
+    </p>
+
+    <div class="related">
+      <p>매매 버튼 없이 시세만 보도록 만든 읽기 전용 앱이 있습니다.</p>
+      <a href="/apps/stockwatch/">불안한개미 — 매매 없이 시세만 보는 한국 주식 앱 →</a>
+    </div>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article { max-width: 720px; padding-top: 3.5rem; padding-bottom: 4rem; }
+  .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; color: var(--clay); letter-spacing: 0.06em; margin: 0; }
+  .article h1 { font-size: clamp(1.7rem, 4.5vw, 2.4rem); margin: 0.4rem 0 0; line-height: 1.25; }
+  .lede { color: var(--sub); line-height: 1.85; margin: 1.2rem 0 0; font-size: 1.05rem; }
+  .article h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>
