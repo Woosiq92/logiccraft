@@ -81,37 +81,38 @@ const guides = [
   title="가이드 — 학습·사고력·시험 전략 · 로직크래프트"
   description="로직크래프트가 제품을 만들며 정리한 학습법, 코딩 교육, 부모-아이 대화법, 시험 전략, 시사 입문 가이드를 모았습니다."
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">GUIDES · 가이드</p>
-    <h1>더 잘 배우고 생각하는 법.</h1>
-    <p class="lede">
-      로직크래프트는 학습과 사고력을 다루는 제품을 만듭니다. 그 과정에서 정리한 공부법과
-      교육 이야기를 누구나 읽을 수 있도록 풀어 두었습니다.
-    </p>
+  <!-- ============ PAGE HERO ============ -->
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">GUIDES · 가이드</p>
+      <h1>더 잘 배우고 생각하는 법</h1>
+      <p class="lead">학습·사고력·시험 전략을 직접 정리한 글입니다.</p>
+    </div>
   </section>
 
-  <section class="wrap list">
-    {guides.map((g) => (
-      <a class="card" href={g.href}>
-        <span class="cat">{g.cat}</span>
-        <h2>{g.title}</h2>
-        <p>{g.excerpt}</p>
-        <span class="more">읽기 →</span>
-      </a>
-    ))}
+  <!-- ============ LIST ============ -->
+  <section class="section">
+    <div class="wrap">
+      <div class="card-grid">
+        {guides.map((g) => (
+          <a class="pcard guide-card reveal" href={g.href}>
+            <span class="g-cat">{g.cat}</span>
+            <h2>{g.title}</h2>
+            <p class="g-ex">{g.excerpt}</p>
+            <span class="g-more">읽기 →</span>
+          </a>
+        ))}
+      </div>
+    </div>
   </section>
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .list { padding-top: 2rem; padding-bottom: 4rem; display: grid; gap: 1rem; max-width: 820px; }
-  .card { display: block; border: 1px solid var(--line); border-radius: 16px; padding: 1.4rem 1.6rem; text-decoration: none; color: inherit; transition: border-color .15s, transform .15s; }
-  .card:hover { border-color: var(--accent); transform: translateY(-2px); }
-  .card .cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--clay); letter-spacing: 0.05em; }
-  .card h2 { font-size: 1.2rem; margin: 0.4rem 0 0.5rem; line-height: 1.35; }
-  .card p { color: var(--sub); line-height: 1.7; margin: 0; font-size: 0.97rem; }
-  .card .more { display: inline-block; margin-top: 0.8rem; color: var(--accent); font-weight: 700; font-size: 0.92rem; }
+  .guide-card { text-decoration: none; color: inherit; }
+  .guide-card:hover { border-color: var(--accent); transform: translateY(-3px); }
+  .g-cat { font-family: 'IBM Plex Mono', monospace; font-size: 0.75rem; color: var(--clay); letter-spacing: 0.05em; }
+  .guide-card h2 { font-size: 1.18rem; line-height: 1.35; margin: 0.55rem 0 0.5rem; }
+  .g-ex { color: var(--sub); line-height: 1.72; margin: 0; font-size: 0.95rem; flex: 1; }
+  .g-more { display: inline-block; margin-top: 0.9rem; color: var(--accent); font-weight: 700; font-size: 0.9rem; }
 </style>
