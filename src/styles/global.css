@@ -402,7 +402,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 /* ============================================================
    Products
    ============================================================ */
-.products { padding: clamp(70px, 9vw, 120px) 0; }
+.products { padding: clamp(44px, 5.5vw, 72px) 0; }
 .cat-head { display: flex; align-items: center; gap: 14px; margin: 0 0 26px; }
 .cat-head .label { display: flex; align-items: center; gap: 11px; font-size: 19px; font-weight: 800; letter-spacing: -0.02em; }
 .cat-head .label::before { content: ""; width: 10px; height: 10px; border-radius: 50%; background: var(--blue); }
@@ -538,7 +538,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .page-hero {
   position: relative; overflow: hidden;
   background: radial-gradient(120% 130% at 82% 0%, #24356e 0%, #182a5c 42%, #11183a 82%);
-  color: #fff; padding: clamp(64px, 10vw, 112px) 0 clamp(56px, 8vw, 92px);
+  color: #fff; padding: clamp(48px, 7vw, 84px) 0 clamp(36px, 4.5vw, 56px);
 }
 .page-hero::before {
   content: ""; position: absolute; inset: 0;
@@ -561,7 +561,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .page-hero .lead a:hover { color: #fff; }
 
 /* generic section padding for sub-pages */
-.section { padding: clamp(60px, 8vw, 104px) 0; }
+.section { padding: clamp(44px, 5.5vw, 72px) 0; }
 .section.tint { background: #fff; border-block: 1px solid var(--line); }
 
 /* info card (boxed panel) */
