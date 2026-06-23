@@ -36,8 +36,13 @@ public/
 - 히어로: 별가루 dot-field(navy radial) + 나루·느티 마스코트 패널(포인터 3D 틸트).
 - 컴포넌트: `.pcard`(제품 카드)·여정 타임라인(`.journey`/`.stage`/스크롤 스파인 채움)·
   `.principle`·`.bizcard`·`.contact-card`·미디어 밴드.
-- 제품/시리즈 데이터는 **각 페이지에 하드코딩**(과거 `src/data/*.ts` 단일 소스는 폐기).
-  제품 추가·수정 시 `index.astro`와 `apps.astro`의 `.pcard` 마크업을 직접 편집.
+- 제품 데이터는 **`src/data/products.js` 단일 소스**(2026-06-24 SSOT 재도입).
+  홈(`index.astro`)·제품목록(`apps.astro`)이 이 배열을 import해 공용
+  `src/components/ProductCard.astro`로 렌더. 교육/일상 카운트도 데이터에서 파생.
+  → **새 앱 추가·수정 = `products.js` 한 줄.** 카드 마크업은 `ProductCard.astro` 한 곳에만 존재.
+  예외(일회성 마크업, 직접 편집): 홈의 Wonder 피처 카드(마스코트 아트)·`apps.astro`의
+  Synergeion 여정 타임라인(`.journey`/`.stage`). 상세 페이지·법적 페이지는 여전히
+  `src/pages/apps/<slug>/`에 개별 추가.
 
 ### 법적 페이지 보존 트릭 (중요)
 
