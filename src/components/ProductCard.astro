@@ -1,0 +1,27 @@
+---
+// 제품 카드 — 홈·제품목록 공용. 데이터는 src/data/products.js.
+const { p } = Astro.props;
+---
+<article class="pcard reveal">
+  <div class="top">
+    <img class="icon" src={`/icons/${p.icon}.png`} alt="" />
+    <div><div class="name-row"><h3>{p.name}</h3><span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span></div></div>
+  </div>
+  <p class="desc">{p.desc}</p>
+  <div class="links">
+    {p.type === 'web' ? (
+      <a href={p.web}>바로가기 →</a>
+    ) : (
+      <>
+        {p.ios ? <a href={p.ios}>App Store</a> : <span class="soon-btn">App Store (예정)</span>}
+        {p.play ? <a href={p.play}>Google Play</a> : <span class="soon-btn">Google Play (예정)</span>}
+        <div class="legal">
+          <a class="muted" href={`/apps/${p.slug}/`}>자세히</a>
+          <a class="muted" href={`/apps/${p.slug}/support`}>지원</a>
+          <a class="muted" href={`/apps/${p.slug}/privacy`}>개인정보</a>
+          <a class="muted" href={`/apps/${p.slug}/terms`}>약관</a>
+        </div>
+      </>
+    )}
+  </div>
+</article>

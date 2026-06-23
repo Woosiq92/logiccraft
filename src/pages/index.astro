@@ -1,6 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import ProductCard from '../components/ProductCard.astro';
+import { products } from '../data/products.js';
 
+const eduItems = products.filter((p) => p.section === 'edu');
+const dailyItems = products.filter((p) => p.section === 'daily');
+// 교육 카운트 = Build(시리즈, 홈 그리드에 카드로 노출) + 스튜디오 교육 제품. Wonder 피처 카드는 카운트 제외.
+const eduCount = 1 + eduItems.length;
 ---
 
 <Layout>
@@ -80,7 +86,7 @@ import Layout from '../layouts/Layout.astro';
         <div class="cat-head reveal">
           <span class="label">교육</span>
           <span class="rule"></span>
-          <span class="count">08</span>
+          <span class="count">{String(eduCount).padStart(2, '0')}</span>
         </div>
         <div class="card-grid">
 
@@ -127,123 +133,7 @@ import Layout from '../layouts/Layout.astro';
             </div>
           </article>
 
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/psattriage.png" alt="" />
-              <div><div class="name-row"><h3>데일리 PSAT</h3><span class="chip">PSAT·공시</span></div></div>
-            </div>
-            <p class="desc">기출 문제은행이 아니라, 시간배분·버리기·매몰비용을 측정하는 트리아지 트레이너. 자료·논리 감각을 단계로 훈련.</p>
-            <div class="links">
-              <span class="soon-btn">App Store (예정)</span>
-              <span class="soon-btn">Google Play (예정)</span>
-              <div class="legal">
-              <a class="muted" href="/apps/psattriage/">자세히</a>
-                <a class="muted" href="/apps/psattriage/support">지원</a>
-              <a class="muted" href="/apps/psattriage/privacy">개인정보</a>
-              <a class="muted" href="/apps/psattriage/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/robotrail.png" alt="" />
-              <div><div class="name-row"><h3>로보트레일</h3><span class="chip">컴퓨팅 사고력</span></div></div>
-            </div>
-            <p class="desc">코드 없이 명령 퍼즐로 코딩 사고력을 측정·훈련하는 앱. 학습 108판 + 측정 36문제 + 도전 모드.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6764465655">App Store</a>
-              <a href="https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail">Google Play</a>
-              <div class="legal">
-              <a class="muted" href="/apps/robotrail/">자세히</a>
-                <a class="muted" href="/apps/robotrail/support">지원</a>
-              <a class="muted" href="/apps/robotrail/privacy">개인정보</a>
-              <a class="muted" href="/apps/robotrail/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/science-club.png" alt="" />
-              <div><div class="name-row"><h3>과학자 클럽</h3><span class="chip">과학</span></div></div>
-            </div>
-            <p class="desc">추측·발견·분기·회고 4단계로 매일 한 별씩 켜는 과학 사고 게임.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6771675434">App Store</a>
-              <span class="soon-btn">Google Play (예정)</span>
-              <div class="legal">
-              <a class="muted" href="/apps/science-club/">자세히</a>
-                <a class="muted" href="/apps/science-club/support">지원</a>
-              <a class="muted" href="/apps/science-club/privacy">개인정보</a>
-              <a class="muted" href="/apps/science-club/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/scienceapp.png" alt="" />
-              <div><div class="name-row"><h3>왜 그렇게 생각해?</h3><span class="chip">융합 사고력</span></div></div>
-            </div>
-            <p class="desc">정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼(웹).</p>
-            <div class="links">
-              <a href="https://logicschool.co.kr">바로가기 →</a>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/certnote.png" alt="" />
-              <div><div class="name-row"><h3>모두의 자격증</h3><span class="chip">자격증</span></div></div>
-            </div>
-            <p class="desc">오늘의 훈련·정리 글·빠른 모의고사는 무료, 전체 문제은행·실전 모드는 합격팩으로. 자격증 시험 공부를 한 곳에서.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6779944719">App Store</a>
-              <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.certnote">Google Play</a>
-              <div class="legal">
-              <a class="muted" href="/apps/certnote/">자세히</a>
-                <a class="muted" href="/apps/certnote/support">지원</a>
-              <a class="muted" href="/apps/certnote/privacy">개인정보</a>
-              <a class="muted" href="/apps/certnote/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/topbattle.png" alt="" />
-              <div><div class="name-row"><h3>브레인블레이드</h3><span class="chip">학습 배틀</span></div></div>
-            </div>
-            <p class="desc">팽이 배틀과 학습 퀴즈를 합친 두뇌 게임. 빠르고 정확하게 맞힐수록 강한 일격이 나가요. 구구단·영단어·한자·세계·바른말 5과목.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6780302277">App Store</a>
-              <span class="soon-btn">Google Play (예정)</span>
-              <div class="legal">
-              <a class="muted" href="/apps/topbattle/">자세히</a>
-                <a class="muted" href="/apps/topbattle/support">지원</a>
-              <a class="muted" href="/apps/topbattle/privacy">개인정보</a>
-              <a class="muted" href="/apps/topbattle/terms">약관</a>
-              </div>
-            </div>
-          </article>
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/eduessay.png" alt="" />
-              <div><div class="name-row"><h3>교논 트레이너</h3><span class="chip">중등임용</span></div></div>
-            </div>
-            <p class="desc">중등임용 1교시 교육학 논술 올인원. 기출 개념 인출·간격 반복 복습, 50분 논제 실전, 객관식 모의고사를 인터넷·로그인 없이.</p>
-            <div class="links">
-              <span class="soon-btn">App Store (예정)</span>
-              <span class="soon-btn">Google Play (예정)</span>
-              <div class="legal">
-              <a class="muted" href="/apps/eduessay/">자세히</a>
-                <a class="muted" href="/apps/eduessay/support">지원</a>
-              <a class="muted" href="/apps/eduessay/privacy">개인정보</a>
-              <a class="muted" href="/apps/eduessay/terms">약관</a>
-              </div>
-            </div>
-          </article>
+          {eduItems.map((p) => <ProductCard p={p} />)}
         </div>
       </div>
 
@@ -252,62 +142,10 @@ import Layout from '../layouts/Layout.astro';
         <div class="cat-head daily reveal">
           <span class="label">일상</span>
           <span class="rule"></span>
-          <span class="count">03</span>
+          <span class="count">{String(dailyItems.length).padStart(2, '0')}</span>
         </div>
         <div class="card-grid">
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/ourfootprint.png" alt="" />
-              <div><div class="name-row"><h3>커플맵로그</h3><span class="chip warm">지도</span></div></div>
-            </div>
-            <p class="desc">둘이 다녀온 동네가 색으로 칠해지는 커플 점령 지도. 우리만의 맛집 등급도 직접 만들어요.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6769797672">App Store</a>
-              <a href="https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint">Google Play</a>
-              <div class="legal">
-              <a class="muted" href="/apps/ourfootprint/">자세히</a>
-                <a class="muted" href="/apps/ourfootprint/support">지원</a>
-              <a class="muted" href="/apps/ourfootprint/privacy">개인정보</a>
-              <a class="muted" href="/apps/ourfootprint/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/stockwatch.png" alt="" />
-              <div><div class="name-row"><h3>불안한개미</h3><span class="chip warm">주식 시세</span></div></div>
-            </div>
-            <p class="desc">매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6772662894">App Store</a>
-              <a href="https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch">Google Play</a>
-              <div class="legal">
-              <a class="muted" href="/apps/stockwatch/">자세히</a>
-                <a class="muted" href="/apps/stockwatch/support">지원</a>
-              <a class="muted" href="/apps/stockwatch/privacy">개인정보</a>
-              <a class="muted" href="/apps/stockwatch/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/sedolal.png" alt="" />
-              <div><div class="name-row"><h3>세상돌아가는거알아버리기</h3><span class="chip warm">시사·사회</span></div></div>
-            </div>
-            <p class="desc">정치 몰라도 OK. 친구처럼 알려주는 정치·시사 한 토막과 우리 동네 후보·의원 정리.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/id6770908480">App Store</a>
-              <span class="soon-btn">Google Play (예정)</span>
-              <div class="legal">
-              <a class="muted" href="/apps/sedolal/">자세히</a>
-                <a class="muted" href="/apps/sedolal/support">지원</a>
-              <a class="muted" href="/apps/sedolal/privacy">개인정보</a>
-              <a class="muted" href="/apps/sedolal/terms">약관</a>
-              </div>
-            </div>
-          </article>
+          {dailyItems.map((p) => <ProductCard p={p} />)}
         </div>
       </div>
     </div>
