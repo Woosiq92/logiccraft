@@ -8,7 +8,7 @@ export const products = [
   { name: 'Synergeion Wonder', type: 'app', section: 'series' },
   { name: 'Synergeion Build', type: 'app', section: 'series' },
   // 교육
-  { section: 'edu', slug: 'psattriage', icon: 'psattriage', name: '데일리 PSAT', chip: 'PSAT·공시', type: 'app', desc: '기출 문제은행이 아니라, 시간배분·버리기·매몰비용을 측정하는 트리아지 트레이너. 자료·논리 감각을 단계로 훈련.', ios: null, play: null },
+  { section: 'edu', slug: 'psattriage', icon: 'psattriage', name: '데일리 PSAT', chip: 'PSAT·공시', type: 'app', desc: '기출 문제은행이 아니라, 시간배분·버리기·매몰비용을 측정하는 트리아지 트레이너. 자료·논리 감각을 단계로 훈련.', ios: 'https://apps.apple.com/kr/app/id6781955472', play: null },
   { section: 'edu', slug: 'robotrail', icon: 'robotrail', name: '로보트레일', chip: '컴퓨팅 사고력', type: 'app', desc: '코드 없이 명령 퍼즐로 코딩 사고력을 측정·훈련하는 앱. 학습 108판 + 측정 36문제 + 도전 모드.', ios: 'https://apps.apple.com/kr/app/id6764465655', play: 'https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail' },
   { section: 'edu', slug: 'science-club', icon: 'science-club', name: '과학자 클럽', chip: '과학', type: 'app', desc: '추측·발견·분기·회고 4단계로 매일 한 별씩 켜는 과학 사고 게임.', ios: 'https://apps.apple.com/kr/app/id6771675434', play: null },
   { section: 'edu', icon: 'scienceapp', name: '왜 그렇게 생각해?', chip: '융합 사고력', type: 'web', desc: '정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼(웹).', web: 'https://logicschool.co.kr' },
