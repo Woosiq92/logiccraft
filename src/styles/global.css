@@ -254,6 +254,10 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .mascot-float { width: 100%; max-width: 430px; animation: float 7s var(--ease) infinite; }
 @media (prefers-reduced-motion: reduce) { .mascot-float { animation: none; } }
 .mascot-panel {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
   position: relative;
   background: #eef2f7; /* matches mascot PNG background rgb(238,242,247) */
   border-radius: 28px;
