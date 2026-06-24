@@ -43,8 +43,8 @@
   /* ---- Hero: pointer-parallax 3D tilt (subtle) ---- */
   (function heroTilt() {
     if (reduceMotion || !finePointer) return;
-    const art = document.querySelector('.hero-art');
     const panel = document.getElementById('mascotPanel');
+    const art = panel && panel.closest('.feat-art');
     const row = panel && panel.querySelector('.mascot-row');
     const glare = panel && panel.querySelector('.glare');
     if (!art || !panel) return;
