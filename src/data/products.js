@@ -19,4 +19,5 @@ export const products = [
   { section: 'daily', slug: 'ourfootprint', icon: 'ourfootprint', name: '커플맵로그', chip: '지도', warm: true, type: 'app', desc: '둘이 다녀온 동네가 색으로 칠해지는 커플 점령 지도. 우리만의 맛집 등급도 직접 만들어요.', ios: 'https://apps.apple.com/kr/app/id6769797672', play: 'https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint' },
   { section: 'daily', slug: 'stockwatch', icon: 'stockwatch', name: '불안한개미', chip: '주식 시세', warm: true, type: 'app', desc: '매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.', ios: 'https://apps.apple.com/kr/app/id6772662894', play: 'https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch' },
   { section: 'daily', slug: 'sedolal', icon: 'sedolal', name: '세상돌아가는거알아버리기', chip: '시사·사회', warm: true, type: 'app', desc: '정치 몰라도 OK. 친구처럼 알려주는 정치·시사 한 토막과 우리 동네 후보·의원 정리.', ios: 'https://apps.apple.com/kr/app/id6770908480', play: null },
+  { section: 'daily', icon: 'yangmyeon', name: '양면', chip: '중도정치', warm: true, type: 'web', desc: '하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한 논거를 나란히. 어느 쪽이 옳은지 정해주지 않고, 무엇이 사실이고 무엇이 해석인지 구분하도록 돕는 사이트.', web: 'https://중도정치.kr' },
 ];
