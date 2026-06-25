@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <!-- maximum-scale=1: iOS 입력창 자동확대 방지 (메모리 함정) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>매트릭스아이큐</title>
+  <meta name="theme-color" content="#5b6cff" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="screen-title">매트릭스아이큐</h1>
+  </header>
+
+  <main id="app"><!-- app.js가 현재 탭을 렌더 --></main>
+
+  <nav class="tabbar" id="tabbar"><!-- app.js가 탭 버튼 렌더 --></nav>
+
+  <script src="data.js"></script>
+  <script src="engine.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

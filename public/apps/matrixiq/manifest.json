@@ -1,0 +1,12 @@
+{
+  "name": "매트릭스아이큐",
+  "short_name": "매트릭스아이큐",
+  "description": "도형추론 유형 적응 훈련 + 시간 전략",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#5b6cff",
+  "lang": "ko",
+  "icons": []
+}
