@@ -19,6 +19,8 @@
     return a;
   }
   function clamp(x, lo, hi) { return x < lo ? lo : x > hi ? hi : x; }
+  // 받침 유무로 조사 선택 (예: josa('모양','이','가')='모양이', josa('개수','이','가')='개수가')
+  function josa(w, a, b) { var c = w.charCodeAt(w.length - 1); var bat = c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0; return w + (bat ? a : b); }
 
   // ─────────────────────────────────────────────────────────────
   //  도형 렌더 (SVG)
@@ -191,7 +193,7 @@
         for (i = 0; i < n; i++) { seq.push(t); t += dd; dd += step; }
         desc = '차이가 +' + step + ' 씩 커지는 수열';
       } else if (kind === 'fib') {     // 앞 두 항의 합
-        var x = 1 + ri(4), y = 1 + ri(5); seq = [x, y];
+        var x = 1 + ri(3), y = x + ri(4); seq = [x, y];   // y>=x 오름차순 시작 → 규칙 인지 가능
         for (i = 2; i < n; i++) seq.push(seq[i - 1] + seq[i - 2]);
         desc = '앞의 두 항을 더한 수열';
       } else if (kind === 'square') {  // 제곱 + 오프셋
@@ -200,6 +202,7 @@
         desc = '연속한 수의 제곱' + (off ? ' +' + off : '') + ' 수열';
       } else if (kind === 'interleave') { // 두 수열 교차
         var p = 1 + ri(6), q = 2 + ri(6), pk = 2 + ri(4), qk = 2 + ri(4);
+        while (qk === pk) qk = 2 + ri(4);   // 두 부분수열 증가폭이 같으면 교차가 아니므로 다르게
         for (i = 0; i < n; i++) seq.push(i % 2 === 0 ? p + pk * (i / 2 | 0) : q + qk * (i / 2 | 0));
         desc = '두 수열(홀수번째 +' + pk + ', 짝수번째 +' + qk + ')이 번갈아 나오는 수열';
       } else if (kind === 'muladd') {  // ×k +m
@@ -275,15 +278,191 @@
     }).join('') + '</div>';
     var optHTML = cells.map(function (v, i) { return '<span class="opt-num">' + (i + 1) + '</span>'; });
     return { type: 'odd', difficulty: d, stemHTML: stemHTML, options: optHTML, answer: oddIdx,
-      explain: '나머지 다섯은 ' + FEAT_KR[ruleFeat] + '이(가) 모두 같습니다.\n' + (oddIdx + 1) + '번만 ' + FEAT_KR[ruleFeat] + '이(가) 다릅니다.' };
+      explain: '나머지 다섯은 ' + josa(FEAT_KR[ruleFeat], '이', '가') + ' 모두 같습니다.\n' + (oddIdx + 1) + '번만 ' + josa(FEAT_KR[ruleFeat], '이', '가') + ' 다릅니다.' };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  타입 4: 응용수리 (계산) — 거리·농도·비율·경우의수 등. 정답=유일한 정수.
+  //  모든 템플릿은 정수 답이 나오도록 파라미터를 제약한다 (모호함 0).
+  // ─────────────────────────────────────────────────────────────
+  function genCalc(d) {
+    d = clamp(d, 1, 5);
+    var easy = ['speed', 'avg', 'ratio', 'discount'];
+    var mid = ['conc', 'time', 'grow'];
+    var hard = ['perm', 'conc', 'grow'];
+    var pool = d <= 2 ? easy : d === 3 ? easy.concat(mid) : d === 4 ? mid : mid.concat(hard);
+    var kind = pick(pool), q, ans, ds = [];
+
+    if (kind === 'speed') {                 // 거리 = 속력 × 시간
+      var v = pick([20, 30, 40, 50, 60]), t = pick([2, 3, 4, 5]);
+      ans = v * t; q = '시속 ' + v + 'km로 ' + t + '시간 동안 달린 거리는? (km)';
+      ds = [v + t, v * (t + 1), v * (t - 1), v];
+    } else if (kind === 'time') {            // 시간 = 거리 ÷ 속력
+      var v2 = pick([20, 30, 40, 60]), t2 = pick([2, 3, 4, 5]), dist = v2 * t2;
+      ans = t2; q = dist + 'km 거리를 시속 ' + v2 + 'km로 갈 때 걸리는 시간은? (시간)';
+      ds = [t2 + 1, t2 + 2, dist - v2, t2 * 2];
+    } else if (kind === 'avg') {             // 평균
+      var base = pick([12, 15, 18, 20, 24, 30]), g = pick([2, 3, 4]);
+      ans = base; q = (base - g) + ', ' + base + ', ' + (base + g) + ' 세 수의 평균은?';
+      ds = [base + g, base - g, (base - g) + base + (base + g), base + 1];
+    } else if (kind === 'ratio') {           // 비율(%)
+      var whole = pick([200, 300, 400, 500]), r = pick([10, 20, 25, 30, 40]);
+      ans = whole * r / 100; q = whole + '명의 ' + r + '%는 몇 명? (명)';
+      ds = [whole - ans, ans + 10, r, ans * 2];
+    } else if (kind === 'discount') {        // 할인가
+      var p = pick([10000, 12000, 15000, 20000, 25000]), dr = pick([10, 20, 25, 30]);
+      ans = p * (100 - dr) / 100; q = '정가 ' + p + '원인 상품을 ' + dr + '% 할인한 판매가는? (원)';
+      ds = [p * dr / 100, ans - 1000, ans + 1000, p];
+    } else if (kind === 'conc') {            // 농도 → 소금량
+      var c = pick([5, 10, 15, 20, 25]), m = pick([200, 300, 400, 500]);
+      ans = m * c / 100; q = '농도 ' + c + '%인 소금물 ' + m + 'g에 들어 있는 소금의 양은? (g)';
+      ds = [c, m - ans, ans + 10, ans * 2];
+    } else if (kind === 'perm') {            // 순열 nP2
+      var nn = pick([4, 5, 6, 7]);
+      ans = nn * (nn - 1); q = '서로 다른 ' + nn + '개에서 2개를 뽑아 순서대로 나열하는 경우의 수는? (가지)';
+      ds = [nn * nn, nn * (nn - 1) / 2, nn + 2, nn * (nn - 1) * (nn - 2)];
+    } else {                                 // grow: 증가율
+      var a0 = pick([20, 40, 80, 100]), inc = pick([10, 20, 25, 50]), b0 = a0 * (100 + inc) / 100;
+      ans = inc; q = a0 + '에서 ' + b0 + '까지 늘었다면 증가율은? (%)';
+      ds = [b0 - a0, inc + 5, inc + 10, b0 - inc];
+    }
+
+    var set = {}; set[ans] = true; var opts = [];
+    ds.forEach(function (x) { x = Math.round(x); if (x > 0 && !set[x]) { set[x] = true; opts.push(x); } });
+    while (opts.length < 4) {
+      var sp = Math.max(2, Math.round(Math.abs(ans) * 0.2));
+      var g2 = Math.round(ans + (ri(2) ? 1 : -1) * (1 + ri(sp)));
+      if (g2 > 0 && !set[g2]) { set[g2] = true; opts.push(g2); }
+    }
+    opts = opts.slice(0, 4);
+    var all = shuffle(opts.concat([ans])), answer = all.indexOf(ans);
+    var stemHTML = '<div class="calc-q">' + q + '</div>';
+    var optHTML = all.map(function (x) { return '<span class="opt-num">' + x + '</span>'; });
+    return { type: 'calc', difficulty: d, stemHTML: stemHTML, options: optHTML, answer: answer,
+      explain: '정답은 ' + ans + ' 입니다.' };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  타입 5: 언어논리 (순서배열·삼단논법·대우) — 문장형. 정답=유일.
+  //  조사(josa)로 한국어 정합. 옵션은 문장(텍스트).
+  // ─────────────────────────────────────────────────────────────
+  function genVerbal(d) {
+    d = clamp(d, 1, 5);
+    var kinds = d <= 1 ? ['order', 'contra'] : d === 2 ? ['order', 'contra', 'syllog']
+      : d <= 4 ? ['order', 'syllog', 'contra'] : ['order', 'syllog', 'order'];
+    var kind = pick(kinds), facts = [], ask = '', optList = [], ansVal;
+
+    if (kind === 'order') {                    // 순서배열
+      var names = shuffle(['민수', '지영', '현우', '수빈', '태호', '은지', '준서', '하늘', '서연', '도윤']);
+      var N = clamp(d + 2, 3, 5), ord = names.slice(0, N);   // ord[0] = 최상위
+      var rel = pick([
+        { st: '키가 크다', big: '키가 가장 큰', small: '키가 가장 작은' },
+        { st: '나이가 많다', big: '나이가 가장 많은', small: '나이가 가장 적은' },
+        { st: '점수가 높다', big: '점수가 가장 높은', small: '점수가 가장 낮은' },
+        { st: '달리기가 빠르다', big: '달리기가 가장 빠른', small: '달리기가 가장 느린' },
+      ]);
+      var stmts = [];
+      for (var i = 0; i < N - 1; i++) stmts.push(josa(ord[i], '은', '는') + ' ' + ord[i + 1] + '보다 ' + rel.st + '.');
+      facts = shuffle(stmts);
+      var askMax = ri(2);
+      ask = '다음 중 ' + (askMax ? rel.big : rel.small) + ' 사람은?';
+      ansVal = askMax ? ord[0] : ord[N - 1];
+      optList = shuffle(ord);
+    } else if (kind === 'syllog') {            // 삼단논법 (Barbara — 유효형만)
+      var pool = shuffle(['학생', '회원', '운동선수', '예술가', '시민', '직원', '전문가', '독서가', '채식주의자', '음악가']);
+      var A = pool[0], B = pool[1], C = pool[2];
+      facts = ['모든 ' + josa(A, '은', '는') + ' ' + josa(B, '이다', '다') + '.',
+               '모든 ' + josa(B, '은', '는') + ' ' + josa(C, '이다', '다') + '.'];
+      ask = '위 두 문장이 참일 때 반드시 참인 것은?';
+      ansVal = '모든 ' + josa(A, '은', '는') + ' ' + josa(C, '이다', '다') + '.';
+      optList = shuffle([ansVal,
+        '모든 ' + josa(C, '은', '는') + ' ' + josa(A, '이다', '다') + '.',
+        '어떤 ' + josa(A, '은', '는') + ' ' + josa(C, '이', '가') + ' 아니다.',
+        '모든 ' + josa(B, '은', '는') + ' ' + josa(A, '이다', '다') + '.']);
+    } else {                                   // 대우
+      var pr = pick([
+        { p: '비가 오면 길이 젖는다', dae: '길이 젖지 않으면 비가 오지 않는다', yeok: '길이 젖으면 비가 온다', i: '비가 오지 않으면 길이 젖지 않는다', un: '비가 오면 길이 마른다' },
+        { p: '합격하면 기뻐한다', dae: '기뻐하지 않으면 합격하지 않은 것이다', yeok: '기뻐하면 합격한 것이다', i: '합격하지 않으면 기뻐하지 않는다', un: '합격하면 슬퍼한다' },
+        { p: '운동하면 건강해진다', dae: '건강해지지 않으면 운동하지 않은 것이다', yeok: '건강해지면 운동한 것이다', i: '운동하지 않으면 건강해지지 않는다', un: '운동하면 피곤해진다' },
+        { p: '화요일이면 회의가 있다', dae: '회의가 없으면 화요일이 아니다', yeok: '회의가 있으면 화요일이다', i: '화요일이 아니면 회의가 없다', un: '화요일이면 쉬는 날이다' },
+        { p: '금속이면 전기가 통한다', dae: '전기가 통하지 않으면 금속이 아니다', yeok: '전기가 통하면 금속이다', i: '금속이 아니면 전기가 통하지 않는다', un: '금속이면 빛을 낸다' },
+      ]);
+      facts = ["'" + pr.p + "' 가 참이라고 하자."];
+      ask = '위 명제가 참일 때 반드시 참인 것은?';
+      ansVal = pr.dae;
+      optList = shuffle([pr.dae, pr.yeok, pr.i, pr.un]);
+    }
+
+    var answer = optList.indexOf(ansVal);
+    var stemHTML = '<div class="verbal-q"><div class="vq-facts">' +
+      facts.map(function (f) { return '<div>' + f + '</div>'; }).join('') +
+      '</div><div class="vq-ask">' + ask + '</div></div>';
+    return { type: 'verbal', difficulty: d, stemHTML: stemHTML, options: optList, answer: answer,
+      explain: '정답: ' + ansVal };
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  //  타입 6: 공간지각 (회전·대칭) — 비대칭 폴리오미노+마커.
+  //  5방위(0·90·180·270·거울)가 모두 distinct하도록 보장 → 모호성 0.
+  // ─────────────────────────────────────────────────────────────
+  function genSpatial(d) {
+    d = clamp(d, 1, 5);
+    var SHAPES = [
+      [[0, 0], [1, 0], [2, 0], [2, 1]],            // L
+      [[0, 0], [0, 1], [1, 1], [2, 1]],            // J
+      [[0, 1], [1, 1], [1, 0], [2, 0]],            // S
+      [[0, 0], [1, 0], [1, 1], [2, 1]],            // Z
+      [[0, 0], [1, 0], [2, 0], [2, 1], [2, 2]],    // 큰 L (펜토미노)
+      [[0, 0], [1, 0], [1, 1], [1, 2], [2, 2]],    // 계단
+      [[0, 0], [0, 1], [0, 2], [1, 2], [2, 2]],    // ㄴ
+    ];
+    function nrm(cs) {
+      var mx = Math.min.apply(null, cs.map(function (c) { return c[0]; })), my = Math.min.apply(null, cs.map(function (c) { return c[1]; }));
+      return cs.map(function (c) { return [c[0] - mx, c[1] - my]; });
+    }
+    function rot(cs) { return nrm(cs.map(function (c) { return [c[1], -c[0]]; })); }   // 시계 90°
+    function mir(cs) { return nrm(cs.map(function (c) { return [-c[0], c[1]]; })); }   // 좌우 반전
+    function fkey(cs, mi) { return cs.map(function (c) { return c.join(','); }).sort().join(';') + '|' + cs[mi].join(','); }
+    function svg(cs, mi) {
+      var w = Math.max.apply(null, cs.map(function (c) { return c[0]; })) + 1;
+      var h = Math.max.apply(null, cs.map(function (c) { return c[1]; })) + 1;
+      var side = Math.max(w, h), S = 22, ox = (side - w) / 2, oy = (side - h) / 2, V = side * S, r = '';
+      cs.forEach(function (c, i) {
+        var x = (c[0] + ox) * S, y = (c[1] + oy) * S, mk = (i === mi);
+        r += '<rect x="' + (x + 2) + '" y="' + (y + 2) + '" width="' + (S - 4) + '" height="' + (S - 4) + '" rx="3" fill="' + (mk ? '#5b6cff' : '#fff') + '" stroke="' + (mk ? '#5b6cff' : '#2a3057') + '" stroke-width="2"/>';
+      });
+      return '<svg class="cellsvg" viewBox="0 0 ' + V + ' ' + V + '">' + r + '</svg>';
+    }
+
+    var oris, mi, tries = 0;
+    do {
+      var sh = pick(SHAPES).map(function (c) { return c.slice(); });
+      mi = ri(sh.length);
+      var ir = ri(4); for (var k = 0; k < ir; k++) sh = rot(sh);
+      if (ri(2)) sh = mir(sh);
+      oris = [sh, rot(sh), rot(rot(sh)), rot(rot(rot(sh))), mir(sh)];   // 0·90·180·270·거울
+      tries++;
+    } while (tries < 25 && (function () { var s = {}; for (var j = 0; j < 5; j++) s[fkey(oris[j], mi)] = 1; return Object.keys(s).length !== 5; })());
+
+    var kind = d <= 2 ? 'rotate' : pick(['rotate', 'mirror', 'rotate']);
+    var deg = pick([90, 180, 270]), correctOri, ask;
+    if (kind === 'mirror') { correctOri = 4; ask = '위 도형을 좌우로 뒤집으면(거울상)?'; }
+    else { correctOri = deg / 90; ask = '위 도형을 시계 방향으로 ' + deg + '° 돌리면?'; }
+
+    var order = shuffle([0, 1, 2, 3, 4]);
+    var optHTML = order.map(function (i) { return svg(oris[i], mi); });
+    var answer = order.indexOf(correctOri);
+    var stemHTML = '<div class="sp-q"><div class="sp-fig">' + svg(oris[0], mi) + '</div><div class="sp-ask">' + ask + '</div></div>';
+    return { type: 'spatial', difficulty: d, stemHTML: stemHTML, options: optHTML, answer: answer,
+      explain: '파란 칸의 위치로 방향을 추적하면 정답을 찾을 수 있습니다.' };
   }
 
   // ── 디스패치 ──
-  var GEN = { matrix: genMatrix, sequence: genSequence, odd: genOdd };
+  var GEN = { matrix: genMatrix, sequence: genSequence, odd: genOdd, calc: genCalc, verbal: genVerbal, spatial: genSpatial };
   function generate(type, difficulty) {
-    if (type === 'mixed' || !GEN[type]) type = pick(['matrix', 'sequence', 'odd']);
+    if (type === 'mixed' || !GEN[type]) type = pick(Object.keys(GEN));
     return GEN[type](difficulty || 2);
   }
 
-  window.ENGINE = { generate: generate, types: ['matrix', 'sequence', 'odd'] };
+  window.ENGINE = { generate: generate, types: ['matrix', 'sequence', 'odd', 'calc', 'verbal', 'spatial'] };
 })();

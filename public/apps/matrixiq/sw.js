@@ -1,6 +1,6 @@
 /* 매트릭스아이큐 service worker — cache-first.
  * 배포 때마다 CACHE 버전을 올려야 갱신된다 (예: matrixiq-v2). */
-const CACHE = 'matrixiq-v2';
+const CACHE = 'matrixiq-v10';
 const ASSETS = [
   './', './index.html', './app.js', './engine.js', './data.js', './style.css',
   './manifest.json', './icon.svg',
