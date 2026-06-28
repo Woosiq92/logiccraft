@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>웨딩맵 — 전국 결혼식장 지도·견적 비교</title>
+<meta name="description" content="전국 결혼식장(민간·공공·호텔)을 지도에서 한눈에 보고, 받은 견적을 표로 비교해 정하는 도구. 가입·설치 없이 바로 사용." />
+<meta property="og:title" content="웨딩맵 — 전국 결혼식장 지도·견적 비교" />
+<meta property="og:description" content="지도에서 식장을 보고, 견적을 비교하고, 양가와 공유하세요." />
+<meta property="og:type" content="website" />
+<link rel="icon" href="/favicon.png" />
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+<script src="seoul-venues.js" onerror="window.__noBaked=1"></script>
+<script src="seoul-public-venues.js" onerror="window.__noPublic=1"></script>
+<script src="seoul-hotel-venues.js" onerror="window.__noHotel=1"></script>
+<script src="geo-sido.js" onerror="window.__noGeoSido=1"></script>
+<script src="geo-sigungu.js" onerror="window.__noGeoSgg=1"></script>
+<style>
+  :root{
+    --bg:#f4f3f0; --card:#fff; --surface:#faf9f7; --line:#e7e5e0; --line2:#dcdad4; --line3:#efeee9;
+    --ink:#1c1c1e; --ink2:#55555a; --mut:#8a8a8e; --mut2:#9a9a9e; --mut3:#c4c2bc;
+    --priv:#2563eb; --pub:#16a34a; --hot:#cfa233; --gold:#e0b54a; --low:#16a34a; --best:#2563eb;
+  }
+  *{box-sizing:border-box} html,body{margin:0}
+  body{background:var(--bg);color:var(--ink);font-family:Pretendard,-apple-system,BlinkMacSystemFont,sans-serif;font-feature-settings:'tnum';-webkit-font-smoothing:antialiased;padding-bottom:56px}
+  input,button,select,textarea{font-family:inherit} button{cursor:pointer} h1,h2,p{margin:0}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 28px}
+  header{background:#fff;border-bottom:1px solid var(--line)}
+  .crumb{display:flex;align-items:center;gap:9px;font-size:12.5px;letter-spacing:.04em;color:var(--mut);margin-bottom:14px}
+  .crumb b{color:var(--ink);font-weight:700}.crumb .sep{opacity:.5}
+  h1{font-size:clamp(23px,3.2vw,33px);font-weight:800;letter-spacing:-.02em;line-height:1.2}
+  .sub{margin-top:12px;font-size:clamp(14px,1.6vw,16px);line-height:1.6;color:var(--ink2);max-width:780px}
+  .legend-row{display:flex;flex-wrap:wrap;gap:18px;margin-top:18px}
+  .lg{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink2)}
+  .lg i{width:10px;height:10px;border-radius:50%;display:inline-block}
+  .tool{display:flex;flex-wrap:wrap;gap:18px;align-items:flex-start;padding-top:16px}
+  .filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;background:#fff;border:1px solid var(--line);border-radius:14px;padding:13px 18px;margin-top:24px}
+  .fb-group{display:flex;align-items:center;gap:8px}
+  .fb-lbl{font-size:12.5px;font-weight:600;color:var(--ink2);white-space:nowrap}
+  .fb-sep{width:1px;align-self:stretch;background:var(--line)}
+  .filterbar select{width:auto;min-width:126px}
+  .catbar{display:flex;gap:6px}
+  .catbtn{display:flex;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:7px 11px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+  .catbtn i{width:9px;height:9px;border-radius:50%}
+  .catbtn b{font-weight:700;color:var(--mut2);font-variant-numeric:tabular-nums}
+  .catbtn.on{background:#fff;border-color:var(--ink);color:var(--ink)}
+  .catbtn.off{opacity:.55}.catbtn.off i{filter:grayscale(1)}
+  aside{flex:1 1 300px;min-width:268px;max-width:332px;display:flex;flex-direction:column;gap:16px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .ctitle{font-size:13px;font-weight:700;letter-spacing:.02em;color:var(--mut);text-transform:uppercase}
+  .flabel{font-size:12.5px;font-weight:600;color:var(--ink2);margin:18px 0 8px}.flabel:first-of-type{margin-top:0}
+  select,.inp{width:100%;border:1px solid var(--line2);border-radius:9px;padding:10px 12px;font-size:14px;background:var(--surface);color:var(--ink);font-weight:500}
+  select{appearance:none;-webkit-appearance:none;padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239a9a9e' fill='none' stroke-width='1.5'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center}
+  .sel-row{display:flex;gap:8px}
+  .price-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:5px}
+  .pbtn{border:1px solid var(--line2);background:var(--surface);border-radius:8px;padding:8px 2px;font-size:12px;font-weight:600;color:var(--ink2)}
+  .pbtn.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .guest{display:flex;align-items:center;gap:8px}.guest span{font-size:13px;color:var(--mut)}
+  .guest input{flex:1;text-align:right;font-variant-numeric:tabular-nums;padding:9px 12px;font-size:13.5px}
+  .note{margin-top:12px;font-size:11.5px;line-height:1.5;color:#9a8a4a;background:#fbf6e8;border:1px solid #f0e6c8;border-radius:9px;padding:9px 11px}
+  .dong-h{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+  .dong-cap{font-size:11.5px;color:var(--mut2)}
+  .dong-list{display:flex;flex-direction:column;gap:11px}
+  .dong-row .t{display:flex;align-items:center;justify-content:space-between;margin-bottom:5px}
+  .dong-row .t b{font-size:13.5px;font-weight:600}.dong-row .t span{font-size:12.5px;color:var(--mut2);font-variant-numeric:tabular-nums}
+  .bar{display:flex;height:7px;border-radius:4px;overflow:hidden;background:#f0efeb}
+  #guListBody{max-height:340px;overflow-y:auto}
+  .glrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line3)}
+  .glrow:last-child{border-bottom:none}
+  .gl-l{display:flex;align-items:center;gap:8px;min-width:0}
+  .gl-nm{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:165px}
+  .gl-sub{font-size:11px;color:var(--mut2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:165px}
+  .gl-add{flex:0 0 auto;border:1px solid var(--line2);background:#fff;border-radius:7px;padding:5px 10px;font-size:12px;font-weight:600;color:var(--ink)}
+  .catdot{width:9px;height:9px;border-radius:50%;flex:0 0 auto}
+  .gl-empty{padding:22px 6px;text-align:center;font-size:12.5px;line-height:1.6;color:var(--mut2)}
+  .wbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px 16px;padding:12px 22px;border-bottom:1px solid var(--line3);background:var(--surface)}
+  .wbar .wb-h{font-size:12.5px;font-weight:700;color:var(--ink2)}
+  .wb-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)}
+  .wb-item select{padding:5px 8px;font-size:12px;border:1px solid var(--line2);border-radius:7px;background:#fff;color:var(--ink)}
+  .mapsec{flex:3 1 480px;min-width:300px}
+  #mapwrap{position:relative;width:100%;height:clamp(460px,64vh,700px);border-radius:16px;overflow:hidden;border:1px solid #e3e1db;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04),0 10px 30px -12px rgba(40,50,40,.18)}
+  #board{position:absolute;inset:0;width:100%;height:100%;display:block}
+  .region{cursor:pointer;stroke-linejoin:round}
+  .region:hover{stroke:#1c1c1e !important;stroke-width:1.4 !important}
+  .vdot{cursor:pointer}
+  #lblHost{position:absolute;inset:0;pointer-events:none}
+  .lbl{position:absolute;transform:translate(-50%,-50%);text-align:center;white-space:nowrap}
+  .lbl .n{display:inline-block;background:#fff;color:#1c1c1e;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;padding:1px 9px;border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,.22)}
+  .lbl .nm{font-size:11px;color:#55555a;font-weight:500;margin-top:2px;text-shadow:0 0 3px #fff,0 0 3px #fff}
+  .ov{position:absolute;z-index:6}
+  .chips{left:14px;top:14px;display:flex;gap:7px;flex-wrap:wrap;max-width:calc(100% - 28px)}
+  .chip{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.07)}
+  .chip i{width:9px;height:9px;border-radius:50%}.chip .cnt{font-size:11px;color:var(--mut2);font-variant-numeric:tabular-nums}
+  .chip.off{opacity:1;background:rgba(244,243,240,.95);color:var(--mut2)}.chip.off i{filter:grayscale(1);opacity:.5}
+  .sethome{right:14px;top:14px;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:600;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .sethome.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .backbtn{left:14px;top:14px;display:none;background:rgba(255,255,255,.95);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-size:12.5px;font-weight:700;color:var(--ink);box-shadow:0 2px 8px rgba(0,0,0,.08)}
+  .legend{left:14px;bottom:14px;background:rgba(255,255,255,.94);border:1px solid var(--line);border-radius:11px;padding:11px 13px;box-shadow:0 2px 10px rgba(0,0,0,.06)}
+  .legend .h{font-size:10.5px;font-weight:700;color:var(--mut);margin-bottom:6px;letter-spacing:.04em}
+  .legend .l{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--ink2);margin-top:6px}
+  .legend .l i{width:12px;height:12px;border-radius:50%}
+  .hint{left:50%;bottom:14px;transform:translateX(-50%);background:rgba(255,255,255,.93);color:#1c1c1e;font-size:11px;font-weight:600;padding:6px 13px;border-radius:999px;pointer-events:none;box-shadow:0 2px 10px rgba(0,0,0,.1)}
+  .btip{position:absolute;pointer-events:none;background:rgba(28,28,30,.92);color:#fff;font-size:11.5px;font-weight:600;padding:6px 10px;border-radius:8px;transform:translate(-50%,calc(-100% - 10px));white-space:nowrap;z-index:8;box-shadow:0 2px 10px rgba(0,0,0,.25);display:none}
+  .btip b{font-weight:800}.btip .br{margin-top:3px;font-size:10.5px;font-weight:600;opacity:.95}
+  .vpop{position:absolute;transform:translate(-50%,calc(-100% - 14px));z-index:9;background:#fff;border-radius:13px;box-shadow:0 8px 30px rgba(0,0,0,.2);padding:13px 15px;width:212px;display:none}
+  .vpop .x{position:absolute;top:8px;right:8px;width:22px;height:22px;border:none;background:#f0efeb;border-radius:6px;color:#8a8a8e;font-size:13px}
+  .pp .chip2{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .pp .nm{font-size:15.5px;font-weight:800;letter-spacing:-.01em;margin:7px 0 3px;padding-right:16px}
+  .pp .loc{font-size:12px;color:var(--mut)}
+  .pp .rows{display:flex;flex-direction:column;gap:7px;padding:10px 0;border-top:1px solid var(--line3);border-bottom:1px solid var(--line3);margin:10px 0}
+  .pp .rows .r{display:flex;justify-content:space-between;font-size:12px}.pp .rows .r .k{color:var(--mut2)}.pp .rows .r .v{font-weight:700}
+  .pp .add{width:100%;border:none;background:var(--ink);color:#fff;font-weight:700;font-size:13px;padding:10px;border-radius:9px}
+  .cmp{margin-top:30px;background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .cmp-h{padding:20px 22px;display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line3)}
+  .cmp-h h2{font-size:19px;font-weight:800;letter-spacing:-.01em}.cmp-h p{margin-top:5px;font-size:13px;color:var(--mut)}
+  .seg{display:flex;background:var(--bg);border-radius:9px;padding:3px;gap:2px}
+  .seg button{border:none;background:transparent;border-radius:7px;padding:7px 11px;font-size:12.5px;font-weight:600;color:var(--ink2)}
+  .seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+  .addbtn{border:1px solid var(--line2);background:#fff;border-radius:9px;padding:8px 13px;font-size:13px;font-weight:600;color:var(--ink)}
+  .tbl-scroll{overflow-x:auto}
+  table.t{width:100%;border-collapse:collapse;min-width:780px}
+  table.t th{text-align:left;padding:13px 14px;font-size:11.5px;font-weight:700;color:var(--mut2);letter-spacing:.03em;background:var(--surface)}
+  table.t th:first-child{padding-left:22px}
+  table.t td{padding:12px 14px;border-top:1px solid var(--line3);vertical-align:middle}table.t td:first-child{padding-left:22px}
+  table.t tr.row{cursor:pointer}table.t tr.row:hover td{background:#fcfbf9}
+  .r-name{font-size:14.5px;font-weight:700;letter-spacing:-.01em}.r-loc{font-size:11.5px;color:var(--mut2)}
+  .r-dot{width:11px;height:11px;border-radius:50%;flex:0 0 auto}
+  .chip2{display:inline-block;font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:999px}
+  .num{text-align:right;font-variant-numeric:tabular-nums}.total{font-size:15.5px;font-weight:800}
+  .badge-low{font-size:10px;font-weight:700;color:var(--low);margin-top:1px}.badge-best{font-size:10px;font-weight:700;color:var(--best);margin-top:1px}
+  .stars{color:var(--gold);font-size:13px;letter-spacing:1px}
+  .rm{width:26px;height:26px;border:none;background:transparent;color:var(--mut3);font-size:16px;border-radius:6px}
+  .empty{padding:48px 22px;text-align:center;color:var(--mut2);font-size:14px}
+  #formWrap{position:fixed;inset:0;z-index:1200;display:none}#formWrap.open{display:block}
+  #formMask{position:absolute;inset:0;background:rgba(28,28,30,.38);animation:fadeIn .2s ease}
+  #formPanel{position:absolute;top:0;right:0;height:100%;width:min(440px,100%);background:#fff;box-shadow:-8px 0 40px rgba(0,0,0,.18);animation:slideIn .28s cubic-bezier(.32,.72,0,1);display:flex;flex-direction:column}
+  @keyframes slideIn{from{transform:translateX(100%)}to{transform:translateX(0)}}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .fp-h{padding:20px 22px;border-bottom:1px solid var(--line3);display:flex;align-items:flex-start;justify-content:space-between}
+  .fp-h .k{font-size:12px;font-weight:700;color:var(--mut);letter-spacing:.03em;margin-bottom:5px}.fp-h .nm{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .x{border:none;background:#f0efeb;border-radius:8px;color:var(--mut);font-size:17px;width:30px;height:30px}
+  .fp-body{flex:1;overflow-y:auto;padding:20px 22px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{margin-bottom:16px}
+  .field label,.flab{display:block;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:6px}.field .inp,.field select{font-size:13.5px;padding:9px 12px}
+  .totbox{background:var(--ink);border-radius:13px;padding:16px 18px;margin:4px 0 18px;color:#fff}
+  .totbox .k{font-size:12px;color:#a8a8ac;margin-bottom:6px}.totbox .v{font-size:30px;font-weight:800;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .axis{margin-bottom:14px}.axis .t{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}.axis .t b{font-size:13px;font-weight:600}
+  .axis .t .sc{display:flex;align-items:center;gap:8px}.axis .t .sc .stars{font-size:12px}.axis .t .sc .n{font-size:12.5px;font-weight:700;width:14px;text-align:right;font-variant-numeric:tabular-nums}
+  .axis input[type=range]{width:100%;accent-color:var(--ink)}.axis .w{display:flex;align-items:center;gap:9px;margin-top:5px}.axis .w span{font-size:11px;color:var(--mut2);white-space:nowrap}.axis .w input{flex:1;accent-color:var(--mut2)}
+  .fp-foot{padding:16px 22px;border-top:1px solid var(--line3);display:flex;gap:10px}
+  .fp-foot .cancel{flex:0 0 auto;border:1px solid var(--line2);background:#fff;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--ink2)}
+  .fp-foot .save{flex:1;border:none;background:var(--ink);color:#fff;border-radius:10px;padding:12px;font-size:14px;font-weight:700}
+  @media (max-width:760px){.wrap{padding:0 16px}aside{max-width:none}#mapwrap{height:56vh}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="wrap" style="padding-top:26px;padding-bottom:24px">
+      <div class="crumb"><img src="data:image/png;base64,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" alt="LogicCraft" style="height:22px;width:auto;display:block"/><span class="sep">/</span><span>웨딩맵</span></div>
+      <h1>전국 결혼식장, 지도에서 보고 견적으로 비교하기</h1>
+      <p class="sub">민간 예식장·공공예식장·호텔웨딩을 지역별로 한눈에 확인하고, 상담받은 견적을 표로 비교해 정합니다. 가입·설치 없이 바로 사용합니다.</p>
+      <div class="legend-row">
+        <div class="lg"><i style="background:var(--priv)"></i> 민간 예식장 <b id="cntPriv">–</b>곳</div>
+        <div class="lg"><i style="background:var(--pub)"></i> 공공예식장 <b id="cntPub">–</b>곳</div>
+        <div class="lg"><i style="background:var(--hot)"></i> 호텔웨딩 <b id="cntHot">–</b>곳</div>
+      </div>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <div class="filterbar">
+      <div class="fb-group"><span class="fb-lbl">지역</span>
+        <select id="sidoFilter"><option value="">전국 시·도</option></select>
+        <select id="guFilter"><option value="">전체 시·군·구</option></select></div>
+      <div class="fb-sep"></div>
+      <div class="fb-group"><span class="fb-lbl">종류</span>
+        <div id="catFilter" class="catbar"></div></div>
+      <div class="fb-sep"></div>
+      <div class="fb-group"><span class="fb-lbl">예상가격</span>
+        <select id="priceSel"><option value="">전체</option><option value="1000">1,000만원 이하</option><option value="2000">2,000만원 이하</option><option value="3000">3,000만원 이하</option><option value="5000">5,000만원 이하</option><option value="10000">1억원 이하</option><option value="over">1억원 이상</option></select></div>
+      <div class="fb-sep"></div>
+      <div class="fb-group"><span class="fb-lbl">하객수</span>
+        <select id="guestSel"><option value="">전체</option><option value="100">100명 이상</option><option value="150">150명 이상</option><option value="200">200명 이상</option><option value="250">250명 이상</option><option value="300">300명 이상</option><option value="400">400명 이상</option></select></div>
+    </div>
+    <div class="tool">
+      <aside>
+        <section class="card" id="guListCard" style="display:none">
+          <div class="dong-h"><div class="ctitle" id="guListTitle"></div><button id="guListClose" style="border:none;background:#f0efeb;border-radius:6px;width:24px;height:24px;color:#8a8a8e;font-size:13px">×</button></div>
+          <div id="guListBody"></div>
+        </section>
+        <section class="card">
+          <div class="dong-h"><div class="ctitle">지역별 분포</div><div class="dong-cap" id="dongCap"></div></div>
+          <div class="dong-list" id="dongList"></div>
+        </section>
+      </aside>
+
+      <section class="mapsec">
+        <div id="mapwrap">
+          <svg id="board"></svg>
+          <div id="lblHost"></div>
+          <button class="ov sethome" id="setHomeBtn">📍 거점 지정</button>
+          <button class="ov backbtn" id="backBtn">← 전국</button>
+          <div class="ov legend">
+            <div class="h">범례</div>
+            <div style="font-size:10.5px;color:var(--ink2);margin-bottom:4px">지역 식장 밀도 (클릭→세분화)</div>
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:9px">
+              <span style="font-size:9.5px;color:var(--mut2)">적음</span>
+              <span style="flex:1;height:8px;border-radius:4px;background:linear-gradient(90deg,#fdf0f5,#f9cfe1,#f1a1c4,#e36ba1,#cc347d)"></span>
+              <span style="font-size:9.5px;color:var(--mut2)">많음</span>
+            </div>
+            <div class="l"><i style="background:var(--priv)"></i> 민간 예식장</div>
+            <div class="l"><i style="background:var(--pub)"></i> 공공예식장</div>
+            <div class="l"><i style="background:var(--hot)"></i> 호텔웨딩</div>
+          </div>
+          <div class="ov hint" id="hint">시·도를 클릭하면 시·군·구로 세분화돼요</div>
+          <div class="btip" id="btip"></div>
+          <div class="vpop" id="vpop"></div>
+        </div>
+      </section>
+    </div>
+
+    <section class="cmp">
+      <div class="cmp-h">
+        <div><h2>견적 비교표</h2><p>담은 후보 <span id="rowCount">0</span>곳 · <span style="color:var(--low);font-weight:600">초록=최저 총비용</span> · <span style="color:var(--best);font-weight:600">파랑=최고 점수</span></p></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+          <span style="font-size:12.5px;color:var(--mut2)">정렬</span>
+          <div class="seg" id="sortSeg"><button data-sort="cost" class="on">총비용</button><button data-sort="score">점수</button><button data-sort="dist">거리</button></div>
+          <button class="addbtn" id="blankAdd">+ 직접 입력</button>
+          <button class="addbtn" id="shareBtn">🔗 공유 링크</button>
+          <button class="addbtn" id="exportBtn">⤓ 내보내기</button>
+          <button class="addbtn" id="importBtn">⤒ 불러오기</button>
+          <input type="file" id="importFile" accept="application/json" style="display:none">
+        </div>
+      </div>
+      <div class="wbar" id="weightBar"></div>
+      <div class="tbl-scroll" id="tblScroll"></div>
+    </section>
+  </div>
+
+  <div id="formWrap"><div id="formMask"></div><div id="formPanel">
+    <div class="fp-h"><div><div class="k">견적 입력</div><div class="nm" id="fpTitle">새 후보</div></div><button class="x" id="fpClose">×</button></div>
+    <div class="fp-body">
+      <input type="hidden" id="f_id"/><input type="hidden" id="f_lat"/><input type="hidden" id="f_lng"/>
+      <div class="grid2" style="margin-bottom:16px">
+        <div><label class="flab">분류</label><select id="f_cat"><option>민간</option><option>공공</option><option>호텔</option><option>직접</option></select></div>
+        <div><label class="flab">홀 타입</label><input id="f_type" class="inp" placeholder="채플 / 컨벤션 등"/></div>
+      </div>
+      <div class="field"><label>식장명 · 위치</label><input id="f_name" class="inp" placeholder="식장명" style="margin-bottom:7px"/><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><div id="f_loc" style="font-size:12px;color:var(--mut2)"></div><a id="f_naver" href="#" target="_blank" rel="noopener" style="font-size:12px;font-weight:600;color:var(--priv);white-space:nowrap;display:none">네이버지도 ↗</a></div></div>
+      <div class="grid2" style="margin-bottom:14px">
+        <div><label class="flab">대관료 (원)</label><input id="f_rent" class="inp num" inputmode="numeric" placeholder="0"/></div>
+        <div><label class="flab">식대 단가 (원)</label><input id="f_meal" class="inp num" inputmode="numeric" placeholder="0"/></div>
+        <div><label class="flab">최소 보증인원</label><input id="f_guar" class="inp num" inputmode="numeric" placeholder="0"/></div>
+        <div><label class="flab">기타·숨은비용 (원)</label><input id="f_etc" class="inp num" inputmode="numeric" placeholder="0"/></div>
+      </div>
+      <div class="totbox"><div class="k">예상 총비용 = 대관료 + 식대단가 × 보증인원 + 기타</div><div class="v" id="f_total">₩0</div></div>
+      <div style="font-size:12.5px;font-weight:700;color:var(--ink2);margin-bottom:4px">만족도 (1~5점)</div>
+      <div style="font-size:11.5px;color:var(--mut2);margin-bottom:12px">우선순위(가중치)는 비교표 위에서 한 번만 정하면 모든 후보에 적용돼요.</div>
+      <div id="axes"></div>
+      <div class="field" style="margin-bottom:8px"><label>상담 메모</label><textarea id="f_note" class="inp" rows="3" placeholder="주차, 식순, 보증 조건 등" style="resize:vertical;line-height:1.5"></textarea></div>
+    </div>
+    <div class="fp-foot"><button class="cancel" id="fpCancel">취소</button><button class="save" id="fpSave">저장</button></div>
+  </div></div>
+
+<script>
+// ===== 상수/데이터 =====
+const CATCOL={민간:'#2563eb',공공:'#16a34a',호텔:'#cfa233',직접:'#9a9a9e'};
+const CATTINT={민간:'#dbe6fb',공공:'#dde9d3',호텔:'#f0e6c8',직접:'#ececec'};
+const CHORO=['#fdf0f5','#f9cfe1','#f1a1c4','#e36ba1','#cc347d'];  // 분홍(로즈) 5단계
+const SIDO_SHORT={'서울특별시':'서울','부산광역시':'부산','대구광역시':'대구','인천광역시':'인천','광주광역시':'광주','대전광역시':'대전','울산광역시':'울산','세종특별자치시':'세종','경기도':'경기','강원특별자치도':'강원','충청북도':'충북','충청남도':'충남','전북특별자치도':'전북','전라남도':'전남','경상북도':'경북','경상남도':'경남','제주특별자치도':'제주'};
+const SIDO_BY_CODE={'11':'서울특별시','21':'부산광역시','22':'대구광역시','23':'인천광역시','24':'광주광역시','25':'대전광역시','26':'울산광역시','29':'세종특별자치시','31':'경기도','32':'강원특별자치도','33':'충청북도','34':'충청남도','35':'전북특별자치도','36':'전라남도','37':'경상북도','38':'경상남도','39':'제주특별자치도'};
+const won=n=>'₩'+(Number(n)||0).toLocaleString('ko-KR');
+function haversine(a,b){const R=6371,dLat=(b.lat-a.lat)*Math.PI/180,dLng=(b.lng-a.lng)*Math.PI/180;const s=Math.sin(dLat/2)**2+Math.cos(a.lat*Math.PI/180)*Math.cos(b.lat*Math.PI/180)*Math.sin(dLng/2)**2;return R*2*Math.atan2(Math.sqrt(s),Math.sqrt(1-s));}
+const GEO_SIDO=window.GEO_SIDO||{features:[]}, GEO_SGG=window.GEO_SGG||{features:[]};
+
+const HOME={lat:37.54945,lng:126.91363};
+{const _h=JSON.parse(localStorage.getItem('wv_home')||'null'); if(_h){HOME.lat=_h.lat;HOME.lng=_h.lng;}}
+function saveHome(){localStorage.setItem('wv_home',JSON.stringify({lat:HOME.lat,lng:HOME.lng}));}
+
+const allVenues=(window.SEOUL_VENUES||[]).map(v=>({name:v.n||'예식장',addr:v.addr||'',sido:v.sido||'서울특별시',gu:v.gu||'기타',lat:+v.lat,lng:+v.lng})).filter(v=>isFinite(v.lat)&&isFinite(v.lng));
+const publicVenues=(window.SEOUL_PUBLIC_VENUES||[]).map(v=>({name:v.n||'공공예식장',addr:v.addr||'',sido:v.sido||'서울특별시',gu:v.gu||'기타',lat:+v.lat,lng:+v.lng,priceText:v.priceText,priceNum:v.priceNum,capMin:v.capMin,capMax:v.capMax,parking:v.parking,htype:v.htype,tier:v.tier})).filter(v=>isFinite(v.lat)&&isFinite(v.lng));
+const hotelVenues=(window.SEOUL_HOTEL_VENUES||[]).map(v=>({name:v.n||'호텔',sido:v.sido||'서울특별시',gu:v.gu||'기타',lat:+v.lat,lng:+v.lng,tier:v.tier||'고가'})).filter(v=>isFinite(v.lat)&&isFinite(v.lng));
+document.getElementById('cntPriv').textContent=allVenues.length;
+document.getElementById('cntPub').textContent=publicVenues.length;
+document.getElementById('cntHot').textContent=hotelVenues.length;
+
+const state={showPriv:true,showPub:true,showHot:true};
+// 추정 시세(만원) — 식장별 실값 아님, 분류×지역 거친 추정. 핵심상권 민간은 상향.
+const CORE_GU=new Set(['강남구','서초구','용산구','송파구']);
+function estBand(v,cat){
+  if(cat==='호텔') return [6000,12000];
+  if(cat==='공공') return [500,1500];
+  if(v.sido==='서울특별시'&&CORE_GU.has(v.gu)) return [2500,4000];
+  return [1500,2500];
+}
+const manWon=n=>n>=10000?((n%10000?(n/10000).toFixed(1):n/10000)+'억'):n.toLocaleString('ko-KR')+'만';
+const estText=(v,cat)=>{const b=estBand(v,cat);return `${manWon(b[0])}~${manWon(b[1])}원`;};
+const guestMin=()=>+(document.getElementById('guestSel')||{}).value||0;
+function passFilters(v,cat){
+  const pv=(document.getElementById('priceSel')||{}).value||'';
+  if(pv==='over'){ if(estBand(v,cat)[1]<10000) return false; }            // 1억원 이상(상한이 1억↑=호텔)
+  else if(+pv && estBand(v,cat)[0]>+pv) return false;                      // ~이하(하한 기준)
+  const gm=guestMin(); if(gm&&cat!=='민간'&&!(v.capMax!=null&&v.capMax>=gm)) return false;  // 민간 수용 미상→통과
+  return true;
+}
+function venuesForBoard(){
+  const out=[];
+  if(state.showPriv) allVenues.forEach(v=>{if(passFilters(v,'민간'))out.push({v,cat:'민간'});});
+  if(state.showPub) publicVenues.forEach(v=>{if(passFilters(v,'공공'))out.push({v,cat:'공공'});});
+  if(state.showHot) hotelVenues.forEach(v=>{if(passFilters(v,'호텔'))out.push({v,cat:'호텔'});});
+  return out;
+}
+
+// ===== 지오메트리 / polylabel =====
+function ringsOf(f){return f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates;}
+function ringArea(r){let s=0;for(let i=0,j=r.length-1;i<r.length;j=i++)s+=(r[j][0]*r[i][1]-r[i][0]*r[j][1]);return Math.abs(s/2);}
+const _LP={};
+function _seg(px,py,ax,ay,bx,by){const dx=bx-ax,dy=by-ay;let t=((px-ax)*dx+(py-ay)*dy)/((dx*dx+dy*dy)||1e-12);t=Math.max(0,Math.min(1,t));return Math.hypot(px-(ax+t*dx),py-(ay+t*dy));}
+function _inside(x,y,rings){let q=false;for(const r of rings)for(let i=0,j=r.length-1;i<r.length;j=i++){const xi=r[i][0],yi=r[i][1],xj=r[j][0],yj=r[j][1];if(((yi>y)!=(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))q=!q;}return q;}
+function _dist(x,y,rings){let d=1e9;for(const r of rings)for(let i=0,j=r.length-1;i<r.length;j=i++)d=Math.min(d,_seg(x,y,r[i][0],r[i][1],r[j][0],r[j][1]));return _inside(x,y,rings)?d:-d;}
+function labelPoint(f){
+  const key=(f.properties.code||'')+'|'+(f.properties.name||''); if(_LP[key])return _LP[key];
+  let rings,ba=-1; ringsOf(f).forEach(poly=>{const a=ringArea(poly[0]);if(a>ba){ba=a;rings=poly;}});
+  let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9; rings[0].forEach(([x,y])=>{mnx=Math.min(mnx,x);mxx=Math.max(mxx,x);mny=Math.min(mny,y);mxy=Math.max(mxy,y);});
+  let best=[(mnx+mxx)/2,(mny+mxy)/2],bd=-1e9,N=16;
+  for(let a=0;a<=N;a++)for(let b=0;b<=N;b++){const x=mnx+(mxx-mnx)*a/N,y=mny+(mxy-mny)*b/N;const dd=_dist(x,y,rings);if(dd>bd){bd=dd;best=[x,y];}}
+  let st=(mxx-mnx)/N/2;
+  for(let it=0;it<6;it++){for(const c of [[best[0]+st,best[1]],[best[0]-st,best[1]],[best[0],best[1]+st],[best[0],best[1]-st]]){const dd=_dist(c[0],c[1],rings);if(dd>bd){bd=dd;best=c;}}st/=2;}
+  _LP[key]=best; return best;
+}
+
+// ===== 투영 (geo→픽셀, 현재 뷰에 맞춤) =====
+let PX=null;
+function setProjection(feats,W,H,pad){
+  let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9;
+  feats.forEach(f=>ringsOf(f).forEach(poly=>poly.forEach(ring=>ring.forEach(([x,y])=>{mnx=Math.min(mnx,x);mxx=Math.max(mxx,x);mny=Math.min(mny,y);mxy=Math.max(mxy,y);}))));
+  const cl=Math.cos((mny+mxy)/2*Math.PI/180), gw=(mxx-mnx)*cl, gh=(mxy-mny);
+  const k=Math.min((W-2*pad)/gw,(H-2*pad)/gh);
+  PX={mnx,mxy,cl,k,ox:(W-gw*k)/2,oy:(H-gh*k)/2};
+}
+function project(lng,lat){return [PX.ox+(lng-PX.mnx)*PX.cl*PX.k, PX.oy+(PX.mxy-lat)*PX.k];}
+function unproject(px,py){return {lng:PX.mnx+(px-PX.ox)/(PX.cl*PX.k), lat:PX.mxy-(py-PX.oy)/PX.k};}
+function smoothRing(ring){
+  let P=ring.map(([lng,lat])=>project(lng,lat));
+  if(P.length>1&&P[0][0]===P[P.length-1][0]&&P[0][1]===P[P.length-1][1])P=P.slice(0,-1);
+  const m=P.length; if(m<3)return 'M'+P.map(p=>p[0].toFixed(1)+' '+p[1].toFixed(1)).join('L')+'Z';
+  const t=0.6; let d=`M${P[0][0].toFixed(1)} ${P[0][1].toFixed(1)}`;
+  for(let i=0;i<m;i++){const p0=P[(i-1+m)%m],p1=P[i],p2=P[(i+1)%m],p3=P[(i+2)%m];
+    const c1x=p1[0]+(p2[0]-p0[0])/6*t,c1y=p1[1]+(p2[1]-p0[1])/6*t,c2x=p2[0]-(p3[0]-p1[0])/6*t,c2y=p2[1]-(p3[1]-p1[1])/6*t;
+    d+=`C${c1x.toFixed(1)} ${c1y.toFixed(1)} ${c2x.toFixed(1)} ${c2y.toFixed(1)} ${p2[0].toFixed(1)} ${p2[1].toFixed(1)}`;}
+  return d+'Z';
+}
+function pathD(f){let d='';ringsOf(f).forEach(poly=>poly.forEach(ring=>{ring.forEach(([lng,lat],i)=>{const p=project(lng,lat);d+=(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1);});d+='Z';}));return d;}
+
+// ===== 뷰 / 렌더 =====
+let view={level:'nation',sido:null}, selectedGu=null;
+let dotList=[];
+function guVenues(sido,gu){const out=[];
+  if(state.showPriv)allVenues.filter(v=>v.sido===sido&&v.gu===gu&&passFilters(v,'민간')).forEach(v=>out.push({v,cat:'민간'}));
+  if(state.showPub)publicVenues.filter(v=>v.sido===sido&&v.gu===gu&&passFilters(v,'공공')).forEach(v=>out.push({v,cat:'공공'}));
+  if(state.showHot)hotelVenues.filter(v=>v.sido===sido&&v.gu===gu&&passFilters(v,'호텔')).forEach(v=>out.push({v,cat:'호텔'}));
+  return out;}
+function renderGuList(){
+  const card=document.getElementById('guListCard'),close=document.getElementById('guListClose');
+  card.style.display='';
+  if(view.level!=='province'||!selectedGu){
+    document.getElementById('guListTitle').textContent='예식장 목록'; close.style.display='none';
+    document.getElementById('guListBody').innerHTML=`<div class="gl-empty">${view.level==='nation'?'지도에서 시·도를 누른 뒤<br>구를 선택하면 예식장 목록이 떠요.':'지도에서 구를 클릭하면<br>그 구의 예식장 목록이 떠요.'}</div>`;
+    return;
+  }
+  close.style.display='';
+  const list=guVenues(view.sido,selectedGu);
+  document.getElementById('guListTitle').textContent=`${selectedGu} 예식장 ${list.length}곳`;
+  document.getElementById('guListBody').innerHTML=list.length?list.map((it,i)=>{const v=it.v,cat=it.cat;
+    return `<div class="glrow"><div class="gl-l"><span class="catdot" style="background:${CATCOL[cat]}"></span><div style="min-width:0"><div class="gl-nm">${v.name}</div><div class="gl-sub">${haversine(HOME,v).toFixed(1)}km · 추정 ${estText(v,cat)}</div></div></div><button class="gl-add" data-i="${i}">담기</button></div>`;}).join(''):'<div class="dong-cap" style="padding:8px 0">표시할 식장이 없습니다.</div>';
+  card.querySelectorAll('.gl-add').forEach(b=>b.onclick=()=>{const it=list[+b.dataset.i],v=it.v;addFromVenue({lat:v.lat,lng:v.lng,name:v.name,cat:it.cat,sido:v.sido,addr:v.sido+' '+v.gu,rent:v.priceNum,cap:v.capMax,capMin:v.capMin,priceText:v.priceText,est:estText(v,it.cat),htype:v.htype,park:v.parking?'가능':''});});
+  card.style.display='';
+}
+document.getElementById('guListClose').onclick=()=>{selectedGu=null;document.getElementById('guFilter').value='';renderGuList();render();};
+const svg=document.getElementById('board'), lblHost=document.getElementById('lblHost');
+function render(){
+  if(!GEO_SIDO.features.length){svg.innerHTML='<text x=20 y=40 fill=#999>지역 데이터 로딩 실패</text>';return;}
+  const wrap=document.getElementById('mapwrap'),W=wrap.clientWidth; lblHost.innerHTML=''; dotList=[];
+  const bv=venuesForBoard();
+  let feats,keyOf,nameOf,cnt={};
+  if(view.level==='nation'){
+    feats=GEO_SIDO.features; keyOf=f=>SIDO_BY_CODE[f.properties.code]; nameOf=f=>SIDO_SHORT[SIDO_BY_CODE[f.properties.code]]||'';
+    bv.forEach(it=>cnt[it.v.sido]=(cnt[it.v.sido]||0)+1);
+  }else{
+    feats=GEO_SGG.features.filter(f=>SIDO_BY_CODE[(f.properties.code||'').slice(0,2)]===view.sido);
+    keyOf=f=>f.properties.name; nameOf=f=>f.properties.name;
+    bv.filter(it=>it.v.sido===view.sido).forEach(it=>cnt[it.v.gu]=(cnt[it.v.gu]||0)+1);
+  }
+  let use=feats, useGu=null;
+  if(view.level==='province'){   // 외딴 섬 구(강화·옹진 등) 제외, 본토 구만
+    const med=a=>{const b=[...a].sort((p,q)=>p-q);return b[b.length>>1];};
+    const cs=feats.map(f=>{const lp=labelPoint(f);return {f,x:lp[0],y:lp[1]};});
+    const mx=med(cs.map(c=>c.x)),my=med(cs.map(c=>c.y));
+    const K=Math.max(0.25,med(cs.map(c=>Math.hypot(c.x-mx,c.y-my)))*2.5);
+    const kept=cs.filter(c=>Math.hypot(c.x-mx,c.y-my)<=K).map(c=>c.f);
+    if(kept.length){use=kept;useGu=new Set(kept.map(f=>f.properties.name));}
+  }
+  {let mnx=1e9,mny=1e9,mxx=-1e9,mxy=-1e9;
+   use.forEach(f=>ringsOf(f).forEach(poly=>poly.forEach(ring=>ring.forEach(([x,y])=>{mnx=Math.min(mnx,x);mxx=Math.max(mxx,x);mny=Math.min(mny,y);mxy=Math.max(mxy,y);}))));
+   const cl=Math.cos((mny+mxy)/2*Math.PI/180),gw=(mxx-mnx)*cl,gh=(mxy-mny),pad=22;
+   let k=(W-2*pad)/gw,H=Math.round(gh*k+2*pad); const maxH=Math.min(Math.round(window.innerHeight*0.82),760);
+   if(H>maxH){H=maxH;k=(H-2*pad)/gh;}
+   wrap.style.height=H+'px'; svg.setAttribute('viewBox',`0 0 ${W} ${H}`);
+   PX={mnx,mxy,cl,k,ox:(W-gw*k)/2,oy:(H-gh*k)/2};}
+  const vals=use.map(f=>cnt[keyOf(f)]||0).filter(x=>x>0).sort((a,b)=>a-b);
+  const colorFor=c=>{if(!c)return '#edebe7';const below=vals.filter(x=>x<c).length,p=vals.length?below/vals.length:0;return CHORO[Math.min(4,Math.floor(p*5))];};
+  const bd={}; bv.forEach(it=>{const k=view.level==='nation'?it.v.sido:(it.v.sido===view.sido?it.v.gu:null);if(k==null)return;(bd[k]=bd[k]||{민간:0,공공:0,호텔:0})[it.cat]++;});
+  let s='';
+  use.forEach((f,i)=>{const c=cnt[keyOf(f)]||0;const col=colorFor(c);const sel=view.level==='province'&&f.properties.name===selectedGu;
+    s+=`<path class="region" d="${pathD(f)}" fill="${col}" stroke="${sel?'#1c1c1e':'#ffffff'}" stroke-width="${sel?2.2:0.8}" data-i="${i}"/>`;});
+  if(view.level==='province'){
+    bv.filter(it=>it.v.sido===view.sido&&(!useGu||useGu.has(it.v.gu))).forEach(it=>{const p=project(it.v.lng,it.v.lat);dotList.push(it);s+=`<circle class="vdot" cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="3.8" fill="${CATCOL[it.cat]}" fill-opacity="0.92" stroke="#fff" stroke-width="1.2" data-d="${dotList.length-1}"/>`;});
+  }
+  candidates.forEach(c=>{const p=project(c.lng,c.lat);s+=`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="6" fill="${CATCOL[c.cat]||'#9a9a9e'}" stroke="#1c1c1e" stroke-width="2" opacity=".95"/>`;});
+  const hp=project(HOME.lng,HOME.lat);
+  s+=`<g transform="translate(${hp[0].toFixed(1)},${hp[1].toFixed(1)})"><circle r="11" fill="rgba(28,28,30,.16)"/><circle r="7" fill="#1c1c1e" stroke="#fff" stroke-width="3"/></g>`;
+  svg.innerHTML=s;
+  // labels
+  use.forEach(f=>{const c=cnt[keyOf(f)]||0;if(!c)return;const lp=labelPoint(f),p=project(lp[0],lp[1]);
+    const d=document.createElement('div');d.className='lbl';d.style.left=p[0]+'px';d.style.top=p[1]+'px';
+    d.innerHTML=`<div class="n">${c}</div><div class="nm">${nameOf(f)}</div>`;
+    if(view.level==='nation'){d.style.pointerEvents='auto';d.style.cursor='pointer';d.onclick=()=>{if(!setHomeMode)goView(SIDO_BY_CODE[f.properties.code]);};}
+    lblHost.appendChild(d);});
+  // events
+  svg.querySelectorAll('.region').forEach(el=>{const f=use[+el.dataset.i];
+    el.onmousemove=e=>showTip(e,f,keyOf,cnt,bd,nameOf);
+    el.onmouseleave=()=>document.getElementById('btip').style.display='none';
+    el.onclick=()=>{ if(setHomeMode)return; document.getElementById('btip').style.display='none';
+      if(view.level==='nation') goView(SIDO_BY_CODE[f.properties.code]);
+      else { selectedGu=f.properties.name; document.getElementById('guFilter').value=selectedGu; renderGuList(); render(); } };
+  });
+  svg.querySelectorAll('.vdot').forEach(el=>{el.onclick=ev=>{ev.stopPropagation();openVPop(dotList[+el.dataset.d],+el.getAttribute('cx'),+el.getAttribute('cy'));};});
+  document.getElementById('backBtn').style.display=view.level==='province'?'block':'none';
+}
+function showTip(e,f,keyOf,cnt,bd,nameOf){
+  const wrap=document.getElementById('mapwrap'),r=wrap.getBoundingClientRect(),t=document.getElementById('btip');
+  const k=keyOf(f),c=cnt[k]||0,b=bd[k]||{민간:0,공공:0,호텔:0};
+  t.innerHTML=`<b>${nameOf(f)} ${c}곳</b><div class="br"><span style="color:#7fb0ff">민간 ${b.민간}</span> · <span style="color:#74d39a">공공 ${b.공공}</span> · <span style="color:#e6c45f">호텔 ${b.호텔}</span></div>`;
+  t.style.left=(e.clientX-r.left)+'px'; t.style.top=(e.clientY-r.top)+'px'; t.style.display='block';
+}
+function goView(sido){view={level:'province',sido};selectedGu=null;document.getElementById('sidoFilter').value=sido;fillGu();applyMeta();render();renderGuList();}
+function goNation(){view={level:'nation',sido:null};selectedGu=null;document.getElementById('sidoFilter').value='';document.getElementById('guFilter').value='';fillGu();applyMeta();render();renderGuList();}
+document.getElementById('backBtn').onclick=goNation;
+
+// 식장 팝업
+function openVPop(it,cx,cy){
+  const v=it.v,cat=it.cat,col=CATCOL[cat],vp=document.getElementById('vpop');
+  let rows=`<div class="r"><span class="k">추정 시세</span><span class="v">${estText(v,cat)}</span></div><div class="r"><span class="k">거점에서 거리</span><span class="v">${haversine(HOME,v).toFixed(1)}km</span></div><div class="r"><span class="k">위치</span><a class="v" href="https://map.naver.com/p/search/${encodeURIComponent(v.name+' '+v.gu)}" target="_blank" rel="noopener" style="color:var(--priv);font-weight:700">네이버지도 ↗</a></div>`;
+  if(cat==='공공'){rows+=(v.priceText?`<div class="r"><span class="k">대관료</span><span class="v">${v.priceText}</span></div>`:'')+(v.capMax!=null?`<div class="r"><span class="k">수용</span><span class="v">~${v.capMax}명</span></div>`:'')+(v.parking?`<div class="r"><span class="k">주차</span><span class="v">가능</span></div>`:'')+(v.htype?`<div class="r"><span class="k">타입</span><span class="v">${v.htype}</span></div>`:'');}
+  vp.innerHTML=`<button class="x" onclick="document.getElementById('vpop').style.display='none'">×</button><div class="pp"><span class="chip2" style="background:${CATTINT[cat]};color:${col}">${cat}예식장</span><div class="nm">${v.name}</div><div class="loc">${v.sido} ${v.gu}</div><div class="rows">${rows}</div><button class="add" onclick='addFromVenue(${JSON.stringify({lat:v.lat,lng:v.lng,name:v.name,cat,sido:v.sido,addr:(v.sido+" "+v.gu),rent:v.priceNum,cap:v.capMax,capMin:v.capMin,priceText:v.priceText,est:estText(v,cat),htype:v.htype,park:v.parking?"가능":""}).replace(/'/g,"&#39;")})'>내 후보로 담기 →</button></div>`;
+  vp.style.left=cx+'px'; vp.style.top=cy+'px'; vp.style.display='block';
+}
+
+// 거점 지정
+let setHomeMode=false;
+document.getElementById('setHomeBtn').onclick=()=>{setHomeMode=!setHomeMode;document.getElementById('setHomeBtn').classList.toggle('on',setHomeMode);
+  document.getElementById('mapwrap').style.cursor=setHomeMode?'crosshair':'';document.getElementById('hint').textContent=setHomeMode?'지도를 눌러 거점을 지정하세요':'시·도를 클릭하면 시·군·구로 세분화돼요';};
+svg.addEventListener('click',e=>{ if(!setHomeMode)return; const r=svg.getBoundingClientRect(),ll=unproject(e.clientX-r.left,e.clientY-r.top);
+  HOME.lat=ll.lat;HOME.lng=ll.lng;saveHome();setHomeMode=false;document.getElementById('setHomeBtn').classList.remove('on');document.getElementById('mapwrap').style.cursor='';document.getElementById('hint').textContent='시·도를 클릭하면 시·군·구로 세분화돼요';render();renderCands();});
+
+// ===== 필터 메타(분포/칩/안내) =====
+function renderDong(){
+  const bv=venuesForBoard();
+  if(view.level==='nation'){
+    const by={};bv.forEach(it=>{const k=SIDO_SHORT[it.v.sido]||it.v.sido;(by[k]=by[k]||{p:0,u:0,h:0})[it.cat==='민간'?'p':it.cat==='공공'?'u':'h']++;});
+    paintDong(by,'시·도');
+  }else{
+    const by={};bv.filter(it=>it.v.sido===view.sido).forEach(it=>{(by[it.v.gu]=by[it.v.gu]||{p:0,u:0,h:0})[it.cat==='민간'?'p':it.cat==='공공'?'u':'h']++;});
+    paintDong(by,(SIDO_SHORT[view.sido]||view.sido)+' 시·군·구');
+  }
+}
+function paintDong(by,cap){
+  const arr=Object.entries(by).map(([k,c])=>[k,c,c.p+c.u+c.h]).sort((a,b)=>b[2]-a[2]).slice(0,9);
+  document.getElementById('dongCap').textContent=`${cap} 상위 ${arr.length}`;
+  document.getElementById('dongList').innerHTML=arr.map(([k,c,t])=>{const seg=(n,col)=>n?`<div style="width:${n/t*100}%;background:${col}"></div>`:'';
+    return `<div class="dong-row"><div class="t"><b>${k}</b><span>${t}곳</span></div><div class="bar">${seg(c.p,CATCOL.민간)}${seg(c.u,CATCOL.공공)}${seg(c.h,CATCOL.호텔)}</div></div>`;}).join('')||'<div class="dong-cap">표시할 지역이 없습니다.</div>';
+}
+function renderCatFilter(){
+  const defs=[['민간','showPriv',allVenues.length],['공공','showPub',publicVenues.length],['호텔','showHot',hotelVenues.length]];
+  document.getElementById('catFilter').innerHTML=defs.map(([lab,key,cnt])=>`<button class="catbtn ${state[key]?'on':'off'}" data-key="${key}"><i style="background:${CATCOL[lab]}"></i>${lab}<b>${cnt}</b></button>`).join('');
+  document.querySelectorAll('#catFilter .catbtn').forEach(b=>b.onclick=()=>{state[b.dataset.key]=!state[b.dataset.key];applyMeta();render();});
+}
+function applyMeta(){renderDong();renderCatFilter();}
+document.getElementById('priceSel').onchange=()=>{applyMeta();render();};
+document.getElementById('guestSel').onchange=()=>{applyMeta();render();};
+function fillGu(){const s=document.getElementById('sidoFilter').value,guSel=document.getElementById('guFilter');guSel.innerHTML='<option value="">전체 시·군·구</option>';
+  const all=[...allVenues,...publicVenues,...hotelVenues];[...new Set(all.filter(v=>!s||v.sido===s).map(v=>v.gu).filter(g=>g&&g!=='기타'))].sort((a,b)=>a.localeCompare(b,'ko')).forEach(g=>guSel.add(new Option(g,g)));}
+(function(){const all=[...allVenues,...publicVenues,...hotelVenues],sidoSel=document.getElementById('sidoFilter');
+  [...new Set(all.map(v=>v.sido).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'ko')).forEach(s=>sidoSel.add(new Option(s,s)));
+  fillGu();
+  sidoSel.onchange=()=>{const s=sidoSel.value; if(s) goView(s); else goNation();};
+  document.getElementById('guFilter').onchange=()=>{selectedGu=document.getElementById('guFilter').value||null;renderGuList();render();};
+})();
+window.addEventListener('resize',()=>render());
+
+// ===== 후보 / 비교표 =====
+const AX=[['loc','위치/접근'],['mood','분위기'],['fac','시설/서비스'],['conv','하객편의']];
+let candidates=JSON.parse(localStorage.getItem('wv_cands')||'[]');
+let weights=JSON.parse(localStorage.getItem('wv_weights')||'null')||{loc:1,mood:1,fac:1,conv:1};
+const saveWeights=()=>localStorage.setItem('wv_weights',JSON.stringify(weights));
+let sortKey='cost', selId=null, pendingSido=null;
+const saveLS=()=>localStorage.setItem('wv_cands',JSON.stringify(candidates));
+const total=c=>(+c.rent||0)+(+c.meal||0)*(+c.guar||0)+(+c.etc||0);
+function wscore(c){const s=c.scores||{},sw=AX.reduce((a,[k])=>a+(+weights[k]||0),0)||1;return AX.reduce((a,[k])=>a+(+s[k]||3)*(+weights[k]||0),0)/sw;}
+function renderWeights(){
+  document.getElementById('weightBar').innerHTML='<span class="wb-h">점수 우선순위</span>'+AX.map(([k,lab])=>`<span class="wb-item">${lab}<select data-w="${k}">${[[0,'무시'],[1,'보통'],[2,'중요'],[3,'매우 중요']].map(([v,t])=>`<option value="${v}" ${weights[k]===v?'selected':''}>${t}</option>`).join('')}</select></span>`).join('');
+  document.querySelectorAll('#weightBar select[data-w]').forEach(s=>s.onchange=()=>{weights[s.dataset.w]=+s.value;saveWeights();renderCands();});
+}
+const stars=n=>{const f=Math.round(n);return '★★★★★'.slice(0,f)+'☆☆☆☆☆'.slice(0,5-f);};
+function renderCands(){
+  document.getElementById('rowCount').textContent=candidates.length;
+  const host=document.getElementById('tblScroll');
+  if(!candidates.length){host.innerHTML='<div class="empty">지도에서 시·도→식장을 눌러 “담기”, 또는 “+ 직접 입력”으로 후보를 추가합니다.</div>';return;}
+  const arr=[...candidates].sort((a,b)=>sortKey==='cost'?total(a)-total(b):sortKey==='score'?wscore(b)-wscore(a):haversine(HOME,a)-haversine(HOME,b));
+  const minC=Math.min(...arr.map(total)),maxS=Math.max(...arr.map(wscore));
+  host.innerHTML=`<table class="t"><thead><tr><th>식장</th><th>분류</th><th class="num">총비용</th><th class="num">보증인원</th><th>점수</th><th class="num">거점에서</th><th></th></tr></thead><tbody>${
+    arr.map(c=>{const tc=total(c),sc=wscore(c),cat=c.cat||'직접';return `<tr class="row" data-id="${c.id}"><td><div style="display:flex;align-items:center;gap:10px"><span class="r-dot" style="background:${CATCOL[cat]}"></span><div><div class="r-name">${c.name}</div><div class="r-loc">${c.addr||''}</div></div></div></td><td><span class="chip2" style="background:${CATTINT[cat]};color:${CATCOL[cat]}">${cat}</span></td><td class="num"><div class="total">${tc?won(tc):'-'}</div>${tc&&tc===minC?'<div class="badge-low">최저</div>':''}</td><td class="num">${c.guar||'-'}</td><td><div style="display:flex;align-items:center;gap:7px"><span class="stars">${stars(sc)}</span><span style="font-size:13px;font-weight:700" class="num">${sc.toFixed(1)}</span></div>${sc===maxS?'<div class="badge-best">최고 점수</div>':''}</td><td class="num" style="color:var(--ink2)">${haversine(HOME,c).toFixed(1)}km</td><td style="text-align:right"><button class="rm" data-rm="${c.id}">×</button></td></tr>`;}).join('')
+  }</tbody></table>`;
+  host.querySelectorAll('tr.row').forEach(tr=>tr.onclick=e=>{if(e.target.dataset.rm)return;const c=candidates.find(x=>x.id===tr.dataset.id);selId=c.id;if(c.sido&&SIDO_SHORT[c.sido])goView(c.sido);openForm(c);});
+  host.querySelectorAll('[data-rm]').forEach(b=>b.onclick=e=>{e.stopPropagation();candidates=candidates.filter(c=>c.id!==b.dataset.rm);saveLS();renderCands();render();});
+}
+document.querySelectorAll('#sortSeg button').forEach(b=>b.onclick=()=>{sortKey=b.dataset.sort;document.querySelectorAll('#sortSeg button').forEach(x=>x.classList.toggle('on',x===b));renderCands();});
+
+// ===== 공유 / 백업 =====
+function appState(){return {v:1,cands:candidates,home:{lat:HOME.lat,lng:HOME.lng},weights};}
+function loadState(s){if(!s)return;if(Array.isArray(s.cands))candidates=s.cands;if(s.home&&isFinite(s.home.lat)){HOME.lat=s.home.lat;HOME.lng=s.home.lng;saveHome();}if(s.weights)weights={...weights,...s.weights};saveLS();saveWeights();}
+document.getElementById('exportBtn').onclick=()=>{const b=new Blob([JSON.stringify(appState())],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='웨딩홀-비교.json';a.click();};
+document.getElementById('importBtn').onclick=()=>document.getElementById('importFile').click();
+document.getElementById('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{loadState(JSON.parse(r.result));renderWeights();renderCands();render();alert('불러왔어요.');}catch(_){alert('파일을 읽을 수 없어요.');}e.target.value='';};r.readAsText(f);};
+document.getElementById('shareBtn').onclick=()=>{const d=btoa(unescape(encodeURIComponent(JSON.stringify(appState()))));const url=location.origin+location.pathname+'#d='+d;(navigator.clipboard?navigator.clipboard.writeText(url):Promise.reject()).then(()=>alert('공유 링크를 복사했어요.\n카톡 등으로 보내면 상대도 같은 후보·거점·우선순위를 봐요.'),()=>prompt('이 링크를 복사하세요:',url));};
+
+// ===== 폼 =====
+const F=id=>document.getElementById('f_'+id);
+function fTotal(){const t=(+F('rent').value||0)+(+F('meal').value||0)*(+F('guar').value||0)+(+F('etc').value||0);document.getElementById('f_total').textContent=won(t);}
+['rent','meal','guar','etc'].forEach(k=>F(k).addEventListener('input',fTotal));
+let curScores;
+function renderAxes(){document.getElementById('axes').innerHTML=AX.map(([k,lab])=>`<div class="axis"><div class="t"><b>${lab}</b><span class="sc"><span class="stars">${stars(curScores[k])}</span><span class="n">${curScores[k]}</span></span></div><input type="range" min="1" max="5" step="1" value="${curScores[k]}" data-s="${k}"/></div>`).join('');
+  document.querySelectorAll('#axes input[data-s]').forEach(i=>i.oninput=()=>{curScores[i.dataset.s]=+i.value;renderAxes();});}
+function openForm(c){
+  pendingSido=c?(c.sido||null):null;
+  document.getElementById('formWrap').classList.add('open');document.getElementById('fpTitle').textContent=c?c.name:'새 후보';
+  F('id').value=c?c.id:'';F('lat').value=c?c.lat:HOME.lat;F('lng').value=c?c.lng:HOME.lng;F('cat').value=c?(c.cat||'직접'):'직접';F('type').value=c?(c.hallType||''):'';
+  F('name').value=c?c.name:'';document.getElementById('f_loc').textContent=c?(c.addr||''):'';F('rent').value=c?(c.rent||''):'';F('meal').value=c?(c.meal||''):'';F('guar').value=c?(c.guar||''):'';F('etc').value=c?(c.etc||''):'';F('note').value=c?(c.memo||''):'';
+  curScores=c?{...c.scores}:{loc:3,mood:3,fac:3,conv:3};renderAxes();fTotal();
+  const nv=document.getElementById('f_naver'),nm=F('name').value.trim();
+  if(nm){nv.style.display='';nv.href='https://map.naver.com/p/search/'+encodeURIComponent(nm+' '+(document.getElementById('f_loc').textContent||''));}else nv.style.display='none';}
+const closeForm=()=>document.getElementById('formWrap').classList.remove('open');
+document.getElementById('fpClose').onclick=closeForm;document.getElementById('fpCancel').onclick=closeForm;document.getElementById('formMask').onclick=closeForm;
+document.getElementById('blankAdd').onclick=()=>openForm(null);
+document.getElementById('fpSave').onclick=()=>{const id=F('id').value||('c'+Date.now());
+  const c={id,name:F('name').value||'(이름없음)',cat:F('cat').value||'직접',hallType:F('type').value,addr:document.getElementById('f_loc').textContent,lat:+F('lat').value,lng:+F('lng').value,sido:pendingSido,rent:+F('rent').value||0,meal:+F('meal').value||0,guar:+F('guar').value||0,etc:+F('etc').value||0,scores:{...curScores},memo:F('note').value};
+  const i=candidates.findIndex(x=>x.id===id);if(i>=0)candidates[i]=c;else candidates.push(c);saveLS();closeForm();selId=c.id;renderCands();render();};
+window.addFromVenue=function(p){document.getElementById('vpop').style.display='none';
+  const ex=candidates.find(c=>c.name===p.name);if(ex){selId=ex.id;openForm(ex);return;}
+  openForm(null);pendingSido=p.sido||null;F('name').value=p.name;document.getElementById('f_loc').textContent=p.addr||'';F('cat').value=p.cat||'직접';F('lat').value=p.lat;F('lng').value=p.lng;
+  if(p.rent!=null)F('rent').value=p.rent;if(p.htype)F('type').value=/전통/.test(p.htype)?'전통':/야외/.test(p.htype)?'야외':p.htype;else if(p.cat==='호텔')F('type').value='호텔';
+  if(p.capMin!=null)F('guar').value=p.capMin;   // 보증인원 시작값=최소수용
+  const memo=[
+    p.est?`추정 시세 ${p.est}`:'',
+    (p.cat==='공공'&&p.priceText)?`대관료 ${p.priceText}`:'',
+    (p.capMin!=null||p.cap!=null)?`수용 ${p.capMin??''}${p.cap!=null?'~'+p.cap:''}명`:'',
+    p.park?`주차 ${p.park}`:''
+  ].filter(Boolean).join(' / ');
+  if(memo)F('note').value=memo;fTotal();
+  const nv=document.getElementById('f_naver');nv.style.display='';nv.href='https://map.naver.com/p/search/'+encodeURIComponent(p.name+' '+(p.addr||''));};
+
+// ===== 시작 ===== (서울 우선: 서울 시군구 보드로 오픈, “← 전국”으로 전체)
+(function(){const m=location.hash.match(/[#&]d=([^&]+)/);if(m){try{loadState(JSON.parse(decodeURIComponent(escape(atob(m[1])))));history.replaceState(null,'',location.pathname+location.search);}catch(_){}}})();
+renderWeights(); renderCands(); goView('서울특별시');
+</script>
+</body>
+</html>
