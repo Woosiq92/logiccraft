@@ -5,12 +5,10 @@ import { products } from '../data/products.js';
 
 const eduItems = products.filter((p) => p.section === 'edu');
 const dailyItems = products.filter((p) => p.section === 'daily');
-// Wonder·Build 는 series(카운트용)라 데이터에 카드 필드가 없음 → 홈 컴팩트 카드용으로 정의.
-const seriesCards = [
-  { slug: 'wonder', icon: 'wonder', name: 'Synergeion Wonder', chip: '3–6세', type: 'app', desc: '아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알.' },
-  { slug: 'build', icon: 'build', name: 'Synergeion Build', chip: '6–9세', type: 'app', desc: '직접 만들고 부수며 원리를 익히는 사고력 놀이.' },
-];
-const eduCards = [...seriesCards, ...eduItems];
+// Wonder 는 피처 카드로 별도 렌더(아래 마크업). Build 는 series(카운트용)라 데이터에 카드 필드가 없어 컴팩트 카드용으로 정의.
+const buildCard = { slug: 'build', icon: 'build', name: 'Synergeion Build', chip: '6–9세', type: 'app', desc: '직접 만들고 부수며 원리를 익히는 사고력 놀이.' };
+const eduCards = [buildCard, ...eduItems];
+const eduCount = 1 + eduCards.length; // Wonder 피처 카드 포함
 ---
 
 <Layout>
@@ -88,9 +86,44 @@ const eduCards = [...seriesCards, ...eduItems];
         <div class="cat-head reveal">
           <span class="label">교육</span>
           <span class="rule"></span>
-          <span class="count">{String(eduCards.length).padStart(2, '0')}</span>
+          <span class="count">{String(eduCount).padStart(2, '0')}</span>
         </div>
         <div class="card-grid compact">
+
+          <!-- Featured: Wonder -->
+          <article class="pcard feature reveal">
+            <div class="feat-art">
+              <div class="mascot-float">
+                <a class="mascot-panel" id="mascotPanel" href="https://www.youtube.com/@NaruandNeti" target="_blank" rel="noopener" aria-label="나루와 느티 유튜브 채널 열기">
+                  <div class="glare"></div>
+                  <div class="mascot-row">
+                    <img class="naru" src="/mascots/naru.png" alt="나루 — 아기 비버 마스코트" />
+                    <img class="neti" src="/mascots/neti.png" alt="느티 — 새싹 정령 마스코트" />
+                  </div>
+                  <div class="mascot-caption">
+                    <div class="m"><b>나루</b><span>NARU</span></div>
+                    <div class="m"><b>느티</b><span>NETI</span></div>
+                  </div>
+                </a>
+              </div>
+            </div>
+            <div class="feat-body">
+              <p class="eyebrow warm">SYNERGEION 시리즈 · 출시</p>
+              <div class="name-row"><h3>Synergeion Wonder</h3><span class="chip">3–6세</span></div>
+              <p class="desc">아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알, 부모도 같이 자랍니다.</p>
+              <div class="links">
+                <a href="https://apps.apple.com/kr/app/synergeion-wonder/id6774041352">App Store</a>
+                <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.wonder">Google Play</a>
+              <div class="legal">
+                <a class="muted" href="/apps/wonder/">자세히</a>
+                <a class="muted" href="/apps/wonder/support">지원</a>
+                <a class="muted" href="/apps/wonder/privacy">개인정보</a>
+                <a class="muted" href="/apps/wonder/terms">약관</a>
+              </div>
+              </div>
+            </div>
+          </article>
+
           {eduCards.map((p) => <CompactCard p={p} />)}
         </div>
       </div>
