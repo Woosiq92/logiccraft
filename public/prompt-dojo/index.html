@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#13110d">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
+<link rel="icon" href="data:," sizes="any">
+<title>프롬프트 도장</title>
+<style>
+  :root{
+    --bg:#13110d; --surface:#1c1813; --surface2:#221f1a; --mono-bg:#100e0a;
+    --line:#3a342a; --line2:#45403a;
+    --ink:#e7e1d7; --ink2:#cfc9bf; --dim:#9b948a; --faint:#6c665c;
+    --gold:#d8a44a; --gold-soft:#e9c479; --gold-dim:#2e2719;
+    --ok:#7fd3a4; --ok-bg:#172420; --bad:#e88a84; --bad-bg:#261917;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:15px/1.6 'Pretendard','Pretendard Variable',-apple-system,'Apple SD Gothic Neo',BlinkMacSystemFont,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+  .wrap{max-width:680px;margin:0 auto;padding:max(20px,env(safe-area-inset-top)) 16px 80px}
+  /* 헤더 */
+  .brand{display:flex;align-items:center;gap:13px;margin-bottom:14px}
+  .logo{width:50px;height:50px;border-radius:14px;flex:none;display:flex;align-items:center;justify-content:center;
+    font-size:26px;font-weight:800;color:var(--gold-soft);background:var(--surface2);
+    border:1.5px solid var(--gold);box-shadow:inset 0 1px 0 #ffffff0d}
+  .overline{font-size:10px;letter-spacing:3px;color:var(--gold);font-weight:800;text-transform:uppercase;margin-bottom:1px}
+  h1{font-size:22px;margin:0;font-weight:800;letter-spacing:-.3px}
+  .tagline{font-size:16px;font-weight:700;color:var(--ink);margin:2px 0 4px}
+  .sub{color:var(--dim);font-size:13px;margin-bottom:16px}
+  /* 탭 */
+  .tabs{display:flex;gap:8px;margin-bottom:12px}
+  .tab{flex:1;padding:11px;border:1px solid var(--line);border-radius:11px;background:transparent;color:var(--dim);
+    text-align:center;cursor:pointer;font-weight:700;font-size:14px;transition:.15s}
+  .tab.on{background:var(--surface2);border-color:var(--gold);color:var(--ink)}
+  .tab .dot{width:7px;height:7px;border-radius:50%;background:var(--faint);display:inline-block;margin-right:7px;vertical-align:middle}
+  .tab.on .dot{background:var(--gold);box-shadow:0 0 6px var(--gold)}
+  .status{font-size:12px;color:var(--dim);margin:0 2px 8px}
+  .status::before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--ok);margin-right:7px;vertical-align:middle}
+  .section-label{font-size:11px;letter-spacing:4px;color:var(--faint);text-transform:uppercase;font-weight:700;margin:16px 2px 9px}
+  /* 레벨 카드 */
+  .lvl{border:1px solid var(--line);border-radius:14px;background:var(--surface);margin-bottom:10px;overflow:hidden}
+  .lvl.locked{opacity:.5}
+  .lvl-head{display:flex;align-items:center;gap:11px;padding:14px 15px;cursor:pointer}
+  .lv-badge{width:30px;height:30px;border-radius:9px;flex:none;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
+  .lv-badge.num{background:var(--gold-dim);color:var(--gold-soft);border:1px solid var(--gold)}
+  .lv-badge.done{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok);border-radius:50%}
+  .lv-badge.lock{background:transparent;color:var(--faint);border:1px solid var(--line)}
+  .lvl-head h3{margin:0;font-size:15px;font-weight:700;flex:1}
+  .tag{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);color:var(--dim);white-space:nowrap}
+  .tag.ok{color:var(--ok);border-color:var(--ok);background:var(--ok-bg)}
+  .tag.gold{color:var(--gold-soft);border-color:var(--gold);background:var(--gold-dim)}
+  .body{padding:0 15px 16px;display:none}
+  .body.open{display:block}
+  /* 게이트/스트릭 */
+  .gate{border-top:1px solid var(--line);padding-top:13px;margin-bottom:8px}
+  .gate-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--dim);margin-bottom:8px}
+  .gate-n{color:var(--gold-soft);font-weight:700;font-variant-numeric:tabular-nums}
+  .streak{display:flex;gap:6px}
+  .seg{height:7px;flex:1;border-radius:4px;background:var(--surface2);border:1px solid var(--line)}
+  .seg.on{background:linear-gradient(90deg,var(--gold-soft),var(--gold));border-color:var(--gold)}
+  /* 문항 */
+  .q{padding:10px 0 4px}
+  .qtag{display:inline-block;font-size:11px;color:var(--gold-soft);background:var(--gold-dim);border:1px solid var(--gold);
+    border-radius:999px;padding:3px 11px;font-weight:700;margin-bottom:9px}
+  .qprompt{margin:0 0 11px;font-weight:700;font-size:15px;line-height:1.5}
+  .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:pre-wrap;
+    background:var(--mono-bg);border:1px solid var(--line);border-radius:9px;padding:11px;margin:8px 0;color:var(--ink2)}
+  .opt{display:flex;gap:9px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:7px 0;cursor:pointer;background:var(--surface2)}
+  .opt.sel{border-color:var(--gold);background:var(--gold-dim)}
+  .opt input{margin-top:3px;accent-color:var(--gold)}
+  textarea{width:100%;min-height:96px;background:var(--mono-bg);border:1px solid var(--line);border-radius:9px;color:var(--ink);
+    padding:11px;font:13px/1.5 ui-monospace,Menlo,monospace;resize:vertical}
+  textarea:focus{outline:none;border-color:var(--gold)}
+  .ord-item{padding:10px 12px;border:1px solid var(--line);border-radius:10px;margin:7px 0;background:var(--surface2);display:flex;gap:8px;align-items:center}
+  .ord-item button{background:transparent;border:1px solid var(--line);color:var(--dim);border-radius:7px;cursor:pointer;width:28px;height:28px;flex:none}
+  .ord-item button:active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold-soft)}
+  .btn{background:linear-gradient(180deg,var(--gold-soft),var(--gold));color:#1b1408;border:none;border-radius:10px;
+    padding:12px 16px;font-weight:800;font-size:15px;cursor:pointer;margin-top:10px;width:100%}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line);font-weight:700}
+  .btn:disabled{opacity:.45;cursor:default}
+  .verdict{margin-top:11px;padding:12px 13px;border-radius:10px;font-size:14px}
+  .verdict.pass{background:var(--ok-bg);border:1px solid var(--ok);color:#cfe9d8}
+  .verdict.fail{background:var(--bad-bg);border:1px solid var(--bad);color:#f2cfcc}
+  .verdict .vh{font-weight:800;font-size:15px}
+  .rub{margin:6px 0;font-size:13px}
+  .rub .ok{color:var(--ok);font-weight:700} .rub .no{color:var(--bad);font-weight:700}
+  .rmark{font-weight:800;margin-right:4px} .rmark.ok{color:var(--ok)} .rmark.no{color:var(--faint)}
+  .rex{color:var(--faint);font-size:11px}
+  .givens{background:var(--gold-dim);border:1px solid var(--gold);border-radius:10px;padding:11px 13px;margin:8px 0}
+  .givens-h{color:var(--gold-soft);font-size:11px;font-weight:800;margin-bottom:6px}
+  .given-row{color:var(--ink2);font-size:13px;line-height:1.6}
+  .explain{margin-top:9px;font-size:13px;color:var(--dim);border-left:2px solid var(--line2);padding-left:11px;line-height:1.55}
+  .reset{margin-top:26px;font-size:12px;color:var(--faint);text-decoration:underline;cursor:pointer;display:inline-block}
+  b{font-weight:700;color:var(--ink)}
+  /* 앱 셸 */
+  .app{min-height:100dvh}
+  .appbar{position:fixed;top:0;left:0;right:0;z-index:20;display:flex;align-items:center;gap:11px;
+    height:calc(58px + env(safe-area-inset-top));padding:env(safe-area-inset-top) 16px 0;
+    background:#13110deb;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  .appbar .logo{width:38px;height:38px;border-radius:10px;border-width:1px}
+  .logo svg{width:21px;height:21px;color:var(--gold-soft)}
+  .ab-titles{display:flex;flex-direction:column;justify-content:center;line-height:1.2}
+  .appbar h1{font-size:16px;font-weight:800;margin:0}
+  .ab-tag{font-size:10.5px;color:var(--dim);margin-top:1px}
+  .ab-chip{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:12px;font-weight:800;color:var(--gold-soft);
+    background:var(--gold-dim);border:1px solid var(--gold);border-radius:999px;padding:5px 11px;white-space:nowrap}
+  #screen{display:block;max-width:680px;margin:0 auto;
+    padding:calc(58px + env(safe-area-inset-top) + 16px) 16px calc(76px + env(safe-area-inset-bottom))}
+  .navbar{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;
+    background:#13110df5;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+    border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+  .nav-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 0 9px;
+    color:var(--faint);cursor:pointer;font-size:11px;font-weight:700;-webkit-tap-highlight-color:transparent}
+  .nav-item.on{color:var(--gold-soft)}
+  .nav-ico{line-height:0;opacity:.6}
+  .nav-ico svg{width:22px;height:22px}
+  .nav-item.on .nav-ico{opacity:1}
+  /* 홈 — 이어서 히어로(골드 채움) + 과목 카드(칩) + 힌트 (디자인 이식) */
+  .cont{position:relative;background:linear-gradient(135deg,var(--gold-soft),var(--gold));border-radius:18px;
+    padding:16px 17px;color:#1b1408;overflow:hidden;cursor:pointer;margin-bottom:6px}
+  .cont-eye{font-size:11px;font-weight:800;opacity:.65;letter-spacing:.3px}
+  .cont-pill{position:absolute;top:14px;right:14px;font-size:11px;font-weight:800;background:#1b140820;border:1px solid #1b140833;border-radius:999px;padding:3px 10px}
+  .cont-title{font-size:21px;font-weight:800;margin:7px 64px 2px 0;letter-spacing:-.3px;line-height:1.25}
+  .cont-sub{font-size:12.5px;font-weight:600;opacity:.78;margin-right:64px}
+  .cont-play{position:absolute;right:16px;top:54%;transform:translateY(-50%);width:46px;height:46px;border-radius:50%;
+    background:#1b1408;color:var(--gold-soft);display:flex;align-items:center;justify-content:center}
+  .cont-play svg{width:20px;height:20px}
+  .cont-seg{display:flex;gap:6px;margin-top:13px}
+  .cont-seg span{height:7px;flex:1;border-radius:4px;background:#1b140822;border:1px solid #1b140833}
+  .cont-seg span.on{background:#1b1408;border-color:#1b1408}
+  .hcard{border:1px solid var(--line);border-radius:15px;background:var(--surface);padding:15px;margin-bottom:10px;cursor:pointer}
+  .hc-top{display:flex;align-items:center;gap:12px}
+  .hc-ic{width:42px;height:42px;flex:none;border-radius:12px;background:var(--gold-dim);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;color:var(--gold-soft);line-height:0}
+  .hc-ic svg{width:20px;height:20px}
+  .hc-name{font-weight:800;font-size:15px}
+  .hc-badge{margin-left:7px;font-size:10px;font-weight:800;color:var(--gold-soft);background:var(--gold-dim);border:1px solid var(--gold);border-radius:999px;padding:2px 7px;vertical-align:middle}
+  .hc-subs{color:var(--dim);font-size:11.5px;margin-top:2px}
+  .hc-go{margin-left:auto;color:var(--gold-soft);font-size:13px;font-weight:700;white-space:nowrap}
+  .hc-barrow{display:flex;align-items:center;gap:10px;margin:12px 0 11px}
+  .hc-bar{flex:1;height:6px;border-radius:4px;background:var(--surface2);border:1px solid var(--line);overflow:hidden}
+  .hc-bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--gold))}
+  .hc-stat{color:var(--dim);font-size:11px;white-space:nowrap}
+  .hc-chips{display:flex;gap:7px}
+  .hc-chip{flex:1;text-align:center;padding:8px 0;border-radius:9px;border:1px solid var(--line);background:var(--surface2);color:var(--dim);font-size:12px;font-weight:700}
+  .hc-chip.on{border-color:var(--gold);color:var(--gold-soft);background:var(--gold-dim)}
+  .hc-chip.done{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+  .hc-chip.lock{opacity:.4}
+  .hhint{display:flex;align-items:center;gap:11px;border:1px solid var(--line);border-radius:13px;background:var(--surface);
+    padding:13px 14px;margin-top:6px;color:var(--dim);font-size:12.5px;line-height:1.5}
+  .hhint .hh-ic{width:30px;height:30px;flex:none;border-radius:8px;background:var(--surface2);border:1px solid var(--gold);
+    color:var(--gold-soft);display:flex;align-items:center;justify-content:center;font-weight:800}
+  /* 트랙 세그먼트 */
+  .seg-row{display:flex;gap:6px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px}
+  .seg{flex:1;text-align:center;padding:9px 0;border-radius:9px;font-size:13px;font-weight:700;color:var(--dim);cursor:pointer}
+  .seg.on{background:var(--gold-dim);color:var(--gold-soft);box-shadow:inset 0 0 0 1px var(--gold)}
+  /* 하위분류 칩 */
+  .sub-row{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+  .subchip{padding:6px 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);color:var(--dim);font-size:12px;font-weight:700;cursor:pointer}
+  .subchip.on{border-color:var(--gold);background:var(--gold-dim);color:var(--gold-soft)}
+  /* 레벨 스텝퍼 */
+  .step-row{display:flex;gap:8px;margin-bottom:14px}
+  .step{flex:1;text-align:center;padding:10px 0;border-radius:10px;font-size:13px;font-weight:800;
+    border:1px solid var(--line);background:var(--surface2);color:var(--dim);cursor:pointer}
+  .step.on{border-color:var(--gold);color:var(--gold-soft);background:var(--gold-dim)}
+  .step.done{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+  .step.paylock{border-color:var(--gold);border-style:dashed;color:var(--gold-soft)}
+  .step.master{flex:0 0 44px;border-color:var(--gold);color:var(--gold-soft)}
+  .step.master.on{background:var(--gold-dim)}
+  .step.lock{opacity:.4;cursor:default}
+  .lv-title{display:flex;align-items:center;gap:9px;font-size:16px;margin-bottom:4px}
+  .scr-h{font-size:18px;font-weight:800;margin-bottom:12px}
+  .pdot-row{display:flex;gap:6px}
+  .pdot{flex:1;text-align:center;padding:8px 0;border-radius:8px;font-size:12px;font-weight:800;
+    border:1px solid var(--line);background:var(--surface2);color:var(--dim)}
+  .pdot.on{border-color:var(--gold);color:var(--gold-soft)}
+  .pdot.done{border-color:var(--ok);color:var(--ok);background:var(--ok-bg)}
+  /* 홈 — 이어서(진행 링) + 과목 행 (모두의 자격증 홈 패턴 참고) */
+  .tt{text-align:center;margin-bottom:4px}
+  .ttring{width:172px;height:172px;border-radius:50%;margin:8px auto 16px;
+    background:conic-gradient(var(--gold) calc(var(--p)*1%), var(--surface2) 0);display:grid;place-items:center}
+  .ttring .tt-in{width:142px;height:142px;border-radius:50%;background:var(--surface);border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px}
+  .ttring .tt-big{font-size:2.7rem;font-weight:800;color:var(--gold-soft);letter-spacing:-.03em;line-height:1}
+  .ttring .tt-sub{font-size:.86rem;color:var(--dim)}
+  .todaycta{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;border:none;border-radius:12px;
+    padding:14px 18px;cursor:pointer;font-size:15px;font-weight:800;color:#1b1408;background:linear-gradient(180deg,var(--gold-soft),var(--gold))}
+  .todaycta:active{transform:translateY(1px)}
+  .todaycta .tcta-arrow{font-size:1.2rem}
+  .trackcard{display:flex;align-items:center;gap:12px;width:100%;text-align:left;border:1px solid var(--line);
+    border-radius:13px;background:var(--surface);padding:13px 14px;margin-bottom:9px;cursor:pointer;font:inherit;color:inherit}
+  .trackcard:active{border-color:var(--gold)}
+  .tc-ic{font-size:1.3rem;width:44px;height:44px;flex:none;display:flex;align-items:center;justify-content:center;
+    background:var(--gold-dim);border:1px solid var(--line);border-radius:12px}
+  .tc-main{flex:1;min-width:0}
+  .tc-label{display:block;font-weight:700;font-size:15px;color:var(--ink)}
+  .tc-meta{display:block;color:var(--dim);font-size:11px;margin-top:3px}
+  .tc-main .bar{display:block;height:6px;border-radius:4px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin:7px 0 0}
+  .tc-main .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--gold))}
+  .tc-arrow{color:var(--faint);font-size:1.5rem;flex:none}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="appbar">
+    <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 7l5 5-5 5"/><path d="M15 7v10"/></svg></div>
+    <div class="ab-titles"><h1>프롬프트 도장</h1><div class="ab-tag">읽지 말고 망가뜨리고 고친다</div></div>
+    <span id="ab-chip" class="ab-chip"></span>
+  </header>
+  <main id="screen"></main>
+  <nav class="navbar" id="nav"></nav>
+</div>
+
+<script src="iap.js"></script>
+<script>
+//#GEN-START  (이 구간은 DOM 비의존 — node 스모크 테스트로 검증)
+
+// ---------- 채점 엔진 (LLM 없음, 전부 결정론) ----------
+function normalize(s){ return (s||"").toLowerCase().replace(/\s+/g," ").trim(); }
+function detect(text, rule){
+  const t = normalize(text);
+  if(rule.any) return rule.any.some(k => t.includes(normalize(k)));
+  if(rule.all) return rule.all.every(k => t.includes(normalize(k)));
+  if(rule.minLen) return (text||"").trim().length >= rule.minLen;
+  if(rule.example) return /(예\s*[:：]|예시|e\.?g\.?|보기\s*[:：]|[\[\("'][^\]\)"']{2,})/i.test(text||"");
+  return false;
+}
+
+// ---------- 시드 기반 PRNG ----------
+function rng(seed){
+  let s = (seed|0) || 1;
+  return function(){
+    s = s + 0x6D2B79F5 | 0;
+    let t = Math.imul(s ^ s>>>15, 1 | s);
+    t = t + Math.imul(t ^ t>>>7, 61 | t) ^ t;
+    return ((t ^ t>>>14) >>> 0) / 4294967296;
+  };
+}
+function pick(rnd, arr){ return arr[Math.floor(rnd()*arr.length)]; }
+function shuffle(rnd, arr){
+  const a=[...arr];
+  for(let i=a.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; }
+  return a;
+}
+
+// ---------- 문항 뱅크 ----------
+// 좋은 프롬프트의 5축 의도(불변). LLM 원리에서 도출 — 자세한 근거는 #guide(좋은 프롬프트란?).
+// 기법(예시 개수·명시 CoT·태그 문법)은 모델마다 달라 가변 — 여기선 '의도'만 단련한다.
+const LEVELS = [
+  {key:"ctx",  name:"맥락 채우기",        short:"맥락", why:"그냥 물어보면 AI는 가장 흔한 답을 내놔요. 누구를 위해·무엇을·왜인지 알려주면 원하는 답에 가까워져요."},
+  {key:"fmt",  name:"출력 지정",          short:"형식", why:"원하는 모양(목록·표·길이·예시)을 정해주면 결과를 그대로 받아쓸 수 있어요."},
+  {key:"proc", name:"추론 확보",          short:"추론", why:"어려운 일은 '단계로 나눠 생각해'라고 하면 AI가 더 잘 풀어요. (똑똑한 추론 AI는 굳이 안 해도 됩니다)"},
+  {key:"goal", name:"검증 가능한 목표화", short:"검증", why:"'잘'이 아니라 '무엇이 되면 합격'인지 정해주면 결과를 점검할 수 있어요."}
+];
+
+// 과목 한 줄 설명 (홈 카드용)
+const TRACKDESC = { basics:"일상 예시로 배우는 프롬프트 기본", coding:"코드를 만들고 고치는 프롬프트", writing:"글·카피·SNS 프롬프트", video:"AI 영상 생성 프롬프트" };
+// (구 하위분류 필터는 제거 — 트랙당 전체 문제를 섞어서 출제. sub 인자 미사용 시 전체 반환)
+function bySub(arr, sub){ const p = sub ? arr.filter(x=>x.sub===sub) : arr; return p.length ? p : arr; }
+
+const BANK = {
+  coding: {
+    ctx: {
+      seeds:[
+        {text:"이 버그 고쳐줘", rel:["target","repro"], sub:"debug", facts:{target:"src/order.js의 calcTotal 함수에서", repro:"수량 0을 넣으면 NaN이 나오는 증상이"}, model:"src/order.js의 calcTotal 함수에서 수량 0을 넣으면 NaN이 반환되는 증상이 있어. 원인을 찾아 고쳐줘."},
+        {text:"여기 왜 안 돼?", rel:["repro","target"], sub:"debug", facts:{repro:"로그인 후 빈 화면이 뜨는 증상이", target:"auth.js의 login 함수에서"}, model:"auth.js의 login 함수에서 로그인 후 빈 화면이 뜨는 증상이 있어. 왜 안 되는지 원인을 짚어줘."},
+        {text:"크래시 나는데 봐줘", rel:["repro","env"], sub:"debug", facts:{repro:"앱 시작 직후 크래시가 나는 증상이", env:"React Native 0.74 환경에서"}, model:"React Native 0.74 환경에서 앱 시작 직후 크래시가 나는 증상이 있어. 스택트레이스 기준으로 원인을 봐줘."},
+        {text:"이거 왜 느려?", rel:["repro","goal"], sub:"debug", facts:{repro:"목록 1만 건에서 렉이 걸리는 증상이", goal:"렌더 속도를 기준으로"}, model:"목록 1만 건을 렌더하면 렉이 걸리는 증상이 있어. 렌더 속도를 기준으로 병목을 찾아줘."},
+        {text:"타입 에러 고쳐줘", rel:["target","repro"], sub:"debug", facts:{target:"api/user.ts의 fetchUser 함수에서", repro:"'undefined is not assignable' 타입 에러가 나는 증상이"}, model:"api/user.ts의 fetchUser 함수에서 'undefined is not assignable' 타입 에러가 나는 증상이 있어. 원인을 찾아 고쳐줘."},
+        {text:"메모리 누수 잡아줘", rel:["repro","goal"], sub:"debug", facts:{repro:"장시간 실행하면 메모리가 계속 느는 증상이", goal:"메모리 사용을 기준으로"}, model:"장시간 실행하면 메모리가 계속 느는 증상이 있어. 메모리 사용을 기준으로 누수 지점을 잡아줘."},
+        {text:"이 코드 리뷰해줘", rel:["target","goal"], sub:"review", facts:{target:"PaymentService 클래스를", goal:"버그 위험과 가독성을 기준으로"}, model:"PaymentService 클래스를 버그 위험과 가독성을 기준으로 리뷰해줘. 발견은 심각도순으로 정리해줘."},
+        {text:"이 PR 봐줘", rel:["target","goal"], sub:"review", facts:{target:"결제 모듈 변경분을", goal:"테스트 누락 여부를 기준으로"}, model:"결제 모듈 변경분(PR)을 테스트 누락 여부를 기준으로 봐줘. 빠진 케이스를 짚어줘."},
+        {text:"개선점 찾아줘", rel:["target","goal"], sub:"review", facts:{target:"utils/date.js 파일을", goal:"중복 제거를 기준으로"}, model:"utils/date.js 파일을 중복 제거를 기준으로 보고 개선점을 찾아줘."},
+        {text:"리팩터링할 데 짚어줘", rel:["target","goal"], sub:"review", facts:{target:"UserController 클래스를", goal:"함수 길이와 중복을 기준으로"}, model:"UserController 클래스를 함수 길이와 중복을 기준으로 보고 리팩터링할 곳을 짚어줘."},
+        {text:"쿼리 느린 거 봐줘", rel:["target","goal"], sub:"review", facts:{target:"orders 조회 쿼리가 있는 파일을", goal:"응답 속도를 기준으로"}, model:"orders 조회 쿼리가 있는 파일을 응답 속도를 기준으로 봐줘. 인덱스·N+1 문제를 짚어줘."},
+        {text:"이 기능 만들어줘", rel:["target","goal"], sub:"feature", facts:{target:"장바구니 담기 함수를", goal:"품절 상품은 막는 걸 기준으로"}, model:"장바구니 담기 함수를 만들어줘. 품절 상품은 담기지 않게 막는 걸 기준으로."},
+        {text:"엔드포인트 추가해줘", rel:["target","env"], sub:"feature", facts:{target:"주문 생성 라우트 파일에", env:"Express·Node 20 환경에서"}, model:"Express·Node 20 환경에서 주문 생성 라우트 파일에 POST 엔드포인트를 추가해줘."},
+        {text:"폼 검증 붙여줘", rel:["target","env"], sub:"feature", facts:{target:"회원가입 폼 컴포넌트 파일에", env:"React·TypeScript 환경에서"}, model:"React·TypeScript 환경에서 회원가입 폼 컴포넌트 파일에 입력 검증을 붙여줘."},
+        {text:"테스트 코드 짜줘", rel:["target","env"], sub:"feature", facts:{target:"calcTotal 함수에 대해", env:"Jest 환경에서"}, model:"Jest 환경에서 calcTotal 함수에 대한 테스트 코드를 짜줘. 엣지케이스도 포함해서."},
+        {text:"이 함수 문서화해줘", rel:["target","supply"], sub:"feature", facts:{target:"parseConfig 함수를", supply:"JSDoc 형식 예시를 참고해"}, model:"parseConfig 함수를 JSDoc 형식 예시를 참고해 문서화해줘."},
+        {text:"이 코드 검토 부탁해", rel:["supply","target"], sub:"review", facts:{supply:"시니어 리뷰어 관점에서", target:"PaymentService 클래스를"}, model:"시니어 리뷰어 관점에서 PaymentService 클래스를 검토해줘. 위험한 부분부터 짚어줘."}
+      ],
+      comps:{
+        target:{opt:"대상 코드/파일을 지목하지 않았다", rub:"대상 코드/함수/모듈을 지목", rule:{any:["함수","파일","모듈","클래스","대상","이 코드","아래 코드"]}, out:"어떤 코드를 말하는지 모르겠습니다"},
+        repro:{opt:"증상/재현 조건이 없다", rub:"증상·재현 조건을 적음", rule:{any:["증상","재현","에러","오류","입력하면","했더니","로그","크래시"]}, out:"어떤 증상인지 알려주세요"},
+        goal:{opt:"원하는 결과·방향이 없다", rub:"원하는 결과·방향을 밝힘", rule:{any:["목표","기준","원하는","속도","메모리","가독성","결과를"]}, out:"무엇을 원하는지 방향이 없음"},
+        env:{opt:"실행 환경/제약이 없다", rub:"환경·제약(버전·프레임워크)을 줌", rule:{any:["환경","버전","제약","프레임워크","node","python","브라우저","jest","vitest","pytest"]}, out:"어떤 환경인지 알려주세요"},
+        supply:{opt:"역할/관점·참조 자료를 안 줬다", rub:"역할·관점 또는 참조 자료를 제공", rule:{any:["역할","처럼","관점","입장","리뷰어","시니어","참고","자료","문서","로그","아래","근거"]}, out:"어떤 관점·근거로 볼지 모름"}
+      },
+      distract:[{id:"x_fmt",opt:"출력 형식을 지정하지 않았다"},{id:"x_len",opt:"분량을 지정하지 않았다"},{id:"x_polite",opt:"말투가 공손하지 않다"},{id:"x_name",opt:"변수명을 정해주지 않았다"}]
+    },
+    fmt: {
+      seeds:[
+        {text:"에러 로그 분석해줘", rel:["shape","fields"], sub:"debug", facts:{shape:"표 형식으로", fields:"원인·위치·심각도 컬럼을 넣어"}, model:"에러 로그를 표 형식으로 분석해줘. 원인·위치·심각도 컬럼을 넣어서."},
+        {text:"스택트레이스 정리해줘", rel:["shape","fields"], sub:"debug", facts:{shape:"목록 형식으로", fields:"파일·라인·원인 항목으로"}, model:"스택트레이스를 목록 형식으로 정리해줘. 파일·라인·원인 항목으로."},
+        {text:"원인 후보 뽑아줘", rel:["shape","example"], sub:"debug", facts:{shape:"번호 목록으로", example:"예: 1) null 참조 가능성 처럼"}, model:"원인 후보를 번호 목록으로 뽑아줘. 예: 1) null 참조 가능성 처럼."},
+        {text:"이 코드 리뷰해줘", rel:["shape","fields","example"], sub:"review", facts:{shape:"표로", fields:"위치·심각도·제안 컬럼을 넣어", example:"예: L42 | 높음 | 널 체크 추가 처럼"}, model:"리뷰 결과를 표로 줘. 위치·심각도·제안 컬럼을 넣고, 예: L42 | 높음 | 널 체크 추가 처럼."},
+        {text:"지적사항 표로 줘", rel:["shape","fields"], sub:"review", facts:{shape:"표 형식으로", fields:"항목·심각도·우선순위 컬럼으로"}, model:"지적사항을 표 형식으로 줘. 항목·심각도·우선순위 컬럼으로."},
+        {text:"심각도별로 분류해줘", rel:["shape","fields"], sub:"review", facts:{shape:"심각도별 묶음 목록으로", fields:"심각도·위치 항목을 포함해"}, model:"지적사항을 심각도별 묶음 목록으로 분류해줘. 심각도·위치 항목을 포함해서."},
+        {text:"리뷰 결과 정리해줘", rel:["shape","fields","example"], sub:"review", facts:{shape:"마크다운 표로", fields:"원인·심각도·제안 컬럼으로", example:"예: 중복코드 | 중간 | 함수 추출 처럼"}, model:"리뷰 결과를 마크다운 표로 정리해줘. 원인·심각도·제안 컬럼으로, 예: 중복코드 | 중간 | 함수 추출 처럼."},
+        {text:"API 명세 뽑아줘", rel:["shape","example"], sub:"feature", facts:{shape:"JSON 형식으로", example:'예: {"method":"POST","path":"/orders"} 처럼'}, model:'API 명세를 JSON 형식으로 뽑아줘. 예: {"method":"POST","path":"/orders"} 처럼.'},
+        {text:"함수 시그니처 정리해줘", rel:["shape","example"], sub:"feature", facts:{shape:"목록 형식으로", example:"예: calcTotal(items): number 처럼"}, model:"함수 시그니처를 목록 형식으로 정리해줘. 예: calcTotal(items): number 처럼."},
+        {text:"체크리스트 만들어줘", rel:["shape","length"], sub:"feature", facts:{shape:"체크박스 목록으로", length:"7개 이내로"}, model:"체크리스트를 체크박스 목록으로 만들어줘. 7개 이내로."}
+      ],
+      comps:{
+        shape:{opt:"출력 형식(표·JSON)을 지정하지 않았다", rub:"표/JSON 등 출력 형식 지정", rule:{any:["표","json","형식","목록","마크다운","컬럼","항목"]}, out:"형식 없이 줄글로 쏟아짐"},
+        fields:{opt:"담을 필드/항목을 지정하지 않았다", rub:"필드·항목(원인·심각도 등) 지정", rule:{any:["필드","항목","컬럼","원인","심각도","우선순위","빈도","위치","라인"]}, out:"무엇을 담을지 불명확"},
+        example:{opt:"원하는 모양의 예시가 없다", rub:"예시 1개 제시", rule:{example:true}, out:"예시가 없어 모양을 추측"},
+        length:{opt:"분량/개수 제약이 없다", rub:"분량·개수 지정", rule:{any:["자 내외","글자","줄","개 이내","개 이하","항목 수","간결"]}, out:"분량이 들쭉날쭉"}
+      },
+      distract:[{id:"x_who",opt:"대상을 안 정했다 (맥락 단계 문제)"},{id:"x_tone",opt:"말투가 딱딱하다"},{id:"x_polite",opt:"공손하지 않다"}]
+    },
+    proc:[
+      {name:"디버깅", steps:["재현 절차를 고정","문제 범위를 이분 탐색으로 좁힘","원인 가설을 세워 검증","수정 후 회귀 테스트"], sub:"debug"},
+      {name:"버그 수정", steps:["가정을 명시하고 불명확하면 먼저 질문","버그를 재현하는 실패 테스트 작성","테스트를 통과시키는 최소 수정","다른 곳을 깨뜨리지 않는지 자기검증"], sub:"debug"},
+      {name:"성능 최적화", steps:["먼저 측정해 병목을 특정","가장 비싼 구간 하나를 고름","알고리즘/자료구조를 바꿔 개선","다시 측정해 개선을 확인"], sub:"debug"},
+      {name:"코드 리뷰", steps:["변경 의도와 범위를 먼저 파악","정확성(버그)부터 점검","다음으로 단순화·중복 점검","발견을 심각도순으로 정리"], sub:"review"},
+      {name:"보안 점검", steps:["신뢰 경계(입력 지점)를 나열","각 입력의 검증·이스케이프 확인","권한·인증 흐름 점검","발견을 위험도순으로 정리"], sub:"review"},
+      {name:"리팩터링", steps:["기존 테스트가 통과하는지 먼저 확인","한 번에 하나씩 작은 단위로 변경","변경마다 테스트 재실행","무엇을 왜 바꿨는지 요약"], sub:"review"},
+      {name:"새 기능", steps:["요구사항을 분해하고 계획부터 세움","핵심 경로를 먼저 구현","엣지케이스·예외 처리 추가","테스트로 전체 검증"], sub:"feature"},
+      {name:"API 설계", steps:["사용 사례(호출 예)를 먼저 적음","입력·출력 계약을 정의","에러·엣지케이스를 명시","구현하고 예제로 검증"], sub:"feature"},
+      {name:"로그 분석", steps:["에러 메시지·스택을 먼저 읽음","의심 구간을 로그로 좁힘","가설을 코드로 확인","원인을 한 줄로 정리"], sub:"debug"},
+      {name:"PR 피드백", steps:["변경 목적을 먼저 확인","동작 정확성부터 점검","읽기·유지보수성 지적","칭찬·개선을 나눠 코멘트"], sub:"review"},
+      {name:"스키마 설계", steps:["저장할 데이터를 나열","관계·제약을 정의","인덱스·쿼리 패턴 고려","마이그레이션을 계획"], sub:"feature"},
+      {name:"외부 API 연동", steps:["문서에서 계약을 확인","최소 호출로 먼저 검증","에러·재시도를 처리","응답을 타입으로 고정"], sub:"feature"}
+    ],
+    goal:{
+      rubricComps:[
+        {id:"success",label:"통과/실패 판정 가능한 성공조건", rule:{any:["통과","반환","===","리턴","true","false","만족","결과가","기준","조건"]}},
+        {id:"cases",label:"판정용 입력/엣지케이스 예시", rule:{example:true}},
+        {id:"constraint",label:"범위·금지 제약(최소변경·모호표현 금지)", rule:{any:["최소","범위","건드리지","수정하지","금지","없이","빼고","모호"]}}
+      ],
+      vbank:[
+        {task:"날짜 파싱 버그 수정", ok:["2026-13-01은 에러를 반환","빈 문자열은 null 반환"], vague:["견고하게","깔끔하게"], sub:"debug"},
+        {task:"정렬 함수 버그 수정", ok:["입력 [3,1,2]에 [1,2,3] 반환","빈 배열에 [] 반환"], vague:["빠르게","우아하게"], sub:"debug"},
+        {task:"코드 리뷰 기준 정의", ok:["함수 30줄 이하 권고","공개 API에 주석 필수"], vague:["읽기 좋게","센스있게"], sub:"review"},
+        {task:"PR 승인 기준", ok:["테스트 통과 필수","린트 0 에러"], vague:["적당히","무난하게"], sub:"review"},
+        {task:"이메일 검증 함수", ok:["'a@b.com'은 통과","'abc'는 거부"], vague:["견고하게","유연하게"], sub:"feature"},
+        {task:"중복 제거 함수", ok:["[1,1,2]에 [1,2] 반환","원소 순서를 보존"], vague:["효율적으로","깔끔하게"], sub:"feature"},
+        {task:"널 참조 버그 수정", ok:["빈 입력에 기본값 반환","에러 대신 빈 배열 반환"], vague:["안전하게","튼튼하게"], sub:"debug"},
+        {task:"무한루프 버그 수정", ok:["종료 조건을 명시","최대 반복 100회로 제한"], vague:["효율적으로","스마트하게"], sub:"debug"},
+        {task:"네이밍 컨벤션 정의", ok:["함수는 동사로 시작","상수는 대문자"], vague:["일관되게","깔끔하게"], sub:"review"},
+        {task:"커밋 메시지 규칙", ok:["제목 50자 이내","왜 바꿨는지 본문에"], vague:["명확하게","센스있게"], sub:"review"},
+        {task:"비밀번호 검증 함수", ok:["8자 미만은 거부","숫자 없으면 거부"], vague:["강력하게","유연하게"], sub:"feature"},
+        {task:"페이지네이션 함수", ok:["page=1은 첫 10개 반환","범위 초과 page는 빈 배열"], vague:["효율적으로","우아하게"], sub:"feature"}
+      ]
+    }
+  },
+  writing: {
+    ctx: {
+      seeds:[
+        {text:"블로그 글 써줘", rel:["who","goal"], sub:"blog", facts:{who:"베이킹 입문 독자를 대상으로", goal:"레시피를 따라 만들도록 설득하려고"}, model:"베이킹 입문 독자를 대상으로, 레시피를 따라 만들도록 설득하는 블로그 글을 써줘."},
+        {text:"정보 글 써줘", rel:["who","goal"], sub:"blog", facts:{who:"IT 입문 독자를 대상으로", goal:"개념을 이해시키는 목적으로"}, model:"IT 입문 독자를 대상으로, 개념을 이해시키는 목적의 정보 글을 써줘."},
+        {text:"리뷰 글 써줘", rel:["who","tone"], sub:"blog", facts:{who:"구매를 고민하는 고객 대상으로", tone:"솔직하고 담백한 톤으로"}, model:"구매를 고민하는 고객을 대상으로, 솔직하고 담백한 톤의 리뷰 글을 써줘."},
+        {text:"가이드 글 써줘", rel:["who","goal"], sub:"blog", facts:{who:"처음 해보는 초보 대상으로", goal:"끝까지 따라 하도록 설득하려고"}, model:"처음 해보는 초보를 대상으로, 끝까지 따라 하도록 설득하는 가이드 글을 써줘."},
+        {text:"광고 카피 써줘", rel:["who","goal"], sub:"copy", facts:{who:"20대 직장인 고객 대상으로", goal:"구매 클릭을 유도하려고"}, model:"20대 직장인 고객을 대상으로, 구매 클릭을 유도하는 광고 카피를 써줘."},
+        {text:"상세페이지 문구 써줘", rel:["who","goal"], sub:"copy", facts:{who:"가격을 비교 중인 고객 대상으로", goal:"구매 전환을 목적으로"}, model:"가격을 비교 중인 고객을 대상으로, 구매 전환을 목적으로 상세페이지 문구를 써줘."},
+        {text:"슬로건 만들어줘", rel:["goal","tone"], sub:"copy", facts:{goal:"브랜드를 각인시키려는 목적으로", tone:"짧고 강한 톤으로"}, model:"브랜드를 각인시키려는 목적으로, 짧고 강한 톤의 슬로건을 만들어줘."},
+        {text:"홍보 문구 써줘", rel:["who","goal"], sub:"copy", facts:{who:"동네 단골 고객 대상으로", goal:"매장 방문을 유도하려고"}, model:"동네 단골 고객을 대상으로, 매장 방문을 유도하는 홍보 문구를 써줘."},
+        {text:"SNS 글 써줘", rel:["platform","tone"], sub:"sns", facts:{platform:"인스타 피드 채널에", tone:"친근한 말투로"}, model:"인스타 피드 채널에 올릴, 친근한 말투의 SNS 글을 써줘."},
+        {text:"인스타 캡션 써줘", rel:["platform","goal"], sub:"sns", facts:{platform:"인스타 채널에", goal:"저장·공유를 유도하려고"}, model:"인스타 채널에 올릴, 저장·공유를 유도하는 캡션을 써줘."},
+        {text:"트윗 써줘", rel:["platform","tone"], sub:"sns", facts:{platform:"트위터(X) 채널에", tone:"짧고 위트 있는 톤으로"}, model:"트위터(X) 채널에 올릴, 짧고 위트 있는 톤의 트윗을 써줘."},
+        {text:"이벤트 공지 써줘", rel:["who","platform"], sub:"sns", facts:{who:"기존 구독 고객 대상으로", platform:"뉴스레터 지면에"}, model:"기존 구독 고객을 대상으로, 뉴스레터 지면에 맞는 이벤트 공지를 써줘."},
+        {text:"유튜브 설명란 써줘", rel:["platform","goal"], sub:"sns", facts:{platform:"유튜브 채널 설명란에", goal:"구독 전환을 유도하려고"}, model:"유튜브 채널 설명란에 들어갈, 구독 전환을 유도하는 글을 써줘."},
+        {text:"뉴스레터 제목 써줘", rel:["platform","goal"], sub:"copy", facts:{platform:"이메일 뉴스레터 제목으로", goal:"열람을 유도하려고"}, model:"이메일 뉴스레터 제목으로, 열람을 유도하는 문구를 써줘."},
+        {text:"보도자료 써줘", rel:["who","tone"], sub:"blog", facts:{who:"기자·언론 대상으로", tone:"객관적이고 담백한 문체로"}, model:"기자·언론을 대상으로, 객관적이고 담백한 문체의 보도자료를 써줘."},
+        {text:"공감 글 써줘", rel:["who","tone"], sub:"blog", facts:{who:"육아 중인 부모 대상으로", tone:"따뜻하고 친근한 말투로"}, model:"육아 중인 부모를 대상으로, 따뜻하고 친근한 말투의 공감 글을 써줘."},
+        {text:"이 자료로 글 부탁해", rel:["supply","who"], sub:"blog", facts:{supply:"아래 자료를 근거로", who:"입문 독자 대상으로"}, model:"아래 자료를 근거로, 입문 독자를 대상으로 글을 써줘."}
+      ],
+      comps:{
+        who:{opt:"독자/대상이 없다", rub:"독자·대상 지정", rule:{any:["독자","대상","초보","고객","부모","학생","사용자","엄마","입문"]}, out:"누구를 위한 글인지 불명확"},
+        goal:{opt:"목적/원하는 행동이 없다", rub:"목적·행동 지정", rule:{any:["목적","유도","가입","구매","설득","알리","전환","공유","클릭"]}, out:"무엇을 위한 글인지 불명확"},
+        tone:{opt:"톤·길이 제약이 없다", rub:"톤·길이 지정", rule:{any:["톤","말투","짧게","자 내외","글자","길이","문체","친근","담백"]}, out:"톤이 들쭉날쭉"},
+        platform:{opt:"채널/지면 맥락이 없다", rub:"채널/지면 명시", rule:{any:["블로그","인스타","채널","지면","뉴스레터","상세페이지","sns","메일"]}, out:"어느 채널에도 안 맞음"},
+        supply:{opt:"화자 역할·참조 자료를 안 줬다", rub:"화자 역할 또는 참조 자료를 제공", rule:{any:["역할","처럼","관점","입장","화자","에디터","카피라이터","참고","자료","근거","아래","문서"]}, out:"어떤 관점·근거로 쓸지 모름"}
+      },
+      distract:[{id:"x_emoji",opt:"이모지를 안 넣었다"},{id:"x_kw",opt:"키워드를 안 넣었다 (다음 단계)"},{id:"x_title",opt:"제목을 안 정했다"},{id:"x_fmt",opt:"표를 안 썼다"}]
+    },
+    fmt: {
+      seeds:[
+        {text:"마들렌 레시피 글 써줘", rel:["shape","sections"], sub:"blog", facts:{shape:"소제목 3개 구조로", sections:"마지막에 실패 포인트 섹션을 넣어"}, model:"마들렌 레시피 글을 소제목 3개 구조로 써줘. 마지막에 실패 포인트 섹션을 넣어서."},
+        {text:"A랑 B 비교 글 써줘", rel:["shape","sections"], sub:"blog", facts:{shape:"비교 표로", sections:"장단점과 결론 섹션을 넣어"}, model:"A와 B 비교 글을 비교 표로 정리해줘. 장단점과 결론 섹션을 넣어서."},
+        {text:"단계별 가이드 써줘", rel:["shape","sections"], sub:"blog", facts:{shape:"번호 단계 구조로", sections:"각 단계에 주의 섹션을 넣어"}, model:"단계별 가이드를 번호 단계 구조로 써줘. 각 단계에 주의 섹션을 넣어서."},
+        {text:"여행 후기 써줘", rel:["shape","length"], sub:"blog", facts:{shape:"소제목 구조로", length:"1000자 내외로"}, model:"여행 후기를 소제목 구조로, 1000자 내외로 써줘."},
+        {text:"제품 설명 써줘", rel:["shape","length"], sub:"copy", facts:{shape:"항목 목록으로", length:"5문단 이내로"}, model:"제품 설명을 항목 목록으로, 5문단 이내로 써줘."},
+        {text:"헤드라인 뽑아줘", rel:["shape","example"], sub:"copy", facts:{shape:"번호 목록으로", example:"예: '하루 10분, 통장 챙기기' 처럼"}, model:"헤드라인 후보를 번호 목록으로 뽑아줘. 예: '하루 10분, 통장 챙기기' 처럼."},
+        {text:"FAQ 써줘", rel:["shape","sections"], sub:"copy", facts:{shape:"질문·답변 항목 구조로", sections:"환불·배송 섹션을 포함해"}, model:"FAQ를 질문·답변 항목 구조로 써줘. 환불·배송 섹션을 포함해서."},
+        {text:"릴스 캡션 써줘", rel:["shape","length"], sub:"sns", facts:{shape:"줄바꿈 항목으로", length:"100자 내외로"}, model:"릴스 캡션을 줄바꿈 항목으로, 100자 내외로 써줘."},
+        {text:"카드뉴스 문구 써줘", rel:["shape","sections"], sub:"sns", facts:{shape:"장표 번호 구조로", sections:"마지막에 요약 섹션을 넣어"}, model:"카드뉴스 문구를 장표 번호 구조로 써줘. 마지막에 요약 섹션을 넣어서."},
+        {text:"해시태그 세트 만들어줘", rel:["shape","example"], sub:"sns", facts:{shape:"번호 목록 항목으로", example:"예: #홈베이킹 #초보베이킹 처럼"}, model:"해시태그 세트를 번호 목록 항목으로 만들어줘. 예: #홈베이킹 #초보베이킹 처럼."}
+      ],
+      comps:{
+        shape:{opt:"구조/소제목을 지정하지 않았다", rub:"구조·소제목 지정", rule:{any:["소제목","목차","구조","단계","번호","항목","표"]}, out:"한 덩어리 줄글"},
+        sections:{opt:"필수 섹션을 요구하지 않았다", rub:"필수 섹션(결론·팁 등) 지정", rule:{any:["섹션","결론","요약","팁","주의","실패","장단점","추천"]}, out:"필요한 부분이 빠짐"},
+        length:{opt:"분량/길이를 지정하지 않았다", rub:"분량·길이 지정", rule:{any:["자 내외","글자","문단","줄","개","길이","간결"]}, out:"분량이 제멋대로"},
+        example:{opt:"원하는 모양의 예시가 없다", rub:"예시 제시", rule:{example:true}, out:"모양을 추측"}
+      },
+      distract:[{id:"x_who",opt:"대상을 안 정했다 (맥락 단계 문제)"},{id:"x_polite",opt:"공손하지 않다"},{id:"x_kw",opt:"키워드를 안 넣었다"}]
+    },
+    proc:[
+      {name:"초안→재작성", steps:["대상·톤·금지 규칙을 먼저 고정","초안을 작성","초안을 스스로 비평(약점 지적)","비평을 반영해 재작성"], sub:"blog"},
+      {name:"SEO 글", steps:["타겟 키워드와 검색 의도를 정리","소제목 구조(목차) 설계","초안 작성","제목·소제목 키워드·가독성 점검"], sub:"blog"},
+      {name:"비교 리뷰", steps:["비교 기준을 먼저 정함","각 대상을 같은 기준으로 정리","장단점을 균형 있게 기술","상황별 추천으로 결론"], sub:"blog"},
+      {name:"카피 압축", steps:["하고 싶은 말을 다 적음","중복·수식어를 덜어냄","능동·짧은 문장으로 바꿈","소리내어 읽고 리듬 점검"], sub:"copy"},
+      {name:"랜딩 카피", steps:["한 줄 가치 제안을 먼저","근거(혜택)를 셋으로 정리","의심을 미리 해소","행동 유도로 닫음"], sub:"copy"},
+      {name:"제목 짓기", steps:["글의 핵심 약속(베네핏)을 한 줄로","대상이 쓰는 단어로 바꿈","후보를 여러 개 뽑음","구체성·길이로 하나를 고름"], sub:"sns"},
+      {name:"스토리텔링", steps:["전하려는 한 가지 메시지를 정함","상황(맥락)으로 시작","갈등·전환을 넣음","메시지로 마무리"], sub:"sns"},
+      {name:"정보 구조화", steps:["독자가 궁금한 질문을 나열","답을 소제목으로 만듦","논리 순서로 배치","요약·다음 행동으로 마무리"], sub:"blog"},
+      {name:"슬로건 만들기", steps:["핵심 약속을 한 단어로","리듬·운율을 다듬음","후보를 여러 개 생성","짧고 기억되는 것 선택"], sub:"copy"},
+      {name:"상세페이지", steps:["가장 큰 혜택을 먼저","기능을 혜택으로 번역","후기·근거로 신뢰 형성","구매 행동으로 닫음"], sub:"copy"},
+      {name:"릴스 스크립트", steps:["첫 3초 훅을 작성","핵심 한 가지만 담음","빠른 전개로 유지","행동 유도로 끝맺음"], sub:"sns"},
+      {name:"이벤트 공지", steps:["무엇을·언제를 한 줄로","참여 방법을 단계로","혜택·마감을 강조","문의·링크로 마무리"], sub:"sns"}
+    ],
+    goal:{
+      rubricComps:[
+        {id:"measure",label:"검증 가능한 산출 기준(글자·개수 등)", rule:{any:["글자","자 이내","해시태그","개","문장","줄","섹션","가지","만족","기준"]}},
+        {id:"cases",label:"구체 예시 제시", rule:{example:true}},
+        {id:"ban",label:"금지 규칙(굵게·2인칭·모호표현)", rule:{any:["금지","쓰지 마","하지 마","빼고","없이","피해","모호"]}}
+      ],
+      vbank:[
+        {task:"부모 대상 베이킹 블로그 글", ok:["소제목 3개로 나눔","마지막에 실패 포인트 섹션"], vague:["감성적으로","술술 읽히게"], sub:"blog"},
+        {task:"입문자 대상 IT 설명글", ok:["전문용어 3개 이하","예시 1개 포함"], vague:["친절하게","쉽게"], sub:"blog"},
+        {task:"행동 유도(CTA) 문구", ok:["문장을 2개 이하로","느낌표를 쓰지 않는다"], vague:["임팩트 있게","매력적으로"], sub:"copy"},
+        {task:"제품 헤드라인", ok:["20자 이내","혜택 1개를 명시"], vague:["눈길 끌게","센스있게"], sub:"copy"},
+        {task:"인스타그램 캡션", ok:["해시태그 3개 이하","100자 이내"], vague:["센스있게","트렌디하게"], sub:"sns"},
+        {task:"릴스 후킹 문구", ok:["첫 문장 15자 이내","질문형으로 시작"], vague:["바이럴 되게","끌리게"], sub:"sns"},
+        {task:"제품 비교 글", ok:["같은 기준 3개로 비교","결론에 상황별 추천"], vague:["객관적으로","유익하게"], sub:"blog"},
+        {task:"튜토리얼 글", ok:["단계마다 번호","각 단계에 예시 1개"], vague:["따라하기 쉽게","친절하게"], sub:"blog"},
+        {task:"배너 카피", ok:["15자 이내","혜택과 행동을 포함"], vague:["눈에 띄게","임팩트 있게"], sub:"copy"},
+        {task:"이메일 제목", ok:["30자 이내","스팸 단어 금지"], vague:["열고 싶게","매력적으로"], sub:"copy"},
+        {task:"트위터(X) 글", ok:["140자 이내","해시태그 2개 이하"], vague:["바이럴하게","센스있게"], sub:"sns"},
+        {task:"유튜브 제목", ok:["40자 이내","숫자 또는 질문 포함"], vague:["클릭되게","끌리게"], sub:"sns"}
+      ]
+    }
+  },
+  video: {
+    ctx: {
+      seeds:[
+        {text:"릴스 영상 만들어줘", rel:["subject","scene"], sub:"reels", facts:{subject:"커피를 내리는 손 동작을", scene:"밝은 카페 실내에서"}, model:"밝은 카페 실내에서 커피를 내리는 손 동작을 담은 릴스 영상을 만들어줘."},
+        {text:"숏폼 클립 뽑아줘", rel:["subject","camera"], sub:"reels", facts:{subject:"러닝하는 인물을", camera:"트래킹 샷으로"}, model:"러닝하는 인물을 트래킹 샷으로 따라가는 숏폼 클립을 만들어줘."},
+        {text:"브이로그 컷 만들어줘", rel:["scene","camera"], sub:"reels", facts:{scene:"노을 지는 거리에서", camera:"핸드헬드 와이드 샷으로"}, model:"노을 지는 거리에서 핸드헬드 와이드 샷으로 찍은 듯한 브이로그 컷을 만들어줘."},
+        {text:"강아지 영상 만들어줘", rel:["scene","camera"], sub:"reels", facts:{scene:"해변 모래밭에서", camera:"로우앵글 트래킹 샷으로"}, model:"해변 모래밭에서 로우앵글 트래킹 샷으로 강아지가 달리는 영상을 만들어줘."},
+        {text:"제품 광고 영상 만들어줘", rel:["subject","style"], sub:"ad", facts:{subject:"화장품 병을 든 손 동작을", style:"고급스러운 시네마틱 톤으로"}, model:"화장품 병을 든 손 동작을, 고급스러운 시네마틱 톤으로 담은 제품 광고 영상을 만들어줘."},
+        {text:"브랜드 영상 만들어줘", rel:["subject","scene"], sub:"ad", facts:{subject:"제품을 사용하는 인물을", scene:"미니멀한 스튜디오 배경에서"}, model:"미니멀한 스튜디오 배경에서 제품을 사용하는 인물을 담은 브랜드 영상을 만들어줘."},
+        {text:"광고 한 컷 뽑아줘", rel:["subject","scene"], sub:"ad", facts:{subject:"음료를 따르는 동작을", scene:"여름 야외 테라스 장소에서"}, model:"여름 야외 테라스 장소에서 음료를 따르는 동작을 담은 광고 한 컷을 만들어줘."},
+        {text:"b-roll 만들어줘", rel:["scene","camera"], sub:"broll", facts:{scene:"비 오는 도시 거리에서", camera:"고정 와이드 샷으로"}, model:"비 오는 도시 거리에서 고정 와이드 샷으로 b-roll을 만들어줘."},
+        {text:"분위기 컷 뽑아줘", rel:["scene","style"], sub:"broll", facts:{scene:"안개 낀 숲에서", style:"차분한 필름 무드로"}, model:"안개 낀 숲에서, 차분한 필름 무드의 분위기 컷을 만들어줘."},
+        {text:"배경 영상 만들어줘", rel:["scene","camera"], sub:"broll", facts:{scene:"창밖 도시 야경을", camera:"느린 팬 샷으로"}, model:"창밖 도시 야경을 느린 팬 샷으로 담은 배경 영상을 만들어줘."},
+        {text:"i2v로 움직임 넣어줘", rel:["supply","subject"], sub:"broll", facts:{supply:"기준 이미지를 참고해", subject:"머리카락이 바람에 날리는 움직임을"}, model:"기준 이미지를 참고해(i2v), 머리카락이 바람에 날리는 움직임을 자연스럽게 넣어줘."},
+        {text:"시네마틱 풍경 영상", rel:["scene","style"], sub:"broll", facts:{scene:"산 정상 야외 장소에서", style:"시네마틱 실사 톤으로"}, model:"산 정상 야외 장소에서, 시네마틱 실사 톤의 풍경 영상을 만들어줘."},
+        {text:"360도 제품 영상", rel:["subject","style"], sub:"ad", facts:{subject:"운동화를 회전시키는 동작을", style:"미니멀한 실사 톤으로"}, model:"운동화를 회전시키는 동작을, 미니멀한 실사 톤으로 담은 360도 제품 영상을 만들어줘."},
+        {text:"이 느낌으로 영상 만들어줘", rel:["supply","scene"], sub:"broll", facts:{supply:"첨부한 레퍼런스 영상처럼", scene:"카페 실내 배경에서"}, model:"첨부한 레퍼런스 영상처럼, 카페 실내 배경에서 영상을 만들어줘."}
+      ],
+      comps:{
+        subject:{opt:"피사체/동작이 없다", rub:"피사체와 동작을 지정", rule:{any:["인물","피사체","대상","동작","움직","걷","뛰","춤","날아","들고"]}, out:"무엇이 어떻게 움직이는지 모르겠습니다"},
+        scene:{opt:"배경/장소가 없다", rub:"배경·장소·시간을 지정", rule:{any:["배경","장소","실내","실외","도시","숲","바다","해변","낮","밤","노을","거리"]}, out:"어디인지 알 수 없습니다"},
+        style:{opt:"비주얼 스타일이 없다", rub:"비주얼 스타일/룩을 지정", rule:{any:["스타일","시네마틱","애니","실사","3d","픽사","필름","흑백","톤","무드","질감"]}, out:"어떤 룩인지 불명확"},
+        camera:{opt:"카메라/샷 지정이 없다", rub:"카메라 앵글·움직임을 지정", rule:{any:["카메라","샷","클로즈업","와이드","앵글","줌","트래킹","팬","부감","로우앵글","핸드헬드"]}, out:"어느 각도·움직임인지 모름"},
+        supply:{opt:"연출 관점·레퍼런스를 안 줬다", rub:"연출 관점 또는 레퍼런스를 제공", rule:{any:["역할","처럼","관점","감독","레퍼런스","참고","이미지","영상","아래","자료","무드보드"]}, out:"기준 룩·레퍼런스가 없음"}
+      },
+      distract:[{id:"x_len",opt:"길이를 안 정했다"},{id:"x_ratio",opt:"화면비를 안 정했다"},{id:"x_music",opt:"배경음악을 안 정했다"},{id:"x_polite",opt:"말투가 공손하지 않다"}]
+    },
+    fmt: {
+      seeds:[
+        {text:"릴스용 영상 뽑아줘", rel:["ratio","shots"], sub:"reels", facts:{ratio:"9:16 세로 화면비로", shots:"3컷 시퀀스로"}, model:"릴스용 영상을 9:16 세로 화면비로, 3컷 시퀀스로 만들어줘."},
+        {text:"숏폼 인트로 만들어줘", rel:["ratio","duration"], sub:"reels", facts:{ratio:"9:16 세로로", duration:"3초 길이로"}, model:"숏폼 인트로를 9:16 세로로, 3초 길이로 만들어줘."},
+        {text:"훅 영상 만들어줘", rel:["duration","motion"], sub:"reels", facts:{duration:"2초 길이로", motion:"빠른 줌인 모션으로"}, model:"첫 2초 길이로, 빠른 줌인 모션의 훅 영상을 만들어줘."},
+        {text:"제품 회전 영상 만들어줘", rel:["motion","duration"], sub:"ad", facts:{motion:"360도 회전 모션으로", duration:"5초 길이로"}, model:"제품을 360도 회전 모션으로, 5초 길이로 보여주는 영상을 만들어줘."},
+        {text:"로고 모션 만들어줘", rel:["ratio","motion"], sub:"ad", facts:{ratio:"1:1 정사각으로", motion:"페이드인 모션으로"}, model:"로고 모션을 1:1 정사각으로, 페이드인 모션으로 만들어줘."},
+        {text:"광고 하이라이트 만들어줘", rel:["shots","duration"], sub:"ad", facts:{shots:"4컷 구성으로", duration:"10초 길이로"}, model:"광고 하이라이트를 4컷 구성으로, 10초 길이로 만들어줘."},
+        {text:"b-roll 시퀀스 만들어줘", rel:["shots","motion"], sub:"broll", facts:{shots:"5컷 시퀀스로", motion:"슬로우 모션으로"}, model:"b-roll을 5컷 시퀀스로, 슬로우 모션으로 만들어줘."},
+        {text:"슬로우 컷 만들어줘", rel:["motion","duration"], sub:"broll", facts:{motion:"슬로우 모션으로", duration:"6초 길이로"}, model:"슬로우 모션으로, 6초 길이의 컷을 만들어줘."},
+        {text:"풍경 영상 만들어줘", rel:["ratio","motion"], sub:"broll", facts:{ratio:"16:9 가로로", motion:"느린 팬 모션으로"}, model:"풍경 영상을 16:9 가로로, 느린 팬 모션으로 만들어줘."}
+      ],
+      comps:{
+        ratio:{opt:"화면비를 지정하지 않았다", rub:"화면비(9:16·16:9 등) 지정", rule:{any:["화면비","비율","9:16","16:9","1:1","세로","가로","정사각"]}, out:"세로인지 가로인지 불명확"},
+        duration:{opt:"영상 길이를 지정하지 않았다", rub:"길이(초)를 지정", rule:{any:["초","길이","분량","프레임","짧게","길게"]}, out:"몇 초인지 불명확"},
+        shots:{opt:"샷/컷 구성을 지정하지 않았다", rub:"컷·시퀀스 구성 지정", rule:{any:["컷","샷","장면","시퀀스","순서","구성","전환"]}, out:"한 컷인지 여러 컷인지 불명확"},
+        motion:{opt:"카메라 모션 형식을 지정하지 않았다", rub:"카메라 모션 형식 지정", rule:{any:["모션","움직임","줌","팬","슬로우","속도","정지","고정","트래킹"]}, out:"정적인지 움직이는지 불명확"}
+      },
+      distract:[{id:"x_subject",opt:"피사체를 안 정했다 (맥락 단계 문제)"},{id:"x_style",opt:"스타일을 안 정했다 (맥락 단계 문제)"},{id:"x_polite",opt:"공손하지 않다"}]
+    },
+    proc:[
+      {name:"릴스 한 컷", steps:["피사체·배경·스타일을 한 줄로 정함","카메라 앵글·움직임을 정함","세로 화면비·길이를 정함","생성 후 어긋난 부분을 수정"], sub:"reels"},
+      {name:"숏폼 훅", steps:["첫 1초 훅을 정함","핵심 동작만 짧게 지시","세로 9:16로 고정","튀는 프레임 재생성"], sub:"reels"},
+      {name:"제품 광고 클립", steps:["핵심 셀링포인트 한 줄을 정함","제품을 보여줄 앵글·모션을 정함","화면비·길이를 타깃 채널에 맞춤","생성물에서 로고·텍스트 가독성 점검"], sub:"ad"},
+      {name:"브랜드 무드", steps:["톤·무드를 한 줄로 정함","상징 컷을 설계","일관된 색·룩 유지","컷을 자연스럽게 연결"], sub:"ad"},
+      {name:"b-roll 수집", steps:["어디에 쓸지 용도를 정함","고정·안정 샷을 우선","같은 룩으로 통일","여분 컷을 넉넉히 확보"], sub:"broll"},
+      {name:"이미지→영상(i2v)", steps:["기준 이미지를 먼저 고정","원하는 움직임만 짧게 지시","과한 모션·왜곡을 줄이도록 제약","프레임 튀는 구간을 재생성"], sub:"broll"},
+      {name:"트렌드 리믹스", steps:["참고 포맷을 분석","내 소재로 치환","세로·짧게 재구성","훅·자막 점검"], sub:"reels"},
+      {name:"자막 영상", steps:["핵심 메시지를 분절","컷마다 한 문장","가독성 큰 자막","리듬에 맞춰 타이밍"], sub:"reels"},
+      {name:"USP 광고", steps:["차별점을 한 줄로 정의","그걸 보여줄 장면 설계","제품 클로즈업 배치","CTA·로고로 마무리"], sub:"ad"},
+      {name:"비포애프터", steps:["전/후 대비 포인트 정함","같은 앵글로 촬영 지시","전환 모션 설계","결과를 강조하는 컷"], sub:"ad"},
+      {name:"분위기 컷", steps:["전하려는 무드를 정함","빛·색·질감을 지정","고정·슬로우 위주","여러 앵글 확보"], sub:"broll"},
+      {name:"타임랩스", steps:["대상의 변화를 정함","간격·속도를 지정","고정 프레임 유지","흔들림 없이 안정화"], sub:"broll"}
+    ],
+    goal:{
+      rubricComps:[
+        {id:"spec",label:"검증 가능한 출력 사양(화면비·길이·컷 수)", rule:{any:["9:16","16:9","1:1","초","화면비","프레임","세로","가로","컷","샷","고정","슬로우","만족","기준"]}},
+        {id:"cases",label:"구체 예시(피사체·동작 등)", rule:{example:true}},
+        {id:"constraint",label:"금지/제약 명시(텍스트 없음 등)", rule:{any:["없음","없이","금지","제외","넣지","빼고","워터마크","모호"]}}
+      ],
+      vbank:[
+        {task:"릴스 제품 소개 영상", ok:["화면비 9:16","길이 6초 이내"], vague:["감각적으로","바이럴 되게"], sub:"reels"},
+        {task:"숏폼 인트로", ok:["3초 이내","첫 컷에 제목 노출"], vague:["힙하게","눈에 띄게"], sub:"reels"},
+        {task:"로고 인트로 모션", ok:["1:1 정사각 비율","로고가 2초 안에 등장"], vague:["임팩트 있게","고급스럽게"], sub:"ad"},
+        {task:"제품 광고 컷", ok:["16:9 가로","제품 정면 클로즈업"], vague:["멋지게","프리미엄하게"], sub:"ad"},
+        {task:"카페 분위기 b-roll", ok:["손 떨림 없는 고정 샷","사람 얼굴이 안 보이게"], vague:["감성적으로","따뜻한 느낌으로"], sub:"broll"},
+        {task:"도시 야경 b-roll", ok:["슬로우 모션","16:9 가로"], vague:["시네마틱하게","분위기 있게"], sub:"broll"},
+        {task:"댄스 챌린지 영상", ok:["9:16 세로","15초 이내"], vague:["신나게","트렌디하게"], sub:"reels"},
+        {task:"정보 카드 릴스", ok:["컷당 한 메시지","자막 필수"], vague:["깔끔하게","유익하게"], sub:"reels"},
+        {task:"앱 프로모 영상", ok:["16:9 가로","핵심 기능 1개 시연"], vague:["멋지게","설득력 있게"], sub:"ad"},
+        {task:"세일 광고 컷", ok:["할인율 텍스트 명시","3초 이내"], vague:["눈길 끌게","강렬하게"], sub:"ad"},
+        {task:"자연 풍경 b-roll", ok:["고정 또는 슬로우","사람 없이"], vague:["웅장하게","평화롭게"], sub:"broll"},
+        {task:"음식 b-roll", ok:["접시 클로즈업","사람·손 없이 음식만"], vague:["먹음직스럽게","감성적으로"], sub:"broll"}
+      ]
+    }
+  },
+  basics: {
+    ctx: {
+      seeds:[
+        {text:"케이크 레시피 알려줘", rel:["who","detail"], facts:{who:"4인 가족 기준으로", detail:"30분 이내로 만들 수 있게"}, model:"4인 가족 기준으로, 30분 이내로 만들 수 있는 케이크 레시피를 알려줘."},
+        {text:"여행 코스 짜줘", rel:["who","purpose"], facts:{who:"부모님과 함께 가는 상황으로", purpose:"효도 여행 목적으로"}, model:"부모님과 함께 가는 상황으로, 효도 여행 목적의 여행 코스를 짜줘."},
+        {text:"이메일 써줘", rel:["purpose","detail"], facts:{purpose:"환불을 요청하려는 목적으로", detail:"3문장 이내로"}, model:"환불을 요청하려는 목적으로, 3문장 이내의 이메일을 써줘."},
+        {text:"운동 알려줘", rel:["who","purpose"], facts:{who:"운동 초보 기준으로", purpose:"다이어트 목적으로"}, model:"운동 초보 기준으로, 다이어트 목적의 운동을 알려줘."},
+        {text:"선물 추천해줘", rel:["who","detail"], facts:{who:"20대 친구에게 줄", detail:"예산 3만원으로"}, model:"20대 친구에게 줄, 예산 3만원으로 선물을 추천해줘."},
+        {text:"식단 짜줘", rel:["who","purpose"], facts:{who:"혼자 사는 자취생 기준으로", purpose:"건강 관리 목적으로"}, model:"혼자 사는 자취생 기준으로, 건강 관리 목적의 식단을 짜줘."},
+        {text:"조언 좀 해줘", rel:["supply","purpose"], facts:{supply:"전문가 관점에서", purpose:"건강 관리 목적으로"}, model:"전문가 관점에서, 건강 관리 목적으로 조언을 해줘."}
+      ],
+      comps:{
+        who:{opt:"누구/어떤 상황인지 없다", rub:"대상·상황을 지정", rule:{any:["대상","상황","초보","아이","가족","부모","친구","연인","아내","남편","자녀","어르신","손님","인분","명","혼자","사람","나이","20대","30대"]}, out:"누구를 위한 건지 모르겠습니다"},
+        subject:{opt:"무엇을 구체적으로 안 정했다", rub:"구체적인 대상·주제 지정", rule:{any:["종류","메뉴","주제","구체","어떤","재료","장소","분야"]}, out:"정확히 무엇인지 불명확"},
+        purpose:{opt:"목적/이유가 없다", rub:"목적·이유를 밝힘", rule:{any:["목적","이유","위해","때문","용도","기념","건강","공부","다이어트","선물"]}, out:"왜 필요한지 모름"},
+        detail:{opt:"조건/제약이 없다", rub:"조건·제약(시간·예산 등) 지정", rule:{any:["분","시간","예산","원","없이","빼고","이내","간단","가격","만원"]}, out:"어떤 조건인지 불명확"},
+        supply:{opt:"역할·관점이나 참고 자료를 안 줬다", rub:"역할·관점 또는 참고 자료를 제공", rule:{any:["역할","처럼","관점","입장","전문가","참고","자료","아래","예시","문서"]}, out:"누구 관점·무슨 근거인지 모름"}
+      },
+      distract:[{id:"x_fmt",opt:"형식을 안 정했다"},{id:"x_len",opt:"분량을 안 정했다"},{id:"x_polite",opt:"공손하지 않다"},{id:"x_emoji",opt:"이모지를 안 넣었다"}]
+    },
+    fmt: {
+      seeds:[
+        {text:"할 일 정리해줘", rel:["shape","length"], facts:{shape:"번호 목록으로", length:"5개 이내로"}, model:"할 일을 번호 목록으로, 5개 이내로 정리해줘."},
+        {text:"비교해줘", rel:["shape","sections"], facts:{shape:"표로", sections:"요약과 결론을 넣어"}, model:"표로 비교해줘. 요약과 결론을 넣어서."},
+        {text:"요약해줘", rel:["length","sections"], facts:{length:"3문장으로", sections:"핵심 요약과 결론을 넣어"}, model:"3문장으로 요약해줘. 핵심 요약과 결론을 넣어서."},
+        {text:"설명해줘", rel:["shape","example"], facts:{shape:"단계 순서로", example:"예: 1) 먼저 …하기 처럼"}, model:"단계 순서로 설명해줘. 예: 1) 먼저 …하기 처럼."},
+        {text:"추천 목록 줘", rel:["shape","length"], facts:{shape:"번호 목록으로", length:"5가지로"}, model:"추천을 번호 목록으로, 5가지로 줘."}
+      ],
+      comps:{
+        shape:{opt:"형식(목록·표·단계)을 안 정했다", rub:"형식(목록·표·단계) 지정", rule:{any:["목록","표","단계","번호","순서","항목"]}, out:"줄글로 뭉텅이"},
+        length:{opt:"분량/개수를 안 정했다", rub:"분량·개수 지정", rule:{any:["개","줄","자","문장","간단","짧게","가지"]}, out:"분량이 제멋대로"},
+        sections:{opt:"필요한 부분을 안 짚었다", rub:"필요한 항목 지정", rule:{any:["제목","요약","팁","주의","준비물","이유","결론"]}, out:"필요한 게 빠짐"},
+        example:{opt:"예시를 원한다고 안 했다", rub:"예시 요청", rule:{example:true}, out:"예시가 없음"}
+      },
+      distract:[{id:"x_who",opt:"대상을 안 정했다 (맥락 단계)"},{id:"x_polite",opt:"공손하지 않다"}]
+    },
+    proc:[
+      {name:"부탁하기", steps:["무엇을·누구를 위한 건지 정함","원하는 형식을 말함","조건(시간·예산)을 덧붙임","결과 보고 부족하면 다시 요청"]},
+      {name:"초안 받고 다듬기", steps:["대충 요청해 초안을 받음","마음에 안 드는 점을 짚음","고칠 방향을 구체적으로 말함","원하는 형태가 될 때까지 반복"]},
+      {name:"비교 부탁", steps:["비교할 대상들을 정함","비교 기준을 정함","표로 정리 요청","내 상황에 맞는 추천 요청"]},
+      {name:"정보 찾기", steps:["무엇을 알고 싶은지 한 줄로","아는 것·모르는 것 구분","원하는 깊이를 말함","출처·근거를 함께 요청"]},
+      {name:"글 부탁", steps:["누구에게·어떤 글인지 정함","담을 핵심을 적음","톤·길이를 정함","초안 받고 고쳐 달라 요청"]}
+    ],
+    goal:{
+      rubricComps:[
+        {id:"spec",label:"검증 가능한 조건(개수·시간·예산 등)", rule:{any:["개","분","시간","자","원","이내","이하","가지","만족","기준"]}},
+        {id:"cases",label:"구체 예시·상황", rule:{example:true}},
+        {id:"constraint",label:"제외/금지 조건(예: ~없이)", rule:{any:["없이","빼고","금지","제외","말고","모호"]}}
+      ],
+      vbank:[
+        {task:"가족 저녁 메뉴 추천", ok:["4인분 기준","30분 내 조리"], vague:["맛있게","근사하게"]},
+        {task:"주말 나들이 코스", ok:["차 없이 대중교통","반나절 분량"], vague:["좋은 곳으로","힐링되게"]},
+        {task:"감사 이메일", ok:["3문장 이내","과한 표현 금지"], vague:["정중하게","센스있게"]},
+        {task:"집에서 하는 운동 루틴", ok:["주 3회","기구 없이"], vague:["효과적으로","빡세게"]},
+        {task:"생일 선물 추천", ok:["예산 3만원","받는 사람 20대"], vague:["감동적인","특별한"]},
+        {task:"2주 공부 계획", ok:["하루 1시간","2주 분량"], vague:["열심히","제대로"]}
+      ]
+    }
+  }
+};
+
+// 군더더기 풀(짝비교 약한 프롬프트용). 구체 facts는 각 시드(seed.facts)에 둔다.
+const FLUFF = {
+  coding:{ ctx:["정중한 말투로 답해줘","최대한 길게 설명해줘","아주 멋지게 만들어줘"], fmt:["친절하게 설명해줘","서론을 길게 붙여줘","느낌표를 많이 써줘"] },
+  writing:{ ctx:["감동적으로 써줘","최대한 화려하게","이모지를 많이 써줘"], fmt:["멋지게 써줘","분량을 길게 늘려줘","느낌표를 많이 써줘"] },
+  video:{ ctx:["아주 멋지게 만들어줘","최대한 화려하게","대박나게 만들어줘"], fmt:["느낌 살려서 뽑아줘","예쁘게 만들어줘","감각적으로 뽑아줘"] },
+  basics:{ ctx:["아주 잘 부탁해","최대한 멋지게","센스있게"], fmt:["예쁘게 정리해줘","느낌 살려서","깔끔하게"] }
+};
+
+// 살러드 탐지: 키워드 나열형(연결어 적고 짧은 토큰 많음 / 반복)을 통계로 잡는다
+function looksLikeSalad(text){
+  const t=(text||"").trim();
+  const tokens=t.split(/[\s,、·\/]+/).filter(Boolean);
+  if(tokens.length<6) return false;
+  const shortRatio=tokens.filter(w=>w.length<=2).length/tokens.length;
+  const uniqRatio=new Set(tokens).size/tokens.length;
+  const conn=["로","으로","를","을","에서","에게","에","의","와","과","하고","해서","하라","해줘","하세요","세요","포함","작성","정리","반환","이내","처럼","같이","마다","으며","하며","면서"];
+  const connDensity=tokens.filter(w=>conn.some(c=>w.includes(c))).length/tokens.length;
+  return (shortRatio>0.55 && connDensity<0.2) || uniqRatio<0.5;
+}
+
+// ---------- 문항 생성기 ----------
+function genCompare(track, stage, rnd, sub){
+  const b=BANK[track][stage], fluff=FLUFF[track][stage];
+  const seed=pick(rnd,bySub(b.seeds,sub)), rel=seed.rel;
+  const strong=shuffle(rnd, rel.map(id=>seed.facts[id]));
+  const dropId=pick(rnd, rel);
+  const weak=shuffle(rnd, rel.filter(id=>id!==dropId).map(id=>seed.facts[id]).concat([pick(rnd,fluff)]));
+  const strongIsA=rnd()<0.5;
+  const A=strongIsA?strong:weak, B=strongIsA?weak:strong, better=strongIsA?"A":"B";
+  const distract=pick(rnd, b.distract);
+  const missOpts=shuffle(rnd, rel.map(id=>({id,label:b.comps[id].opt})).concat([{id:distract.id,label:distract.opt}]));
+  return {type:"compare",
+    prompt:"두 프롬프트 중 더 나은 것을 고르고, 약한 쪽이 빠뜨린 핵심을 고르세요.",
+    task:seed.text, A, B, better, missOpts, missing:dropId,
+    explain:"약한 쪽은 ["+b.comps[dropId].rub+"]를 빠뜨리고 군더더기로 채웠어요. 빠진 걸 채운 쪽이 좋은 프롬프트예요."};
+}
+function genDiagnoseCtxFmt(track, stage, rnd, sub){
+  const b = BANK[track][stage];
+  const seed = pick(rnd, bySub(b.seeds,sub));
+  const correct = seed.rel.map(id => ({id, label:b.comps[id].opt}));
+  const dist = shuffle(rnd, b.distract).slice(0,2);
+  const opts = shuffle(rnd, correct.concat(dist.map(d=>({id:d.id,label:d.opt}))));
+  const out = seed.rel.map(id => b.comps[id].out).join("; ");
+  const tip = stage==="ctx"
+    ? "상황(무엇을·어디서·왜)이 비면 AI는 추측만 해요. 빠진 핵심만 짚으세요. 형식·말투는 이 단계 문제가 아니에요."
+    : "내용이 아니라 모양이 문제예요. 형식·항목·예시를 정해주면 결과가 깔끔하게 나와요. 대상·말투는 이 단계 문제가 아니에요.";
+  const model=seed.model || (seed.rel.map(id=>seed.facts[id]).join(", ")+", "+seed.text);
+  return {type:"diagnose",
+    prompt:`아래 프롬프트로 이런 결과가 나왔어요. 이 과제에서 가장 크게 빠진 것은? (정답 ${seed.rel.length}개)`,
+    bad:seed.text, out:'"'+out+'"', opts, correct:seed.rel, explain:tip, model};
+}
+function genFixCtxFmt(track, stage, rnd, sub){
+  const b = BANK[track][stage];
+  const seed = pick(rnd, bySub(b.seeds,sub));
+  const rubric = seed.rel.map(id => ({id, label:b.comps[id].rub, rule:b.comps[id].rule}));
+  const prompt = stage==="ctx"
+    ? "아래 주어진 정보를 담아, AI가 추측하지 않게 프롬프트를 고쳐 보세요."
+    : "아래 주어진 정보를 담아, 출력 형식을 정해 고쳐 보세요.";
+  const tip = stage==="ctx" ? "대상·증상·목표·환경을 채우면 AI가 추측을 멈춰요." : "형식·항목·예시를 정해주면 결과가 표 한 줄로 깔끔하게 나와요.";
+  const facts=seed.rel.map(id=>seed.facts[id]);
+  const model=seed.model || (facts.join(", ")+", "+seed.text);   // seed.model = 손으로 다듬은 자연스러운 모범 프롬프트
+  return {type:"fix", prompt, seed:seed.text, rubric, explain:tip, model, facts};
+}
+function genOrder(track, rnd, sub){
+  const proc = pick(rnd, bySub(BANK[track].proc, sub));
+  const items = proc.steps.map((s,i)=>({id:"s"+i, label:s}));
+  return {type:"order",
+    prompt:'"'+proc.name+'" 작업을 시키는 올바른 순서로 배열해 보세요.',
+    items:shuffle(rnd, items), order:items.map(i=>i.id),
+    explain:"순서를 정해주면 AI가 차근차근 풀며 스스로 오류를 잡아요. 올바른 순서 → "+proc.steps.join(" → ")};
+}
+function genReasonFix(track, rnd, sub){
+  const proc = pick(rnd, bySub(BANK[track].proc, sub));
+  const facts=["계획부터 세우고 단계로 나눠 진행하게", "끝나면 스스로 점검하게"];
+  const rubric=[
+    {id:"steps", label:"추론 절차를 지시(계획·단계로 나눔 등)", rule:{any:["단계","계획","먼저","나눠","하나씩","순서"]}},
+    {id:"check", label:"자기검토·점검을 요청", rule:{any:["검토","점검","확인","스스로","다시"]}}
+  ];
+  return {type:"fix",
+    prompt:"복잡한 작업이에요. AI가 차근차근 풀도록 프롬프트에 무엇을 넣을지 채워 고쳐 보세요.",
+    seed:proc.name+" 해줘", rubric, facts,
+    explain:"AI는 한 번에 생각하는 양이 정해져 있다. 계획·단계·자기점검을 시키면 더 차근차근 푼다. (똑똑한 추론 AI는 굳이 안 시켜도 된다)",
+    model:facts.join(", ")+", "+proc.name+" 해줘"};
+}
+function genRubricGoal(track, rnd, sub){
+  const g = BANK[track].goal;
+  const e = pick(rnd, bySub(g.vbank, sub));
+  const model='"'+e.task+'" — '+e.ok.join(", ")+'를 만족시키고, '+e.vague.join("·")+' 같은 모호한 표현은 금지.';
+  return {type:"rubric",
+    prompt:'"'+e.task+'"에 대해, 통과/실패를 딱 잘라 판정할 수 있는 프롬프트를 작성하세요.',
+    rubric:g.rubricComps,
+    explain:"합격 조건·구체 예시·금지를 정해주면 결과가 맞았는지 직접 확인할 수 있어요.", model};
+}
+function genVerif(track, rnd, sub){
+  const e = pick(rnd, bySub(BANK[track].goal.vbank, sub));
+  const ok = e.ok.map((t,i)=>({id:"k"+i, label:t}));
+  const vague = e.vague.map((t,i)=>({id:"g"+i, label:t}));
+  return {type:"diagnose",
+    prompt:"목표: "+e.task+`. 통과/실패로 판정 가능한 조건을 모두 고르세요. (정답 ${e.ok.length}개)`,
+    bad:"목표 = "+e.task, out:"(검증 가능한 조건만 고르세요)",
+    opts:shuffle(rnd, ok.concat(vague)), correct:ok.map(o=>o.id),
+    explain:"통과/실패를 딱 잘라 판정할 수 있어야 해요. '우아하게'·'빠르게' 같은 형용사는 기준이 못 돼요."};
+}
+const RECOG_UNTIL = 3;   // 숙련도 0~2: 인지(객관식)만, 3+: 생산(주관식) 등장
+function genQuestion(track, li, seed, sub, mastery){
+  const rnd = rng(seed);
+  const key = LEVELS[li].key;
+  const recog = (mastery==null ? 99 : mastery) < RECOG_UNTIL;   // 낮은 숙련도 = 객관식, 높으면 주관식
+  if(key==="ctx"||key==="fmt"){
+    if(recog) return (rnd()<0.5) ? genDiagnoseCtxFmt(track,key,rnd,sub) : genCompare(track,key,rnd,sub);  // 둘 다 객관식
+    const r=rnd();
+    if(r<0.25) return genDiagnoseCtxFmt(track,key,rnd,sub);
+    if(r<0.45) return genCompare(track,key,rnd,sub);
+    return genFixCtxFmt(track,key,rnd,sub);   // 생산형(고치기)
+  }
+  if(key==="proc"){
+    if(recog) return genOrder(track, rnd, sub);                 // 객관식(순서)
+    return (rnd()<0.4) ? genOrder(track, rnd, sub) : genReasonFix(track, rnd, sub);
+  }
+  // goal
+  if(recog) return genVerif(track, rnd, sub);                   // 객관식(검증 가능 조건 고르기)
+  return (rnd()<0.4) ? genVerif(track, rnd, sub) : genRubricGoal(track, rnd, sub);
+}
+//#GEN-END
+
+// ---------- 상태 ----------
+const MASTER_N = 5;                         // 스킬별 정답 누적이 이만큼 차면 "익힘"
+const KEY = "promptdojo.v2";
+let state = JSON.parse(localStorage.getItem(KEY) || "{}");
+state.mastery = state.mastery || {};        // 스킬별 누적 정답 수(숙련도 미터)
+state.streak = state.streak || {};          // 세션 외 연속(홈 히어로 표시용)
+state.seedFor = state.seedFor || {};
+state.seedCtr = state.seedCtr || 1;
+state.solved = state.solved || 0;          // 누적 정답 수(엔드게임 신호)
+state.best = state.best || {};             // 과목별 마스터 최고 연속
+let masteryStreak = {};                    // 세션 내 마스터 연속(비영속)
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+const lk = (t,li)=>`${t}.${li}`;
+function masteryOf(t,li){ return state.mastery[lk(t,li)]||0; }
+function isMastered(t,li){ return masteryOf(t,li)>=MASTER_N; }
+function allMastered(t){ return LEVELS.every((_,i)=>isMastered(t,i)); }
+function unlocked(t,li){ return true; }    // 강제 순서 제거 — 접근은 결제(paidOk)만 좌우
+function seedFor(t,li){
+  const k=lk(t,li);
+  if(!state.seedFor[k]){ state.seedCtr++; state.seedFor[k]=state.seedCtr; save(); }
+  return state.seedFor[k];
+}
+function newSeed(t,li){ state.seedCtr++; state.seedFor[lk(t,li)]=state.seedCtr; save(); }
+function onGrade(t,li,ok){
+  if(ok) state.solved++;
+  if(li==="m"){   // 마스터 모드: 숙련도 누적 없이 연속·최고만 기록
+    if(ok){ masteryStreak[t]=(masteryStreak[t]||0)+1; state.best[t]=Math.max(state.best[t]||0, masteryStreak[t]); }
+    else masteryStreak[t]=0;
+    save(); return;
+  }
+  const k=lk(t,li);
+  if(ok){ state.mastery[k]=(state.mastery[k]||0)+1; state.streak[k]=(state.streak[k]||0)+1; }
+  else { state.streak[k]=0; }   // 숙련도는 누적(감점 없음), 연속만 리셋
+  save();
+}
+
+// ---------- 결제 권한 (기초만 무료 / 코딩·글쓰기·영상 = 전체 이용 IAP) ----------
+const ENT_KEY="promptdojo.entitled";
+const IS_NATIVE = !!(window.Capacitor && window.Capacitor.isNativePlatform && window.Capacitor.isNativePlatform());
+let entitled = JSON.parse(localStorage.getItem(ENT_KEY) || "[]");
+const PID = (window.IAP&&window.IAP.products) || {full:'kr.logiccraft.promptdojo.full'};
+function hasFull(){ return !IS_NATIVE || entitled.indexOf(PID.full)>=0; }   // 웹은 전체 무료, 네이티브 앱만 IAP 게이트
+function paidOk(track, li){ return track==="basics" || hasFull(); }   // 기초는 전부 무료, 도메인 과목은 전체 이용(앱)
+if(window.IAP){
+  window.IAP.onChange=function(id){ if(entitled.indexOf(id)<0){ entitled.push(id); localStorage.setItem(ENT_KEY, JSON.stringify(entitled)); } if(typeof rerender==="function") rerender(); };
+  if(window.IAP.configure) window.IAP.configure();
+}
+
+let curTrack=state.lastTrack||"basics";   // 새 사용자는 기초부터, 그 외엔 마지막 트랙
+let view="home";                          // home | learn | settings  (과목은 curTrack)
+let selLevel={basics:0, coding:0, writing:0, video:0};
+
+// ---------- 렌더 (앱 셸) ----------
+function el(t,c){ const d=document.createElement(t); if(c)d.className=c; return d; }
+function defaultLevel(t){
+  for(let i=0;i<LEVELS.length;i++) if(paidOk(t,i) && !isMastered(t,i)) return i;
+  for(let i=LEVELS.length-1;i>=0;i--) if(paidOk(t,i)) return i;
+  return 0;
+}
+// 실제로 풀 수 있는(결제 OK) 스킬 — '이어서 풀기'가 페이월로 빠지지 않게. 아직 안 익힌 것 우선.
+function playableLevel(t){
+  let last=0;
+  for(let i=0;i<LEVELS.length;i++){ if(paidOk(t,i)){ last=i; if(!isMastered(t,i)) return i; } }
+  return last;
+}
+// 모든 진입점이 착지할 레벨: 현재 선택이 풀 수 있으면 유지, 아니면 playableLevel (콜드 페이월 방지)
+function landingLevel(t){ const c=selLevel[t]; return (c!=="m" && !isMastered(t,c) && paidOk(t,c)) ? c : playableLevel(t); }
+// ---------- 해시 라우팅 (페이지별 URL) ----------
+// "" / #home → 홈 · #coding/#writing/#video → 학습 · #settings → 설정
+let pendingLevel=null;   // 특정 레벨을 콕 집어 진입(칩 클릭) — 라우팅 보정 대신 그 레벨로
+function applyRoute(){
+  const h=(location.hash||"").replace(/^#\/?/,"");
+  if(h==="settings") view="settings";
+  else if(h==="guide") view="guide";
+  else if(h==="basics"||h==="coding"||h==="writing"||h==="video"){
+    curTrack=h; state.lastTrack=h; save();
+    if(pendingLevel!=null){ selLevel[h]=pendingLevel; pendingLevel=null; }
+    else if(selLevel[h]!=="m") selLevel[h]=landingLevel(h);
+    view="learn";
+  }
+  else view="home";
+  renderApp();
+}
+// 모든 진입점 단일 경로 — 해시만 바꾸면 hashchange가 렌더(일관성+뒤로가기)
+function nav(hash){ if(location.hash===("#"+hash)) applyRoute(); else location.hash="#"+hash; }
+function rerender(){ renderApp(); }
+function gateHTML(t,li){
+  if(li==="m"){
+    const cur=masteryStreak[t]||0, best=state.best[t]||0;
+    return `<div class="gate-row"><span>마스터 · 무작위 혼합</span><span class="gate-n">연속 ${cur} · 최고 ${best}</span></div>`;
+  }
+  const m=Math.min(masteryOf(t,li),MASTER_N), mastered=isMastered(t,li);
+  let segs=""; for(let i=0;i<MASTER_N;i++) segs+=`<span class="seg${i<m?' on':''}"></span>`;
+  const label = mastered ? "이 스킬 익힘 ★ (계속 단련 가능)" : "숙련도 — 정답을 쌓아 채워요";
+  return `<div class="gate-row"><span>${label}</span><span class="gate-n">${m} / ${MASTER_N}</span></div><div class="streak">${segs}</div>`;
+}
+function renderPaywall(li){
+  const wrap=el("div","lvl"); wrap.style.padding="18px 16px";
+  const pFull=(window.IAP&&window.IAP.priceOf&&window.IAP.priceOf("full"))||"₩7,900";
+  const canBuy=!!(window.IAP&&window.IAP.available&&window.IAP.available());
+  const lvName=(LEVELS[li]?LEVELS[li].name:"")||"";
+  wrap.innerHTML=`<div style="font-size:17px;font-weight:800;margin-bottom:4px">여기부터 전체 이용</div>
+    <div class="sub" style="margin-bottom:14px">기초 트랙은 무료입니다. 코딩·글쓰기·영상 세 과목의 모든 스킬을 한 번 결제로 영구 해제합니다.${LEVELS[li]?` (지금: ${lvName})`:""}</div>`;
+  const b1=el("button","btn"); b1.textContent=`전체 이용 · ${pFull}`;
+  const b2=el("button","btn ghost"); b2.textContent="구매 복원";
+  b1.onclick=()=>{ if(canBuy) window.IAP.buy("full").catch(()=>{}); };
+  b2.onclick=()=>{ if(canBuy) window.IAP.restore().catch(()=>{}); };
+  if(!canBuy){ b1.disabled=true; b2.disabled=true; }
+  wrap.appendChild(b1); wrap.appendChild(b2);
+  if(!canBuy){ const n=el("div","explain"); n.textContent="앱 스토어 빌드에서 구매·복원할 수 있어요."; wrap.appendChild(n); }
+  return wrap;
+}
+const ICON={
+  play:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>',
+  code:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 8l-4 4 4 4M16 8l4 4-4 4"/></svg>',
+  pen:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg>',
+  film:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="6" width="13" height="12" rx="2"/><path d="M16 10l5-2v8l-5-2z"/></svg>',
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7M5 10v10h14V10"/></svg>',
+  gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2 2M16.4 16.4l2 2M18.4 5.6l-2 2M7.6 16.4l-2 2"/></svg>',
+  book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"/></svg>'
+};
+function renderApp(){
+  document.getElementById("ab-chip").innerHTML = "◆ "+state.solved;
+  const sc=document.getElementById("screen"); sc.innerHTML="";
+  sc.appendChild(view==="home" ? renderHome() : view==="settings" ? renderSettings() : view==="guide" ? renderGuide() : renderLearn());
+  renderNav();
+  sc.scrollTop=0; window.scrollTo(0,0);
+}
+function renderNav(){
+  const navEl=document.getElementById("nav"); navEl.innerHTML="";
+  [["__home","홈",ICON.home],["coding","코딩",ICON.code],["writing","글쓰기",ICON.pen],["video","영상",ICON.film],["__set","설정",ICON.gear]].forEach(([k,label,ico])=>{
+    const on = k==="__home" ? view==="home" : k==="__set" ? view==="settings" : (view==="learn" && curTrack===k);
+    const d=el("div","nav-item"+(on?" on":""));
+    d.innerHTML=`<span class="nav-ico">${ico}</span>${label}`;
+    d.onclick=()=>nav(k==="__home"?"home":k==="__set"?"settings":k);
+    navEl.appendChild(d);
+  });
+}
+function renderHome(){
+  const s=el("div");
+  const subIcon={basics:ICON.book,coding:ICON.code,writing:ICON.pen,video:ICON.film};
+  const ct={basics:"기초",coding:"코딩",writing:"글쓰기",video:"영상"}[curTrack];
+  const li=landingLevel(curTrack);
+  const lvname=LEVELS[li].name;
+  const m=Math.min(masteryOf(curTrack,li),MASTER_N), mastered=isMastered(curTrack,li);
+
+  // ── 이어서 풀기 (골드 히어로 · 숙련도 미터) ──
+  let seg=""; for(let i=0;i<MASTER_N;i++) seg+=`<span class="${i<m?'on':''}"></span>`;
+  const cont=el("div","cont");
+  cont.innerHTML=`<div class="cont-eye">이어서 풀기</div><div class="cont-pill">숙련도 ${m} / ${MASTER_N}</div>`+
+    `<div class="cont-title">${ct} · ${lvname}</div>`+
+    `<div class="cont-sub">${mastered?"이 스킬 익힘 ★ — 다른 스킬도 단련해요":"정답 "+(MASTER_N-m)+"번 더 쌓으면 익힘"}</div>`+
+    `<div class="cont-play">${ICON.play}</div>`+
+    `<div class="cont-seg">${seg}</div>`;
+  cont.onclick=()=>nav(curTrack);
+  s.appendChild(cont);
+
+  // ── 닻: 좋은 프롬프트란? (이 앱의 기준) ──
+  const anchor=el("div","hhint"); anchor.style.cursor="pointer"; anchor.style.marginTop="10px";
+  anchor.innerHTML=`<span class="hh-ic">📐</span><span><b style="color:var(--ink)">좋은 프롬프트란?</b><br>AI가 답하는 방식으로 보는 5가지 기준 — 이 앱이 무엇을 연습하는지</span>`;
+  anchor.onclick=()=>nav("guide");
+  s.appendChild(anchor);
+
+  // ── 과목 카드 ──
+  const lab=el("div","section-label"); lab.textContent="과목"; lab.style.margin="18px 2px 10px"; s.appendChild(lab);
+  [["basics","기초"],["coding","코딩"],["writing","글쓰기"],["video","영상"]].forEach(([tk,name])=>{
+    const c=LEVELS.filter((_,i)=>isMastered(tk,i)).length;
+    const p=Math.round(LEVELS.reduce((a,_,i)=>a+Math.min(masteryOf(tk,i),MASTER_N),0)/(LEVELS.length*MASTER_N)*100);
+    const subs=TRACKDESC[tk]||"";
+    const tag = tk==="basics" ? '<span class="hc-badge">입문 · 무료</span>' : "";
+    const status = allMastered(tk) ? "4요소 마스터 ★" : `4요소 중 ${c} 익힘`;
+    const card=el("div","hcard");
+    card.innerHTML=`<div class="hc-top"><span class="hc-ic">${subIcon[tk]}</span><div><div class="hc-name">${name}${tag}</div><div class="hc-subs">${subs}</div></div><span class="hc-go">${c===0?"시작 →":"이어서 →"}</span></div>`+
+      `<div class="hc-barrow"><span class="hc-bar"><i style="width:${p}%"></i></span><span class="hc-stat">${status}</span></div>`;
+    const chipRow=el("div","hc-chips");
+    LEVELS.forEach((lv,i)=>{
+      const cl=isMastered(tk,i), locked=!cl && !paidOk(tk,i);
+      const cls = cl?"done" : (i===landingLevel(tk) && !locked ?"on":"lock");
+      const ch=el("div","hc-chip "+cls);
+      ch.innerHTML = cl?"✓" : (locked && !paidOk(tk,i) ? `${lv.short} 🔒` : lv.short);
+      ch.onclick=(e)=>{ e.stopPropagation(); pendingLevel=i; nav(tk); };   // 잠긴 레벨이면 학습화면이 페이월 표시
+      chipRow.appendChild(ch);
+    });
+    card.appendChild(chipRow);
+    card.onclick=()=>nav(tk);
+    s.appendChild(card);
+  });
+
+  return s;
+}
+function levelStepper(){
+  const t=curTrack, sel=selLevel[t];
+  const wrap=el("div");
+  const row=el("div","step-row");
+  LEVELS.forEach((lv,li)=>{
+    const mastered=isMastered(t,li), pay=!paidOk(t,li);
+    const c=el("div","step"+(li===sel?" on":"")+(mastered?" done":"")+(pay?" paylock":""));
+    c.innerHTML = mastered ? "✓" : (pay ? `${lv.short}<span style="font-size:9px;opacity:.85;margin-left:1px">🔒</span>` : lv.short);
+    c.onclick=()=>{ selLevel[t]=li; rerender(); };   // 결제 잠금 스킬 탭하면 학습 화면이 페이월 표시
+    row.appendChild(c);
+  });
+  // 마스터 칩은 처음부터 보여줌(언질) — 4요소 다 익히기 전엔 잠금, 익히면 활성
+  const am=allMastered(t);
+  const mc=el("div","step master"+(sel==="m"?" on":"")+(am?"":" lock"));
+  mc.textContent="★";
+  if(am) mc.onclick=()=>{ selLevel[t]="m"; rerender(); };
+  row.appendChild(mc);
+  wrap.appendChild(row);
+  if(!am && sel!=="m"){
+    const hint=el("div","explain"); hint.style.cssText="margin:6px 2px 0;font-size:11px";
+    hint.textContent="★ 마스터 — 4요소를 모두 익히면 무작위 혼합 모드가 열려요";
+    wrap.appendChild(hint);
+  }
+  return wrap;
+}
+function renderLearn(){
+  const s=el("div");
+  if(selLevel[curTrack]==="m"){   // 마스터 모드: 무작위 레벨 혼합, 무한
+    s.appendChild(levelStepper());
+    const ms=seedFor(curTrack,"m"), mr=rng(ms);
+    const mli=Math.floor(mr()*LEVELS.length);
+    const card=el("div","lvl"); card.style.padding="14px 15px";
+    const h=el("div","lv-title"); h.innerHTML=`<span class="lv-badge num">★</span><b>마스터 · ${LEVELS[mli].name}</b>`;
+    card.appendChild(h);
+    const gate=el("div","gate"); gate.innerHTML=gateHTML(curTrack,"m");
+    card.appendChild(gate);
+    card.appendChild(renderQ(genQuestion(curTrack,mli,ms), curTrack, "m", gate));
+    s.appendChild(card);
+    return s;
+  }
+  // 결제 잠금이 최우선: L2+ 미구매면 (콕 집어 들어왔어도) 페이월
+  if(!paidOk(curTrack, selLevel[curTrack])){ s.appendChild(levelStepper()); s.appendChild(renderPaywall(selLevel[curTrack])); return s; }
+  // 진행 잠금: 아직 못 푸는 레벨이면 현재 풀 수 있는 레벨로
+  if(!unlocked(curTrack, selLevel[curTrack])) selLevel[curTrack]=defaultLevel(curTrack);
+  s.appendChild(levelStepper());
+  const li=selLevel[curTrack];
+  const card=el("div","lvl"); card.style.padding="14px 15px";
+  const h=el("div","lv-title"); h.innerHTML=`<span class="lv-badge num">${li+1}</span><b>스킬 ${li+1} · ${LEVELS[li].name}</b>`;
+  card.appendChild(h);
+  const why=el("div","explain"); why.style.margin="0 0 4px"; why.textContent=LEVELS[li].why; card.appendChild(why);
+  const gate=el("div","gate"); gate.innerHTML=gateHTML(curTrack,li);
+  card.appendChild(gate);
+  card.appendChild(renderQ(genQuestion(curTrack,li,seedFor(curTrack,li),undefined,masteryOf(curTrack,li)), curTrack, li, gate));
+  s.appendChild(card);
+  return s;
+}
+function renderGuide(){
+  const s=el("div");
+  const card=(html)=>{ const c=el("div","lvl"); c.style.padding="16px 15px"; c.style.marginBottom="12px"; c.innerHTML=html; s.appendChild(c); };
+  const h=el("div","scr-h"); h.textContent="좋은 프롬프트란?"; s.appendChild(h);
+  card(`<b>좋은 프롬프트란</b><div class="explain" style="margin-top:7px">원하는 결과를, AI가 헷갈리지 않게 콕 집어 줘서, 여러 번 고치지 않고 한 번에 얻어내는 지시예요. 진짜 좋은지는 나온 결과로 판단합니다.</div>`);
+  card(`<b>왜 — AI가 답하는 방식</b><div class="explain" style="margin-top:7px">기준은 취향이 아니라 AI가 답을 만드는 방식에서 나옵니다.<br>① AI는 내가 준 말만 보고 다음 말을 이어 써요 — 안 주면 흔한 쪽으로 채웁니다<br>② 한 번에 생각하는 양이 정해져 있어요 — 복잡하면 단계로 풀게 해야 합니다<br>③ 대화 밖의 일은 몰라요 — 자료·역할·합격 기준은 내가 줘야 합니다</div>`);
+  card(`<b>좋은 프롬프트의 5가지</b>
+    <div class="explain" style="margin-top:7px"><b style="color:var(--gold-soft)">1. 상황(맥락)을 준다</b><br>안 주면 AI가 흔한 답으로 때워요 (①)</div>
+    <div class="explain" style="margin-top:8px"><b style="color:var(--gold-soft)">2. 필요한 자료·역할을 준다</b><br>안 준 건 AI가 몰라요 (③)</div>
+    <div class="explain" style="margin-top:8px"><b style="color:var(--gold-soft)">3. 원하는 출력 모양을 정한다</b><br>목록·표·길이·예시 (①)</div>
+    <div class="explain" style="margin-top:8px"><b style="color:var(--gold-soft)">4. 어려우면 단계로 풀게 한다</b><br>AI는 한 번에 생각하는 양이 한정적이에요 (②)</div>
+    <div class="explain" style="margin-top:8px"><b style="color:var(--gold-soft)">5. 합격 기준을 준다</b><br>AI는 스스로 채점하지 못해요 (③)</div>`);
+  card(`<b>5가지는 그대로, 방법은 AI마다 달라요</b><div class="explain" style="margin-top:7px">이 5가지는 어떤 AI에도 통합니다. 다만 구체적 방법은 AI·버전마다 달라요 — 예시를 몇 개 줄지, '단계로 생각해'를 붙일지(똑똑한 추론 AI는 안 붙여도 됨), 형식 쓰는 법 등. 이 앱은 변하지 않는 5가지를 연습합니다.</div>`);
+  const back=el("button","btn ghost"); back.textContent="← 홈으로"; back.onclick=()=>nav("home"); s.appendChild(back);
+  return s;
+}
+function renderSettings(){
+  const s=el("div");
+  // ── 이용권 ── (진도는 홈 과목 카드가 정본 — 중복 제거)
+  const ph2=el("div","scr-h"); ph2.textContent="이용권"; s.appendChild(ph2);
+  if(hasFull()){
+    const ok=el("div","verdict pass"); ok.innerHTML=IS_NATIVE?'<span class="vh">전체 이용 중</span><div style="margin-top:6px">전과목 모든 스킬이 열렸습니다.</div>':'<span class="vh">웹 버전 · 전체 무료</span><div style="margin-top:6px">모든 과목·스킬이 열려 있어요.</div>';
+    s.appendChild(ok);
+  } else {
+    s.appendChild(renderPaywall(1));
+  }
+  // ── 안내 ── (닻은 #guide가 정본 — 여기선 링크)
+  const gh=el("div","scr-h"); gh.textContent="안내"; gh.style.marginTop="22px"; s.appendChild(gh);
+  const gl=el("button","btn ghost"); gl.textContent="좋은 프롬프트란? — 이 앱의 기준 보기"; gl.onclick=()=>nav("guide"); s.appendChild(gl);
+  const note=el("div","explain"); note.style.marginTop="10px";
+  note.textContent="채점은 전부 기기 안에서 바로 됩니다 (인터넷·AI 없이). '좋은 프롬프트'에 점수를 매기는 게 아니라, 위 5가지가 빠짐없이 들었는지를 연습합니다.";
+  s.appendChild(note);
+  let done=0; ["basics","coding","writing","video"].forEach(tk=>LEVELS.forEach((_,li)=>{ if(isMastered(tk,li))done++; }));
+  const stat=el("div","explain"); stat.style.marginTop="14px";
+  stat.textContent=`익힌 스킬 ${done} / ${LEVELS.length*4} · 지금까지 ${state.solved}문제 맞힘`;
+  s.appendChild(stat);
+  const reset=el("button","btn ghost"); reset.textContent="진행 초기화"; reset.style.marginTop="14px"; reset.onclick=resetAll;
+  s.appendChild(reset);
+  const ver=el("div","explain"); ver.style.marginTop="14px"; ver.textContent="프롬프트 도장 · v0.1 · by LogicCraft";
+  s.appendChild(ver);
+  return s;
+}
+
+// 항목 충족 힌트 — 어떤 단어/형식이 채점에 잡히는지 (실제 detect 규칙 기반)
+function ruleHint(rule){
+  if(rule.any) return "예: "+rule.any.slice(0,3).join("·")+" 등";
+  if(rule.example) return "예: \"예: …\" 처럼 구체 예시";
+  if(rule.minLen) return "구체적으로 충분히 길게";
+  return "";
+}
+let qcounter=0;
+function renderQ(q,t,li,gateEl){
+  const uid=++qcounter;
+  const wrap=document.createElement("div"); wrap.className="q";
+  const tags={diagnose:"진단",fix:"고치기",order:"순서",rubric:"루브릭",compare:"짝 비교"};
+  wrap.innerHTML=`<span class="qtag">유형 · ${tags[q.type]}</span><div class="qprompt">${q.prompt}</div>`;
+  let getResult; // ()=>{ok, detail}
+
+  if(q.type==="compare"){
+    wrap.innerHTML+=`<div class="mono">과제: ${q.task}</div>`;
+    const t1=document.createElement("div"); t1.className="explain"; t1.textContent="① 더 나은 프롬프트는?";
+    wrap.appendChild(t1);
+    const blocks=document.createElement("div");
+    [["A",q.A],["B",q.B]].forEach(([L,lines])=>{
+      const lab=document.createElement("label"); lab.className="opt";
+      lab.innerHTML=`<input type="radio" name="better_${uid}" value="${L}"><div style="flex:1"><b>프롬프트 ${L}</b><div class="mono" style="margin:6px 0 0">${lines.map(x=>"· "+x).join("\n")}</div></div>`;
+      lab.querySelector("input").onchange=()=>{ blocks.querySelectorAll(".opt").forEach(o=>o.classList.remove("sel")); lab.classList.add("sel"); };
+      blocks.appendChild(lab);
+    });
+    wrap.appendChild(blocks);
+    const t2=document.createElement("div"); t2.className="explain"; t2.textContent="② 약한 쪽이 빠뜨린 핵심은?";
+    wrap.appendChild(t2);
+    const mbox=document.createElement("div");
+    q.missOpts.forEach(o=>{
+      const lab=document.createElement("label"); lab.className="opt";
+      lab.innerHTML=`<input type="radio" name="missing_${uid}" value="${o.id}"><span>${o.label}</span>`;
+      lab.querySelector("input").onchange=()=>{ mbox.querySelectorAll(".opt").forEach(x=>x.classList.remove("sel")); lab.classList.add("sel"); };
+      mbox.appendChild(lab);
+    });
+    wrap.appendChild(mbox);
+    getResult=()=>{
+      const better=wrap.querySelector(`input[name="better_${uid}"]:checked`);
+      const miss=wrap.querySelector(`input[name="missing_${uid}"]:checked`);
+      if(!better||!miss) return {ok:false, detail:"두 가지를 모두 선택해야 합니다."};
+      const ok = better.value===q.better && miss.value===q.missing;
+      const reveal=()=>{
+        blocks.querySelectorAll(".opt").forEach(l=>{ const i=l.querySelector("input"); i.disabled=true;
+          if(i.value===q.better) l.style.borderColor="var(--ok)"; });
+        mbox.querySelectorAll(".opt").forEach(l=>{ const i=l.querySelector("input"); i.disabled=true;
+          if(i.value===q.missing){ l.style.borderColor="var(--ok)"; l.insertAdjacentHTML("beforeend",'<span style="margin-left:auto;color:var(--ok);font-weight:700;font-size:12px">정답</span>'); } });
+      };
+      return {ok, detail: ok?"정확하다.":"정답을 아래에 표시했어요.", reveal};
+    };
+  }
+
+  if(q.type==="diagnose"){
+    wrap.innerHTML+=`<div class="mono">프롬프트: ${q.bad}\n결과: ${q.out}</div>`;
+    const box=document.createElement("div");
+    q.opts.forEach(o=>{
+      const d=document.createElement("label"); d.className="opt";
+      d.innerHTML=`<input type="checkbox" value="${o.id}"><span>${o.label}</span>`;
+      d.querySelector("input").onchange=e=>d.classList.toggle("sel",e.target.checked);
+      box.appendChild(d);
+    });
+    wrap.appendChild(box);
+    getResult=()=>{
+      const sel=[...box.querySelectorAll("input:checked")].map(i=>i.value).sort();
+      const ok=JSON.stringify(sel)===JSON.stringify([...q.correct].sort());
+      const reveal=()=>{
+        box.querySelectorAll(".opt").forEach(l=>{ const i=l.querySelector("input"); i.disabled=true;
+          if(q.correct.includes(i.value)){ l.style.borderColor="var(--ok)"; l.insertAdjacentHTML("beforeend",'<span style="margin-left:auto;color:var(--ok);font-weight:700;font-size:12px">핵심</span>'); }
+          else if(i.checked){ l.style.borderColor="var(--bad)"; l.insertAdjacentHTML("beforeend",'<span style="margin-left:auto;color:var(--bad);font-weight:700;font-size:12px">아님</span>'); }
+        });
+      };
+      const hit=sel.filter(x=>q.correct.includes(x)).length;
+      return {ok, reveal, detail: ok?`정확히 짚었다 — 핵심 ${q.correct.length}개 전부.`:`핵심 ${q.correct.length}개 중 ${hit}개만. 정답을 표시했어요.`};
+    };
+  }
+
+  if(q.type==="fix"||q.type==="rubric"){
+    if(q.type==="fix"){
+      wrap.innerHTML+=`<div class="mono">약한 프롬프트: ${q.seed}</div>`;
+      if(q.facts) wrap.innerHTML+=`<div class="givens"><div class="givens-h">주어진 정보 — 이 내용을 프롬프트에 담으세요</div>`+
+        q.facts.map(f=>`<div class="given-row">· ${f}</div>`).join("")+`</div>`;
+    }
+    const ta=document.createElement("textarea");
+    ta.value="";
+    ta.placeholder=q.type==="fix"?"주어진 정보를 담아 프롬프트를 다시 써 보세요":"여기에 사양서형 프롬프트를 작성하세요";
+    wrap.appendChild(ta);
+    const help=el("div","explain");
+    help.innerHTML="아래 항목이 들어가도록 <b>자연스러운 지시문</b>으로 쓰세요. 쓰는 동안 충족되면 ✓ 가 켜집니다.";
+    wrap.appendChild(help);
+    const liveEls=[];
+    q.rubric.forEach(r=>{
+      const row=el("div","rub");
+      row.innerHTML=`<span class="rmark no">○</span> ${r.label} <span class="rex">${ruleHint(r.rule)}</span>`;
+      liveEls.push({r,row}); wrap.appendChild(row);
+    });
+    const refreshLive=()=>{ liveEls.forEach(({r,row})=>{ const ok=detect(ta.value,r.rule); const m=row.querySelector(".rmark"); m.textContent=ok?"✓":"○"; m.className="rmark "+(ok?"ok":"no"); }); };
+    ta.addEventListener("input", refreshLive); refreshLive();
+    getResult=()=>{
+      const res=q.rubric.map(r=>({label:r.label, ok:detect(ta.value,r.rule)}));
+      const salad=looksLikeSalad(ta.value);
+      if(salad) res.forEach(r=>{ r.ok=false; });
+      const all=res.every(r=>r.ok);
+      const met=res.filter(r=>r.ok).length;
+      let detail=`<div style="font-weight:800;font-size:15px;margin-bottom:6px">핵심 ${met} / ${res.length} 충족</div>`;
+      detail+=res.map(r=>`<div class="rub"><span class="${r.ok?'ok':'no'}">${r.ok?'✓':'○'}</span> ${r.label}</div>`).join("");
+      if(salad) detail+=`<div class="rub no">⚠ 키워드 나열처럼 보입니다 — 자연스러운 지시문으로 쓰세요.</div>`;
+      return {ok:all, detail};
+    };
+  }
+
+  if(q.type==="order"){
+    let order=q.items.map(i=>i.id);
+    const list=document.createElement("div");
+    function draw(){
+      list.innerHTML="";
+      order.forEach((id,idx)=>{
+        const it=q.items.find(x=>x.id===id);
+        const row=document.createElement("div"); row.className="ord-item";
+        row.innerHTML=`<button>▲</button><button>▼</button><span>${it.label}</span>`;
+        const [up,down]=row.querySelectorAll("button");
+        up.onclick=()=>{ if(idx>0){[order[idx-1],order[idx]]=[order[idx],order[idx-1]];draw();} };
+        down.onclick=()=>{ if(idx<order.length-1){[order[idx+1],order[idx]]=[order[idx],order[idx+1]];draw();} };
+        list.appendChild(row);
+      });
+    }
+    draw(); wrap.appendChild(list);
+    getResult=()=>{
+      const ok=JSON.stringify(order)===JSON.stringify(q.order);
+      return {ok, detail: ok?"순서가 맞다.":"절차 순서를 다시 보라."};
+    };
+  }
+
+  const btn=document.createElement("button"); btn.className="btn"; btn.textContent="채점하기";
+  wrap.appendChild(btn);
+  btn.onclick=()=>{
+    const {ok,detail,reveal}=getResult();
+    btn.disabled=true;
+    if(typeof reveal==="function") reveal();
+    onGrade(t,li,ok);
+    if(gateEl) gateEl.innerHTML=gateHTML(t,li);
+    const v=document.createElement("div"); v.className="verdict "+(ok?"pass":"fail");
+    v.innerHTML=`<span class="vh">${ok?"통과":"다시"}</span>`+(detail?`<div style="margin-top:6px">${detail}</div>`:"")
+      +`<div class="explain">${q.explain}</div>`
+      +(q.model?`<div class="explain" style="border-left-color:var(--gold);margin-top:8px"><b style="color:var(--gold-soft)">모범 예시</b><br>${q.model}</div>`:"");
+    wrap.appendChild(v);
+    const onMastered = li!=="m" && isMastered(t,li);
+    if(onMastered){
+      if(ok && masteryOf(t,li)===MASTER_N){ const msg=el("div","explain"); msg.style.color="var(--ok)"; msg.textContent="이 스킬을 익혔어요 ★"; wrap.appendChild(msg); }
+      let nx=-1; for(let i=0;i<LEVELS.length;i++){ if(!isMastered(t,i)){ nx=i; break; } }
+      if(nx!==-1){
+        const go=el("button","btn"); go.textContent=`다음 스킬: ${LEVELS[nx].name} →`;
+        go.onclick=()=>{ selLevel[t]=nx; rerender(); }; wrap.appendChild(go);
+      } else {
+        const go=el("button","btn"); go.textContent="마스터 모드 ★ 도전";
+        go.onclick=()=>{ selLevel[t]="m"; rerender(); }; wrap.appendChild(go);
+      }
+    }
+    const next=el("button","btn ghost"); next.textContent= onMastered ? "이 스킬 더 풀기 →" : "다음 문제 →";
+    next.onclick=()=>{ newSeed(t,li); rerender(); }; wrap.appendChild(next);
+  };
+  return wrap;
+}
+
+function resetAll(){
+  if(confirm("진행상황을 모두 지울까요?")){
+    state={mastery:{},streak:{},seedFor:{},seedCtr:1,solved:0,best:{}}; save(); selLevel={basics:0,coding:0,writing:0,video:0}; rerender();
+  }
+}
+
+window.addEventListener("hashchange", applyRoute);
+applyRoute();   // 초기 해시로 진입(없으면 홈)
+
+// Android 하드웨어 뒤로가기 → 히스토리 뒤로(홈이면 종료)
+(function(){
+  var App = window.Capacitor && window.Capacitor.Plugins && window.Capacitor.Plugins.App;
+  if(App && App.addListener) App.addListener('backButton', function(){
+    var h = location.hash;
+    if(h && h!=="#home" && h!=="#/"){ history.back(); }
+    else if(App.exitApp){ App.exitApp(); }
+  });
+})();
+</script>
+</body>
+</html>
