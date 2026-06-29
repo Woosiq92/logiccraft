@@ -1,12 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import ProductCard from '../components/ProductCard.astro';
+import CompactCard from '../components/CompactCard.astro';
 import { products } from '../data/products.js';
 
 const eduItems = products.filter((p) => p.section === 'edu');
 const dailyItems = products.filter((p) => p.section === 'daily');
-// 교육 카운트 = Build(시리즈, 홈 그리드에 카드로 노출) + 스튜디오 교육 제품. Wonder 피처 카드는 카운트 제외.
-const eduCount = 1 + eduItems.length;
+// Wonder·Build 는 series(카운트용)라 데이터에 카드 필드가 없음 → 홈 컴팩트 카드용으로 정의.
+const seriesCards = [
+  { slug: 'wonder', icon: 'wonder', name: 'Synergeion Wonder', chip: '3–6세', type: 'app', desc: '아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알.' },
+  { slug: 'build', icon: 'build', name: 'Synergeion Build', chip: '6–9세', type: 'app', desc: '직접 만들고 부수며 원리를 익히는 사고력 놀이.' },
+];
+const eduCards = [...seriesCards, ...eduItems];
 ---
 
 <Layout>
@@ -80,67 +84,14 @@ const eduCount = 1 + eduItems.length;
       </div>
 
       <!-- 교육 -->
-      <div class="section-block" style="margin-top: clamp(40px,5vw,64px)">
+      <div class="section-block" style="margin-top: clamp(32px,4vw,52px)">
         <div class="cat-head reveal">
           <span class="label">교육</span>
           <span class="rule"></span>
-          <span class="count">{String(eduCount).padStart(2, '0')}</span>
+          <span class="count">{String(eduCards.length).padStart(2, '0')}</span>
         </div>
-        <div class="card-grid">
-
-          <!-- Featured: Wonder -->
-          <article class="pcard feature reveal">
-            <div class="feat-art">
-              <div class="mascot-float">
-                <a class="mascot-panel" id="mascotPanel" href="https://www.youtube.com/@NaruandNeti" target="_blank" rel="noopener" aria-label="나루와 느티 유튜브 채널 열기">
-                  <div class="glare"></div>
-                  <div class="mascot-row">
-                    <img class="naru" src="/mascots/naru.png" alt="나루 — 아기 비버 마스코트" />
-                    <img class="neti" src="/mascots/neti.png" alt="느티 — 새싹 정령 마스코트" />
-                  </div>
-                  <div class="mascot-caption">
-                    <div class="m"><b>나루</b><span>NARU</span></div>
-                    <div class="m"><b>느티</b><span>NETI</span></div>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <div class="feat-body">
-              <p class="eyebrow warm">SYNERGEION 시리즈 · 출시</p>
-              <div class="name-row"><h3>Synergeion Wonder</h3><span class="chip">3–6세</span></div>
-              <p class="desc">아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알, 부모도 같이 자랍니다.</p>
-              <div class="links">
-                <a href="https://apps.apple.com/kr/app/synergeion-wonder/id6774041352">App Store</a>
-                <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.wonder">Google Play</a>
-              <div class="legal">
-                <a class="muted" href="/apps/wonder/">자세히</a>
-                <a class="muted" href="/apps/wonder/support">지원</a>
-                <a class="muted" href="/apps/wonder/privacy">개인정보</a>
-                <a class="muted" href="/apps/wonder/terms">약관</a>
-              </div>
-              </div>
-            </div>
-          </article>
-
-          <article class="pcard reveal">
-            <div class="top">
-              <img class="icon" src="/icons/build.png" alt="" />
-              <div><div class="name-row"><h3>Synergeion Build</h3><span class="chip">6–9세</span></div></div>
-            </div>
-            <p class="desc">자란 나무로 집과 배를 만들 듯, 직접 손으로 만들고 부수며 원리를 익히는 사고력 놀이.</p>
-            <div class="links">
-              <a href="https://apps.apple.com/kr/app/synergeion-build-%EC%82%AC%EA%B3%A0%EB%A0%A5-%EB%86%80%EC%9D%B4/id6777975502">App Store</a>
-              <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.build">Google Play</a>
-              <div class="legal">
-              <a class="muted" href="/apps/build/">자세히</a>
-                <a class="muted" href="/apps/build/support">지원</a>
-              <a class="muted" href="/apps/build/privacy">개인정보</a>
-              <a class="muted" href="/apps/build/terms">약관</a>
-              </div>
-            </div>
-          </article>
-
-          {eduItems.map((p) => <ProductCard p={p} />)}
+        <div class="card-grid compact">
+          {eduCards.map((p) => <CompactCard p={p} />)}
         </div>
       </div>
 
@@ -151,9 +102,13 @@ const eduCount = 1 + eduItems.length;
           <span class="rule"></span>
           <span class="count">{String(dailyItems.length).padStart(2, '0')}</span>
         </div>
-        <div class="card-grid">
-          {dailyItems.map((p) => <ProductCard p={p} />)}
+        <div class="card-grid compact">
+          {dailyItems.map((p) => <CompactCard p={p} />)}
         </div>
+      </div>
+
+      <div class="reveal" style="text-align:center; margin-top: clamp(36px,4.5vw,52px)">
+        <a href="/apps" class="btn btn-dark">전체 제품 자세히 보기 <span class="arr">→</span></a>
       </div>
     </div>
   </section>

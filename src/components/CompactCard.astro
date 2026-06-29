@@ -1,0 +1,15 @@
+---
+// 컴팩트 제품 카드 — 홈 전용. 아이콘+이름+칩+한 줄 설명, 카드 전체가 링크.
+// 풀카드(스토어·법적 링크 포함)는 ProductCard.astro / 제품 페이지에서 렌더.
+const { p } = Astro.props;
+const href = p.type === 'web' ? p.web : (p.slug ? `/apps/${p.slug}/` : (p.ios || p.play || '#'));
+const external = p.type === 'web';
+---
+<a class="ccard reveal" href={href} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+  <div class="cc-top">
+    <img class="cc-icon" src={`/icons/${p.icon}.png`} alt="" />
+    <h3>{p.name}</h3>
+  </div>
+  <span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span>
+  <p class="cc-desc">{p.desc}</p>
+</a>
