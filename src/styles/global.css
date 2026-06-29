@@ -453,6 +453,15 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
+.ccard .cc-more {
+  margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 5px;
+  padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line-strong);
+  font-size: 12.5px; font-weight: 700; color: var(--blue);
+  transition: background .2s, color .2s, border-color .2s;
+}
+.ccard .cc-more .arr { transition: transform .2s var(--ease); }
+.ccard:hover .cc-more { background: var(--blue); border-color: var(--blue); color: #fff; }
+.ccard:hover .cc-more .arr { transform: translateX(2px); }
 
 .pcard p.desc { margin: 14px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; flex: 1; }
 .pcard .links { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 7px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }

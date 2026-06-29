@@ -4,6 +4,7 @@
 const { p } = Astro.props;
 const href = p.type === 'web' ? p.web : (p.slug ? `/apps/${p.slug}/` : (p.ios || p.play || '#'));
 const external = p.type === 'web';
+const cta = p.type === 'web' ? '바로가기' : '자세히 보기';
 ---
 <a class="ccard reveal" href={href} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
   <div class="cc-top">
@@ -12,4 +13,5 @@ const external = p.type === 'web';
   </div>
   <span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span>
   <p class="cc-desc">{p.desc}</p>
+  <span class="cc-more">{cta} <span class="arr">→</span></span>
 </a>
