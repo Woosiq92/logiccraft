@@ -123,3 +123,28 @@
     update();
   })();
 })();
+
+/* 방문자 카운터. 어느 페이지로 들어오든 1회 집계, 같은 브라우저는 하루 1번만(localStorage).
+   Railway 배포 후 받은 도메인으로 COUNTER_API 를 교체할 것. 미설정/실패 시 조용히 숨김. */
+(function () {
+  var COUNTER_API = 'https://REPLACE-ME.up.railway.app';
+  var box = document.querySelector('.visit-count');
+  if (!box || COUNTER_API.indexOf('REPLACE-ME') !== -1) return;
+
+  var fmt = function (n) { return Number(n).toLocaleString('ko-KR'); };
+  var show = function (d) {
+    if (!d) return;
+    document.getElementById('visitToday').textContent = fmt(d.today);
+    document.getElementById('visitTotal').textContent = fmt(d.total);
+    box.hidden = false;
+  };
+
+  var day = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Seoul' }).format(new Date());
+  var fresh = false;
+  try { fresh = !localStorage.getItem('lc_visit_' + day); } catch (e) {}
+
+  fetch(COUNTER_API + (fresh ? '/hit' : '/count'), { method: fresh ? 'POST' : 'GET' })
+    .then(function (r) { return r.json(); })
+    .then(function (d) { if (fresh) { try { localStorage.setItem('lc_visit_' + day, '1'); } catch (e) {} } show(d); })
+    .catch(function () {});
+})();
