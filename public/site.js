@@ -127,7 +127,7 @@
 /* 방문자 카운터. 어느 페이지로 들어오든 1회 집계, 같은 브라우저는 하루 1번만(localStorage).
    Railway 배포 후 받은 도메인으로 COUNTER_API 를 교체할 것. 미설정/실패 시 조용히 숨김. */
 (function () {
-  var COUNTER_API = 'https://REPLACE-ME.up.railway.app';
+  var COUNTER_API = 'https://logiccraft-counter-production.up.railway.app';
   var box = document.querySelector('.visit-count');
   if (!box || COUNTER_API.indexOf('REPLACE-ME') !== -1) return;
 
