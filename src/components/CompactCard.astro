@@ -9,8 +9,8 @@ const external = p.type === 'web';
   <div class="cc-top">
     <img class="cc-icon" src={`/icons/${p.icon}.png`} alt="" />
     <h3>{p.name}</h3>
+    <span class="cc-more" aria-hidden="true"><span class="arr">→</span></span>
   </div>
   <span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span>
   <p class="cc-desc">{p.desc}</p>
-  <span class="cc-more" aria-hidden="true"><span class="arr">→</span></span>
 </a>
