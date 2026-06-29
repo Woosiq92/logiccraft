@@ -79,11 +79,12 @@
   .wb-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--ink2)}
   .wb-item select{padding:5px 8px;font-size:12px;border:1px solid var(--line2);border-radius:7px;background:#fff;color:var(--ink)}
   .mapsec{flex:3 1 480px;min-width:300px}
-  #mapwrap{position:relative;width:100%;height:clamp(460px,64vh,700px);border-radius:16px;overflow:hidden;border:1px solid #e3e1db;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04),0 10px 30px -12px rgba(40,50,40,.18)}
+  #mapwrap{position:relative;width:100%;height:clamp(460px,64vh,700px);border-radius:16px;overflow:hidden;border:1px solid #e3e1db;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04),0 10px 30px -12px rgba(40,50,40,.18);touch-action:manipulation}
   #board{position:absolute;inset:0;width:100%;height:100%;display:block}
   .region{cursor:pointer;stroke-linejoin:round}
   .region:hover{stroke:#1c1c1e !important;stroke-width:1.4 !important}
   .vdot{cursor:pointer}
+  @media (pointer:coarse){.vdot{r:6.5}}  /* 손가락 탭 타깃 확대 */
   #lblHost{position:absolute;inset:0;pointer-events:none}
   .lbl{position:absolute;transform:translate(-50%,-50%);text-align:center;white-space:nowrap}
   .lbl .n{display:inline-block;background:#fff;color:#1c1c1e;font-weight:700;font-size:14px;font-variant-numeric:tabular-nums;padding:1px 9px;border-radius:999px;box-shadow:0 1px 4px rgba(0,0,0,.22)}
@@ -150,7 +151,8 @@
   .fp-foot{padding:16px 22px;border-top:1px solid var(--line3);display:flex;gap:10px}
   .fp-foot .cancel{flex:0 0 auto;border:1px solid var(--line2);background:#fff;border-radius:10px;padding:12px 18px;font-size:14px;font-weight:600;color:var(--ink2)}
   .fp-foot .save{flex:1;border:none;background:var(--ink);color:#fff;border-radius:10px;padding:12px;font-size:14px;font-weight:700}
-  @media (max-width:760px){.wrap{padding:0 16px}aside{max-width:none}#mapwrap{height:56vh}}
+  @media (max-width:760px){.wrap{padding:0 16px}aside{max-width:none}#mapwrap{height:56vh}
+    .mapsec{order:-1}}  /* 모바일: 지도를 필터 바로 아래로(목록·분포 카드보다 위) */
 </style>
 </head>
 <body>
@@ -495,7 +497,9 @@ function fillGu(){const s=document.getElementById('sidoFilter').value,guSel=docu
   sidoSel.onchange=()=>{const s=sidoSel.value; if(s) goView(s); else goNation();};
   document.getElementById('guFilter').onchange=()=>{selectedGu=document.getElementById('guFilter').value||null;renderGuList();render();};
 })();
-window.addEventListener('resize',()=>render());
+// 모바일: 스크롤 시 주소창 노출/숨김으로 높이만 바뀌어도 resize가 연발 → 폭이 실제로 바뀐 경우에만 재렌더(디바운스). 진행 중 탭이 SVG 재생성으로 유실되는 것 방지.
+let __mapW=0,__rzT;
+window.addEventListener('resize',()=>{clearTimeout(__rzT);__rzT=setTimeout(()=>{const w=document.getElementById('mapwrap').clientWidth;if(w&&w!==__mapW){__mapW=w;render();}},150);});
 
 // ===== 후보 / 비교표 =====
 const AX=[['loc','위치/접근'],['mood','분위기'],['fac','시설/서비스'],['conv','하객편의']];
