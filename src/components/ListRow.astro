@@ -1,0 +1,13 @@
+---
+// 한 줄 리스트 행 — 홈 전용. 아이콘+이름+칩+설명 한 줄, 행 전체가 링크.
+const { p } = Astro.props;
+const href = p.type === 'web' ? p.web : (p.slug ? `/apps/${p.slug}/` : (p.ios || p.play || '#'));
+const external = p.type === 'web';
+---
+<a class="lrow reveal" href={href} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
+  <img class="lrow-icon" src={`/icons/${p.icon}.png`} alt="" />
+  <h3>{p.name}</h3>
+  <span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span>
+  <p class="lrow-desc">{p.desc}</p>
+  <span class="lrow-arr" aria-hidden="true">→</span>
+</a>
