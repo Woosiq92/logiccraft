@@ -1040,8 +1040,7 @@ function renderHome(){
   const li=landingLevel(curTrack), m=Math.min(masteryOf(curTrack,li),MASTER_N), mastered=isMastered(curTrack,li);
   w.innerHTML=
     '<div class="home-head"><span class="eyebrow">읽지 말고 풀며 익힌다</span>'+
-    '<h1>매번 새 문제를 풀고, 그 자리에서 채점받는다.</h1>'+
-    '<p>강의를 듣는 곳이 아니다. AI에게 잘 부탁하는 법을 문제로 단련하는 연습 도장이다. 채점은 기기 안에서 즉시, AI 없이 이뤄진다.</p></div>'+
+    '<h1>AI에게 잘 부탁하는 법을, 문제로 풀며 익힌다.</h1></div>'+
     '<div class="home-grid">'+
       '<div class="hero"><div><div class="htag"><span class="pill">이어서 풀기</span>'+
         '<span class="mono" style="font-size:12px;color:var(--muted)">'+TRACK_NAME[curTrack]+' 트랙 · '+LEVELS[li].name+'</span></div>'+
