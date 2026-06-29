@@ -202,6 +202,30 @@
   .tc-main .bar{display:block;height:6px;border-radius:4px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin:7px 0 0}
   .tc-main .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--gold-soft),var(--gold))}
   .tc-arrow{color:var(--faint);font-size:1.5rem;flex:none}
+  /* 로직크래프트 회사 로고 (웹 전용) */
+  .lc-mark{display:none}
+  .lc-footer{display:none}
+  body.web .lc-footer{display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;
+    margin:28px 0 6px;padding:22px 16px;border-top:1px solid var(--line);color:var(--dim)}
+  .lc-foot-logo{height:26px;opacity:.85}
+  .lc-foot-links{font-size:12.5px} .lc-foot-links a{color:var(--dim);text-decoration:none}
+  .lc-foot-links a:hover{color:var(--gold-soft)}
+  .lc-foot-copy{font-size:11px;color:var(--faint)}
+  /* 데스크톱 웹 레이아웃 — 상단 가로 네비 + 넓은 컨테이너 + 과목 2열 */
+  @media(min-width:860px){
+    .app{display:flex;flex-direction:column;min-height:100dvh}
+    .appbar{position:sticky;order:1;height:62px;padding:0 28px;max-width:none}
+    .navbar{position:sticky;top:62px;order:2;bottom:auto;flex-direction:row;justify-content:center;gap:6px;
+      border-top:none;border-bottom:1px solid var(--line);padding:7px 0;padding-bottom:7px}
+    .nav-item{flex:0 0 auto;flex-direction:row;gap:8px;padding:9px 16px;border-radius:10px;font-size:13px}
+    body.web .nav-item.on{background:var(--gold-dim)}
+    .nav-ico svg{width:18px;height:18px}
+    #screen{order:3;align-self:center;width:100%;max-width:940px;padding:26px 28px 12px}
+    .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .cont-title{font-size:24px}
+    body.web .lc-mark{display:inline-flex;align-items:center;margin-left:12px}
+    body.web .lc-mark img{height:24px;display:block;opacity:.9}
+  }
 </style>
 </head>
 <body>
@@ -827,10 +851,28 @@ const ICON={
   gear:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5.6 5.6l2 2M16.4 16.4l2 2M18.4 5.6l-2 2M7.6 16.4l-2 2"/></svg>',
   book:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 3H20v18H6.5A2.5 2.5 0 0 1 4 18.5v-13A2.5 2.5 0 0 1 6.5 3z"/></svg>'
 };
+function buildFooter(){   // 웹 전용 로직크래프트 푸터
+  const f=document.createElement("footer"); f.className="lc-footer";
+  f.innerHTML='<img class="lc-foot-logo" src="logo-full.png" alt="LogicCraft">'
+    +'<div class="lc-foot-links"><a href="https://logiccraft.co.kr">로직크래프트</a> · <a href="/apps/prompt-dojo/privacy">개인정보</a> · <a href="/apps/prompt-dojo/support">지원</a></div>'
+    +'<div class="lc-foot-copy">© LogicCraft · 프롬프트 도장</div>';
+  return f;
+}
+function injectWebChrome(){   // 웹에서만 회사 로고(헤더 마크 + 푸터)
+  if(IS_NATIVE) return;
+  document.body.classList.add("web");
+  const ab=document.querySelector(".appbar");
+  if(ab && !ab.querySelector(".lc-mark")){
+    const a=document.createElement("a"); a.className="lc-mark"; a.href="https://logiccraft.co.kr"; a.target="_blank"; a.rel="noopener";
+    a.innerHTML='<img src="logo-mark.png" alt="LogicCraft">';
+    ab.appendChild(a);
+  }
+}
 function renderApp(){
   document.getElementById("ab-chip").innerHTML = "◆ "+state.solved;
   const sc=document.getElementById("screen"); sc.innerHTML="";
   sc.appendChild(view==="home" ? renderHome() : view==="settings" ? renderSettings() : view==="guide" ? renderGuide() : renderLearn());
+  if(!IS_NATIVE) sc.appendChild(buildFooter());
   renderNav();
   sc.scrollTop=0; window.scrollTo(0,0);
 }
@@ -871,6 +913,7 @@ function renderHome(){
 
   // ── 과목 카드 ──
   const lab=el("div","section-label"); lab.textContent="과목"; lab.style.margin="18px 2px 10px"; s.appendChild(lab);
+  const grid=el("div","home-grid");
   [["basics","기초"],["coding","코딩"],["writing","글쓰기"],["video","영상"]].forEach(([tk,name])=>{
     const c=LEVELS.filter((_,i)=>isMastered(tk,i)).length;
     const p=Math.round(LEVELS.reduce((a,_,i)=>a+Math.min(masteryOf(tk,i),MASTER_N),0)/(LEVELS.length*MASTER_N)*100);
@@ -891,9 +934,9 @@ function renderHome(){
     });
     card.appendChild(chipRow);
     card.onclick=()=>nav(tk);
-    s.appendChild(card);
+    grid.appendChild(card);
   });
-
+  s.appendChild(grid);
   return s;
 }
 function levelStepper(){
@@ -1164,6 +1207,7 @@ function resetAll(){
   }
 }
 
+injectWebChrome();   // 웹이면 회사 로고 주입
 window.addEventListener("hashchange", applyRoute);
 applyRoute();   // 초기 해시로 진입(없으면 홈)
 
