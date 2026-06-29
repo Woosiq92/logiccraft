@@ -80,7 +80,7 @@
     border-radius:20px; padding:4px 11px 4px 8px;
   }
   .lc-dot{width:16px; height:16px; object-fit:contain; flex-shrink:0; display:block;}
-  .lc-plaque span{font-size:12.5px; font-weight:750; letter-spacing:-.01em;}
+  .lc-plaque span{font-size:12.5px; font-weight:750; letter-spacing:-.01em; color:#000;}
 
   /* ============ SCREEN SYSTEM ============ */
   .screen{display:none; animation:fade .35s ease;}
@@ -1277,7 +1277,7 @@ function renderSettings(){
       '<div class="panel"><h3>정보</h3>'+
         '<div class="setrow"><div class="sl">버전</div><span class="mono" style="font-size:13px;color:var(--muted)">v0.4.0 (web)</span></div>'+
         '<div class="setrow"><div class="sl">만든 곳</div><a class="lc-plaque" href="https://logiccraft.co.kr" target="_blank" rel="noopener"><img class="lc-dot" src="logiccraft-mark.png" alt=""><span>LogicCraft</span></a></div>'+
-        '<div class="setrow"><div class="sl">문의</div><a href="https://logiccraft.co.kr" target="_blank" rel="noopener" class="act">logiccraft.co.kr</a></div></div>'+
+        '<div class="setrow"><div class="sl">문의</div><a href="mailto:logiccraftmarketing@gmail.com" class="act">logiccraftmarketing@gmail.com</a></div></div>'+
     '</div></div>';
   w.querySelector("#sguide").onclick=()=>nav("guide");
   w.querySelector("#sreset").onclick=resetAll;
