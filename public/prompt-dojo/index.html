@@ -223,8 +223,10 @@
     #screen{order:3;align-self:center;width:100%;max-width:940px;padding:26px 28px 12px}
     .home-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
     .cont-title{font-size:24px}
-    body.web .lc-mark{display:inline-flex;align-items:center;margin-left:12px}
+    body.web .lc-mark{display:inline-flex;align-items:center;gap:7px;margin-left:14px;text-decoration:none}
     body.web .lc-mark img{height:20px;display:block;background:#fff;border-radius:7px;padding:4px 7px;box-sizing:content-box}
+    body.web .lc-mark-txt{color:var(--dim);font-size:12.5px;font-weight:700}
+    body.web .lc-mark:hover .lc-mark-txt{color:var(--gold-soft)}
   }
 </style>
 </head>
@@ -864,7 +866,7 @@ function injectWebChrome(){   // 웹에서만 회사 로고(헤더 마크 + 푸�
   const ab=document.querySelector(".appbar");
   if(ab && !ab.querySelector(".lc-mark")){
     const a=document.createElement("a"); a.className="lc-mark"; a.href="https://logiccraft.co.kr"; a.target="_blank"; a.rel="noopener";
-    a.innerHTML='<img src="logo-mark.png" alt="LogicCraft">';
+    a.innerHTML='<img src="logo-mark.png" alt="LogicCraft"><span class="lc-mark-txt">로직크래프트</span>';
     ab.appendChild(a);
   }
 }
