@@ -463,29 +463,6 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .ccard:hover .cc-more { background: var(--blue); border-color: var(--blue); color: #fff; }
 .ccard:hover .cc-more .arr { transform: translateX(2px); }
 
-/* 한 줄 리스트 행 (홈 전용) */
-.list-rows { display: flex; flex-direction: column; }
-.lrow {
-  display: flex; align-items: center; gap: 14px; padding: 15px 8px;
-  border-bottom: 1px solid var(--line); text-decoration: none; color: inherit;
-  transition: background .15s;
-}
-.lrow:first-child { border-top: 1px solid var(--line); }
-.lrow:hover { background: var(--paper-2); }
-.lrow .lrow-icon { width: 40px; height: 40px; border-radius: 11px; flex-shrink: 0; box-shadow: var(--shadow-sm); background: var(--paper-2); object-fit: cover; }
-.lrow h3 { font-size: 15.5px; font-weight: 800; letter-spacing: -0.025em; margin: 0; flex-shrink: 0; }
-.lrow .chip { flex-shrink: 0; }
-.lrow .lrow-desc {
-  margin: 0; flex: 1; min-width: 0; color: var(--muted); font-size: 13.5px;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-}
-.lrow .lrow-arr { flex-shrink: 0; color: var(--blue); font-weight: 700; font-size: 15px; transition: transform .2s var(--ease); }
-.lrow:hover .lrow-arr { transform: translateX(3px); }
-@media (max-width: 640px) {
-  .lrow .lrow-desc { display: none; }
-  .lrow h3 { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-}
-
 .pcard p.desc { margin: 14px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.6; flex: 1; }
 .pcard .links { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 7px; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
 .pcard .links a {
