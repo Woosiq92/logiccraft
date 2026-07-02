@@ -6,14 +6,17 @@ import '../styles/global.css';
 interface Props {
   title?: string;
   description?: string;
+  image?: string;
 }
 
 const {
   title = '로직크래프트 LogicCraft — 생각하는 힘을 키우는 제품',
   description = '로직크래프트(LogicCraft)는 사고력·판단력을 키우는 앱과 학습 플랫폼을 만드는 회사입니다.',
+  image = '/og.png',
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL(image, Astro.site).href;
 
 const orgJsonLd = {
   '@context': 'https://schema.org',
@@ -54,9 +57,9 @@ const orgJsonLd = {
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL('/og.png', Astro.site).href} />
+    <meta property="og:image" content={ogImage} />
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:image" content={new URL('/og.png', Astro.site).href} />
+    <meta name="twitter:image" content={ogImage} />
 
     <meta name="theme-color" content="#1a2754" />
     <link rel="icon" type="image/png" href="/favicon.png" />
