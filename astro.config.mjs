@@ -5,5 +5,11 @@ import sitemap from '@astrojs/sitemap';
 // Custom domain at root → no `base` needed.
 export default defineConfig({
   site: 'https://logiccraft.co.kr',
-  integrations: [sitemap()],
+  // public/ 아래 정적 sub-app은 Astro가 스캔하지 않으므로 sitemap에 수동 등록
+  integrations: [sitemap({
+    customPages: [
+      'https://logiccraft.co.kr/prompt-dojo/',
+      'https://logiccraft.co.kr/wedding-map/',
+    ],
+  })],
 });
