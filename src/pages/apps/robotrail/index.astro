@@ -1,5 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
+import StoreButtons from '../../../components/StoreButtons.astro';
 
 const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6764465655' },
@@ -21,11 +22,7 @@ const stores = [
       “문제를 잘게 나누고, 반복되는 규칙을 찾고, 순서를 설계하는” 코딩의 진짜 바탕을
       놀이로 익힐 수 있습니다.
     </p>
-    <div class="stores">
-      {stores.map((s) => (s.url
-        ? <a class="store" href={s.url}>{s.name}</a>
-        : <span class="store soon">{s.name}</span>)) }
-    </div>
+    <StoreButtons ios={stores[0].url} play={stores[1].url} />
   </section>
 
   <section class="wrap body">
@@ -91,9 +88,6 @@ const stores = [
   .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
   .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
   .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .stores { margin-top: 1.6rem; display: flex; gap: 0.6rem; flex-wrap: wrap; }
-  .store { display: inline-block; padding: 0.6rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: 0.95rem; background: var(--accent); color: #fff; }
-  .store.soon { background: #eee; color: #999; }
   .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
   .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
   .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
