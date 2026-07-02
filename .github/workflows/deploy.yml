@@ -38,3 +38,7 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        with:
+          # GitHub Pages 배포 큐 혼잡 시 기본 10분 타임아웃으로 실패하는 문제 →
+          # 30분으로 상향(deployment_queued 상태를 더 오래 견딤).
+          timeout: 1800000
