@@ -1,0 +1,39 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="왜 그렇게 생각해? — 답이 아니라 생각의 과정을 훈련하는 학습 플랫폼 · 로직크래프트"
+  description="왜 그렇게 생각해?는 정답이 아니라 답에 도달하는 사고 과정을 9과목으로 훈련하는 자기주도 학습 플랫폼입니다. 가입·설치 없이 웹에서 바로 시작합니다."
+  image="/og/scienceapp.png"
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 왜 그렇게 생각해?</p>
+    <h1>답이 아니라, 답에 도달하는 과정을.</h1>
+    <p class="lede">
+      왜 그렇게 생각해?는 정답을 외우는 대신 “왜 그렇게 생각했는지”를 스스로 설명하게 하는
+      자기주도 학습 플랫폼입니다. 9과목을 넘나들며 사고 과정을 단계로 훈련합니다.
+    </p>
+    <div class="cta-row"><a class="cta" href="https://logicschool.co.kr">바로 시작하기 →</a></div>
+  </section>
+
+  <section class="wrap body">
+    <p>
+      과목마다 정답이 하나로 떨어지지 않는 질문을 던지고, 답에 이르는 길을 스스로 밟게
+      합니다. 가입이나 설치 없이 웹에서 바로 쓸 수 있습니다.
+    </p>
+    <p class="links"><a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .cta-row { margin-top: 1.6rem; }
+  .cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; font-weight: 700; background: var(--accent); color: #fff; }
+  .body { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .body p { color: var(--sub); line-height: 1.85; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>

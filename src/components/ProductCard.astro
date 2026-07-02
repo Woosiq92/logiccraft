@@ -10,7 +10,10 @@ const { p } = Astro.props;
   <p class="desc">{p.desc}</p>
   <div class="links">
     {p.type === 'web' ? (
-      <a href={p.web}>바로가기 →</a>
+      <>
+        <a href={p.web}>바로가기 →</a>
+        {p.slug && <div class="legal"><a class="muted" href={`/apps/${p.slug}/`}>소개</a></div>}
+      </>
     ) : (
       <>
         {p.ios ? <a href={p.ios}>App Store</a> : <span class="soon-btn">App Store (예정)</span>}

@@ -1,0 +1,43 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="프롬프트 도장 — 좋은 프롬프트를 문제로 익히는 무료 훈련 · 로직크래프트"
+  description="프롬프트 도장은 AI가 답하는 방식에 기반해 좋은 프롬프트의 다섯 가지를 문제로 풀며 익히는 훈련입니다. 기초부터 코딩·글쓰기·영상까지, 가입·설치 없이 무료로."
+  image="/og/prompt-dojo.png"
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 프롬프트 도장</p>
+    <h1>좋은 프롬프트, 문제로 익힌다.</h1>
+    <p class="lede">
+      프롬프트 도장은 AI가 답을 만드는 원리에 기반해, 좋은 프롬프트의 다섯 가지 축을
+      문제로 풀며 익히는 훈련입니다. 기초부터 코딩·글쓰기·영상까지, 가입·설치 없이 무료로.
+    </p>
+    <div class="cta-row"><a class="cta" href="https://logiccraft.co.kr/prompt-dojo/">바로 시작하기 →</a></div>
+  </section>
+
+  <section class="wrap body">
+    <p>
+      막연한 “잘 쓰는 법”이 아니라, 채점이 결정론으로 떨어지는 문제로 감각을 잡습니다.
+      네 갈래 트랙으로 필요한 곳부터 골라 훈련할 수 있습니다.
+    </p>
+    <p class="links">
+      <a href="/apps/prompt-dojo/support">고객 지원</a> ·
+      <a href="/apps/prompt-dojo/privacy">개인정보 처리방침</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .cta-row { margin-top: 1.6rem; }
+  .cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; font-weight: 700; background: var(--accent); color: #fff; }
+  .body { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .body p { color: var(--sub); line-height: 1.85; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>

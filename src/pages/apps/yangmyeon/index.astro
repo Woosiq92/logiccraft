@@ -1,0 +1,39 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="양면 — 한 쟁점, 양쪽의 가장 강한 논거를 나란히 · 로직크래프트"
+  description="양면은 하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한 논거를 나란히 보여 줍니다. 어느 쪽이 옳은지 정해 주지 않고, 사실과 해석을 구분하도록 돕습니다."
+  image="/og/yangmyeon.png"
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">PRODUCT · 양면</p>
+    <h1>한 쟁점, 양쪽의 가장 강한 논거.</h1>
+    <p class="lede">
+      양면은 하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한
+      근거를 나란히 둡니다. 판단은 읽는 사람의 몫으로 남깁니다.
+    </p>
+    <div class="cta-row"><a class="cta" href="https://중도정치.kr">살펴보기 →</a></div>
+  </section>
+
+  <section class="wrap body">
+    <p>
+      어느 쪽이 옳은지 정해 주지 않습니다. 대신 무엇이 사실이고 무엇이 해석인지 구분하도록
+      돕고, 양쪽의 가장 설득력 있는 논거를 있는 그대로 마주하게 합니다.
+    </p>
+    <p class="links"><a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
+  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
+  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
+  .cta-row { margin-top: 1.6rem; }
+  .cta { display: inline-block; padding: 0.7rem 1.5rem; border-radius: 999px; font-weight: 700; background: var(--accent); color: #fff; }
+  .body { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .body p { color: var(--sub); line-height: 1.85; }
+  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+</style>
