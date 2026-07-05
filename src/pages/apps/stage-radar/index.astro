@@ -7,34 +7,51 @@ import Layout from '../../../layouts/Layout.astro';
   description="공연 발견은 끝난 공연·상설 전시는 빼고, 지금 갈 수 있는 공연·페스티벌만 날짜·지역·장르·가격으로 골라 보는 서비스입니다. 라인업 검색과 인기순까지, 공연예술통합전산망(KOPIS) 데이터 기반."
   image="/og/stage-radar.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · 공연 발견</p>
-    <h1>오늘 갈 수 있는 공연만.</h1>
-    <p class="lede">
-      공연 발견은 이미 끝난 공연과 상설 전시는 빼고, 지금 갈 수 있는 공연·페스티벌만
-      날짜·지역·장르·가격으로 골라 보여 줍니다.
-    </p>
-    <div class="cta-row"><a class="cta" href="https://stage-radar-production.up.railway.app">공연 찾기 →</a></div>
+  <section class="edu-hero">
+    <div class="wrap web-hero-inner">
+      <div class="web-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 공연 발견</p>
+        <h1>오늘 갈 수 있는<br />공연만.</h1>
+        <p class="web-lede">
+          이미 끝난 공연과 상설 전시는 빼고, 지금 갈 수 있는 공연·페스티벌만
+          날짜·지역·장르·가격으로 골라 보여 줍니다.
+        </p>
+        <div class="web-cta"><a class="cta" href="https://stage-radar-production.up.railway.app">공연 찾기 →</a></div>
+        <p class="web-note">
+          라인업을 검색해 좋아하는 아티스트가 서는 무대를 찾고, 찜해 두거나 인기순으로
+          훑어봅니다. 데이터는 공연예술통합전산망(KOPIS)에서 가져옵니다.
+        </p>
+      </div>
+      <div class="web-hero-shot">
+        <img src="/screens/stage-radar/hero.png" alt="공연 발견 화면 — 이번 주 서울 공연·페스티벌을 날짜·장르·가격 필터로 고른 포스터 목록" width="1120" height="752" loading="eager" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <p>
-      라인업을 검색해 좋아하는 아티스트가 서는 무대를 찾고, 찜해 두거나 인기순으로
-      훑어봅니다. 데이터는 공연예술통합전산망(KOPIS)에서 가져옵니다.
-    </p>
+  <section class="wrap web-links">
     <p class="links"><a href="/apps">← 제품 목록</a></p>
   </section>
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .cta-row { margin-top: 1.6rem; }
-  .cta { display: inline-flex; align-items: center; min-height: 58px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.1rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.28); transition: transform .2s var(--ease), box-shadow .2s; }
-  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.34); }
-  .body { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
-  .body p { color: var(--sub); line-height: 1.85; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
+  .web-hero-inner { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
+  .web-hero-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .web-lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
+  .web-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
+  .web-note { color: #aab4dc; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
+  .web-hero-shot { display: flex; justify-content: center; }
+  .web-hero-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+  .web-links { padding-block: 2rem 4rem; }
+  .links { font-size: 0.95rem; }
+  @media (max-width: 860px) {
+    .web-hero-inner { grid-template-columns: 1fr; }
+    .web-hero-shot { order: -1; }
+    .web-hero-copy { text-align: center; }
+    .web-lede, .web-note { margin-inline: auto; }
+    .web-cta { display: flex; justify-content: center; }
+  }
 </style>

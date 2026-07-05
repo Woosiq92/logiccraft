@@ -7,34 +7,51 @@ import Layout from '../../../layouts/Layout.astro';
   description="양면은 하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한 논거를 나란히 보여 줍니다. 어느 쪽이 옳은지 정해 주지 않고, 사실과 해석을 구분하도록 돕습니다."
   image="/og/yangmyeon.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · 양면</p>
-    <h1>한 쟁점, 양쪽의 가장 강한 논거.</h1>
-    <p class="lede">
-      양면은 하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한
-      근거를 나란히 둡니다. 판단은 읽는 사람의 몫으로 남깁니다.
-    </p>
-    <div class="cta-row"><a class="cta" href="https://중도정치.kr">살펴보기 →</a></div>
+  <section class="edu-hero">
+    <div class="wrap web-hero-inner">
+      <div class="web-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 양면</p>
+        <h1>한 쟁점, 양쪽의<br />가장 강한 논거.</h1>
+        <p class="web-lede">
+          하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한
+          근거를 나란히 둡니다. 판단은 읽는 사람의 몫으로 남깁니다.
+        </p>
+        <div class="web-cta"><a class="cta" href="https://중도정치.kr">살펴보기 →</a></div>
+        <p class="web-note">
+          어느 쪽이 옳은지 정해 주지 않습니다. 무엇이 사실이고 무엇이 해석인지 구분하도록
+          돕고, 양쪽의 가장 설득력 있는 논거를 있는 그대로 마주하게 합니다.
+        </p>
+      </div>
+      <div class="web-hero-shot">
+        <img src="/screens/yangmyeon/hero.png" alt="양면 화면 — 정치·사법/경제/사회 쟁점 목록과 찬성·반대 논거 비율" width="1120" height="752" loading="eager" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <p>
-      어느 쪽이 옳은지 정해 주지 않습니다. 대신 무엇이 사실이고 무엇이 해석인지 구분하도록
-      돕고, 양쪽의 가장 설득력 있는 논거를 있는 그대로 마주하게 합니다.
-    </p>
+  <section class="wrap web-links">
     <p class="links"><a href="/apps">← 제품 목록</a></p>
   </section>
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .cta-row { margin-top: 1.6rem; }
-  .cta { display: inline-flex; align-items: center; min-height: 58px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.1rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.28); transition: transform .2s var(--ease), box-shadow .2s; }
-  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.34); }
-  .body { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
-  .body p { color: var(--sub); line-height: 1.85; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
+  .web-hero-inner { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
+  .web-hero-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .web-lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
+  .web-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
+  .web-note { color: #aab4dc; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
+  .web-hero-shot { display: flex; justify-content: center; }
+  .web-hero-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+  .web-links { padding-block: 2rem 4rem; }
+  .links { font-size: 0.95rem; }
+  @media (max-width: 860px) {
+    .web-hero-inner { grid-template-columns: 1fr; }
+    .web-hero-shot { order: -1; }
+    .web-hero-copy { text-align: center; }
+    .web-lede, .web-note { margin-inline: auto; }
+    .web-cta { display: flex; justify-content: center; }
+  }
 </style>

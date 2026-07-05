@@ -6,6 +6,47 @@ const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6774041352' },
   { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=kr.logiccraft.wonder' },
 ];
+
+const S = '/screens/wonder';
+
+const themes = [
+  { name: '일상', c: '#cf8350' },
+  { name: '자연', c: '#3f9d6b' },
+  { name: '이야기 · 상상', c: '#c26b6b' },
+  { name: '만들기', c: '#7c74d6' },
+];
+
+// 화면 + 짧은 설명 (이미지·텍스트를 번갈아 배치)
+const features = [
+  {
+    img: `${S}/play.png`,
+    alt: '놀이 화면 — “같은 햇빛 아래인데 왜 그늘만 시원할까?” 질문과 아이 말 담기',
+    tag: '물어보기 · 담기',
+    title: '오늘의 놀이를 열고, 아이 말을 담습니다',
+    body: '“같은 햇빛 아래인데 왜 그늘만 시원할까?”처럼 질문 하나를 함께 물어봅니다. 아이가 한 말을 부모가 적거나 말로 적기로 담고, 정답이 없어 그냥 넘겨도 됩니다. 나루와 느티가 곁에서 함께 생각합니다.',
+  },
+  {
+    img: `${S}/seeds.png`,
+    alt: '씨앗 화면 — 108가지 놀이, 일상·자연·이야기·상상·만들기 테마와 준비물 필터',
+    tag: '씨앗 고르기',
+    title: '108가지 놀이 씨앗에서 오늘 하나를',
+    body: '일상 · 자연 · 이야기·상상 · 만들기 네 테마에서 오늘의 놀이를 고릅니다. 준비물 없이 · 준비물 있는 · 안 해본 것으로 걸러, 지금 상황에 맞는 씨앗 하나를 심습니다.',
+  },
+  {
+    img: `${S}/garden.png`,
+    alt: '정원 화면 — 함께한 날들 달력과 테마별 진척, 모아서 공유·인쇄 앨범',
+    tag: '정원에 쌓기',
+    title: '함께한 날들이 정원에 남습니다',
+    body: '매일 심은 씨앗이 달력과 지도에 흔적으로 남습니다. 테마별로 얼마나 가꿨는지 한눈에 보고, 모아서 공유하거나 인쇄 앨범으로 남길 수 있습니다.',
+  },
+  {
+    img: `${S}/growth.png`,
+    alt: '자람 화면 — 왜·만약·연결·해보기 네 가지 생각의 결과 수료증까지의 여정',
+    tag: '자람 보기',
+    title: '점수가 아니라, 함께 자라는 결',
+    body: '왜 · 만약 · 연결 · 해보기 네 가지 생각의 결로 무엇을 많이 나눴는지 보여줍니다. 점수를 매기지 않고, 놀이를 다 해보면 수료증에 닿는 여정으로 보여 줍니다.',
+  },
+];
 ---
 
 <Layout
@@ -13,58 +54,85 @@ const stores = [
   description="Synergeion Wonder는 3~6세 아이와 부모가 매일 한 가지 생각 놀이를 함께 나누는 앱입니다. 광고·AI 없이 무료로 시작하고, 모든 기록은 부모 기기에만 저장됩니다. 정답이 아니라 좋은 질문을 함께 나누는 습관을 돕습니다."
   image="/og/wonder.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">SYNERGEION · Wonder</p>
-    <h1>매일 씨앗 한 알, 부모도 자랍니다.</h1>
-    <p class="lede">
-      Wonder는 3~6세 아이와 부모가 매일 한 가지 작은 생각 놀이를 함께 나누는 앱입니다.
-      아이를 똑똑하게 만들어 주겠다고 약속하지 않습니다. 대신 “왜 그럴까?”, “만약에?”
-      같은 좋은 질문을 부모와 아이가 함께 주고받는 습관을 돕습니다.
-    </p>
-    <StoreButtons ios={stores[0].url} play={stores[1].url} />
+  <!-- HERO (full-bleed dark band) -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">SYNERGEION · Wonder</p>
+        <h1>매일 씨앗 한 알,<br />부모도 자랍니다.</h1>
+        <p class="edu-lede">
+          3~6세 아이와 부모가 매일 작은 생각 놀이 하나를 함께 나누는 앱.
+          똑똑하게 만들어 주겠다 약속하는 대신, “왜 그럴까?”, “만약에?” 같은
+          좋은 질문을 함께 주고받는 습관을 돕습니다.
+        </p>
+        <div class="edu-cta">
+          <StoreButtons ios={stores[0].url} play={stores[1].url} />
+        </div>
+        <ul class="edu-badges">
+          <li>3~6세</li>
+          <li>광고 · AI 없음</li>
+          <li>한 번만 결제 (구독 없음)</li>
+          <li>기기에만 저장</li>
+        </ul>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/home.png`} alt="Wonder 오늘 화면 — 오늘의 놀이 씨앗과 나루·느티랑 같이 놀기" loading="eager" width="300" height="650" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <h2>진짜 사용자는 부모입니다</h2>
-    <p>
-      Wonder는 아이가 혼자 화면을 들여다보는 앱이 아닙니다. 부모와 아이가 함께 보고
-      이야기하며, 입력과 기록은 부모가 합니다. 화면 시간을 늘리는 도구가 아니라,
-      잠들기 전 몇 분 동안 아이와 나눌 대화의 실마리를 건네는 도구로 설계했습니다.
-      그래서 정답을 채점하지도, 점수를 매기지도 않습니다.
-    </p>
+  <!-- CORE LOOP -->
+  <section class="wrap edu-loop">
+    <p class="edu-eyebrow warm">아이는 씨앗, 부모는 정원사</p>
+    <div class="edu-steps">
+      <div class="edu-step"><span class="edu-n">1</span><b>씨앗 심기</b><span>오늘의 놀이 하나</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">2</span><b>함께 놀기</b><span>물어보고 아이 말 담기</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">3</span><b>정원 자람</b><span>흔적이 쌓여 자라기</span></div>
+    </div>
+    <p class="edu-loop-note">정답을 채점하거나 점수를 매기지 않습니다. 한 번에 길게가 아니라 매일 조금씩 쌓습니다.</p>
+  </section>
 
-    <h2>정원이라는 세계</h2>
-    <p>
-      Wonder는 아이를 씨앗에, 부모를 정원사에 비유합니다. 오늘의 놀이는 씨앗을 심는 일,
-      아이의 말과 반응을 적어 두는 기록은 정원을 가꾸는 일, 그렇게 쌓인 흔적이 자라는
-      모습은 정원이 우거지는 일에 빗대어집니다. 아기 비버 나루와 새싹 정령 느티가
-      그 정원을 함께 거닐며 매일의 놀이를 안내합니다.
-    </p>
+  <!-- FEATURES (image + text, alternating) -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
 
-    <h2>네 가지 생각 동작</h2>
-    <p>
-      매일의 놀이는 물어보기, 상상하기, 연결하기, 해보기라는 네 가지 동작을 중심으로
-      구성됩니다. 정해진 답으로 아이를 끌고 가는 대신, 아이가 스스로 떠올린 말을 부모가
-      받아 적고 되물으며 생각을 한 걸음 더 밀어 주도록 안내합니다. 한 번에 길게가 아니라,
-      매일 조금씩 쌓는 것이 핵심입니다.
-    </p>
+  <!-- THEMES -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow warm">한 가지 결에 머물지 않게</p>
+    <h2>네 가지 테마의 놀이를 한 앱에</h2>
+    <ul class="edu-chips">
+      {themes.map((t) => (
+        <li><span class="edu-dot" style={`background:${t.c}`}></span>{t.name}</li>
+      ))}
+    </ul>
+  </section>
 
-    <h2>안심하고 쓸 수 있게</h2>
+  <!-- CLOSING NOTE -->
+  <section class="wrap edu-closing">
     <p>
-      Wonder는 광고와 AI를 사용하지 않습니다. 무료로 내려받아 써보고, 원하면 일회성
-      인앱 결제(₩6,900)로 전체 놀이를 평생 잠금해제합니다(구독·자동 갱신 아님). 모든 놀이와 기록은 인터넷 없이 기기 안에서
-      작동하고, 아이의 어떤 정보도 서버로 전송되지 않습니다. 아이가 실수로 외부 링크나
-      문의 화면에 닿지 않도록 부모 확인 게이트를 두어, 아동 안전 기준에 맞췄습니다.
+      Wonder는 아이가 혼자 보는 앱이 아니라, 부모와 아이가 함께 보고 이야기하며 입력과 기록은
+      부모가 하는 도구입니다. 광고와 AI를 쓰지 않고, 무료로 내려받아 써 본 뒤 전체 놀이는 한 번만
+      결제해 평생 잠금해제하는 인앱 구매입니다(₩6,900, 구독·자동 갱신 없음). 모든 놀이와 기록은
+      인터넷 없이 기기 안에서 작동하고, 아이의 어떤 정보도 서버로 전송하지 않습니다. 아이가 실수로
+      외부 링크나 문의 화면에 닿지 않도록 부모 확인 게이트를 두어 아동 안전 기준에 맞췄습니다.
+      헛간의 데이터·백업에서 백업 파일(JSON)이나 텍스트로 내보낼 수 있고, 지운 기록은 휴지통에
+      30일간 보관된 뒤 영구 삭제됩니다. 학습 참고용 놀이로, 아이마다 발달 속도는 다를 수 있습니다.
     </p>
-
-    <h2>기록과 백업</h2>
-    <p>
-      쌓인 기록은 “헛간”의 데이터·백업에서 백업 파일(JSON)로 저장하거나 텍스트로 내보낼 수
-      있습니다. 기기를 바꾸기 전 백업해 두면 정원을 그대로 옮길 수 있습니다. 기록을 지우면
-      휴지통에 30일간 보관된 뒤 영구 삭제되므로, 실수로 지워도 되돌릴 여유가 있습니다.
-    </p>
-
-    <p class="links">
+    <p class="edu-links">
       <a href="/apps/wonder/support">고객 지원 · 자주 묻는 질문</a> ·
       <a href="/apps/wonder/privacy">개인정보 처리방침</a> ·
       <a href="/apps/wonder/terms">이용약관</a> ·
@@ -75,12 +143,124 @@ const stores = [
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
-  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
-  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #8fb0ff; margin: 0;
+  }
+  .edu-eyebrow.warm { color: var(--clay); }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c4cdef; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 40ch; }
+  .edu-cta { display: flex; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- core loop ---- */
+  .edu-loop { text-align: center; padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
+  .edu-steps {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0.6rem; margin: 1rem 0 0; flex-wrap: wrap;
+  }
+  .edu-step {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem; min-width: 160px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .edu-n {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--clay-soft); color: var(--clay);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .edu-step b { font-size: 1.05rem; color: var(--ink); }
+  .edu-step span:last-child { font-size: 0.85rem; color: var(--muted); }
+  .edu-arrow { display: grid; place-items: center; color: var(--clay); font-size: 1.3rem; }
+  .edu-loop-note { color: var(--muted); font-size: 0.92rem; margin: 1.3rem 0 0; }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--clay); margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- areas ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
+  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
+  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-cta { justify-content: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+    .edu-arrow { transform: rotate(90deg); }
+  }
 </style>

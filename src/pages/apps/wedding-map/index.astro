@@ -7,34 +7,51 @@ import Layout from '../../../layouts/Layout.astro';
   description="웨딩맵은 전국 결혼식장(민간·공공·호텔)을 지도에서 한눈에 보고, 받은 견적을 표로 비교해 정하는 도구입니다. 가입·설치 없이 양가와 링크로 공유합니다."
   image="/og/wedding-map.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · 웨딩맵</p>
-    <h1>전국 결혼식장, 지도에서 한눈에.</h1>
-    <p class="lede">
-      웨딩맵은 전국 결혼식장을 지도 위에서 한눈에 보고, 받은 견적을 표로 나란히 비교해
-      정하는 도구입니다. 민간·공공·호텔 예식장을 한 화면에서 훑을 수 있습니다.
-    </p>
-    <div class="cta-row"><a class="cta" href="https://logiccraft.co.kr/wedding-map/">지도 열기 →</a></div>
+  <section class="edu-hero">
+    <div class="wrap web-hero-inner">
+      <div class="web-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 웨딩맵</p>
+        <h1>전국 결혼식장,<br />지도에서 한눈에.</h1>
+        <p class="web-lede">
+          전국 결혼식장을 지도 위에서 한눈에 보고, 받은 견적을 표로 나란히 비교해
+          정하는 도구입니다. 민간·공공·호텔 예식장을 한 화면에서 훑을 수 있습니다.
+        </p>
+        <div class="web-cta"><a class="cta" href="https://logiccraft.co.kr/wedding-map/">지도 열기 →</a></div>
+        <p class="web-note">
+          마음에 든 식장을 골라 담고, 받은 견적을 표로 비교합니다. 가입이나 설치 없이,
+          정리한 목록을 링크로 양가와 바로 공유할 수 있습니다.
+        </p>
+      </div>
+      <div class="web-hero-shot">
+        <img src="/screens/wedding-map/hero.png" alt="웨딩맵 화면 — 서울 구별 예식장 분포 지도와 지역·종류·가격 필터, 지역별 분포 순위" width="1120" height="752" loading="eager" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <p>
-      마음에 든 식장을 골라 담고, 받은 견적을 표로 비교합니다. 가입이나 설치 없이,
-      정리한 목록을 링크로 양가와 바로 공유할 수 있습니다.
-    </p>
+  <section class="wrap web-links">
     <p class="links"><a href="/apps">← 제품 목록</a></p>
   </section>
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .cta-row { margin-top: 1.6rem; }
-  .cta { display: inline-flex; align-items: center; min-height: 58px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.1rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.28); transition: transform .2s var(--ease), box-shadow .2s; }
-  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.34); }
-  .body { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
-  .body p { color: var(--sub); line-height: 1.85; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
+  .web-hero-inner { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
+  .web-hero-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .web-lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
+  .web-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
+  .web-note { color: #aab4dc; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
+  .web-hero-shot { display: flex; justify-content: center; }
+  .web-hero-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+  .web-links { padding-block: 2rem 4rem; }
+  .links { font-size: 0.95rem; }
+  @media (max-width: 860px) {
+    .web-hero-inner { grid-template-columns: 1fr; }
+    .web-hero-shot { order: -1; }
+    .web-hero-copy { text-align: center; }
+    .web-lede, .web-note { margin-inline: auto; }
+    .web-cta { display: flex; justify-content: center; }
+  }
 </style>
