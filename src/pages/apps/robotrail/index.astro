@@ -6,6 +6,46 @@ const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6764465655' },
   { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.smartsikhye.robotrail' },
 ];
+
+const S = '/screens/robotrail';
+
+const areas = [
+  { name: '명령 시뮬레이션', c: '#7cb342' },
+  { name: '코드 분석', c: '#2f9e8f' },
+  { name: '시각 작업 기억', c: '#7c74d6' },
+];
+
+// 화면 + 짧은 설명 (이미지·텍스트를 번갈아 배치)
+const features = [
+  {
+    img: `${S}/play.png`,
+    alt: '플레이 화면 — 3D 그리드 위 로봇과 앞으로·왼쪽 돌기·오른쪽 돌기 명령 블록',
+    tag: '핵심 플레이',
+    title: '명령 블록을 놓아 로봇을 움직입니다',
+    body: '앞으로 · 왼쪽 돌기 · 오른쪽 돌기 블록을 슬롯에 놓고 ▶ 실행을 누르면 로봇이 목적지로 향합니다. 색 조건을 걸면 같은 색 칸에서만 명령이 실행돼, 더 적은 블록으로 같은 길을 가는 풀이를 고민하게 됩니다.',
+  },
+  {
+    img: `${S}/learn.png`,
+    alt: '학습 모드 화면 — 명령 시뮬레이션 112판, 연속 클리어·누적 별·챌린지 메달',
+    tag: '학습',
+    title: '112판의 캠페인으로 감각을 쌓습니다',
+    body: '가장 단순한 한 걸음부터 반복·갈림길·분기까지 난이도가 촘촘히 올라가는 명령 시뮬레이션 112판. 연속 클리어·누적 별·챌린지 메달로 매일 머리를 쓰는 습관을 만듭니다. 학습은 인터넷 없이도 즐길 수 있습니다.',
+  },
+  {
+    img: `${S}/assess.png`,
+    alt: '측정 화면 — 3개 인지 영역, 총 36문제, 영역별 도전 시작',
+    tag: '측정',
+    title: '3개 영역 36문제로 사고력을 점검',
+    body: '시뮬레이션 · 패턴 사고 · 추상화 세 인지 영역, 총 36문제로 지금의 사고력을 가늠합니다. 시간 안에 풀어 메달을 따고, 도전마다 본인 기록 갱신과 성장 추이를 확인합니다.',
+  },
+  {
+    img: `${S}/profile.png`,
+    alt: '내 정보 화면 — 나의 트로피 진열대, 트랙별 점수 3트랙 가중 합산',
+    tag: '내 정보',
+    title: '트랙별 점수가 한곳에 쌓입니다',
+    body: '명령 시뮬레이션 · 코드 분석 · 시각 작업 기억 세 트랙의 점수를 가중 합산해 본인 사고력을 진단합니다. 다음에 도전할 트랙을 추천받아, 약한 유형을 다시 연습할 수 있습니다.',
+  },
+];
 ---
 
 <Layout
@@ -13,68 +53,83 @@ const stores = [
   description="RoboTrail은 코드를 타이핑하지 않고 방향·반복 명령 블록을 놓아 로봇을 움직이는 퍼즐 앱입니다. 분해·패턴·추상화 같은 코딩의 바탕이 되는 사고력을 학습 108판과 측정 36문제로 훈련합니다."
   image="/og/robotrail.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · RoboTrail</p>
-    <h1>코드는 아직, 사고력은 먼저.</h1>
-    <p class="lede">
-      RoboTrail은 키보드로 코드를 치는 대신 ↑(앞으로)·↺(왼쪽)·↻(오른쪽) 같은 명령 블록을
-      슬롯에 놓아 로봇을 목적지까지 움직이는 퍼즐 게임입니다. 프로그래밍 언어를 몰라도,
-      “문제를 잘게 나누고, 반복되는 규칙을 찾고, 순서를 설계하는” 코딩의 진짜 바탕을
-      놀이로 익힐 수 있습니다.
-    </p>
-    <StoreButtons ios={stores[0].url} play={stores[1].url} />
+  <!-- HERO (full-bleed dark band) -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · RoboTrail</p>
+        <h1>코드는 아직,<br />사고력은 먼저.</h1>
+        <p class="edu-lede">
+          키보드로 코드를 치는 대신, 방향·반복 명령 블록을 슬롯에 놓아 로봇을
+          목적지까지 움직이는 퍼즐 앱. 문제를 잘게 나누고 규칙을 찾고 순서를
+          설계하는 코딩의 진짜 바탕을 놀이로 익힙니다.
+        </p>
+        <div class="edu-cta">
+          <StoreButtons ios={stores[0].url} play={stores[1].url} />
+        </div>
+        <ul class="edu-badges">
+          <li>오프라인 학습·측정</li>
+          <li>로그인 없음</li>
+          <li>한국어 · 영어</li>
+          <li>콘텐츠 무료</li>
+        </ul>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/home.png`} alt="RoboTrail 홈 화면 — 코딩 마스터로 가는 3가지 길과 트랙별 진행률" loading="eager" width="300" height="650" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <h2>무엇을 기르나요</h2>
+  <!-- CORE LOOP -->
+  <section class="wrap edu-loop">
+    <p class="edu-eyebrow warm">모든 퍼즐이 기르는 세 가지 사고</p>
+    <div class="edu-steps">
+      <div class="edu-step"><span class="edu-n">1</span><b>분해</b><span>큰 문제를 작은 단계로</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">2</span><b>패턴 인식</b><span>반복되는 규칙 찾기</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">3</span><b>추상화</b><span>규칙을 하나로 묶기</span></div>
+    </div>
+    <p class="edu-loop-note">문법 암기가 아니라 사고의 순서 · 로봇이 벽에 부딪히면 어디서 틀렸는지 스스로 되짚습니다.</p>
+  </section>
+
+  <!-- FEATURES (image + text, alternating) -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- 3 TRACKS -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow warm">코딩 마스터로 가는 3가지 길</p>
+    <h2>세 트랙으로 사고력을 넓힙니다</h2>
+    <ul class="edu-chips">
+      {areas.map((a) => (
+        <li><span class="edu-dot" style={`background:${a.c}`}></span>{a.name}</li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- CLOSING NOTE -->
+  <section class="wrap edu-closing">
     <p>
-      코딩 교육의 핵심은 문법 암기가 아니라 사고의 순서입니다. 큰 문제를 작은 단계로
-      쪼개는 분해, 같은 동작이 반복되는 규칙을 알아채는 패턴 인식, 그 규칙을 하나의
-      명령으로 묶는 추상화 — RoboTrail의 모든 퍼즐은 이 세 가지 사고를 자연스럽게
-      쓰도록 설계돼 있습니다. 로봇이 벽에 부딪히면 어디서 순서가 틀렸는지 스스로
-      되짚게 되고, 더 적은 블록으로 같은 길을 가도록 다듬으며 “더 좋은 풀이”를 고민하게
-      됩니다.
+      학습과 측정은 인터넷 없이 오프라인으로 즐길 수 있고, 데일리 챌린지·게시판 등 일부
+      기능만 인터넷을 사용합니다. 설정 화면이나 상단 KO/EN 칩에서 한국어와 영어를 즉시
+      전환할 수 있습니다. 회원가입·로그인 없이 바로 시작하며, 진행 기록은 기기 안에 저장되므로
+      기기를 바꾸거나 앱을 삭제하면 기록이 사라질 수 있습니다. 학습 참고용 도구로 특정 성취를
+      보장하지 않습니다.
     </p>
-
-    <h2>구성</h2>
-
-    <h3>학습 — 108판의 캠페인</h3>
-    <p>
-      가장 단순한 한 칸 이동부터 시작해 반복 블록, 갈림길, 조건에 따른 분기까지 난이도가
-      촘촘하게 올라가는 108개의 퍼즐이 준비돼 있습니다. 막힐 때는 각 퍼즐에 마련된 단계별
-      힌트를 펼쳐 보거나, 풀이 팁 게시판에서 다른 사람들의 접근법을 참고할 수 있습니다.
-    </p>
-
-    <h3>측정 — 36문제로 보는 사고력</h3>
-    <p>
-      학습으로 다진 감각을 36개의 측정 문제로 점검합니다. 정답 여부뿐 아니라 풀이 과정을
-      통해 지금의 사고력 수준을 가늠하고, 약한 유형을 다시 연습할 수 있도록 도와줍니다.
-    </p>
-
-    <h3>도전 모드와 데일리 챌린지</h3>
-    <p>
-      더 어려운 퍼즐에 도전하는 모드와, 매일 새로 열리는 데일리 챌린지로 꾸준히 머리를
-      쓰는 습관을 만들 수 있습니다. 학습과 측정은 인터넷 없이 오프라인으로 즐길 수 있고,
-      데일리 챌린지·게시판 등 일부 기능만 인터넷을 사용합니다.
-    </p>
-
-    <h2>한국어와 영어, 그리고 무료</h2>
-    <p>
-      설정 화면의 “언어” 항목이나 상단 헤더의 KO/EN 칩에서 한국어와 영어를 즉시 전환할 수
-      있고, 처음 실행 시 기기 언어에 맞춰 자동으로 설정됩니다. 회원가입·로그인 없이 바로
-      시작하며, 모든 캠페인·측정·트레이닝 콘텐츠를 무료로 이용할 수 있습니다. 진행 기록은
-      기기 내부에 저장되므로, 기기를 바꾸거나 앱을 삭제하면 기록이 사라질 수 있습니다.
-      중요한 기록은 같은 기기에서 이어가시길 권장합니다.
-    </p>
-
-    <h2>이런 분께</h2>
-    <p>
-      코딩을 처음 접하는 어린이와 학생, 자녀와 함께 사고력 놀이를 하고 싶은 부모,
-      그리고 짬짬이 머리를 쓰는 퍼즐을 즐기는 어른 모두에게 어울립니다. 정답을 외우는
-      학습이 아니라, 스스로 길을 설계하고 다듬는 과정 자체가 재미가 되도록 만들었습니다.
-    </p>
-
-    <p class="links">
+    <p class="edu-links">
       <a href="/apps/robotrail/support">고객 지원 · 자주 묻는 질문</a> ·
       <a href="/apps/robotrail/privacy">개인정보 처리방침</a> ·
       <a href="/apps/robotrail/terms">이용약관</a> ·
@@ -84,13 +139,124 @@ const stores = [
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
-  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
-  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
-  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #8fb0ff; margin: 0;
+  }
+  .edu-eyebrow.warm { color: var(--clay); }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c4cdef; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 40ch; }
+  .edu-cta { display: flex; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- core loop ---- */
+  .edu-loop { text-align: center; padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
+  .edu-steps {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0.6rem; margin: 1rem 0 0; flex-wrap: wrap;
+  }
+  .edu-step {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem; min-width: 160px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .edu-n {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--clay-soft); color: var(--clay);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .edu-step b { font-size: 1.05rem; color: var(--ink); }
+  .edu-step span:last-child { font-size: 0.85rem; color: var(--muted); }
+  .edu-arrow { display: grid; place-items: center; color: var(--clay); font-size: 1.3rem; }
+  .edu-loop-note { color: var(--muted); font-size: 0.92rem; margin: 1.3rem 0 0; }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--clay); margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- areas ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
+  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
+  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-cta { justify-content: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+    .edu-arrow { transform: rotate(90deg); }
+  }
 </style>

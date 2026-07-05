@@ -6,81 +6,118 @@ const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6772662894' },
   { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch' },
 ];
+
+const S = '/screens/stockwatch';
+
+// 화면 + 짧은 설명 (이미지·텍스트를 번갈아 배치)
+const features = [
+  {
+    img: `${S}/fullscreen.png`,
+    alt: '전체화면 거치대 모드 — 삼성전자 시세를 화면 가득 큰 글씨로 표시',
+    tag: '거치대 모드',
+    title: '가격을 화면 가득 크게',
+    body: '관심 종목을 탭하면 가격이 화면 가득 큰 글씨로 표시됩니다. 책상 거치대에 폰을 세워 두고 멀리서도 등락을 확인하세요. 화면이 켜져 있는 동안 약 7초마다 자동으로 갱신됩니다.',
+  },
+  {
+    img: `${S}/market.png`,
+    alt: '시장 종합 탭 — 내 종목 평균 등락, 과열·쏠림 신호, 주요 지수·환율',
+    tag: '시장 · 종합',
+    title: '오늘 시장 분위기를 한 화면에',
+    body: '시장 탭에서 내 종목 평균 등락과 코스피를 나란히 보고, 과열·쏠림 신호로 오늘 시장 상태를 가늠합니다. 코스피·코스닥 지수와 원/달러 환율도 함께 확인할 수 있습니다.',
+  },
+  {
+    img: `${S}/market-flow.png`,
+    alt: '시장 국내 탭 — 코스피 추이 차트와 외국인·기관·개인 수급',
+    tag: '시장 · 국내 · 국외',
+    title: '지수 추이와 수급까지',
+    body: '코스피 추이 차트에 외국인·기관·개인 순매수, 상승·하락 종목 수를 더해 시장 흐름을 읽습니다. 국외 탭에서는 미국 3대 지수와 환율 추이를 봅니다. 참고용 정보이며 매매 권유가 아닙니다.',
+  },
+  {
+    img: `${S}/news.png`,
+    alt: '뉴스 탭 — 같은 이슈를 여러 매체가 어떻게 다르게 다뤘는지 비교',
+    tag: '뉴스',
+    title: '같은 이슈, 매체별 표현 비교',
+    body: '한 사건을 두 곳 이상이 다룬 경우만 묶어, 경향·조선·연합 등 매체가 같은 소식을 어떻게 다르게 표현했는지 나란히 봅니다. 경제·국제·전체로 걸러 워딩 차이를 직접 비교할 수 있습니다.',
+  },
+];
 ---
 
 <Layout
   title="불안한개미 — 매매 없이 시세만 보는 한국 주식 앱 · 로직크래프트"
-  description="불안한개미는 주문·거래 기능 없이 한국 주식(KOSPI/KOSDAQ) 시세만 크게 보여주는 읽기 전용 앱입니다. 거치대 모드, 홈·잠금화면 위젯, 잠금화면 카드로 가장 손쉽게 시세를 확인하세요."
+  description="불안한개미는 주문·거래 기능 없이 한국 주식(KOSPI/KOSDAQ) 시세만 크게 보여주는 읽기 전용 앱입니다. 거치대 모드, 홈·잠금화면 위젯, 시장·뉴스 탭으로 가장 손쉽게 시세를 확인하세요."
   image="/og/stockwatch.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · 불안한개미</p>
-    <h1>매매는 빼고, 시세만 크게.</h1>
-    <p class="lede">
-      불안한개미는 주문·거래·계좌 관리 기능이 전혀 없는 읽기 전용 한국 주식 시세 앱입니다.
-      차트 분석 도구도, 매수·매도 버튼도 없습니다. 오직 내가 담아 둔 종목의 가격을
-      가장 크고 빠르게 확인하는 한 가지 일에만 집중했습니다.
-    </p>
-    <StoreButtons ios={stores[0].url} play={stores[1].url} />
+  <!-- HERO (full-bleed dark band) -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 불안한개미</p>
+        <h1>매매는 빼고,<br />시세만 크게.</h1>
+        <p class="edu-lede">
+          주문·거래·계좌 관리 기능이 전혀 없는 읽기 전용 한국 주식 시세 앱.
+          매수·매도 버튼 없이, 내가 담아 둔 종목의 가격을 가장 크고 빠르게
+          확인하는 한 가지 일에만 집중했습니다.
+        </p>
+        <div class="edu-cta">
+          <StoreButtons ios={stores[0].url} play={stores[1].url} />
+        </div>
+        <ul class="edu-badges">
+          <li>실시간에 가까운 시세</li>
+          <li>거치대 모드</li>
+          <li>위젯 · 잠금화면 카드</li>
+          <li>내 종목 · 시장 · 뉴스</li>
+        </ul>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/watchlist.png`} alt="불안한개미 내 종목 화면 — 삼성전자·SK하이닉스·NAVER 시세를 큰 글씨로" loading="eager" width="300" height="650" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <h2>왜 만들었나요</h2>
+  <!-- CORE LOOP -->
+  <section class="wrap edu-loop">
+    <p class="edu-eyebrow warm">쓰는 법, 3단계</p>
+    <div class="edu-steps">
+      <div class="edu-step"><span class="edu-n">1</span><b>담기</b><span>이름·6자리 코드로 검색</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">2</span><b>지켜보기</b><span>탭하면 거치대 모드로</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">3</span><b>위젯</b><span>앱 없이 바탕화면에서</span></div>
+    </div>
+    <p class="edu-loop-note">로그인·회원가입·계좌 연결 없이 · 처음 켠 순간부터 바로 시세를 봅니다.</p>
+  </section>
+
+  <!-- FEATURES (image + text, alternating) -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- CLOSING NOTE -->
+  <section class="wrap edu-closing">
     <p>
-      장중에 주식 앱을 열면 매수·매도 버튼이 먼저 눈에 들어옵니다. 시세만 잠깐 보려다
-      충동적으로 주문을 넣게 되는 경험은 누구에게나 익숙합니다. 불안한개미는 그 버튼을
-      아예 없앴습니다. 거래는 증권사 앱에서 하고, 시세를 “지켜보는” 일은 이 앱에서 하도록
-      역할을 나눈 것입니다. 그래서 로그인도, 회원가입도, 증권 계좌 연결도 필요하지 않습니다.
-      앱을 처음 켠 순간부터 종목을 검색해 바로 시세를 볼 수 있습니다.
+      홈·잠금화면 위젯과 잠금화면 카드(Live Activity)로 앱을 열지 않아도 시세를 봅니다.
+      위젯은 저장한 종목을 바탕화면에서 바로 보여 주고, 잠금화면 카드는 폰을 깨우기만 해도
+      약 10~15초 간격으로 갱신되며 배터리 보호를 위해 약 8시간 후 자동 종료됩니다.
+      관심 종목과 설정값은 모두 기기 안에만 저장되고, 앱을 삭제하면 함께 삭제됩니다.
     </p>
-
-    <h2>핵심 기능</h2>
-
-    <h3>전체화면 거치대 모드</h3>
     <p>
-      관심 종목을 탭하면 가격이 화면 가득 큰 글씨로 표시되는 거치대 모드로 들어갑니다.
-      책상 위 거치대에 폰을 세워 두고 일하면서, 또는 멀리서도 한눈에 등락을 확인할 수
-      있습니다. 화면이 켜져 있는 동안 약 7초마다 시세가 자동으로 갱신됩니다.
-    </p>
-
-    <h3>홈·잠금화면 위젯</h3>
-    <p>
-      홈 화면이나 잠금화면을 길게 눌러 위젯을 추가하고, 저장해 둔 종목을 선택하면
-      앱을 열지 않아도 바탕화면에서 바로 시세를 볼 수 있습니다. 하루에도 여러 번
-      앱을 여닫는 수고를 덜어 줍니다.
-    </p>
-
-    <h3>잠금화면 카드(Live Activity)</h3>
-    <p>
-      특정 종목을 열고 잠금화면 카드를 켜면, 폰을 깨우기만 해도 잠금화면에서 실시간에
-      가까운 시세가 보입니다. 약 10~15초 간격으로 갱신되며, 배터리 보호를 위해 약 8시간
-      후 자동으로 종료됩니다.
-    </p>
-
-    <h3>관심 종목 · 시장 탭</h3>
-    <p>
-      검색 화면에서 종목 이름이나 6자리 코드(예: 005930 삼성전자, 035420 NAVER)를 입력해
-      관심 종목을 담아 둘 수 있습니다. 별도의 시장 탭에서는 코스피·코스닥 지수와 주요 환율을
-      한 화면에서 확인할 수 있어, 시장 분위기를 빠르게 가늠할 수 있습니다.
-    </p>
-
-    <h2>시작하기</h2>
-    <p>
-      앱을 설치하고 처음 실행하면 안내에 따라 관심 종목을 검색해 추가하기만 하면 됩니다.
-      추가한 종목을 탭하면 거치대 모드로, 길게 누른 홈·잠금화면에서는 위젯으로 시세를
-      볼 수 있습니다. 관심 종목과 설정값은 모두 기기 내부에만 저장되며, 앱을 삭제하면
-      함께 삭제됩니다.
-    </p>
-
-    <h2>데이터와 정책</h2>
-    <p>
-      시세는 네이버 증권의 공개 시장 데이터를 사용합니다. 불안한개미는 증권사가 아니며,
+      시세는 네이버 증권의 공개 시장 데이터를 사용합니다. 불안한개미는 증권사가 아니며
       투자 자문이나 매매 기능을 제공하지 않고 공개된 시세 정보를 표시할 뿐입니다.
-      표시되는 가격은 지연될 수 있으므로 투자 판단의 단독 근거로 삼지 마세요.
-      앱 운영을 위해 화면 하단에 비개인화 배너 광고 1개가 표시될 수 있습니다.
+      표시되는 가격은 지연될 수 있어 투자 판단의 단독 근거로 삼지 마세요. 앱 운영을 위해
+      화면 하단에 비개인화 배너 광고 1개가 표시될 수 있습니다.
     </p>
-
-    <p class="links">
+    <p class="edu-links">
       <a href="/apps/stockwatch/support">고객 지원 · 자주 묻는 질문</a> ·
       <a href="/apps/stockwatch/privacy">개인정보 처리방침</a> ·
       <a href="/apps/stockwatch/terms">이용약관</a> ·
@@ -90,13 +127,125 @@ const stores = [
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
-  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
-  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
-  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #8fb0ff; margin: 0;
+  }
+  .edu-eyebrow.warm { color: var(--clay); }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c4cdef; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 40ch; }
+  .edu-cta { display: flex; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- core loop ---- */
+  .edu-loop { text-align: center; padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
+  .edu-steps {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0.6rem; margin: 1rem 0 0; flex-wrap: wrap;
+  }
+  .edu-step {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem; min-width: 160px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .edu-n {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--clay-soft); color: var(--clay);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .edu-step b { font-size: 1.05rem; color: var(--ink); }
+  .edu-step span:last-child { font-size: 0.85rem; color: var(--muted); }
+  .edu-arrow { display: grid; place-items: center; color: var(--clay); font-size: 1.3rem; }
+  .edu-loop-note { color: var(--muted); font-size: 0.92rem; margin: 1.3rem 0 0; }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--clay); margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- areas ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
+  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
+  .edu-closing > p + p { margin-top: 1rem; }
+  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-cta { justify-content: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+    .edu-arrow { transform: rotate(90deg); }
+  }
 </style>

@@ -6,6 +6,51 @@ const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6779944719' },
   { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=kr.logiccraft.certnote' },
 ];
+
+const S = '/screens/certnote';
+
+const areas = [
+  { name: '제과제빵', c: '#cf8350' },
+  { name: '한식 · 양식', c: '#c26b6b' },
+  { name: '중식 · 일식', c: '#b08a2e' },
+  { name: '바리스타 · 조주', c: '#3f9d6b' },
+  { name: '정보처리', c: '#4f7bd0' },
+  { name: '네트워크 · 전기', c: '#5a5fd6' },
+  { name: '공인중개사', c: '#2f9e8f' },
+  { name: '사회복지사', c: '#7c74d6' },
+];
+
+// 화면 + 짧은 설명 (이미지·텍스트를 번갈아 배치)
+const features = [
+  {
+    img: `${S}/training.png`,
+    alt: '오늘의 훈련 화면 — 정답 카드를 보고 넘기며 인출·복습',
+    tag: '오늘의 훈련',
+    title: '만기 카드와 새 카드를 매일 조금씩',
+    body: '만기가 된 카드와 새 카드를 섞어 매일 반복하도록 짜여 있습니다. 무엇부터 할지 고민하지 않고 바로 시작하고, 마친 카드는 망각곡선에 맞춰 다시 올라옵니다.',
+  },
+  {
+    img: `${S}/theory.png`,
+    alt: '정리 글 읽기 화면 — 과목별 필기·실기 핵심 정리',
+    tag: '정리 글',
+    title: '큰 흐름부터 잡는 정리 글',
+    body: '과목마다 필기·실기 핵심을 정리한 글을 읽으며 흐름을 먼저 잡습니다. 처음 보는 과목도 무엇부터 봐야 할지 길을 잡을 수 있도록 구성했습니다.',
+  },
+  {
+    img: `${S}/quiz.png`,
+    alt: '모의고사 화면 — 빠른 10문제, 골라풀기, 실전 모드',
+    tag: '모의고사',
+    title: '빠른 10문제부터 실전 모드까지',
+    body: '객관식·OX를 랜덤으로 풉니다. 풀고 나면 즉시 채점과 해설, 근거가 된 정리 글로 바로 넘어갑니다. 틀린 문제는 오답노트에 모여 약한 부분만 다시 풉니다.',
+  },
+  {
+    img: `${S}/cards.png`,
+    alt: '암기카드 화면 — 앞면을 보고 정답을 떠올린 뒤 넘겨 확인',
+    tag: '암기카드',
+    title: '앞면을 보고 정답을 떠올리기',
+    body: '앞면을 보고 정답을 떠올린 뒤 넘겨 확인하며 외웁니다. 기본 카드 외에 MY 탭에서 나만의 카드를 직접 만들어 약점만 집중해서 반복할 수 있습니다.',
+  },
+];
 ---
 
 <Layout
@@ -13,80 +58,71 @@ const stores = [
   description="모두의 자격증은 필기·실기 정리, 모의고사, 암기카드, 진도·D-day 관리를 한 앱에서 무료로 제공하는 자격증 학습 앱입니다. 조리·식음료부터 IT·전문직까지 다양한 과목을 다룹니다."
   image="/og/certnote.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · 모두의 자격증</p>
-    <h1>자격증 공부, 한 곳에서 끝내기.</h1>
-    <p class="lede">
-      모두의 자격증은 흩어진 자격증 공부를 하나로 모은 학습 앱입니다. 매일 “오늘의 훈련”으로
-      핵심 키워드를 점검하고, 정리 글로 개념을 잡고, 모의고사로 실력을 확인하고, 암기카드로
-      외웁니다. 오늘의 훈련·정리 글·빠른 모의고사는 회원가입 없이 무료로 쓰고, 전체
-      문제은행과 실전 모드는 합격팩으로 한 번에 엽니다.
-    </p>
-    <StoreButtons ios={stores[0].url} play={stores[1].url} />
+  <!-- HERO (full-bleed dark band) -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 모두의 자격증</p>
+        <h1>자격증 공부,<br />한 곳에서.</h1>
+        <p class="edu-lede">
+          흩어진 자격증 공부를 하나로 모은 학습 앱.
+          매일 ‘오늘의 훈련’으로 핵심을 점검하고, 정리 글로 개념을 잡고,
+          모의고사로 확인하고, 암기카드로 외웁니다.
+        </p>
+        <div class="edu-cta">
+          <StoreButtons ios={stores[0].url} play={stores[1].url} />
+        </div>
+        <ul class="edu-badges">
+          <li>무료로 시작</li>
+          <li>로그인 없음</li>
+          <li>기기 안에만 저장</li>
+        </ul>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/today.png`} alt="모두의 자격증 홈 화면 — 오늘의 훈련 진행 링과 D-day, 이어서 학습" loading="eager" width="300" height="650" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
+  <!-- AREAS -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow warm">43종을 한 앱에</p>
     <h2>다루는 자격증</h2>
-    <p>
-      제과제빵·한식·양식·중식·일식·바리스타·조주 같은 조리·식음료 분야부터, 정보처리·네트워크·전기
-      같은 IT·기술 분야, 공인중개사·물류관리사·주택관리사·경비지도사·사회복지사 같은 전문직까지
-      43종을 다룹니다. 과목은 계속 추가·보강하고 있습니다.
-    </p>
-
-    <h2>다섯 가지 학습 도구</h2>
-
-    <h3>오늘의 훈련으로 매일 점검하기</h3>
-    <p>
-      홈에 오늘 풀 키워드 점검이 진행 링으로 뜹니다. 만기가 된 카드와 새 카드를 섞어
-      매일 조금씩 반복하도록 짜여 있어, 무엇부터 할지 고민하지 않고 바로 시작할 수 있습니다.
-    </p>
-
-    <h3>정리 글로 개념 잡기</h3>
-    <p>
-      과목마다 필기·실기 핵심을 정리한 글을 읽으며 큰 흐름을 먼저 잡습니다. 처음 보는
-      과목도 무엇부터 봐야 할지 길을 잡을 수 있도록 구성했습니다.
-    </p>
-
-    <h3>모의고사로 점검하기</h3>
-    <p>
-      객관식·OX 문제를 랜덤으로 풉니다. 빠른 10문제부터 단원별·난이도별 골라풀기, 제한시간이
-      걸린 실전 모드까지 고를 수 있습니다. 풀고 나면 즉시 채점과 해설이 나오고, 해설에서
-      근거가 된 정리 글로 바로 넘어갑니다. 틀린 문제는 오답노트에 모여 약한 부분만 다시
-      풉니다.
-    </p>
-
-    <h3>암기카드로 외우기</h3>
-    <p>
-      앞면을 보고 정답을 떠올린 뒤 넘겨 확인하며 외웁니다. 기본 제공 카드 외에 MY 탭에서
-      나만의 카드를 직접 만들어 약점만 집중해서 반복할 수 있습니다.
-    </p>
-
-    <h3>진도와 시험일 관리</h3>
-    <p>
-      메모, 진도, 시험일까지 한 곳에서 관리해 “어디까지 봤더라”를 매번 떠올릴 필요가
-      없습니다. 모든 학습 기록은 기기 내부에만 저장되며, 앱을 제거하면 함께 삭제됩니다.
-    </p>
-
-    <h2>무료로 쓰는 기능과 합격팩</h2>
-    <p>
-      오늘의 훈련, 정리 글 읽기, 과목별 빠른 모의고사, 암기카드, 진도·시험일 관리는 회원가입
-      없이 무료로 씁니다. 더 깊게 준비할 때를 위한 합격팩은 전체 문제은행, 실전 모드,
-      단원·난이도 골라풀기, 오답노트 무제한, 약점 분석을 한 번에 열어 줍니다. 구독이 아닌
-      일회성 구매입니다.
-    </p>
-    <ul class="plans">
-      <li><b>전과목 패스 ₩12,900</b> — 43종 전 과목의 합격팩 기능을 영구히 잠금 해제합니다(복원 가능).</li>
-      <li><b>1과목 패스권 ₩4,900</b> — 고른 한 과목만 잠금 해제합니다(이 기기 전용, 복원 안 됨).</li>
+    <ul class="edu-chips">
+      {areas.map((a) => (
+        <li><span class="edu-dot" style={`background:${a.c}`}></span>{a.name}</li>
+      ))}
     </ul>
+  </section>
 
-    <h2>정확성에 대한 안내</h2>
+  <!-- FEATURES (image + text, alternating) -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- CLOSING NOTE -->
+  <section class="wrap edu-closing">
     <p>
-      자료와 문제는 학습 참고용으로 제공되며 합격이나 점수를 보장하지 않습니다. 시험 범위·
-      출제 기준·법령은 바뀔 수 있으니, 최신 정보는 큐넷 등 시험 주관처의 공식 자료로 꼭
-      확인해 주세요. 오류를 발견해 알려 주시면 확인 후 반영하겠습니다.
+      오늘의 훈련, 정리 글 읽기, 과목별 빠른 모의고사, 암기카드, 진도·시험일 관리는
+      회원가입 없이 무료로 씁니다. 더 깊게 준비할 때를 위한 합격팩은 전체 문제은행,
+      실전 모드, 단원·난이도 골라풀기, 오답노트 무제한, 약점 분석을 한 번에 열어 줍니다.
+      구독이 아닌 일회성 구매로, 전과목 패스 ₩12,900 · 1과목 패스권 ₩4,900입니다.
+      모든 학습 기록은 기기 안에만 저장되며 앱을 제거하면 함께 삭제됩니다. 자료와 문제는
+      학습 참고용으로 합격이나 점수를 보장하지 않으며, 시험 범위·출제 기준·법령은 바뀔 수
+      있으니 최신 정보는 큐넷 등 시험 주관처의 공식 자료로 꼭 확인해 주세요.
     </p>
-
-    <p class="links">
+    <p class="edu-links">
       <a href="/apps/certnote/support">고객 지원 · 자주 묻는 질문</a> ·
       <a href="/apps/certnote/privacy">개인정보 처리방침</a> ·
       <a href="/apps/certnote/terms">이용약관</a> ·
@@ -97,16 +133,124 @@ const stores = [
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
-  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
-  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
-  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
-  .plans { color: var(--sub); line-height: 1.85; margin: 0.6rem 0 0; padding-left: 1.1rem; }
-  .plans li { margin: 0.3rem 0; }
-  .plans b { color: var(--ink, inherit); }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #8fb0ff; margin: 0;
+  }
+  .edu-eyebrow.warm { color: var(--clay); }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c4cdef; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 40ch; }
+  .edu-cta { display: flex; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- core loop ---- */
+  .edu-loop { text-align: center; padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
+  .edu-steps {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0.6rem; margin: 1rem 0 0; flex-wrap: wrap;
+  }
+  .edu-step {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem; min-width: 160px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .edu-n {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--clay-soft); color: var(--clay);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .edu-step b { font-size: 1.05rem; color: var(--ink); }
+  .edu-step span:last-child { font-size: 0.85rem; color: var(--muted); }
+  .edu-arrow { display: grid; place-items: center; color: var(--clay); font-size: 1.3rem; }
+  .edu-loop-note { color: var(--muted); font-size: 0.92rem; margin: 1.3rem 0 0; }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--clay); margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- areas ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
+  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
+  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-cta { justify-content: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+    .edu-arrow { transform: rotate(90deg); }
+  }
 </style>

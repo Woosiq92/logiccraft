@@ -6,6 +6,41 @@ const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6769797672' },
   { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint' },
 ];
+
+const S = '/screens/ourfootprint';
+
+const areas = [
+  { name: '맛집', c: '#cf8350' },
+  { name: '카페', c: '#b08a2e' },
+  { name: '술집', c: '#c26b6b' },
+  { name: '전시 · 문화', c: '#7c74d6' },
+  { name: '기타', c: '#4f7bd0' },
+];
+
+// 화면 + 짧은 설명 (이미지·텍스트를 번갈아 배치)
+const features = [
+  {
+    img: `${S}/02-records.png`,
+    alt: '기록 화면 — 다녀옴 / 갈 곳 필터, 카테고리, 우리의 기록 목록',
+    tag: '기록 · 다음 코스',
+    title: '다녀온 곳을 모으고, 다음 갈 곳을 찾습니다',
+    body: '함께 간 장소를 다녀옴과 갈 곳으로 나눠 정리하고, 맛집·카페·술집·전시·문화 카테고리로 묶어 봅니다. “오늘 어디?”를 누르면 전국의 동 하나를 추천해 주고, 각 장소에 남긴 평점은 “우리만의 미슐랭” 등급으로 모입니다.',
+  },
+  {
+    img: `${S}/03-missions.png`,
+    alt: '미션 화면 — 우리 미션 진행률, 첫 발자국 · 첫 점령 등 미션 목록',
+    tag: '미션 · 점령',
+    title: '함께 다닐수록 미션이 채워집니다',
+    body: '첫 발자국, 첫 점령처럼 두 사람이 함께 달성하는 미션이 준비돼 있고, 우리만의 미션을 직접 추가할 수도 있습니다. 미션을 완료할 때마다 지도 위 “우리 발자국”이 조금씩 더 진해집니다.',
+  },
+  {
+    img: `${S}/04-ledger.png`,
+    alt: '가계부 화면 — 일별 · 월별 · 기간 집계와 데이트 달력',
+    tag: '가계부',
+    title: '데이트에 쓴 돈도 함께 기록',
+    body: '지출을 입력하면 일별·월별·기간으로 집계되고, 데이트 횟수와 1회 평균이 자동으로 계산됩니다. 어느 날 어디에 얼마를 썼는지 달력에서 한눈에 되짚어 볼 수 있습니다.',
+  },
+];
 ---
 
 <Layout
@@ -13,70 +48,83 @@ const stores = [
   description="커플맵로그는 두 사람이 함께 다녀온 곳을 기록하면 동네가 색으로 칠해지고, 다음 갈 곳을 찾게 해 주는 커플 지도 앱입니다. 6자리 커플 코드로 두 기기가 같은 기록을 실시간 공유합니다."
   image="/og/ourfootprint.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">PRODUCT · 커플맵로그</p>
-    <h1>둘이 다녀온 곳, 다음 갈 곳.</h1>
-    <p class="lede">
-      커플맵로그는 두 사람이 함께 다녀온 장소를 기록하면 그 동네가 지도 위에서 점점 진한
-      색으로 칠해지는 커플 전용 지도 앱입니다. 추억을 한 장의 지도로 모으고, 아직 가 보지
-      않은 동네를 다음 데이트 코스로 삼게 됩니다.
-    </p>
-    <StoreButtons ios={stores[0].url} play={stores[1].url} />
+  <!-- HERO (full-bleed dark band) -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 커플맵로그</p>
+        <h1>둘이 다녀온 곳,<br />다음 갈 곳.</h1>
+        <p class="edu-lede">
+          함께 다녀온 장소를 기록하면 그 동네가 지도 위에서 점점 진해지는
+          커플 전용 지도 앱. 6자리 커플 코드로 두 기기가 같은 기록을
+          실시간으로 공유합니다.
+        </p>
+        <div class="edu-cta">
+          <StoreButtons ios={stores[0].url} play={stores[1].url} />
+        </div>
+        <ul class="edu-badges">
+          <li>6자리 커플 코드</li>
+          <li>두 기기 실시간 공유</li>
+          <li>기본 기능 무료</li>
+          <li>위치 권한 선택</li>
+        </ul>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/01-home.png`} alt="커플맵로그 홈 화면 — D-day와 동 점령 현황, 서울 동네 지도" loading="eager" width="300" height="650" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <h2>두 기기, 같은 기록</h2>
+  <!-- CORE LOOP -->
+  <section class="wrap edu-loop">
+    <p class="edu-eyebrow warm">한 동네를 채워 가는 3단계</p>
+    <div class="edu-steps">
+      <div class="edu-step"><span class="edu-n">1</span><b>발자국</b><span>1곳 이상 방문</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">2</span><b>정복</b><span>3곳 이상 방문</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">3</span><b>지배자</b><span>5곳 이상 방문</span></div>
+    </div>
+    <p class="edu-loop-note">방문이 쌓일수록 동네 색이 진해지고 · 아직 비워 둔 동네가 다음 데이트 코스가 됩니다.</p>
+  </section>
+
+  <!-- FEATURES (image + text, alternating) -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow warm">카테고리로 정리</p>
+    <h2>다녀온 곳을 종류별로 묶어서</h2>
+    <ul class="edu-chips">
+      {areas.map((a) => (
+        <li><span class="edu-dot" style={`background:${a.c}`}></span>{a.name}</li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- CLOSING NOTE -->
+  <section class="wrap edu-closing">
     <p>
-      한쪽이 앱을 처음 실행하면 6자리 커플 코드가 만들어집니다. 상대가 그 코드를 입력하면
-      두 기기가 즉시 같은 데이터를 공유합니다. 한 사람이 장소를 추가하면 상대 폰에도
-      반영되고, 폰을 바꿔도 같은 코드를 입력하면 모든 기록이 그대로 복원됩니다.
-      설정의 동기화 버튼으로 언제든 강제로 맞출 수도 있습니다.
+      한쪽이 앱을 처음 실행하면 6자리 커플 코드가 만들어지고, 상대가 그 코드를 입력하면
+      두 기기가 같은 기록을 실시간으로 공유합니다. 위치 권한은 “현재 동네 자동 찾기”에만
+      쓰이며, 거부해도 검색으로 동네를 골라 모든 기능을 그대로 쓸 수 있습니다. 다녀온 모든
+      기록은 설정에서 JSON 파일로 내보낼 수 있습니다. 기본 기능은 무료이고, 광고 제거를 한 번
+      구매하면 같은 Apple ID·계정의 모든 기기에 영구 적용됩니다.
     </p>
-
-    <h2>주요 기능</h2>
-
-    <h3>동네 점령 게임</h3>
-    <p>
-      함께 방문한 곳이 쌓일수록 동네의 단계가 올라갑니다. 한 동네에 1곳 이상 방문하면
-      “발자국”, 3곳 이상이면 “정복”, 5곳 이상이면 “지배자” 단계가 되고, 지도에서 동네 색이
-      점점 진해집니다. 어느 동네를 아직 비워 뒀는지 한눈에 보이니, 다음 주말 행선지를
-      정하는 일이 게임처럼 즐거워집니다.
-    </p>
-
-    <h3>평점과 우리의 시네마</h3>
-    <p>
-      다녀온 장소마다 두 사람이 각자 평점을 남길 수 있어, 같은 곳을 어떻게 다르게 느꼈는지
-      비교하는 재미가 있습니다. 함께 본 영화에 평점을 매기는 “우리의 시네마” 기능으로
-      장소뿐 아니라 함께한 시간 전반을 기록할 수 있습니다.
-    </p>
-
-    <h3>맛집·미슐랭 가이드</h3>
-    <p>
-      어디를 갈지 막막할 때 참고할 수 있도록 미슐랭 가이드 정보를 함께 담았습니다.
-      추억을 기록하는 일과 다음 코스를 찾는 일을 한 앱 안에서 끝낼 수 있습니다.
-    </p>
-
-    <h3>스토리 카드로 공유</h3>
-    <p>
-      다녀온 기록을 예쁜 카드 이미지로 만들어 SNS 스토리에 공유할 수 있습니다.
-      우리만의 지도를 친구들에게 자랑하거나, 기념일에 한 해를 돌아보기 좋습니다.
-    </p>
-
-    <h2>위치 권한과 데이터</h2>
-    <p>
-      위치 권한은 “현재 동네 자동 찾기”에만 사용되며, 거부해도 검색으로 동네를 직접 선택해
-      모든 기능을 그대로 쓸 수 있습니다. 다녀온 모든 곳은 설정에서 JSON 파일로 내보낼 수
-      있고, 모든 데이터 초기화를 누르면 두 기기의 기록이 영구 삭제됩니다(되돌릴 수 없습니다).
-    </p>
-
-    <h2>무료로 쓰고, 원하면 광고 제거</h2>
-    <p>
-      기본 기능은 모두 무료입니다. 광고 없이 쓰고 싶다면 광고 제거를 한 번 구매하면 되고,
-      같은 Apple ID·계정으로 로그인한 기기 전체에 영구 적용됩니다. 앱을 다시 설치해도
-      “구매 복원”으로 즉시 되살릴 수 있습니다.
-    </p>
-
-    <p class="links">
+    <p class="edu-links">
       <a href="/apps/ourfootprint/support">고객 지원 · 자주 묻는 질문</a> ·
       <a href="/apps/ourfootprint/privacy">개인정보 처리방침</a> ·
       <a href="/apps/ourfootprint/terms">이용약관</a> ·
@@ -87,13 +135,124 @@ const stores = [
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
-  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
-  .body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
-  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #8fb0ff; margin: 0;
+  }
+  .edu-eyebrow.warm { color: var(--clay); }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c4cdef; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 40ch; }
+  .edu-cta { display: flex; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- core loop ---- */
+  .edu-loop { text-align: center; padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
+  .edu-steps {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0.6rem; margin: 1rem 0 0; flex-wrap: wrap;
+  }
+  .edu-step {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem; min-width: 160px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .edu-n {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--clay-soft); color: var(--clay);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .edu-step b { font-size: 1.05rem; color: var(--ink); }
+  .edu-step span:last-child { font-size: 0.85rem; color: var(--muted); }
+  .edu-arrow { display: grid; place-items: center; color: var(--clay); font-size: 1.3rem; }
+  .edu-loop-note { color: var(--muted); font-size: 0.92rem; margin: 1.3rem 0 0; }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--clay); margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- areas ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
+  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
+  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-cta { justify-content: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+    .edu-arrow { transform: rotate(90deg); }
+  }
 </style>

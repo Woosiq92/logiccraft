@@ -6,6 +6,48 @@ const stores = [
   { name: 'App Store', url: 'https://apps.apple.com/kr/app/id6777975502' },
   { name: 'Google Play', url: 'https://play.google.com/store/apps/details?id=kr.logiccraft.build' },
 ];
+
+const S = '/screens/build';
+
+const kinds = [
+  { name: '정말 그래?', c: '#3f9d6b' },
+  { name: '탐정 놀이', c: '#4f7bd0' },
+  { name: '상상 놀이', c: '#b08a2e' },
+  { name: '마음 놀이', c: '#c26b6b' },
+  { name: '몸 놀이', c: '#7c74d6' },
+];
+
+// 화면 + 짧은 설명 (이미지·텍스트를 번갈아 배치)
+const features = [
+  {
+    img: `${S}/predict.png`,
+    alt: '예측 화면 — “정말 그럴 것 같아 / 아닐 것 같아” 두 갈래로 먼저 짐작하기',
+    tag: '예측',
+    title: '확인하기 전에, 먼저 짐작해 봅니다',
+    body: '“정말 그럴 것 같아 / 아닐 것 같아”. 답을 알려 주기 전에 아이가 자기 짐작을 먼저 골라 봅니다. 예측이 있어야 확인이 발견이 됩니다.',
+  },
+  {
+    img: `${S}/reason.png`,
+    alt: '이유 적기 화면 — “왜 그렇게 생각했어?”에 손으로 쓰거나 말로 적기',
+    tag: '이유 말하기',
+    title: '“왜 그렇게 생각했어?”',
+    body: '짐작에는 이유를 붙입니다. 손으로 쓰기 어려우면 말로 적기로 대신합니다. 음성은 텍스트로 바뀐 결과만 기기에 남고, 정답이 없어 그냥 넘겨도 됩니다.',
+  },
+  {
+    img: `${S}/discovery.png`,
+    alt: '발견 화면 — 직접 확인한 뒤 오늘의 발견을 함께 정리',
+    tag: '직접 확인',
+    title: '직접 확인하고, 오늘의 발견을 담습니다',
+    body: '예측과 실제를 맞춰 보며 아이가 스스로 결론에 닿습니다. 하루를 마치면 “오늘 생각이 배에 한 조각 더해졌어”처럼 발견이 차곡차곡 쌓입니다.',
+  },
+  {
+    img: `${S}/imagine.png`,
+    alt: '상상 놀이 탭 — 상상하기·엉뚱한 생각·연결하기와 마음 5분·몸 활동',
+    tag: '다른 결의 놀이',
+    title: '상상 놀이, 마음 놀이, 몸 놀이도 함께',
+    body: '“만약에~” 상상하기, 마음을 살피는 5분, 화면을 끄고 몸으로 하는 활동까지. 한 가지 결에 머물지 않고 생각하는 힘을 여러 방향에서 기릅니다.',
+  },
+];
 ---
 
 <Layout
@@ -13,55 +55,84 @@ const stores = [
   description="Synergeion Build는 6~9세 아이가 매일 '정말 그래?'를 스스로 묻고 직접 확인해 보는 부모-아이 사고력 놀이입니다. 광고·AI·구독 없이 무료로 시작하고, 전체 이용은 한 번만 결제하며, 모든 기록은 기기에만 저장됩니다."
   image="/og/build.png"
 >
-  <section class="wrap page-head">
-    <p class="eyebrow">SYNERGEION · Build</p>
-    <h1>매일 한 번 “정말 그래?”</h1>
-    <p class="lede">
-      Build는 6~9세 아이가 “정말 그래?·왜 그럴까?”를 스스로 묻고 직접 확인해 보는 부모-아이
-      사고력 놀이입니다. 정답을 가르치는 대신, 의심하고 예측하고 직접 확인하는 생각 습관을
-      함께 만듭니다.
-    </p>
-    <StoreButtons ios={stores[0].url} play={stores[1].url} />
+  <!-- HERO (full-bleed dark band) -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">SYNERGEION · Build</p>
+        <h1>매일 한 번,<br />“정말 그래?”</h1>
+        <p class="edu-lede">
+          6~9세 아이가 당연한 것을 한 번 더 의심하고, 예측한 뒤,
+          직접 확인해 보는 부모-아이 사고력 놀이. 정답을 가르치는 대신
+          스스로 결론에 닿는 생각 습관을 함께 만듭니다.
+        </p>
+        <div class="edu-cta">
+          <StoreButtons ios={stores[0].url} play={stores[1].url} />
+        </div>
+        <ul class="edu-badges">
+          <li>6~9세</li>
+          <li>광고 · AI 없음</li>
+          <li>한 번만 결제 (구독 없음)</li>
+          <li>기기에만 저장</li>
+        </ul>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/home.png`} alt="Build 오늘 화면 — 오늘의 ‘정말 그래?’와 나루·느티랑 같이 생각하기" loading="eager" width="300" height="650" />
+      </div>
+    </div>
   </section>
 
-  <section class="wrap body">
-    <h2>의심 · 예측 · 직접 확인</h2>
-    <p>
-      매일의 “정말 그래?”는 아이가 당연하게 여기던 것을 한 번 더 의심하고, 어떻게 될지
-      예측한 뒤, 직접 확인해 보도록 이끕니다. 어른이 답을 알려 주는 대신 아이가 스스로
-      결론에 닿는 경험을 쌓는 것이 핵심입니다.
-    </p>
+  <!-- CORE LOOP -->
+  <section class="wrap edu-loop">
+    <p class="edu-eyebrow warm">하루 한 번, 3단계</p>
+    <div class="edu-steps">
+      <div class="edu-step"><span class="edu-n">1</span><b>의심</b><span>“정말 그래?” 물어보기</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">2</span><b>예측</b><span>어떻게 될지 짐작하기</span></div>
+      <div class="edu-arrow" aria-hidden="true">→</div>
+      <div class="edu-step"><span class="edu-n">3</span><b>직접 확인</b><span>스스로 알아내기</span></div>
+    </div>
+    <p class="edu-loop-note">어른이 답을 알려 주는 대신, 아이가 직접 결론에 닿는 경험을 매일 하나씩 쌓습니다.</p>
+  </section>
 
-    <h2>주말 탐정 놀이</h2>
+  <!-- FEATURES (image + text, alternating) -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- KINDS OF PLAY -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow warm">한 가지 결에 머물지 않게</p>
+    <h2>여러 결의 놀이를 한 앱에</h2>
+    <ul class="edu-chips">
+      {kinds.map((k) => (
+        <li><span class="edu-dot" style={`background:${k.c}`}></span>{k.name}</li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- CLOSING NOTE -->
+  <section class="wrap edu-closing">
     <p>
       주말에는 집과 동네를 무대로 한 탐정 놀이가 열립니다. 아이가 찾은 답을 사진·그림·음성으로
-      담을 수 있어, 화면 안에 머물지 않고 현실에서 직접 움직이며 확인하게 됩니다. 카메라와
-      마이크는 바로 이때만 사용하며, 사진·그림은 기기에만 저장되고 음성은 텍스트로 바뀐
-      결과만 저장됩니다. 외부로 전송하지 않습니다.
+      담을 수 있고, 카메라와 마이크는 이때만 사용합니다. 사진·그림은 기기에만 저장되고 음성은
+      텍스트로 바뀐 결과만 남으며, 어떤 정보도 서버로 전송하지 않습니다. 광고와 AI를 쓰지 않고,
+      무료로 설치해 일부를 먼저 써 본 뒤 전체 이용은 한 번만 결제하는 인앱 구매입니다(₩12,900,
+      구독·자동 갱신 없음). 설정 탭에서 백업(JSON)과 텍스트 내보내기를 지원하며, 기기를 바꾸기
+      전 백업을 권합니다. 학습 참고용 놀이로, 아이마다 발달 속도는 다를 수 있습니다.
     </p>
-
-    <h2>아이가 직접, 부모가 곁에서</h2>
-    <p>
-      Build는 아이가 직접 하되 부모가 곁에서 함께 보는 놀이입니다. 설정과 기록 관리는 부모
-      몫이고, 놀이의 주인공은 아이입니다. 상상 놀이, 마음 놀이, 몸 놀이 같은 다른 결의
-      활동도 함께 담아, 생각하는 힘을 여러 방향에서 기릅니다.
-    </p>
-
-    <h2>안심하고 쓸 수 있게</h2>
-    <p>
-      광고와 AI를 사용하지 않습니다. 무료로 설치해 일부를 먼저 써 보고, 전체 이용은 한 번만
-      결제하는 인앱 구매입니다(구독·자동 갱신 없음). 오늘의 놀이부터 기록까지 모두 기기 안에서
-      작동하고, 어떤 정보도 서버로 전송되지 않습니다.
-    </p>
-
-    <h2>기록과 백업</h2>
-    <p>
-      설정 탭의 데이터·백업에서 백업 파일(JSON) 저장·복원과 텍스트 내보내기를 할 수 있습니다.
-      기록은 이 기기에만 저장되니, 기기를 바꾸기 전 백업해 두는 것을 권합니다. 앱 전체 초기화
-      또는 앱 삭제로 모든 데이터를 지울 수 있습니다.
-    </p>
-
-    <p class="links">
+    <p class="edu-links">
       <a href="/apps/build/support">고객 지원 · 자주 묻는 질문</a> ·
       <a href="/apps/build/privacy">개인정보 처리방침</a> ·
       <a href="/apps/build/terms">이용약관</a> ·
@@ -72,12 +143,124 @@ const stores = [
 </Layout>
 
 <style>
-  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
-  .eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: var(--clay); margin: 0; }
-  .page-head h1 { font-size: clamp(1.9rem, 5vw, 2.8rem); margin: 0.4rem 0 0; line-height: 1.2; }
-  .lede { color: var(--sub); margin: 1rem 0 0; line-height: 1.8; max-width: 720px; }
-  .body { padding-top: 2.5rem; padding-bottom: 4rem; max-width: 760px; }
-  .body h2 { font-size: 1.35rem; margin: 2.2rem 0 0.6rem; }
-  .body p { color: var(--sub); line-height: 1.85; margin: 0.3rem 0; }
-  .links { margin-top: 2.5rem; font-size: 0.95rem; }
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #8fb0ff; margin: 0;
+  }
+  .edu-eyebrow.warm { color: var(--clay); }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c4cdef; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 40ch; }
+  .edu-cta { display: flex; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- core loop ---- */
+  .edu-loop { text-align: center; padding-block: clamp(2.5rem, 5vw, 3.5rem) 1rem; }
+  .edu-steps {
+    display: flex; align-items: stretch; justify-content: center;
+    gap: 0.6rem; margin: 1rem 0 0; flex-wrap: wrap;
+  }
+  .edu-step {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: var(--radius); box-shadow: var(--shadow-sm);
+    padding: 1.1rem 1.2rem; min-width: 160px;
+    display: flex; flex-direction: column; align-items: center; gap: 0.25rem;
+  }
+  .edu-n {
+    width: 30px; height: 30px; border-radius: 999px;
+    background: var(--clay-soft); color: var(--clay);
+    display: grid; place-items: center; font-weight: 700; font-size: 0.95rem;
+    margin-bottom: 0.15rem;
+  }
+  .edu-step b { font-size: 1.05rem; color: var(--ink); }
+  .edu-step span:last-child { font-size: 0.85rem; color: var(--muted); }
+  .edu-arrow { display: grid; place-items: center; color: var(--clay); font-size: 1.3rem; }
+  .edu-loop-note { color: var(--muted); font-size: 0.92rem; margin: 1.3rem 0 0; }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: var(--clay); margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- areas ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
+  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
+  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-cta { justify-content: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+    .edu-arrow { transform: rotate(90deg); }
+  }
 </style>
