@@ -94,6 +94,8 @@
   .task .t{flex:1}
   .task .x{opacity:0; color:var(--weekend); padding-left:3px}
   .task:hover .x{opacity:.7}
+  .task.dragging{opacity:.35}
+  .cell.drop-hot{box-shadow:inset 0 0 0 2px var(--accent); background:rgba(124,196,255,.12)}
   .add{font-size:12px; color:var(--ink-dim); cursor:pointer; opacity:0; padding:2px 5px}
   .cell:hover .add{opacity:.8}
   .add:hover{color:var(--accent)}
@@ -127,6 +129,15 @@
   .palette{position:fixed; z-index:50; display:flex; gap:6px; padding:8px; background:var(--panel-strong); border:1px solid var(--line); border-radius:10px; backdrop-filter:blur(14px)}
   .palette .sw{width:20px; height:20px; border-radius:6px; cursor:pointer; border:1px solid rgba(255,255,255,.3)}
   .palette .sw:hover{transform:scale(1.15)}
+  /* 목표 연결 드롭다운 */
+  .gpick{position:fixed; z-index:50; min-width:180px; max-width:280px; max-height:60vh; overflow:auto; padding:5px; background:var(--panel-strong); border:1px solid var(--line); border-radius:10px; backdrop-filter:blur(14px); box-shadow:0 8px 28px rgba(0,0,0,.45)}
+  .gpick .gp-row{display:flex; align-items:center; gap:8px; padding:6px 8px; border-radius:7px; cursor:pointer; font-size:12.5px; color:var(--ink)}
+  .gpick .gp-row:hover{background:rgba(255,255,255,.13)}
+  .gpick .gp-row.sel{background:rgba(255,255,255,.09)}
+  .gpick .gp-row.sel::after{content:"✓"; margin-left:auto; color:var(--accent); font-size:11px}
+  .gpick .gp-sw{width:11px; height:11px; border-radius:3px; flex:0 0 auto; border:1px solid rgba(255,255,255,.4)}
+  .gpick .gp-t{white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+  .gpick .gp-hint{padding:8px 10px; font-size:12px; color:var(--ink-dim)}
 
   /* 왼쪽 주 목표 레일 */
   .rail{border-left:none; padding:7px 12px; display:flex; flex-direction:column; gap:5px; background:rgba(0,0,0,.14)}
@@ -175,7 +186,7 @@
   <div class="grid" id="grid"></div>
 
   <div class="hint">
-    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 전환 · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
+    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 선택 · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
   </div>
 
 <script>
@@ -190,6 +201,7 @@ const PALETTE=['#7cc4ff','#67e0a3','#ffcf6b','#ff9d9d','#c9a3ff','#7ce0d3','#ff9
 let S=load(); migrate(S);
 let view={y:today.getFullYear(),m:today.getMonth()+1}; // 현재 달부터
 let focusGoal=null;  // 포커스된 월 목표 인덱스 → 그 목표에 연결된 할일만 강조
+let dragSrc=null;    // 드래그 중인 할일 {k, i}
 
 function load(){
   try{ const r=JSON.parse(localStorage.getItem(KEY)); if(r) return r; }catch(e){}
@@ -362,9 +374,9 @@ function render(){
       const gi=+r.dataset.gi;
       const wgEl=r.querySelector('.wgoal');
       wgEl.addEventListener('blur',()=>{ if(S.weekGoals[wkKey]&&S.weekGoals[wkKey][gi]){ S.weekGoals[wkKey][gi].t=wgEl.textContent.trim(); save(); } });
-      r.querySelector('.wchip').onclick=()=>{ const n=mg.length; if(!n) return;
-        const cur=S.weekGoals[wkKey][gi].g;
-        S.weekGoals[wkKey][gi].g=(cur==null)?0:(cur+1>=n?null:cur+1); save(); render(); };
+      r.querySelector('.wchip').onclick=(e)=>{ e.stopPropagation();
+        openGoalPicker(e.currentTarget, mg, S.weekGoals[wkKey][gi].g, (val)=>{
+          S.weekGoals[wkKey][gi].g=val; save(); render(); }); };
       r.querySelector('.wgdel').onclick=()=>{ S.weekGoals[wkKey].splice(gi,1);
         if(!S.weekGoals[wkKey].length) delete S.weekGoals[wkKey]; save(); render(); };
     });
@@ -390,6 +402,13 @@ function render(){
       cell.innerHTML=`<div class="dnum">${d}${d===1?` <span style="color:var(--accent)">${m}월</span>`:''}</div>
         <div class="tasks"></div><div class="add">+ 할일</div>`;
       const tl=cell.querySelector('.tasks');
+      cell.addEventListener('dragover',(e)=>{ if(!dragSrc) return; e.preventDefault(); e.dataTransfer.dropEffect='move';
+        if(dragSrc.k!==k && !cell.classList.contains('drop-hot')){ document.querySelectorAll('.cell.drop-hot').forEach(c=>c.classList.remove('drop-hot')); cell.classList.add('drop-hot'); } });
+      cell.addEventListener('drop',(e)=>{ e.preventDefault(); cell.classList.remove('drop-hot'); if(!dragSrc) return;
+        const {k:sk,i:si}=dragSrc; dragSrc=null; if(sk===k) return;
+        const arr=S.tasks[sk]; if(!arr||!arr[si]) return;
+        const [moved]=arr.splice(si,1); if(!arr.length) delete S.tasks[sk];
+        (S.tasks[k]=S.tasks[k]||[]).push(moved); save(); render(); });
       tasks.forEach((t,i)=>{
         if(S.hideDone && t.done) return;   // 완료 접기
         const gi=(t.g!=null && t.g<mg.length)?t.g:null;
@@ -399,13 +418,14 @@ function render(){
         const el=document.createElement('div');
         el.className='task'+(t.done?' done':'')+(dim?' dim':'')+(hl?' hl':'');
         el.style.borderLeftColor=gcolor;
+        el.draggable=true;
+        el.addEventListener('dragstart',(e)=>{ dragSrc={k,i}; e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain','');}catch(_){} el.classList.add('dragging'); });
+        el.addEventListener('dragend',()=>{ el.classList.remove('dragging'); document.querySelectorAll('.cell.drop-hot').forEach(c=>c.classList.remove('drop-hot')); dragSrc=null; });
         el.innerHTML=`<span class="gchip" title="목표 연결(클릭해 전환)" style="background:${gi!=null?gcolor:'transparent'}"></span>`+
           `<span class="box">${t.done?'☑':'☐'}</span><span class="t">${esc(t.t)}</span><span class="x">✕</span>`;
         el.querySelector('.t').onclick=el.querySelector('.box').onclick=()=>{ t.done=!t.done; save(); render(); };
         el.querySelector('.gchip').onclick=(e)=>{ e.stopPropagation();
-          const n=mg.length; if(!n) return;
-          t.g=(t.g==null)?0:(t.g+1>=n?null:t.g+1);   // 미연결→1→2→…→미연결
-          save(); render(); };
+          openGoalPicker(e.currentTarget, mg, t.g, (val)=>{ t.g=val; save(); render(); }); };
         el.querySelector('.x').onclick=(e)=>{ e.stopPropagation(); S.tasks[k].splice(i,1); if(!S.tasks[k].length)delete S.tasks[k]; save(); render(); };
         tl.appendChild(el);
       });
@@ -446,6 +466,32 @@ function openPalette(anchor,mgKey,i){
   setTimeout(()=>document.addEventListener('click',closePalette,{once:true}),0);
 }
 function closePalette(){ document.querySelectorAll('.palette').forEach(p=>p.remove()); }
+
+// 목표 연결 드롭다운 (색칩 클릭 → 월 목표 목록에서 선택)
+function openGoalPicker(anchor,mg,current,onPick){
+  closeGoalPicker();
+  const pk=document.createElement('div'); pk.className='gpick';
+  if(!mg.length){
+    const h=document.createElement('div'); h.className='gp-hint'; h.textContent='먼저 월 목표를 추가하세요';
+    pk.appendChild(h);
+  } else {
+    const curVal=(current!=null && current<mg.length)?current:null;
+    const mkRow=(label,color,sel,val)=>{
+      const row=document.createElement('div'); row.className='gp-row'+(sel?' sel':'');
+      row.innerHTML=`<span class="gp-sw" style="background:${color}"></span><span class="gp-t">${esc(label)}</span>`;
+      row.onclick=(e)=>{ e.stopPropagation(); closeGoalPicker(); onPick(val); };
+      return row;
+    };
+    mg.forEach((g,i)=> pk.appendChild(mkRow(`${i+1}. ${g.t||'(제목 없음)'}`, goalColor(mg,i), curVal===i, i)));
+    pk.appendChild(mkRow('연결 안 함','transparent',curVal==null,null));
+  }
+  document.body.appendChild(pk);
+  const r=anchor.getBoundingClientRect();
+  pk.style.left=Math.max(8,Math.min(r.left,innerWidth-pk.offsetWidth-8))+'px';
+  pk.style.top=Math.min(r.bottom+4, innerHeight-pk.offsetHeight-8)+'px';
+  setTimeout(()=>document.addEventListener('click',closeGoalPicker,{once:true}),0);
+}
+function closeGoalPicker(){ document.querySelectorAll('.gpick').forEach(p=>p.remove()); }
 
 // 완료 할일 접기 토글
 const toggleDone=document.getElementById('toggleDone');
