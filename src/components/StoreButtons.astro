@@ -3,22 +3,24 @@
 // 착지 페이지 공유가 폰에서 열릴 때 "내 기기에 맞는 버전"이 한눈에 오게 한다.
 const { ios = null, play = null } = Astro.props;
 ---
-<div class="dl" data-dl>
-  {ios && (
-    <a class="dlb" data-store="ios" href={ios} aria-label="App Store에서 다운로드">
-      <svg class="dlb-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.89-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.79 1.3 10.34.86 1.25 1.88 2.65 3.22 2.6 1.29-.05 1.78-.83 3.34-.83 1.56 0 2 .83 3.37.81 1.39-.03 2.27-1.27 3.12-2.53.98-1.45 1.39-2.85 1.41-2.92-.03-.01-2.71-1.04-2.74-4.12zM14.53 4.51c.71-.86 1.19-2.06 1.06-3.25-1.02.04-2.26.68-2.99 1.54-.66.76-1.23 1.98-1.08 3.15 1.14.09 2.3-.58 3.01-1.44z"/></svg>
-      <span class="dlb-tx"><small>지금 다운로드</small><b>App Store</b></span>
-    </a>
-  )}
-  {play && (
-    <a class="dlb" data-store="play" href={play} aria-label="Google Play에서 다운로드">
-      <svg class="dlb-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l14-8.5c.7-.4.7-1.4 0-1.8l-14-8.5C4.9 2.2 4 2.7 4 3.5z"/></svg>
-      <span class="dlb-tx"><small>지금 다운로드</small><b>Google Play</b></span>
-    </a>
-  )}
-  {ios && !play && <span class="dlb-soon">Google Play 준비 중</span>}
+<div class="dl-wrap">
+  <div class="dl" data-dl>
+    {ios && (
+      <a class="dlb" data-store="ios" href={ios} aria-label="App Store에서 다운로드">
+        <svg class="dlb-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.05 12.04c-.03-2.6 2.12-3.85 2.22-3.91-1.21-1.77-3.09-2.01-3.76-2.04-1.6-.16-3.12.94-3.93.94-.81 0-2.06-.92-3.39-.89-1.74.03-3.35 1.01-4.25 2.57-1.81 3.14-.46 7.79 1.3 10.34.86 1.25 1.88 2.65 3.22 2.6 1.29-.05 1.78-.83 3.34-.83 1.56 0 2 .83 3.37.81 1.39-.03 2.27-1.27 3.12-2.53.98-1.45 1.39-2.85 1.41-2.92-.03-.01-2.71-1.04-2.74-4.12zM14.53 4.51c.71-.86 1.19-2.06 1.06-3.25-1.02.04-2.26.68-2.99 1.54-.66.76-1.23 1.98-1.08 3.15 1.14.09 2.3-.58 3.01-1.44z"/></svg>
+        <span class="dlb-tx"><small>지금 다운로드</small><b>App Store</b></span>
+      </a>
+    )}
+    {play && (
+      <a class="dlb" data-store="play" href={play} aria-label="Google Play에서 다운로드">
+        <svg class="dlb-ic" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3.5v17c0 .8.9 1.3 1.6.9l14-8.5c.7-.4.7-1.4 0-1.8l-14-8.5C4.9 2.2 4 2.7 4 3.5z"/></svg>
+        <span class="dlb-tx"><small>지금 다운로드</small><b>Google Play</b></span>
+      </a>
+    )}
+    {ios && !play && <span class="dlb-soon">Google Play 준비 중</span>}
+  </div>
+  <p class="dl-hint" data-dl-hint hidden></p>
 </div>
-<p class="dl-hint" data-dl-hint hidden></p>
 
 <script is:inline>
   (function () {
@@ -38,7 +40,8 @@ const { ios = null, play = null } = Astro.props;
 </script>
 
 <style>
-  .dl { margin-top: 1.7rem; display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
+  .dl-wrap { margin-top: 1.7rem; display: flex; flex-direction: column; align-items: flex-start; }
+  .dl { display: flex; gap: 12px; flex-wrap: wrap; align-items: stretch; }
   .dlb {
     display: inline-flex; align-items: center; gap: 13px;
     min-height: 62px; padding: 10px 24px 10px 20px; border-radius: 15px;
@@ -48,8 +51,8 @@ const { ios = null, play = null } = Astro.props;
   .dlb:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(17, 24, 58, .24); }
   .dlb-ic { width: 27px; height: 27px; flex-shrink: 0; }
   .dlb-tx { display: flex; flex-direction: column; line-height: 1.12; text-align: left; }
-  .dlb-tx small { font-size: 12px; font-weight: 500; opacity: .72; }
-  .dlb-tx b { font-size: 20px; font-weight: 700; letter-spacing: -.01em; }
+  .dlb-tx small { font-size: 12px; font-weight: 500; opacity: .72; white-space: nowrap; }
+  .dlb-tx b { font-size: 20px; font-weight: 700; letter-spacing: -.01em; white-space: nowrap; }
   .dlb-soon {
     display: inline-flex; align-items: center; padding: 0 18px; min-height: 62px;
     border-radius: 15px; background: #edece6; color: #9aa1ba; font-weight: 600; font-size: 14px;
@@ -63,6 +66,7 @@ const { ios = null, play = null } = Astro.props;
   .dl.is-android [data-store="ios"] { order: 1; }
   .dl-hint { margin: .9rem 0 0; font-size: .9rem; color: var(--accent); font-weight: 600; }
   @media (max-width: 520px) {
+    .dl-wrap { align-items: stretch; }
     .dl { flex-direction: column; align-items: stretch; }
     .dlb { justify-content: center; }
     .dlb-soon { justify-content: center; }
