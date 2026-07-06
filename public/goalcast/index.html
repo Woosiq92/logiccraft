@@ -1,0 +1,459 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>목표 캘린더 — 월·주·일 목표 달력</title>
+<meta name="description" content="한 해의 목표를 월→주→일로 쪼개 관리하는 무료 목표 달력. 설치·로그인 없이 브라우저에 저장돼요.">
+<meta property="og:title" content="목표 캘린더 — 월·주·일 목표 달력">
+<meta property="og:description" content="큰 목표를 월·주·일 할 일로 캐스케이드. 무료, 설치·로그인 없음.">
+<meta property="og:type" content="website">
+<style>
+  :root{
+    --ink:#f4f7fb; --ink-dim:#c3ccd8; --line:rgba(255,255,255,.16);
+    --panel:rgba(18,28,40,.62); --panel-strong:rgba(12,20,30,.78);
+    --accent:#7cc4ff; --done:#67e0a3; --warn:#ffcf6b; --weekend:#ff9d9d;
+    --veil:1;   /* 배경 베일 불투명도: 1=꽉참, 낮을수록 실제 월페이퍼 비침 (네이티브가 주입) */
+  }
+  /* 조절되는 건 이 배경 베일뿐. 패널·글자는 위에 얹혀 항상 선명 */
+  .veil{
+    position:fixed; inset:0; z-index:-1; pointer-events:none; opacity:var(--veil);
+    background:
+      radial-gradient(120% 80% at 50% 120%, #2a5f7a 0%, #1c3f57 45%, #12222f 100%),
+      linear-gradient(180deg,#5aa6c9,#2a5f7a);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  html,body{height:100%}
+  body{
+    font-family:-apple-system,"Apple SD Gothic Neo",system-ui,sans-serif;
+    color:var(--ink);
+    background:transparent;   /* 실제 월페이퍼가 뒤로 비침. 배경은 .veil 이 담당 */
+    -webkit-font-smoothing:antialiased;
+    padding:12px;
+    height:100vh; display:flex; flex-direction:column; overflow:hidden;
+  }
+  /* 상단: 월 목표 배너 */
+  .topbar{display:flex; align-items:stretch; gap:12px; margin-bottom:10px}
+  .month-nav{
+    display:flex; flex-direction:column; justify-content:center; gap:6px;
+    background:var(--panel-strong); border:1px solid var(--line); border-radius:14px;
+    padding:12px 16px; min-width:190px; backdrop-filter:blur(14px);
+  }
+  .month-nav .title{font-size:20px; font-weight:700; letter-spacing:-.3px}
+  .month-nav .sub{font-size:12px; color:var(--ink-dim)}
+  .month-nav .btns{display:flex; gap:8px; margin-top:2px}
+  .month-nav button{
+    background:rgba(255,255,255,.1); color:var(--ink); border:1px solid var(--line);
+    border-radius:8px; padding:4px 12px; cursor:pointer; font-size:13px;
+  }
+  .month-nav button:hover{background:rgba(255,255,255,.2)}
+  .goal-banner{
+    flex:1; background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:12px 16px; backdrop-filter:blur(14px); display:flex; flex-direction:column; gap:6px;
+  }
+  .goal-banner .lbl{font-size:11px; color:var(--accent); font-weight:700; letter-spacing:.5px}
+  .goal-list{display:flex; flex-flow:row wrap; gap:6px 16px; align-items:center}
+  .goal-line{
+    display:inline-flex; align-items:center; gap:6px; font-size:14px; line-height:1.35;
+  }
+  .goal-line .bullet{color:var(--accent); font-weight:700}
+  .goal-line .txt{outline:none; padding:1px 4px; border-radius:5px; min-width:44px}
+  .goal-line .txt:focus{background:rgba(255,255,255,.12)}
+  .goal-line .txt:empty::before{content:"월 목표를 입력…"; color:var(--ink-dim); opacity:.6}
+  .goal-line .del{opacity:0; cursor:pointer; color:var(--weekend); font-size:14px; padding:0 4px}
+  .goal-line:hover .del{opacity:.7}
+  .mini-bar{height:6px; border-radius:99px; background:rgba(255,255,255,.14); overflow:hidden; margin-top:4px}
+  .mini-bar > i{display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--done)); width:0}
+  .banner-foot{display:flex; align-items:center; gap:8px; font-size:11px; color:var(--ink-dim)}
+
+  /* 캘린더 그리드 */
+  .grid{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    overflow:hidden; backdrop-filter:blur(12px);
+    flex:1 1 auto; min-height:0; display:flex; flex-direction:column;
+  }
+  .row{display:grid; grid-template-columns:150px repeat(7,1fr); border-top:1px solid var(--line); flex:1 1 0; min-height:0}
+  .row.head{border-top:none; flex:0 0 auto}
+  .row.head .cell, .row.head .rail{background:rgba(0,0,0,.18); font-size:12px; color:var(--ink-dim); text-align:center; padding:7px 0; font-weight:600}
+  .row.head .rail{text-align:left; padding-left:14px}
+  .cell{min-height:0; overflow:hidden; border-left:1px solid var(--line); padding:5px 7px; position:relative; display:flex; flex-direction:column; gap:3px}
+  .cell.out{opacity:.4}
+  .cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
+  .cell .dnum{font-size:12px; font-weight:600; color:var(--ink-dim)}
+  .cell.wknd .dnum{color:var(--weekend)}
+  .cell.sun .dnum{color:var(--weekend)}
+  .tasks{display:flex; flex-direction:column; gap:2px; margin-top:1px; overflow:hidden; min-height:0}
+  .task{
+    font-size:12px; line-height:1.3; cursor:pointer; padding:2px 5px; border-radius:6px;
+    background:rgba(255,255,255,.07); display:flex; gap:5px; align-items:flex-start;
+  }
+  .task:hover{background:rgba(255,255,255,.14)}
+  .task .box{flex:0 0 auto; color:var(--ink-dim)}
+  .task.done{opacity:.55}
+  .task.done .t{text-decoration:line-through}
+  .task .t{flex:1}
+  .task .x{opacity:0; color:var(--weekend); padding-left:3px}
+  .task:hover .x{opacity:.7}
+  .add{font-size:12px; color:var(--ink-dim); cursor:pointer; opacity:0; padding:2px 5px}
+  .cell:hover .add{opacity:.8}
+  .add:hover{color:var(--accent)}
+  /* 목표별 묶기 */
+  .goal-line{padding:2px 5px; border-radius:8px}
+  .goal-line.focus{background:rgba(255,255,255,.13); box-shadow:inset 0 0 0 1px var(--line)}
+  .goal-line .bullet{width:18px; height:18px; border-radius:5px; display:inline-grid; place-items:center; font-size:11px; font-weight:800; cursor:pointer}
+  .goal-line .prog{font-size:11px; color:var(--ink-dim); font-variant-numeric:tabular-nums; min-width:24px}
+  .task{border-left:3px solid transparent}
+  .task.dim{opacity:.28}
+  .task.hl{box-shadow:inset 0 0 0 1px rgba(255,255,255,.32)}
+  .gchip{width:9px; height:9px; border-radius:3px; flex:0 0 auto; margin-top:3px; cursor:pointer; border:1px solid rgba(255,255,255,.4); box-sizing:border-box}
+  .gchip:hover{transform:scale(1.25)}
+  .goal-line.complete{box-shadow:inset 0 0 0 1px rgba(103,224,163,.55)}
+  .goal-line.complete .txt{color:var(--done)}
+  /* 완료 접기 토글 */
+  .foot-btn{cursor:pointer; color:var(--ink-dim); font-size:12px; white-space:nowrap}
+  .foot-btn.on{color:var(--accent)}
+  /* 주 목표 색 칩 */
+  .wchip{display:inline-block; width:8px; height:8px; border-radius:3px; margin-right:5px; vertical-align:middle; cursor:pointer; border:1px solid rgba(255,255,255,.4); box-sizing:border-box}
+  .rail .wgoals{display:flex; flex-direction:column; gap:3px}
+  .rail .wgoal-row{display:flex; align-items:center; gap:5px}
+  .rail .wgoal-row .wgoal{flex:1; min-height:16px}
+  .rail .wgoal-row.dim{opacity:.32}
+  .rail .wgoal-row.hl{background:rgba(255,255,255,.1); border-radius:6px}
+  .rail .wgdel{opacity:0; cursor:pointer; color:var(--weekend); font-size:12px; padding:0 2px}
+  .rail .wgoal-row:hover .wgdel{opacity:.7}
+  .rail .wgoal-add{cursor:pointer; color:var(--accent); font-size:11px; font-weight:600; opacity:.75}
+  .rail .wgoal-add:hover{opacity:1}
+  /* 색 팔레트 팝오버 */
+  .palette{position:fixed; z-index:50; display:flex; gap:6px; padding:8px; background:var(--panel-strong); border:1px solid var(--line); border-radius:10px; backdrop-filter:blur(14px)}
+  .palette .sw{width:20px; height:20px; border-radius:6px; cursor:pointer; border:1px solid rgba(255,255,255,.3)}
+  .palette .sw:hover{transform:scale(1.15)}
+
+  /* 왼쪽 주 목표 레일 */
+  .rail{border-left:none; padding:7px 12px; display:flex; flex-direction:column; gap:5px; background:rgba(0,0,0,.14)}
+  .rail .wk{font-size:11px; color:var(--ink-dim); font-weight:600}
+  .rail .wgoal{
+    font-size:12.5px; line-height:1.35; outline:none; min-height:18px; padding:2px 4px; border-radius:6px; color:var(--ink);
+  }
+  .rail .wgoal:focus{background:rgba(255,255,255,.12)}
+  .rail .wgoal:empty::before{content:"주 목표…"; color:var(--ink-dim); opacity:.55}
+  .rail .wbar{height:5px; border-radius:99px; background:rgba(255,255,255,.14); overflow:hidden}
+  .rail .wbar > i{display:block; height:100%; background:linear-gradient(90deg,var(--accent),var(--done)); width:0}
+  .rail .retro{display:flex; align-items:center; gap:6px; margin-top:auto}
+  .rail .retro .ox{cursor:pointer; font-size:13px; font-weight:800; width:20px; height:20px; border-radius:6px; display:grid; place-items:center; background:rgba(255,255,255,.1)}
+  .rail .retro .ox.O{color:var(--done)} .rail .retro .ox.X{color:var(--weekend)}
+  .rail .retro .note{flex:1; font-size:11px; outline:none; color:var(--ink-dim); padding:2px 4px; border-radius:5px; min-height:16px}
+  .rail .retro .note:focus{background:rgba(255,255,255,.12); color:var(--ink)}
+  .rail .retro .note:empty::before{content:"회고 한 줄…"; opacity:.5}
+
+  .hint{margin-top:10px; font-size:12px; color:rgba(255,255,255,.72); text-align:center; line-height:1.6}
+  .hint b{color:#fff; font-weight:600}
+</style>
+</head>
+<body>
+  <div class="veil"></div>
+  <div class="topbar">
+    <div class="month-nav">
+      <div class="title" id="mTitle">2026년 7월</div>
+      <div class="sub" id="mSub">이번 달 목표 진행률</div>
+      <div class="btns">
+        <button id="prev">‹ 이전</button>
+        <button id="next">다음 ›</button>
+      </div>
+    </div>
+    <div class="goal-banner">
+      <div class="lbl">이 달의 목표</div>
+      <div class="goal-list" id="monthGoals"></div>
+      <div class="banner-foot">
+        <div class="mini-bar" style="flex:1"><i id="monthBar"></i></div>
+        <span id="monthPct">0%</span>
+        <span class="foot-btn" id="toggleDone">완료 숨김</span>
+        <span style="cursor:pointer;color:var(--accent)" id="addMonthGoal">+ 목표 추가</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="hint">
+    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 전환 · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
+  </div>
+
+<script>
+const KEY='goalcast_v1';
+const pad=n=>String(n).padStart(2,'0');
+const iso=(y,m,d)=>`${y}-${pad(m)}-${pad(d)}`;
+const today=new Date();
+const todayISO=iso(today.getFullYear(),today.getMonth()+1,today.getDate());
+
+const GCOLORS=['#7cc4ff','#67e0a3','#ffcf6b','#ff9d9d','#c9a3ff','#7ce0d3'];
+const PALETTE=['#7cc4ff','#67e0a3','#ffcf6b','#ff9d9d','#c9a3ff','#7ce0d3','#ff9d5c','#9db2c4'];
+let S=load(); migrate(S);
+let view={y:today.getFullYear(),m:today.getMonth()+1}; // 현재 달부터
+let focusGoal=null;  // 포커스된 월 목표 인덱스 → 그 목표에 연결된 할일만 강조
+
+function load(){
+  try{ const r=JSON.parse(localStorage.getItem(KEY)); if(r) return r; }catch(e){}
+  // 첫 실행 예시 시드 (현재 달 기준으로 생성)
+  const y=today.getFullYear(), m=today.getMonth()+1;
+  const d=Math.min(today.getDate(),28);
+  return {
+    monthGoals:{[`${y}-${m}`]:[
+      {t:'예: 운동 습관 만들기',color:'#7cc4ff'},
+      {t:'예: 사이드 프로젝트 출시',color:'#67e0a3'},
+      {t:'예: 책 2권 읽기',color:'#ffcf6b'}]},
+    weekGoals:{},
+    hideDone:false,
+    retros:{},
+    tasks:{
+      [iso(y,m,d)]:[
+        {t:'글자를 눌러 완료 체크 · 왼쪽 색칩으로 목표 연결',done:false,g:0},
+        {t:'날짜 칸의 “+ 할일”로 새 할일 추가',done:false,g:null}],
+    }
+  };
+}
+// 옛 데이터(문자열 목표/주목표)를 새 객체 구조로 정규화
+function migrate(S){
+  S.hideDone=!!S.hideDone; S.monthGoals=S.monthGoals||{}; S.weekGoals=S.weekGoals||{}; S.tasks=S.tasks||{}; S.retros=S.retros||{};
+  for(const k in S.monthGoals){
+    S.monthGoals[k]=S.monthGoals[k].map((g,i)=> typeof g==='string'
+      ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length]});
+  }
+  for(const k in S.weekGoals){
+    let w=S.weekGoals[k];
+    const norm=x=> (typeof x==='string') ? {t:x,g:null} : {t:(x&&x.t)||'',g:(x&&x.g!=null)?x.g:null};
+    if(Array.isArray(w)) S.weekGoals[k]=w.map(norm);
+    else if(typeof w==='string') S.weekGoals[k]=[{t:w,g:null}];
+    else S.weekGoals[k]= (w&&w.t) ? [norm(w)] : [];   // 옛 단일 객체 → 배열
+  }
+}
+function save(){ localStorage.setItem(KEY,JSON.stringify(S)); }
+function goalColor(mg,i){ return (mg[i]&&mg[i].color) || GCOLORS[i%GCOLORS.length]; }
+
+const WD=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
+
+function weeksOf(y,m){
+  const first=new Date(y,m-1,1);
+  const start=new Date(first); start.setDate(1-first.getDay()); // 그 주 일요일
+  const weeks=[];
+  let cur=new Date(start);
+  for(let w=0;w<6;w++){
+    const week=[];
+    for(let d=0;d<7;d++){ week.push(new Date(cur)); cur.setDate(cur.getDate()+1); }
+    weeks.push(week);
+    // 다음 주 첫날이 이미 다음 달이고 최소 4주 지났으면 종료
+    if(cur.getMonth()!==(m-1) && week[6].getMonth()!==(m-1) && w>=3) break;
+  }
+  return weeks;
+}
+
+function monthTaskStats(y,m){
+  let done=0,total=0;
+  for(const k in S.tasks){
+    if(k.startsWith(`${y}-${pad(m)}-`)) S.tasks[k].forEach(t=>{total++; if(t.done)done++;});
+  }
+  return {done,total};
+}
+function weekTaskStats(week,gi){
+  let done=0,total=0;
+  week.forEach(dt=>{
+    const k=iso(dt.getFullYear(),dt.getMonth()+1,dt.getDate());
+    (S.tasks[k]||[]).forEach(t=>{ if(gi==null||t.g===gi){total++; if(t.done)done++;} });
+  });
+  return {done,total};
+}
+// 특정 월 목표(gi)에 연결된 할일 진행률
+function goalStats(y,m,gi){
+  let done=0,total=0;
+  for(const k in S.tasks){
+    if(k.startsWith(`${y}-${pad(m)}-`)) S.tasks[k].forEach(t=>{ if(t.g===gi){total++; if(t.done)done++;} });
+  }
+  return {done,total};
+}
+// 목표 삭제 시 연결된 할일 재정렬(그 목표=미연결, 이후 인덱스 -1)
+function removeGoal(mgKey,i){
+  S.monthGoals[mgKey].splice(i,1);
+  const parts=mgKey.split('-'), y=parts[0], m=+parts[1];
+  for(const k in S.tasks){
+    if(!k.startsWith(`${y}-${pad(m)}-`)) continue;
+    S.tasks[k].forEach(t=>{ if(t.g===i) t.g=null; else if(t.g>i) t.g--; });
+  }
+  for(const k in S.weekGoals){
+    (S.weekGoals[k]||[]).forEach(w=>{ if(w.g===i) w.g=null; else if(w.g>i) w.g--; });
+  }
+  if(focusGoal===i) focusGoal=null; else if(focusGoal>i) focusGoal--;
+  save(); render();
+}
+
+function render(){
+  document.getElementById('mTitle').textContent=`${view.y}년 ${view.m}월`;
+  // 월 목표
+  const mgKey=`${view.y}-${view.m}`;
+  const mg=S.monthGoals[mgKey]||[];
+  const box=document.getElementById('monthGoals'); box.innerHTML='';
+  if(focusGoal!=null && focusGoal>=mg.length) focusGoal=null;
+  let goalsDone=0, goalsWithTasks=0;
+  mg.forEach((g,i)=>{
+    const color=goalColor(mg,i);
+    const st=goalStats(view.y,view.m,i);
+    const complete = st.total>0 && st.done===st.total;
+    if(st.total>0){ goalsWithTasks++; if(complete) goalsDone++; }
+    const row=document.createElement('div');
+    row.className='goal-line'+(focusGoal===i?' focus':'')+(complete?' complete':'');
+    row.innerHTML=`<span class="bullet" style="background:${color};color:#0e1a24">${i+1}</span>`+
+      `<span class="txt" contenteditable>${esc(g.t)}</span>`+
+      `<span class="prog">${complete?'🎉 ':''}${st.total?`${st.done}/${st.total}`:''}</span>`+
+      `<span class="del">✕</span>`;
+    const txt=row.querySelector('.txt');
+    txt.addEventListener('blur',()=>{ S.monthGoals[mgKey][i].t=txt.textContent.trim(); save(); });
+    const bullet=row.querySelector('.bullet');
+    bullet.onclick=()=>{ focusGoal=(focusGoal===i?null:i); render(); };
+    bullet.oncontextmenu=(e)=>{ e.preventDefault(); openPalette(bullet,mgKey,i); };  // 우클릭=색 고르기
+    row.querySelector('.del').onclick=()=>{ removeGoal(mgKey,i); };
+    box.appendChild(row);
+  });
+  // 진행률 바: 포커스된 목표가 있으면 그 목표 기준, 없으면 전체
+  const ms = focusGoal!=null ? goalStats(view.y,view.m,focusGoal) : monthTaskStats(view.y,view.m);
+  const mpct=ms.total?Math.round(ms.done/ms.total*100):0;
+  const bar=document.getElementById('monthBar');
+  bar.style.width=mpct+'%';
+  bar.style.background = focusGoal!=null ? goalColor(mg,focusGoal) : '';
+  const allDone = goalsWithTasks>0 && goalsDone===mg.length && mg.length>0;
+  document.getElementById('monthPct').textContent = allDone
+    ? '🎉 이 달 목표 전부 달성!'
+    : (focusGoal!=null?`목표 ${focusGoal+1} · `:'')+`${mpct}% (${ms.done}/${ms.total})`;
+
+  // 그리드
+  const grid=document.getElementById('grid'); grid.innerHTML='';
+  const head=document.createElement('div'); head.className='row head';
+  head.innerHTML=`<div class="rail">주 목표 · 회고</div>`+WD.map(w=>`<div class="cell">${w}</div>`).join('');
+  grid.appendChild(head);
+
+  weeksOf(view.y,view.m).forEach(week=>{
+    const row=document.createElement('div'); row.className='row';
+    const rowStart=week[0];
+    const wkKey=iso(rowStart.getFullYear(),rowStart.getMonth()+1,rowStart.getDate());
+    const wgArr = S.weekGoals[wkKey] || [];
+    const linkOf = w => (w.g!=null && w.g<mg.length) ? w.g : null;   // 유효한 연결 목표
+    const ws=weekTaskStats(week, null);   // 바 = 그 주 전체 진행률
+    const wpct=ws.total?Math.round(ws.done/ws.total*100):0;
+    const retro=S.retros[wkKey]||{mark:'',note:''};
+
+    const goalsHtml = wgArr.map((w,gi)=>{
+      const lk=linkOf(w);
+      const dim=(focusGoal!=null && lk!==focusGoal);
+      const hl=(focusGoal!=null && lk===focusGoal);
+      return `<div class="wgoal-row${dim?' dim':''}${hl?' hl':''}" data-gi="${gi}">
+        <span class="wchip" title="월 목표 연결(클릭 전환)" style="background:${lk!=null?goalColor(mg,lk):'transparent'}"></span>
+        <span class="wgoal" contenteditable>${esc(w.t)}</span>
+        <span class="wgdel">✕</span>
+      </div>`;
+    }).join('');
+
+    const rail=document.createElement('div'); rail.className='rail'; rail.dataset.wkkey=wkKey;
+    rail.innerHTML=`
+      <div class="wk">${weekNum(rowStart)}주차 <span class="wgoal-add">+ 주 목표</span></div>
+      <div class="wgoals">${goalsHtml}</div>
+      <div class="wbar"><i style="width:${wpct}%"></i></div>
+      <div class="retro">
+        <span class="ox ${retro.mark}">${retro.mark||'·'}</span>
+        <span class="note" contenteditable>${esc(retro.note)}</span>
+      </div>`;
+    rail.querySelectorAll('.wgoal-row').forEach(r=>{
+      const gi=+r.dataset.gi;
+      const wgEl=r.querySelector('.wgoal');
+      wgEl.addEventListener('blur',()=>{ if(S.weekGoals[wkKey]&&S.weekGoals[wkKey][gi]){ S.weekGoals[wkKey][gi].t=wgEl.textContent.trim(); save(); } });
+      r.querySelector('.wchip').onclick=()=>{ const n=mg.length; if(!n) return;
+        const cur=S.weekGoals[wkKey][gi].g;
+        S.weekGoals[wkKey][gi].g=(cur==null)?0:(cur+1>=n?null:cur+1); save(); render(); };
+      r.querySelector('.wgdel').onclick=()=>{ S.weekGoals[wkKey].splice(gi,1);
+        if(!S.weekGoals[wkKey].length) delete S.weekGoals[wkKey]; save(); render(); };
+    });
+    rail.querySelector('.wgoal-add').onclick=()=>{
+      (S.weekGoals[wkKey]=S.weekGoals[wkKey]||[]).push({t:'',g:focusGoal}); save(); render();
+      const eds=document.querySelector(`.rail[data-wkkey="${wkKey}"]`)?.querySelectorAll('.wgoal');
+      eds && eds[eds.length-1]?.focus();
+    };
+    const ox=rail.querySelector('.ox');
+    ox.onclick=()=>{ const cur=(S.retros[wkKey]||{}).mark; const nx=cur==='O'?'X':cur==='X'?'':'O';
+      S.retros[wkKey]={...(S.retros[wkKey]||{note:''}),mark:nx}; save(); render(); };
+    const note=rail.querySelector('.note');
+    note.addEventListener('blur',()=>{ S.retros[wkKey]={...(S.retros[wkKey]||{mark:''}),note:note.textContent.trim()}; save(); });
+    row.appendChild(rail);
+
+    week.forEach(dt=>{
+      const y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate();
+      const k=iso(y,m,d);
+      const out=(m!==view.m);
+      const cell=document.createElement('div');
+      cell.className='cell'+(out?' out':'')+(k===todayISO?' today':'')+(dt.getDay()===0?' sun':'')+(dt.getDay()===6?' wknd':'');
+      const tasks=S.tasks[k]||[];
+      cell.innerHTML=`<div class="dnum">${d}${d===1?` <span style="color:var(--accent)">${m}월</span>`:''}</div>
+        <div class="tasks"></div><div class="add">+ 할일</div>`;
+      const tl=cell.querySelector('.tasks');
+      tasks.forEach((t,i)=>{
+        if(S.hideDone && t.done) return;   // 완료 접기
+        const gi=(t.g!=null && t.g<mg.length)?t.g:null;
+        const gcolor=gi!=null?goalColor(mg,gi):'transparent';
+        const dim=(focusGoal!=null && gi!==focusGoal);
+        const hl=(focusGoal!=null && gi===focusGoal);
+        const el=document.createElement('div');
+        el.className='task'+(t.done?' done':'')+(dim?' dim':'')+(hl?' hl':'');
+        el.style.borderLeftColor=gcolor;
+        el.innerHTML=`<span class="gchip" title="목표 연결(클릭해 전환)" style="background:${gi!=null?gcolor:'transparent'}"></span>`+
+          `<span class="box">${t.done?'☑':'☐'}</span><span class="t">${esc(t.t)}</span><span class="x">✕</span>`;
+        el.querySelector('.t').onclick=el.querySelector('.box').onclick=()=>{ t.done=!t.done; save(); render(); };
+        el.querySelector('.gchip').onclick=(e)=>{ e.stopPropagation();
+          const n=mg.length; if(!n) return;
+          t.g=(t.g==null)?0:(t.g+1>=n?null:t.g+1);   // 미연결→1→2→…→미연결
+          save(); render(); };
+        el.querySelector('.x').onclick=(e)=>{ e.stopPropagation(); S.tasks[k].splice(i,1); if(!S.tasks[k].length)delete S.tasks[k]; save(); render(); };
+        tl.appendChild(el);
+      });
+      cell.querySelector('.add').onclick=()=>{
+        const v=prompt('할일 입력'); if(v&&v.trim()){ (S.tasks[k]=S.tasks[k]||[]).push({t:v.trim(),done:false,g:focusGoal}); save(); render(); }
+      };
+      row.appendChild(cell);
+    });
+    grid.appendChild(row);
+  });
+}
+
+function weekNum(dt){
+  const d=new Date(Date.UTC(dt.getFullYear(),dt.getMonth(),dt.getDate()));
+  d.setUTCDate(d.getUTCDate()+4-(d.getUTCDay()||7));
+  const ys=new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil(((d-ys)/864e5+1)/7);
+}
+function esc(s){ return (s||'').replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+
+document.getElementById('prev').onclick=()=>{ view.m--; if(view.m<1){view.m=12;view.y--;} render(); };
+document.getElementById('next').onclick=()=>{ view.m++; if(view.m>12){view.m=1;view.y++;} render(); };
+document.getElementById('addMonthGoal').onclick=()=>{ const k=`${view.y}-${view.m}`;
+  const arr=(S.monthGoals[k]=S.monthGoals[k]||[]); arr.push({t:'',color:GCOLORS[arr.length%GCOLORS.length]}); save(); render();
+  const lines=document.querySelectorAll('#monthGoals .txt'); lines[lines.length-1]?.focus(); };
+
+// 목표 색 고르기 팔레트 (목표 번호 우클릭)
+function openPalette(anchor,mgKey,i){
+  closePalette();
+  const pal=document.createElement('div'); pal.className='palette';
+  PALETTE.forEach(c=>{ const sw=document.createElement('span'); sw.className='sw'; sw.style.background=c;
+    sw.onclick=(e)=>{ e.stopPropagation(); S.monthGoals[mgKey][i].color=c; save(); closePalette(); render(); };
+    pal.appendChild(sw); });
+  document.body.appendChild(pal);
+  const r=anchor.getBoundingClientRect();
+  pal.style.left=Math.min(r.left,innerWidth-pal.offsetWidth-8)+'px';
+  pal.style.top=(r.bottom+4)+'px';
+  setTimeout(()=>document.addEventListener('click',closePalette,{once:true}),0);
+}
+function closePalette(){ document.querySelectorAll('.palette').forEach(p=>p.remove()); }
+
+// 완료 할일 접기 토글
+const toggleDone=document.getElementById('toggleDone');
+function syncToggle(){ toggleDone.textContent=S.hideDone?'완료 표시':'완료 숨김'; toggleDone.classList.toggle('on',S.hideDone); }
+toggleDone.onclick=()=>{ S.hideDone=!S.hideDone; save(); syncToggle(); render(); };
+syncToggle();
+
+render();
+</script>
+</body>
+</html>

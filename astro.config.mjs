@@ -10,6 +10,7 @@ export default defineConfig({
     customPages: [
       'https://logiccraft.co.kr/prompt-dojo/',
       'https://logiccraft.co.kr/wedding-map/',
+      'https://logiccraft.co.kr/goalcast/',
     ],
   })],
 });
