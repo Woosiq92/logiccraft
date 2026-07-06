@@ -1,6 +1,6 @@
 ---
-// 앱 다운로드 버튼 — 공식 스토어 배지 스타일 + 방문 기기(iOS/Android) 강조.
-// 착지 페이지 공유가 폰에서 열릴 때 "내 기기에 맞는 버전"이 한눈에 오게 한다.
+// 앱 다운로드 버튼 — 공식 스토어 배지 스타일. 두 버튼 모두 파란 테두리.
+// 방문 기기(iOS/Android)의 버튼을 앞으로 정렬만 한다.
 const { ios = null, play = null } = Astro.props;
 ---
 <div class="dl-wrap">
@@ -19,7 +19,6 @@ const { ios = null, play = null } = Astro.props;
     )}
     {ios && !play && <span class="dlb-soon">Google Play 준비 중</span>}
   </div>
-  <p class="dl-hint" data-dl-hint hidden></p>
 </div>
 
 <script is:inline>
@@ -27,15 +26,8 @@ const { ios = null, play = null } = Astro.props;
     var box = document.querySelector('[data-dl]');
     if (!box) return;
     var ua = navigator.userAgent || '';
-    var ios = /iPhone|iPad|iPod/i.test(ua);
-    var android = /Android/i.test(ua);
-    if (ios) box.classList.add('is-ios');
-    else if (android) box.classList.add('is-android');
-    var hint = document.querySelector('[data-dl-hint]');
-    if ((ios || android) && hint) {
-      hint.textContent = '지금 쓰는 기기에 맞는 버전이에요 — 바로 설치하고 써보세요.';
-      hint.hidden = false;
-    }
+    if (/iPhone|iPad|iPod/i.test(ua)) box.classList.add('is-ios');
+    else if (/Android/i.test(ua)) box.classList.add('is-android');
   })();
 </script>
 
@@ -46,9 +38,10 @@ const { ios = null, play = null } = Astro.props;
     display: inline-flex; align-items: center; gap: 13px;
     min-height: 62px; padding: 10px 24px 10px 20px; border-radius: 15px;
     background: #11183a; color: #fff;
+    box-shadow: 0 0 0 3px var(--accent), 0 14px 32px rgba(47, 99, 244, .28);
     transition: transform .2s var(--ease), box-shadow .2s;
   }
-  .dlb:hover { transform: translateY(-2px); box-shadow: 0 14px 30px rgba(17, 24, 58, .24); }
+  .dlb:hover { transform: translateY(-2px); box-shadow: 0 0 0 3px var(--accent), 0 18px 38px rgba(47, 99, 244, .36); }
   .dlb-ic { width: 27px; height: 27px; flex-shrink: 0; }
   .dlb-tx { display: flex; flex-direction: column; line-height: 1.12; text-align: left; }
   .dlb-tx small { font-size: 12px; font-weight: 500; opacity: .72; white-space: nowrap; }
@@ -57,14 +50,11 @@ const { ios = null, play = null } = Astro.props;
     display: inline-flex; align-items: center; padding: 0 18px; min-height: 62px;
     border-radius: 15px; background: #edece6; color: #9aa1ba; font-weight: 600; font-size: 14px;
   }
-  /* 방문 기기에 맞는 버튼 강조 + 앞으로 정렬 */
+  /* 방문 기기에 맞는 버튼을 앞으로 정렬 */
   .dl.is-ios [data-store="ios"],
-  .dl.is-android [data-store="play"] {
-    order: 0; box-shadow: 0 0 0 3px var(--accent), 0 14px 32px rgba(47, 99, 244, .30);
-  }
+  .dl.is-android [data-store="play"] { order: 0; }
   .dl.is-ios [data-store="play"],
   .dl.is-android [data-store="ios"] { order: 1; }
-  .dl-hint { margin: .9rem 0 0; font-size: .9rem; color: var(--accent); font-weight: 600; }
   @media (max-width: 520px) {
     .dl-wrap { align-items: stretch; }
     .dl { flex-direction: column; align-items: stretch; }
