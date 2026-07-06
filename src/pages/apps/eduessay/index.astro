@@ -127,15 +127,16 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      인터넷 연결 없이 쓰는 오프라인 앱입니다. 회원가입·로그인·광고가 없고, 학습 기록은 기기에만
-      남으며 서버로 보내지 않습니다. iPhone은 세로 화면, iPad는 전용 레이아웃으로 나옵니다.
-      합격이나 점수를 보장하지는 않고, 출제 기준은 한국교육과정평가원 공식 자료를 따릅니다.
-    </p>
+    <ul class="edu-notes">
+      <li>학습 기록은 기기에만 저장되고, 서버로 보내지 않습니다.</li>
+      <li>합격·점수를 보장하지 않으며, 출제 기준은 한국교육과정평가원 공식 자료를 따릅니다.</li>
+    </ul>
     <nav class="edu-links" aria-label="문서 및 탐색">
-      <a href="/apps/eduessay/support">고객 지원 · FAQ</a>
-      <a href="/apps/eduessay/privacy">개인정보 처리방침</a>
-      <a href="/apps/eduessay/terms">이용약관</a>
+      <span class="edu-doclinks">
+        <a href="/apps/eduessay/support">고객 지원 · FAQ</a>
+        <a href="/apps/eduessay/privacy">개인정보 처리방침</a>
+        <a href="/apps/eduessay/terms">이용약관</a>
+      </span>
       <a href="/apps" class="edu-back">← 제품 목록</a>
     </nav>
   </section>
@@ -249,17 +250,33 @@ const features = [
     border-top: 1px solid var(--line);
     margin-top: clamp(1.5rem, 4vw, 2.5rem);
   }
-  .edu-closing > p { color: var(--muted); line-height: 1.7; font-size: 0.9rem; margin: 0; max-width: 60ch; }
-  .edu-links {
-    margin-top: 1.6rem;
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 0.5rem 1.4rem; font-size: 0.9rem;
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
   }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
   .edu-links a {
     color: var(--muted); text-decoration: none; white-space: nowrap;
     transition: color .15s ease;
   }
   .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
   .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
