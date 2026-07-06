@@ -111,20 +111,20 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      정치·시사를 처음 접하는 사람도 쉽게 시작하도록 돕는 앱입니다. 홈·배우기·오늘·우리 동네를
-      로그인 없이 모두 둘러볼 수 있고, 기록을 기기 너머로 영구 보관하려면 카카오 또는 Apple로
-      가입합니다. MY 탭의 계정 메뉴에서 직접 탈퇴할 수 있으며, 탈퇴 시 닉네임·기록 등 계정에
-      연결된 데이터가 삭제되고 되돌릴 수 없습니다. 후보 정보는 중앙선거관리위원회와 국회
-      공공데이터를 기반으로 합니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/sedolal/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/sedolal/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/sedolal/terms">이용약관</a> ·
-      <a href="/apps/sedolal/delete-data">데이터 삭제</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>홈·배우기·오늘·우리 동네는 로그인 없이 둘러보고, 기록을 영구 보관하려면 카카오·Apple로 가입합니다.</li>
+      <li>MY 탭에서 직접 탈퇴할 수 있으며, 탈퇴하면 계정에 연결된 데이터가 삭제되고 되돌릴 수 없습니다.</li>
+      <li>후보 정보는 중앙선거관리위원회·국회 공공데이터를 기반으로 합니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/sedolal/support">고객 지원 · FAQ</a>
+        <a href="/apps/sedolal/privacy">개인정보 처리방침</a>
+        <a href="/apps/sedolal/terms">이용약관</a>
+        <a href="/apps/sedolal/delete-data">데이터 삭제</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -229,10 +229,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

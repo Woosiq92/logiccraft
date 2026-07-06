@@ -124,19 +124,19 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      회원가입·로그인 없이 첫 실행부터 학습과 26종의 팽이를 전부 무료로 즐길 수 있습니다.
-      결제(젬)는 팽이 외형을 꾸미는 스킨에만 쓰이며 어른 확인 절차를 거칩니다. 스킨은 전투력에
-      전혀 영향을 주지 않고 확률형(가챠)이 없으며, 공부를 건너뛰는 결제도 없습니다. 친구 대전은
-      방 코드를 만들어 둘부터 넷까지 겨루며, 무작위 매칭과 채팅이 없어 안심하고 즐길 수 있습니다.
-      문제는 학습 참고용으로 제공되며 성적을 보장하지 않습니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/topbattle/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/topbattle/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/topbattle/terms">이용약관</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>회원가입 없이 학습과 26종 팽이를 전부 무료로 즐기고, 결제(젬)는 팽이 스킨에만 쓰이며 어른 확인을 거칩니다.</li>
+      <li>스킨은 전투력에 영향이 없고 확률형(가챠)이 없으며, 친구 대전은 방 코드로 2~4명이 겨루고 무작위 매칭·채팅이 없습니다.</li>
+      <li>문제는 학습 참고용이라 성적을 보장하지 않습니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/topbattle/support">고객 지원 · FAQ</a>
+        <a href="/apps/topbattle/privacy">개인정보 처리방침</a>
+        <a href="/apps/topbattle/terms">이용약관</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -241,10 +241,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

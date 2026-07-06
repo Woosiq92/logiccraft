@@ -124,21 +124,20 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      주말에는 집과 동네를 무대로 한 탐정 놀이가 열립니다. 아이가 찾은 답을 사진·그림·음성으로
-      담을 수 있고, 카메라와 마이크는 이때만 사용합니다. 사진·그림은 기기에만 저장되고 음성은
-      텍스트로 바뀐 결과만 남으며, 어떤 정보도 서버로 전송하지 않습니다. 광고와 AI를 쓰지 않고,
-      무료로 설치해 일부를 먼저 써 본 뒤 전체 이용은 한 번만 결제하는 인앱 구매입니다(₩12,900,
-      구독·자동 갱신 없음). 설정 탭에서 백업(JSON)과 텍스트 내보내기를 지원하며, 기기를 바꾸기
-      전 백업을 권합니다. 학습 참고용 놀이로, 아이마다 발달 속도는 다를 수 있습니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/build/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/build/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/build/terms">이용약관</a> ·
-      <a href="/apps">Synergeion 시리즈</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>사진·그림·음성은 기기에만 저장되고(음성은 텍스트로 바뀐 결과만), 서버로 보내지 않습니다.</li>
+      <li>광고·AI 없이 무료로 써 본 뒤 전체 이용은 1회 결제 ₩12,900입니다(구독·자동 갱신 없음).</li>
+      <li>학습 참고용 놀이라 아이마다 발달 속도는 다를 수 있습니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/build/support">고객 지원 · FAQ</a>
+        <a href="/apps/build/privacy">개인정보 처리방침</a>
+        <a href="/apps/build/terms">이용약관</a>
+        <a href="/apps">Synergeion 시리즈</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -243,10 +242,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

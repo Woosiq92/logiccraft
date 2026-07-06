@@ -719,8 +719,6 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   .about-intro { grid-template-columns: 1fr; gap: 20px; }
   .mascot-bios { grid-template-columns: 1fr; }
   .contact-grid { grid-template-columns: 1fr; }
-  .foot-grid { grid-template-columns: 1fr; gap: 28px; }
-  .foot-links { justify-content: flex-start; }
 }
 
 @media (max-width: 760px) {
@@ -730,6 +728,11 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   .pcard.feature { flex-direction: column; }
   .pcard.feature .feat-art { flex-basis: auto; min-height: 200px; padding: 28px; }
   .tile.book { flex-direction: column; align-items: flex-start; }
+}
+
+@media (max-width: 640px) {
+  .foot-grid { grid-template-columns: 1fr; gap: 28px; }
+  .foot-links { justify-content: flex-start; }
 }
 
 @media (max-width: 480px) {

@@ -105,20 +105,19 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      과학에 호기심 있는 전 연령 누구나 쓸 수 있습니다. 학습과 일기 등 대부분의 기능은 가입 없이
-      바로 사용할 수 있고, 학회·클럽 같은 공유 기능을 이용할 때만 닉네임 기반 계정이 필요합니다.
-      개인정보를 서버에 수집하지 않고 광고·마케팅 추적도 하지 않습니다. 광고가 없으며 매일 무료로
-      학습할 수 있고, 더 많이 학습하고 싶다면 무제한 이용권을 한 번만 구매하면 됩니다(구독이 아닙니다).
-      기기 내 데이터는 앱을 삭제하면 즉시 사라지고, 공유 기능으로 백엔드에 저장된 데이터는 계정
-      삭제 시 30일 내 영구 삭제됩니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/science-club/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/science-club/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/science-club/terms">이용약관</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>대부분 기능은 가입 없이 쓰고, 학회·클럽 공유 기능을 이용할 때만 닉네임 계정이 필요합니다.</li>
+      <li>개인정보를 서버에 수집하지 않고 광고·추적이 없으며, 매일 무료로 학습하고 더 원하면 무제한 이용권을 1회 구매합니다(구독 아님).</li>
+      <li>기기 데이터는 앱 삭제 시 사라지고, 공유로 저장된 데이터는 계정 삭제 시 30일 내 영구 삭제됩니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/science-club/support">고객 지원 · FAQ</a>
+        <a href="/apps/science-club/privacy">개인정보 처리방침</a>
+        <a href="/apps/science-club/terms">이용약관</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -223,10 +222,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

@@ -105,24 +105,19 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      홈·잠금화면 위젯과 잠금화면 카드(Live Activity)로 앱을 열지 않아도 시세를 봅니다.
-      위젯은 저장한 종목을 바탕화면에서 바로 보여 주고, 잠금화면 카드는 폰을 깨우기만 해도
-      약 10~15초 간격으로 갱신되며 배터리 보호를 위해 약 8시간 후 자동 종료됩니다.
-      관심 종목과 설정값은 모두 기기 안에만 저장되고, 앱을 삭제하면 함께 삭제됩니다.
-    </p>
-    <p>
-      시세는 네이버 증권의 공개 시장 데이터를 사용합니다. 불안한개미는 증권사가 아니며
-      투자 자문이나 매매 기능을 제공하지 않고 공개된 시세 정보를 표시할 뿐입니다.
-      표시되는 가격은 지연될 수 있어 투자 판단의 단독 근거로 삼지 마세요. 앱 운영을 위해
-      화면 하단에 비개인화 배너 광고 1개가 표시될 수 있습니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/stockwatch/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/stockwatch/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/stockwatch/terms">이용약관</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>위젯·잠금화면 카드로 앱을 열지 않아도 시세를 보고, 관심 종목·설정은 기기에만 저장됩니다(앱 삭제 시 함께 삭제).</li>
+      <li>시세는 네이버 증권의 공개 데이터로, 불안한개미는 증권사가 아니며 자문·매매 기능이 없습니다. 가격이 지연될 수 있어 투자 판단의 단독 근거로 삼지 마세요.</li>
+      <li>앱 운영을 위해 화면 하단에 비개인화 배너 광고 1개가 표시될 수 있습니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/stockwatch/support">고객 지원 · FAQ</a>
+        <a href="/apps/stockwatch/privacy">개인정보 처리방침</a>
+        <a href="/apps/stockwatch/terms">이용약관</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -227,11 +222,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-closing > p + p { margin-top: 1rem; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

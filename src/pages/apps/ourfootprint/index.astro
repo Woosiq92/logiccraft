@@ -117,20 +117,20 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      한쪽이 앱을 처음 실행하면 6자리 커플 코드가 만들어지고, 상대가 그 코드를 입력하면
-      두 기기가 같은 기록을 실시간으로 공유합니다. 위치 권한은 “현재 동네 자동 찾기”에만
-      쓰이며, 거부해도 검색으로 동네를 골라 모든 기능을 그대로 쓸 수 있습니다. 다녀온 모든
-      기록은 설정에서 JSON 파일로 내보낼 수 있습니다. 기본 기능은 무료이고, 광고 제거를 한 번
-      구매하면 같은 Apple ID·계정의 모든 기기에 영구 적용됩니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/ourfootprint/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/ourfootprint/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/ourfootprint/terms">이용약관</a> ·
-      <a href="/apps/ourfootprint/delete-data">데이터 삭제</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>6자리 커플 코드로 두 기기가 같은 기록을 실시간 공유하고, 기록은 JSON으로 내보낼 수 있습니다.</li>
+      <li>위치 권한은 현재 동네 자동 찾기에만 쓰이고, 거부해도 검색으로 모든 기능을 씁니다.</li>
+      <li>기본 기능은 무료, 광고 제거를 한 번 구매하면 같은 계정의 모든 기기에 영구 적용됩니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/ourfootprint/support">고객 지원 · FAQ</a>
+        <a href="/apps/ourfootprint/privacy">개인정보 처리방침</a>
+        <a href="/apps/ourfootprint/terms">이용약관</a>
+        <a href="/apps/ourfootprint/delete-data">데이터 삭제</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -235,10 +235,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

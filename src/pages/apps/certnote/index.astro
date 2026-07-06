@@ -113,22 +113,20 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      오늘의 훈련, 정리 글 읽기, 과목별 빠른 모의고사, 암기카드, 진도·시험일 관리는
-      회원가입 없이 무료로 씁니다. 더 깊게 준비할 때를 위한 합격팩은 전체 문제은행,
-      실전 모드, 단원·난이도 골라풀기, 오답노트 무제한, 약점 분석을 한 번에 열어 줍니다.
-      구독이 아닌 일회성 구매로, 전과목 패스 ₩12,900 · 1과목 패스권 ₩4,900입니다.
-      모든 학습 기록은 기기 안에만 저장되며 앱을 제거하면 함께 삭제됩니다. 자료와 문제는
-      학습 참고용으로 합격이나 점수를 보장하지 않으며, 시험 범위·출제 기준·법령은 바뀔 수
-      있으니 최신 정보는 큐넷 등 시험 주관처의 공식 자료로 꼭 확인해 주세요.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/certnote/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/certnote/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/certnote/terms">이용약관</a> ·
-      <a href="/apps/certnote/delete-data">데이터 삭제</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>학습 기록은 기기에만 저장되고, 앱을 삭제하면 함께 사라집니다.</li>
+      <li>기본 기능은 무료, 합격팩은 일회성 구매입니다(전과목 ₩12,900 · 1과목 ₩4,900, 구독 아님).</li>
+      <li>합격·점수를 보장하지 않으며, 시험 범위·출제 기준·법령은 큐넷 등 주관처 공식 자료로 확인하세요.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/certnote/support">고객 지원 · FAQ</a>
+        <a href="/apps/certnote/privacy">개인정보 처리방침</a>
+        <a href="/apps/certnote/terms">이용약관</a>
+        <a href="/apps/certnote/delete-data">데이터 삭제</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -233,10 +231,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {

@@ -123,22 +123,20 @@ const features = [
 
   <!-- CLOSING NOTE -->
   <section class="wrap edu-closing">
-    <p>
-      Wonder는 아이가 혼자 보는 앱이 아니라, 부모와 아이가 함께 보고 이야기하며 입력과 기록은
-      부모가 하는 도구입니다. 광고와 AI를 쓰지 않고, 무료로 내려받아 써 본 뒤 전체 놀이는 한 번만
-      결제해 평생 잠금해제하는 인앱 구매입니다(₩6,900, 구독·자동 갱신 없음). 모든 놀이와 기록은
-      인터넷 없이 기기 안에서 작동하고, 아이의 어떤 정보도 서버로 전송하지 않습니다. 아이가 실수로
-      외부 링크나 문의 화면에 닿지 않도록 부모 확인 게이트를 두어 아동 안전 기준에 맞췄습니다.
-      헛간의 데이터·백업에서 백업 파일(JSON)이나 텍스트로 내보낼 수 있고, 지운 기록은 휴지통에
-      30일간 보관된 뒤 영구 삭제됩니다. 학습 참고용 놀이로, 아이마다 발달 속도는 다를 수 있습니다.
-    </p>
-    <p class="edu-links">
-      <a href="/apps/wonder/support">고객 지원 · 자주 묻는 질문</a> ·
-      <a href="/apps/wonder/privacy">개인정보 처리방침</a> ·
-      <a href="/apps/wonder/terms">이용약관</a> ·
-      <a href="/apps">Synergeion 시리즈</a> ·
-      <a href="/apps">← 제품 목록</a>
-    </p>
+    <ul class="edu-notes">
+      <li>부모와 아이가 함께 보는 도구로, 모든 놀이·기록은 오프라인 기기 안에서 작동하고 아이의 정보를 서버로 보내지 않습니다.</li>
+      <li>광고·AI 없이 무료로 써 본 뒤 전체 놀이는 1회 결제로 평생 잠금해제합니다(₩6,900, 구독·자동 갱신 없음).</li>
+      <li>부모 확인 게이트로 외부 링크·문의를 막아 아동 안전 기준에 맞췄고, 지운 기록은 휴지통에 30일 보관 후 영구 삭제됩니다. 학습 참고용 놀이라 발달 속도는 아이마다 다를 수 있습니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/wonder/support">고객 지원 · FAQ</a>
+        <a href="/apps/wonder/privacy">개인정보 처리방침</a>
+        <a href="/apps/wonder/terms">이용약관</a>
+        <a href="/apps">Synergeion 시리즈</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
   </section>
 </Layout>
 
@@ -243,10 +241,41 @@ const features = [
   }
   .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
 
-  /* ---- closing ---- */
-  .edu-closing { padding-block: clamp(2rem, 4vw, 3rem) 4rem; max-width: 760px; }
-  .edu-closing > p { color: var(--muted); line-height: 1.8; font-size: 0.95rem; margin: 0; }
-  .edu-links { margin-top: 2rem; font-size: 0.95rem; }
+    /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: var(--clay); }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
 
   /* ---- responsive ---- */
   @media (max-width: 860px) {
