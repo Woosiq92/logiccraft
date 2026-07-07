@@ -125,6 +125,10 @@
   .rail .wgoal-row:hover .wgdel{opacity:.7}
   .rail .wgoal-add{cursor:pointer; color:var(--accent); font-size:11px; font-weight:600; opacity:.75}
   .rail .wgoal-add:hover{opacity:1}
+  .rail .wgrip{cursor:grab; opacity:0; color:var(--ink-dim); font-size:11px; padding:0 1px; user-select:none}
+  .rail .wgoal-row:hover .wgrip{opacity:.55}
+  .rail .wgoal-row.wg-drag{opacity:.4}
+  .rail .wgoal-row.wg-over{box-shadow:inset 0 2px 0 var(--accent)}
   /* 색 팔레트 팝오버 */
   .palette{position:fixed; z-index:50; display:flex; gap:6px; padding:8px; background:var(--panel-strong); border:1px solid var(--line); border-radius:10px; backdrop-filter:blur(14px)}
   .palette .sw{width:20px; height:20px; border-radius:6px; cursor:pointer; border:1px solid rgba(255,255,255,.3)}
@@ -202,6 +206,7 @@ let S=load(); migrate(S);
 let view={y:today.getFullYear(),m:today.getMonth()+1}; // 현재 달부터
 let focusGoal=null;  // 포커스된 월 목표 인덱스 → 그 목표에 연결된 할일만 강조
 let dragSrc=null;    // 드래그 중인 할일 {k, i}
+let wgDrag=null;     // 드래그 중인 주 목표 {wkKey, gi} — 같은 주 레일 내 순서 변경
 
 function load(){
   try{ const r=JSON.parse(localStorage.getItem(KEY)); if(r) return r; }catch(e){}
@@ -355,6 +360,7 @@ function render(){
       const dim=(focusGoal!=null && lk!==focusGoal);
       const hl=(focusGoal!=null && lk===focusGoal);
       return `<div class="wgoal-row${dim?' dim':''}${hl?' hl':''}" data-gi="${gi}">
+        <span class="wgrip" draggable="true" title="드래그로 순서 변경">⠿</span>
         <span class="wchip" title="월 목표 연결(클릭 전환)" style="background:${lk!=null?goalColor(mg,lk):'transparent'}"></span>
         <span class="wgoal" contenteditable>${esc(w.t)}</span>
         <span class="wgdel">✕</span>
@@ -379,6 +385,18 @@ function render(){
           S.weekGoals[wkKey][gi].g=val; save(); render(); }); };
       r.querySelector('.wgdel').onclick=()=>{ S.weekGoals[wkKey].splice(gi,1);
         if(!S.weekGoals[wkKey].length) delete S.weekGoals[wkKey]; save(); render(); };
+      // 드래그 핸들로 같은 주 레일 안에서 순서 변경
+      const grip=r.querySelector('.wgrip');
+      grip.addEventListener('dragstart',(e)=>{ wgDrag={wkKey,gi}; e.dataTransfer.effectAllowed='move';
+        try{e.dataTransfer.setData('text/plain','');}catch(_){} r.classList.add('wg-drag'); });
+      grip.addEventListener('dragend',()=>{ r.classList.remove('wg-drag');
+        document.querySelectorAll('.wgoal-row.wg-over').forEach(x=>x.classList.remove('wg-over')); wgDrag=null; });
+      r.addEventListener('dragover',(e)=>{ if(!wgDrag||wgDrag.wkKey!==wkKey) return; e.preventDefault(); e.dataTransfer.dropEffect='move';
+        document.querySelectorAll('.wgoal-row.wg-over').forEach(x=>x.classList.remove('wg-over')); r.classList.add('wg-over'); });
+      r.addEventListener('drop',(e)=>{ if(!wgDrag||wgDrag.wkKey!==wkKey) return; e.preventDefault(); r.classList.remove('wg-over');
+        const from=wgDrag.gi, to=gi; wgDrag=null; if(from===to) return;
+        const arr=S.weekGoals[wkKey]; if(!arr||!arr[from]) return;
+        const [m]=arr.splice(from,1); arr.splice(to,0,m); save(); render(); });
     });
     rail.querySelector('.wgoal-add').onclick=()=>{
       (S.weekGoals[wkKey]=S.weekGoals[wkKey]||[]).push({t:'',g:focusGoal}); save(); render();
@@ -422,8 +440,12 @@ function render(){
         el.addEventListener('dragstart',(e)=>{ dragSrc={k,i}; e.dataTransfer.effectAllowed='move'; try{e.dataTransfer.setData('text/plain','');}catch(_){} el.classList.add('dragging'); });
         el.addEventListener('dragend',()=>{ el.classList.remove('dragging'); document.querySelectorAll('.cell.drop-hot').forEach(c=>c.classList.remove('drop-hot')); dragSrc=null; });
         el.innerHTML=`<span class="gchip" title="목표 연결(클릭해 전환)" style="background:${gi!=null?gcolor:'transparent'}"></span>`+
-          `<span class="box">${t.done?'☑':'☐'}</span><span class="t">${esc(t.t)}</span><span class="x">✕</span>`;
-        el.querySelector('.t').onclick=el.querySelector('.box').onclick=()=>{ t.done=!t.done; save(); render(); };
+          `<span class="box">${t.done?'☑':'☐'}</span><span class="t" contenteditable title="클릭해 수정">${esc(t.t)}</span><span class="x">✕</span>`;
+        el.querySelector('.box').onclick=()=>{ t.done=!t.done; save(); render(); };
+        const tEl=el.querySelector('.t');
+        tEl.addEventListener('focus',()=>{ el.draggable=false; });   // 편집 중엔 드래그 끔
+        tEl.addEventListener('blur',()=>{ el.draggable=true; const v=tEl.textContent.trim(); if(v!==t.t){ t.t=v; save(); } });
+        tEl.addEventListener('keydown',(e)=>{ if(e.key==='Enter'){ e.preventDefault(); tEl.blur(); } });
         el.querySelector('.gchip').onclick=(e)=>{ e.stopPropagation();
           openGoalPicker(e.currentTarget, mg, t.g, (val)=>{ t.g=val; save(); render(); }); };
         el.querySelector('.x').onclick=(e)=>{ e.stopPropagation(); S.tasks[k].splice(i,1); if(!S.tasks[k].length)delete S.tasks[k]; save(); render(); };
