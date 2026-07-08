@@ -104,6 +104,8 @@
   .goal-line.focus{background:rgba(255,255,255,.13); box-shadow:inset 0 0 0 1px var(--line)}
   .goal-line .bullet{width:18px; height:18px; border-radius:5px; display:inline-grid; place-items:center; font-size:11px; font-weight:800; cursor:pointer}
   .goal-line .prog{font-size:11px; color:var(--ink-dim); font-variant-numeric:tabular-nums; min-width:24px}
+  .goal-line .gbox{cursor:pointer; color:var(--ink-dim); font-size:14px; flex:0 0 auto; user-select:none}
+  .goal-line.complete .gbox{color:var(--done)}
   .task{border-left:3px solid transparent}
   .task.dim{opacity:.28}
   .task.hl{box-shadow:inset 0 0 0 1px rgba(255,255,255,.32)}
@@ -233,7 +235,7 @@ function migrate(S){
   S.hideDone=!!S.hideDone; S.monthGoals=S.monthGoals||{}; S.weekGoals=S.weekGoals||{}; S.tasks=S.tasks||{}; S.retros=S.retros||{};
   for(const k in S.monthGoals){
     S.monthGoals[k]=S.monthGoals[k].map((g,i)=> typeof g==='string'
-      ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length]});
+      ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length],done:!!g.done});
   }
   for(const k in S.weekGoals){
     let w=S.weekGoals[k];
@@ -308,15 +310,16 @@ function render(){
   const mg=S.monthGoals[mgKey]||[];
   const box=document.getElementById('monthGoals'); box.innerHTML='';
   if(focusGoal!=null && focusGoal>=mg.length) focusGoal=null;
-  let goalsDone=0, goalsWithTasks=0;
+  let goalsComplete=0;
   mg.forEach((g,i)=>{
     const color=goalColor(mg,i);
     const st=goalStats(view.y,view.m,i);
-    const complete = st.total>0 && st.done===st.total;
-    if(st.total>0){ goalsWithTasks++; if(complete) goalsDone++; }
+    const complete = !!g.done || (st.total>0 && st.done===st.total);  // 수동 체크 or 연결 할일 전부 완료
+    if(complete) goalsComplete++;
     const row=document.createElement('div');
     row.className='goal-line'+(focusGoal===i?' focus':'')+(complete?' complete':'');
-    row.innerHTML=`<span class="bullet" style="background:${color};color:#0e1a24">${i+1}</span>`+
+    row.innerHTML=`<span class="gbox" title="목표 완료 체크">${complete?'☑':'☐'}</span>`+
+      `<span class="bullet" style="background:${color};color:#0e1a24">${i+1}</span>`+
       `<span class="txt" contenteditable>${esc(g.t)}</span>`+
       `<span class="prog">${complete?'🎉 ':''}${st.total?`${st.done}/${st.total}`:''}</span>`+
       `<span class="del">✕</span>`;
@@ -325,6 +328,7 @@ function render(){
     const bullet=row.querySelector('.bullet');
     bullet.onclick=()=>{ focusGoal=(focusGoal===i?null:i); render(); };
     bullet.oncontextmenu=(e)=>{ e.preventDefault(); openPalette(bullet,mgKey,i); };  // 우클릭=색 고르기
+    row.querySelector('.gbox').onclick=()=>{ S.monthGoals[mgKey][i].done=!complete; save(); render(); };
     row.querySelector('.del').onclick=()=>{ removeGoal(mgKey,i); };
     box.appendChild(row);
   });
@@ -334,7 +338,7 @@ function render(){
   const bar=document.getElementById('monthBar');
   bar.style.width=mpct+'%';
   bar.style.background = focusGoal!=null ? goalColor(mg,focusGoal) : '';
-  const allDone = goalsWithTasks>0 && goalsDone===mg.length && mg.length>0;
+  const allDone = mg.length>0 && goalsComplete===mg.length;
   document.getElementById('monthPct').textContent = allDone
     ? '🎉 이 달 목표 전부 달성!'
     : (focusGoal!=null?`목표 ${focusGoal+1} · `:'')+`${mpct}% (${ms.done}/${ms.total})`;
