@@ -197,8 +197,8 @@
 const KEY='goalcast_v1';
 const pad=n=>String(n).padStart(2,'0');
 const iso=(y,m,d)=>`${y}-${pad(m)}-${pad(d)}`;
-const today=new Date();
-const todayISO=iso(today.getFullYear(),today.getMonth()+1,today.getDate());
+let today=new Date();
+let todayISO=iso(today.getFullYear(),today.getMonth()+1,today.getDate());
 
 const GCOLORS=['#7cc4ff','#67e0a3','#ffcf6b','#ff9d9d','#c9a3ff','#7ce0d3'];
 const PALETTE=['#7cc4ff','#67e0a3','#ffcf6b','#ff9d9d','#c9a3ff','#7ce0d3','#ff9d5c','#9db2c4'];
@@ -427,7 +427,8 @@ function render(){
         const arr=S.tasks[sk]; if(!arr||!arr[si]) return;
         const [moved]=arr.splice(si,1); if(!arr.length) delete S.tasks[sk];
         (S.tasks[k]=S.tasks[k]||[]).push(moved); save(); render(); });
-      tasks.forEach((t,i)=>{
+      // 완료된 할일은 아래로, 해야 할 일은 위로 (원래 인덱스 i 유지 — 삭제·드래그 정합성)
+      tasks.map((t,i)=>({t,i})).sort((a,b)=>(a.t.done?1:0)-(b.t.done?1:0)).forEach(({t,i})=>{
         if(S.hideDone && t.done) return;   // 완료 접기
         const gi=(t.g!=null && t.g<mg.length)?t.g:null;
         const gcolor=gi!=null?goalColor(mg,gi):'transparent';
@@ -522,6 +523,18 @@ toggleDone.onclick=()=>{ S.hideDone=!S.hideDone; save(); syncToggle(); render();
 syncToggle();
 
 render();
+
+// 자정마다 오늘 날짜를 다시 계산해 리렌더 (앱을 계속 켜둬도 '오늘' 테두리가 따라감)
+function scheduleMidnight(){
+  const now=new Date();
+  const next=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1,0,0,3); // 자정 3초 뒤
+  setTimeout(()=>{
+    const nd=new Date(), ni=iso(nd.getFullYear(),nd.getMonth()+1,nd.getDate());
+    if(ni!==todayISO){ today=nd; todayISO=ni; render(); }
+    scheduleMidnight();
+  }, next-now);
+}
+scheduleMidnight();
 </script>
 </body>
 </html>
