@@ -131,6 +131,11 @@
   .rail .wgoal-row:hover .wgrip{opacity:.55}
   .rail .wgoal-row.wg-drag{opacity:.4}
   .rail .wgoal-row.wg-over{box-shadow:inset 0 2px 0 var(--accent)}
+  /* 이달의 목표 순서 드래그 (가로 배치라 드롭선은 왼쪽) */
+  .goal-line .mgrip{cursor:grab; opacity:0; color:var(--ink-dim); font-size:11px; padding:0 1px; user-select:none; flex:0 0 auto}
+  .goal-line:hover .mgrip{opacity:.55}
+  .goal-line.mg-drag{opacity:.4}
+  .goal-line.mg-over{box-shadow:inset 2px 0 0 var(--accent)}
   /* 색 팔레트 팝오버 */
   .palette{position:fixed; z-index:50; display:flex; gap:6px; padding:8px; background:var(--panel-strong); border:1px solid var(--line); border-radius:10px; backdrop-filter:blur(14px)}
   .palette .sw{width:20px; height:20px; border-radius:6px; cursor:pointer; border:1px solid rgba(255,255,255,.3)}
@@ -209,6 +214,7 @@ let view={y:today.getFullYear(),m:today.getMonth()+1}; // 현재 달부터
 let focusGoal=null;  // 포커스된 월 목표 인덱스 → 그 목표에 연결된 할일만 강조
 let dragSrc=null;    // 드래그 중인 할일 {k, i}
 let wgDrag=null;     // 드래그 중인 주 목표 {wkKey, gi} — 같은 주 레일 내 순서 변경
+let mgDrag=null;     // 드래그 중인 월 목표 {mgKey, gi} — 이달의 목표 순서 변경
 
 function load(){
   try{ const r=JSON.parse(localStorage.getItem(KEY)); if(r) return r; }catch(e){}
@@ -302,6 +308,25 @@ function removeGoal(mgKey,i){
   if(focusGoal===i) focusGoal=null; else if(focusGoal>i) focusGoal--;
   save(); render();
 }
+// 월 목표 순서 변경(from→to). 연결된 할일/주목표/포커스 인덱스를 순열대로 remap
+function moveGoal(mgKey,from,to){
+  const arr=S.monthGoals[mgKey]; if(!arr||from===to||!arr[from]||to<0||to>=arr.length) return;
+  const n=arr.length;
+  const order=[...Array(n).keys()];          // 옛 인덱스 순열
+  const [mv]=order.splice(from,1); order.splice(to,0,mv);
+  const remap=new Array(n); order.forEach((oldIdx,newIdx)=>{ remap[oldIdx]=newIdx; });
+  const [g]=arr.splice(from,1); arr.splice(to,0,g);   // 실제 배열도 동일하게 이동
+  const parts=mgKey.split('-'), y=parts[0], m=+parts[1];
+  for(const k in S.tasks){
+    if(!k.startsWith(`${y}-${pad(m)}-`)) continue;
+    S.tasks[k].forEach(t=>{ if(t.g!=null && remap[t.g]!=null) t.g=remap[t.g]; });
+  }
+  for(const k in S.weekGoals){
+    (S.weekGoals[k]||[]).forEach(w=>{ if(w.g!=null && remap[w.g]!=null) w.g=remap[w.g]; });
+  }
+  if(focusGoal!=null && remap[focusGoal]!=null) focusGoal=remap[focusGoal];
+  save(); render();
+}
 
 function render(){
   document.getElementById('mTitle').textContent=`${view.y}년 ${view.m}월`;
@@ -318,7 +343,8 @@ function render(){
     if(complete) goalsComplete++;
     const row=document.createElement('div');
     row.className='goal-line'+(focusGoal===i?' focus':'')+(complete?' complete':'');
-    row.innerHTML=`<span class="gbox" title="목표 완료 체크">${complete?'☑':'☐'}</span>`+
+    row.innerHTML=`<span class="mgrip" draggable="true" title="드래그로 순서 변경">⠿</span>`+
+      `<span class="gbox" title="목표 완료 체크">${complete?'☑':'☐'}</span>`+
       `<span class="bullet" style="background:${color};color:#0e1a24">${i+1}</span>`+
       `<span class="txt" contenteditable>${esc(g.t)}</span>`+
       `<span class="prog">${complete?'🎉 ':''}${st.total?`${st.done}/${st.total}`:''}</span>`+
@@ -330,6 +356,16 @@ function render(){
     bullet.oncontextmenu=(e)=>{ e.preventDefault(); openPalette(bullet,mgKey,i); };  // 우클릭=색 고르기
     row.querySelector('.gbox').onclick=()=>{ S.monthGoals[mgKey][i].done=!complete; save(); render(); };
     row.querySelector('.del').onclick=()=>{ removeGoal(mgKey,i); };
+    // 드래그 핸들로 이달의 목표 순서 변경
+    const grip=row.querySelector('.mgrip');
+    grip.addEventListener('dragstart',(e)=>{ mgDrag={mgKey,gi:i}; e.dataTransfer.effectAllowed='move';
+      try{e.dataTransfer.setData('text/plain','');}catch(_){} row.classList.add('mg-drag'); });
+    grip.addEventListener('dragend',()=>{ row.classList.remove('mg-drag');
+      document.querySelectorAll('.goal-line.mg-over').forEach(x=>x.classList.remove('mg-over')); mgDrag=null; });
+    row.addEventListener('dragover',(e)=>{ if(!mgDrag||mgDrag.mgKey!==mgKey) return; e.preventDefault(); e.dataTransfer.dropEffect='move';
+      document.querySelectorAll('.goal-line.mg-over').forEach(x=>x.classList.remove('mg-over')); row.classList.add('mg-over'); });
+    row.addEventListener('drop',(e)=>{ if(!mgDrag||mgDrag.mgKey!==mgKey) return; e.preventDefault(); row.classList.remove('mg-over');
+      const from=mgDrag.gi, to=i; mgDrag=null; moveGoal(mgKey,from,to); });
     box.appendChild(row);
   });
   // 진행률 바: 포커스된 목표가 있으면 그 목표 기준, 없으면 전체
