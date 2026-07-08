@@ -354,7 +354,12 @@ function render(){
     const bullet=row.querySelector('.bullet');
     bullet.onclick=()=>{ focusGoal=(focusGoal===i?null:i); render(); };
     bullet.oncontextmenu=(e)=>{ e.preventDefault(); openPalette(bullet,mgKey,i); };  // 우클릭=색 고르기
-    row.querySelector('.gbox').onclick=()=>{ S.monthGoals[mgKey][i].done=!complete; save(); render(); };
+    row.querySelector('.gbox').onclick=()=>{
+      const nowDone=!complete;
+      S.monthGoals[mgKey][i].done=nowDone;
+      if(nowDone && i!==mg.length-1) moveGoal(mgKey,i,mg.length-1);  // 완성 → 가장 뒷번호로
+      else { save(); render(); }
+    };
     row.querySelector('.del').onclick=()=>{ removeGoal(mgKey,i); };
     // 드래그 핸들로 이달의 목표 순서 변경
     const grip=row.querySelector('.mgrip');
