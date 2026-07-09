@@ -241,7 +241,7 @@ function migrate(S){
   S.hideDone=!!S.hideDone; S.monthGoals=S.monthGoals||{}; S.weekGoals=S.weekGoals||{}; S.tasks=S.tasks||{}; S.retros=S.retros||{};
   for(const k in S.monthGoals){
     S.monthGoals[k]=S.monthGoals[k].map((g,i)=> typeof g==='string'
-      ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length],done:!!g.done});
+      ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length],done:g.done});
   }
   for(const k in S.weekGoals){
     let w=S.weekGoals[k];
@@ -339,7 +339,8 @@ function render(){
   mg.forEach((g,i)=>{
     const color=goalColor(mg,i);
     const st=goalStats(view.y,view.m,i);
-    const complete = !!g.done || (st.total>0 && st.done===st.total);  // 수동 체크 or 연결 할일 전부 완료
+    const auto = st.total>0 && st.done===st.total;        // 연결 할일 전부 완료
+    const complete = (g.done==null) ? auto : g.done;       // 수동 체크(true/false)가 있으면 우선, 없으면 자동
     if(complete) goalsComplete++;
     const row=document.createElement('div');
     row.className='goal-line'+(focusGoal===i?' focus':'')+(complete?' complete':'');
