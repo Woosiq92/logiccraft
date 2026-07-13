@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#11183a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>정보·컴퓨터 임용 합격노트</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="splash">
+  <div class="logo">合</div>
+  <div>
+    <div class="tag" style="letter-spacing:.06em;color:#c3cdea;font-size:13px;font-weight:600">정보·컴퓨터 임용</div>
+    <div class="nm" style="margin-top:6px">합격노트</div>
+  </div>
+  <div class="loadbar"><i></i></div>
+  <div class="corp"><img src="assets/logiccraft-logo.png" alt="LogicCraft"></div>
+</div>
+
+<main id="view"></main>
+
+<nav id="tabbar">
+  <button data-tab="home" class="active"><span class="ic">🗓</span><span>오늘</span><span class="pt"></span></button>
+  <button data-tab="hoedok"><span class="ic">📖</span><span>회독</span><span class="pt"></span></button>
+  <button data-tab="learn"><span class="ic">🎴</span><span>학습</span><span class="pt"></span></button>
+  <button data-tab="note"><span class="ic">📄</span><span>선개념</span><span class="pt"></span></button>
+</nav>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
