@@ -11,7 +11,6 @@ export default defineConfig({
       'https://logiccraft.co.kr/prompt-dojo/',
       'https://logiccraft.co.kr/wedding-map/',
       'https://logiccraft.co.kr/goalcast/',
-      'https://logiccraft.co.kr/infocom-prep/',
     ],
   })],
 });
