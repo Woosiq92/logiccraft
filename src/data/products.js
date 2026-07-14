@@ -24,4 +24,5 @@ export const products = [
   { section: 'daily', slug: 'yangmyeon', icon: 'yangmyeon', name: '양면', chip: '중도정치', warm: true, type: 'web', desc: '하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한 논거를 나란히. 어느 쪽이 옳은지 정해주지 않고, 무엇이 사실이고 무엇이 해석인지 구분하도록 돕는 사이트.', web: 'https://중도정치.kr' },
   { section: 'daily', slug: 'stage-radar', icon: 'stage-radar', name: '공연 발견', chip: '공연·페스티벌', warm: true, type: 'web', desc: '오늘 비는 날 갈 수 있는 공연·페스티벌만 — 끝난 것·상설은 빼고 날짜·지역·장르·가격으로 고르고, 라인업 검색과 인기순까지. 공연예술통합전산망(KOPIS) 데이터.', web: 'https://stage-radar-production.up.railway.app' },
   { section: 'daily', slug: 'goalcast', icon: 'goalcast', name: '목표 캘린더', chip: '목표·할 일', warm: true, type: 'web', desc: '한 해의 큰 목표를 월→주→일 할 일로 쪼개 관리하는 달력. 목표별 색·진행률로 무엇에 얼마나 다가갔는지 한눈에. 가입·설치 없이 브라우저에 저장.', web: 'https://logiccraft.co.kr/goalcast/' },
+  { section: 'daily', icon: 'classvote', name: '학급 도구', chip: '투표·사다리·뽑기', warm: true, type: 'web', desc: '반장·부반장 선거를 종이 없이 — 선생님이 코드·QR을 띄우면 학생들이 각자 폰으로 투표하고 실시간 개표까지. 발표 순서·역할·당번은 사다리 타기와 랜덤 번호 뽑기로. 가입·설치 없이 무료.', web: 'https://classvote-production-6bee.up.railway.app' },
 ];
