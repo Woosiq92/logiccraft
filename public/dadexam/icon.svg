@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1024" viewBox="0 0 1024 1024">
+  <!-- 플레이스홀더 아이콘: 숲 초록 + 체크(자가점검 모티프). 자격증/학사모 이미지 금지(국가공인 오해 회피). 실아이콘은 사람 결정. -->
+  <rect width="1024" height="1024" rx="224" fill="#2F6E5B"/>
+  <circle cx="512" cy="470" r="250" fill="#E3EFEA"/>
+  <path d="M400 470 l70 78 l150 -168" fill="none" stroke="#2F6E5B" stroke-width="56" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="512" y="820" font-family="-apple-system, sans-serif" font-size="150" font-weight="800" fill="#FFFFFF" text-anchor="middle">아빠시험</text>
+</svg>

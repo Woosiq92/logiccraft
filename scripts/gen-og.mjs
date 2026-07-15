@@ -27,6 +27,8 @@ const EXTRA = [
   { icon: 'build', name: 'Synergeion Build', chip: '아동 사고력', type: 'app',
     ios: 'x', play: 'x',
     desc: "6~9세 아이가 매일 '정말 그래?'를 스스로 묻고 직접 확인해 보는 부모-아이 사고력 놀이." },
+  { icon: 'dadexam', name: '아빠자격시험', chip: '예비·초보 아빠', type: 'web', warm: true,
+    desc: "아빠 시점 육아 상식을 시험처럼 점검하고 오답은 근거와 함께 배워요. 임신·출산·신생아 15과목, 설치 없이 무료." },
 ];
 
 const only = process.argv[2];
