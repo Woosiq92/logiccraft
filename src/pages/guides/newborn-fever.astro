@@ -1,0 +1,85 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="신생아·영아 열, 몇 도부터 응급일까 — 아빠가 알아야 할 대응 순서 · 로직크래프트 가이드"
+  description="생후 3개월 미만 아기의 38도 이상 발열은 바로 진료가 필요합니다. 아빠가 당황하지 않도록 체온 재는 법, 병원 가야 할 기준, 열성경련 대응을 근거와 함께 정리했습니다. (일반 정보이며 의료 조언이 아닙니다)"
+>
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">신생아 · 응급</p>
+      <h1>아기가 열이 날 때, 아빠가 알아야 할 순서</h1>
+      <p class="lead">
+      새벽에 아기 몸이 뜨거우면 누구나 당황합니다. 그런데 아기의 나이에 따라 “집에서
+      지켜봐도 되는 열”과 “바로 병원에 가야 하는 열”이 다릅니다. 그 기준을 미리 알아 두면,
+      정작 그 순간에 덜 흔들립니다.
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
+
+    <h2>생후 3개월 미만이면 38도부터 바로 진료</h2>
+    <p>
+      가장 중요한 기준입니다. 생후 3개월(약 90일) 미만 아기가 항문 체온 기준 38도 이상이면,
+      다른 증상이 없어 보여도 지체 없이 진료를 받는 것이 원칙입니다. 이 시기 아기는 면역이
+      덜 갖춰져 있어, 열이 심각한 감염의 유일한 신호일 수 있기 때문입니다. “좀 지켜보자”가
+      가장 위험한 선택이 되는 나이입니다.
+    </p>
+    <p>
+      생후 3개월이 지난 아기라면 열의 절대 수치보다 아기의 상태가 더 중요합니다. 잘 먹고,
+      반응이 또렷하고, 놀 기운이 있으면 열이 조금 있어도 집에서 지켜볼 수 있습니다. 반대로
+      축 늘어지거나, 잘 안 먹거나, 깨워도 반응이 처지면 수치와 상관없이 진료가 필요합니다.
+    </p>
+
+    <h2>체온은 어떻게 재나</h2>
+    <p>
+      영아는 항문(직장) 체온이 가장 정확합니다. 이마·귀 체온계는 편하지만 오차가 있어,
+      애매할 때는 항문 체온으로 확인하세요. 체온을 재기 전에 두껍게 싸매 두었다면 잠깐
+      풀어 두고 다시 재는 것이 좋습니다. 옷·이불로 인한 일시적 상승과 실제 발열을 구분하기
+      위해서입니다.
+    </p>
+
+    <h2>해열제는 나이·몸무게에 맞춰, 미온수로 보조</h2>
+    <p>
+      해열제는 아기의 개월 수와 몸무게에 맞는 종류·용량을 지켜야 합니다. 특히 생후 초기에는
+      임의로 먹이기 전에 진료가 우선입니다. 미지근한 물수건으로 몸을 닦아 주는 것은 보조가
+      될 수 있지만, 찬물이나 알코올로 닦는 것은 오히려 해로워 피해야 합니다.
+    </p>
+
+    <h2>열성경련이 왔을 때</h2>
+    <p>
+      열이 오르는 과정에서 아기가 팔다리를 떨며 의식을 잃는 열성경련이 올 수 있습니다.
+      대부분 몇 분 안에 저절로 멈추고 큰 후유증 없이 회복되지만, 그 순간에는 이렇게 대응합니다.
+      아기를 바닥의 안전한 곳에 옆으로 눕히고, 입에 아무것도 넣지 말고, 시간을 재며 지켜봅니다.
+      경련이 5분 이상 이어지거나 처음 겪는 경련이면 119에 연락하고 진료를 받습니다.
+    </p>
+
+    <div class="related">
+      <p>이런 판단을 실제 상황 문제로 미리 점검해 볼 수 있습니다.</p>
+      <a href="/dadexam/">아빠자격시험 — 신생아 발열·응급 등 육아 상식 자가점검 →</a>
+    </div>
+
+    <p class="disc">
+      이 글은 일반적인 정보 정리이며 의료 조언을 대신하지 않습니다. 아기의 상태가 걱정되면
+      주저 없이 소아청소년과 진료를 받으세요. 참고: 대한소아청소년과학회, 질병관리청 국가건강정보포털.
+    </p>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .disc { margin-top: 2rem; font-size: 0.9rem; color: var(--sub); opacity: 0.85; line-height: 1.7; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

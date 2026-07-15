@@ -1,0 +1,92 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="아빠자격시험 — 예비·초보 아빠 육아 상식 시험 (무료 자가점검) · 로직크래프트"
+  description="아빠 시점으로 임신·출산·신생아 육아 상식을 시험처럼 점검하고, 틀린 문제는 근거와 함께 배우는 자가점검. 15과목, 가입·설치 없이 무료. 재미로 보는 점검이며 국가공인 자격이 아닙니다."
+  image="/og/dadexam.png"
+>
+  <section class="dx-hero">
+    <div class="wrap dx-inner">
+      <div class="dx-copy">
+        <p class="dx-eyebrow">PRODUCT · 아빠자격시험</p>
+        <h1>아빠가 되기 전,<br />몰라서 불안한 것들.</h1>
+        <p class="dx-lede">
+          아빠 시점으로 임신·출산·신생아 육아 상식을 시험처럼 점검하고,
+          틀린 문제는 근거와 함께 배워요. 15과목, 가입·설치 없이 무료로.
+        </p>
+        <div class="dx-cta"><a class="cta" href="https://logiccraft.co.kr/dadexam/">시험 보러 가기 →</a></div>
+        <p class="dx-note">
+          "아기가 새벽에 39도로 열이 나면?"처럼 실전 상황을 문제로 풀며 내가 뭘 모르는지 확인해요.
+          재미로 보는 자가점검이며, 국가공인 자격이 아니고 의료 조언을 대신하지 않아요.
+        </p>
+      </div>
+      <div class="dx-shot">
+        <div class="dx-phone">
+          <img src="/screens/dadexam/hero.png" alt="아빠자격시험 화면 — 예비 아빠 7과목 목록과 미응시 배지, 시험·오답노트·성적표 탭" width="468" height="880" loading="eager" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap dx-feat">
+    <div class="dx-cards">
+      <div class="dx-card">
+        <div class="dx-ic">📝</div>
+        <h3>시험처럼 점검</h3>
+        <p>과목마다 문제은행에서 10문제를 뽑아 즉시 채점. 점수·등급으로 내 빈칸이 한눈에 보여요.</p>
+      </div>
+      <div class="dx-card">
+        <div class="dx-ic">📕</div>
+        <h3>오답은 근거와 함께</h3>
+        <p>틀린 문제는 오답노트에 모여 다시 풀 수 있고, 해설마다 대한소아청소년과학회·질병관리청 등 출처를 밝혀요.</p>
+      </div>
+      <div class="dx-card">
+        <div class="dx-ic">📊</div>
+        <h3>단계별 15과목</h3>
+        <p>예비 아빠(임신·출산)부터 신생아(0~100일), 공통 육아 용어까지. 성적표로 약점 과목을 짚어요.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap dx-links">
+    <p class="links">
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .dx-hero { background: radial-gradient(120% 120% at 78% 8%, #3a8570 0%, #2f6e5b 42%, #234f42 82%); color: #fff; overflow: hidden; }
+  .dx-inner { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .dx-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #bfe3d6; margin: 0; }
+  .dx-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .dx-lede { color: #dcece6; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
+  .dx-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: #fff; color: #2f6e5b; box-shadow: 0 12px 28px rgba(0,0,0,.22); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,0,.3); }
+  .dx-note { color: #b8d6cb; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
+  .dx-shot { display: flex; justify-content: center; }
+  .dx-phone { width: 100%; max-width: 300px; border-radius: 30px; padding: 8px; background: #1c3a31; box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+  .dx-phone img { width: 100%; height: auto; display: block; border-radius: 24px; }
+
+  .dx-feat { padding-block: clamp(2.5rem, 6vw, 4rem); }
+  .dx-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(1rem, 2.5vw, 1.5rem); }
+  .dx-card { background: var(--card, #fff); border: 1px solid var(--border, #e7dfd3); border-radius: 18px; padding: 1.6rem 1.5rem; }
+  .dx-ic { font-size: 1.7rem; }
+  .dx-card h3 { margin: 0.7rem 0 0; font-size: 1.15rem; }
+  .dx-card p { margin: 0.5rem 0 0; line-height: 1.7; color: var(--sub, #6a7392); font-size: 0.95rem; }
+
+  .dx-links { padding-block: 1rem 4rem; }
+  .links { font-size: 0.95rem; }
+
+  @media (max-width: 860px) {
+    .dx-inner { grid-template-columns: 1fr; }
+    .dx-shot { order: -1; }
+    .dx-copy { text-align: center; }
+    .dx-lede, .dx-note { margin-inline: auto; }
+    .dx-cta { display: flex; justify-content: center; }
+    .dx-cards { grid-template-columns: 1fr; }
+  }
+</style>

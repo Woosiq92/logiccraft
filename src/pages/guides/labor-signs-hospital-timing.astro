@@ -1,0 +1,87 @@
+---
+import Layout from '../../layouts/Layout.astro';
+---
+
+<Layout
+  title="진통이 오면 언제 병원에 가야 할까 — 예비 아빠를 위한 출산 신호 정리 · 로직크래프트 가이드"
+  description="초산은 진통 5분 간격, 양수가 터지면 진통 전이라도 바로 병원. 가진통과 진진통 구분, 병원 갈 타이밍, 아빠가 할 일을 근거와 함께 정리했습니다. (일반 정보이며 의료 조언이 아닙니다)"
+>
+  <section class="page-hero">
+    <canvas class="hero-net" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <p class="eyebrow on-dark">예비 아빠</p>
+      <h1>진통이 오면, 언제 병원에 가야 할까</h1>
+      <p class="lead">
+      출산이 다가오면 예비 아빠가 가장 많이 하는 질문입니다. 너무 일찍 가면 돌아오고,
+      너무 늦으면 위험합니다. 다행히 “언제 가야 하는지”에는 꽤 명확한 기준이 있습니다.
+      미리 알아 두면 그 순간 침착하게 움직일 수 있습니다.
+      </p>
+    </div>
+  </section>
+
+  <article class="wrap article-body">
+
+    <h2>진통 간격 — 초산 5분, 경산 10분이 기준</h2>
+    <p>
+      규칙적인 진통이 시작되면 간격을 잽니다. 첫 출산(초산)은 대체로 진통이 5분 간격으로
+      규칙적으로 올 때, 둘째 이상(경산)은 10분 간격일 때를 병원 갈 기준으로 봅니다. 경산은
+      진행이 빠른 편이라 초산보다 일찍 움직입니다. 다만 이건 일반적인 기준이고, 병원에서
+      미리 안내받은 기준이 있으면 그것을 우선합니다.
+    </p>
+
+    <h2>양수가 터지면 진통이 없어도 바로 병원</h2>
+    <p>
+      따뜻한 물이 왈칵 또는 계속 흐르듯 나오면 양수가 터진(파수) 것일 수 있습니다. 이때는
+      진통이 아직 없더라도 감염 위험 때문에 바로 병원으로 갑니다. 나온 물의 색과 시간을
+      기억해 두면 진료에 도움이 됩니다. 맑지 않고 초록빛이 돌면 더 서둘러야 합니다.
+    </p>
+
+    <h2>가진통과 진진통 구분하기</h2>
+    <p>
+      출산 전 몇 주 동안은 불규칙한 가진통(브랙스톤 힉스)이 있을 수 있습니다. 진짜 진통은
+      간격이 규칙적이고, 시간이 갈수록 강해지며 간격이 짧아집니다. 또 자세를 바꾸거나 쉬어도
+      사라지지 않습니다. 반대로 움직이거나 쉬면 잦아드는 통증은 가진통일 가능성이 큽니다.
+    </p>
+
+    <h2>이런 때는 시간을 따지지 말고 진료</h2>
+    <p>
+      임신 37주 이전에 규칙적인 진통이 오면 조기진통일 수 있어 바로 병원에 연락합니다.
+      질 출혈이 많거나, 심한 복통이 가시지 않거나, 평소보다 태동이 뚜렷하게 줄면 진통
+      간격과 상관없이 진료를 받습니다. 이슬(피가 섞인 점액)이 비치는 것은 곧 진통이 온다는
+      신호일 수 있지만 그 자체로 응급은 아닙니다.
+    </p>
+
+    <h2>아빠가 할 일</h2>
+    <p>
+      진통이 시작되면 아빠의 역할은 분명합니다. 진통 간격과 지속 시간을 기록하고, 미리 싸 둔
+      출산가방과 산모수첩·신분증을 챙기고, 병원까지 경로를 확인합니다. 산모가 호흡에 집중할 수
+      있도록 곁을 지키는 것만으로도 큰 도움이 됩니다. 무엇을 할지 미리 정해 두면 당황이 줄어듭니다.
+    </p>
+
+    <div class="related">
+      <p>출산 신호·병원 타이밍을 실제 상황 문제로 미리 점검해 볼 수 있습니다.</p>
+      <a href="/dadexam/">아빠자격시험 — 예비 아빠 출산·진통 등 육아 상식 자가점검 →</a>
+    </div>
+
+    <p class="disc">
+      이 글은 일반적인 정보 정리이며 의료 조언을 대신하지 않습니다. 진통·출혈·양수 등
+      걱정되는 증상이 있으면 다니는 산부인과에 바로 연락하세요. 참고: 대한산부인과학회,
+      질병관리청 국가건강정보포털.
+    </p>
+
+    <p class="back"><a href="/guides">← 가이드 목록</a></p>
+  </article>
+</Layout>
+
+<style>
+  .article-body { max-width: 720px; padding-top: clamp(36px,5vw,56px); padding-bottom: clamp(48px,7vw,90px); }
+  .article-body h2 { font-size: 1.25rem; margin: 2.2rem 0 0.5rem; }
+  .article-body h3 { font-size: 1.08rem; margin: 1.4rem 0 0.3rem; }
+  .article-body p { color: var(--sub); line-height: 1.9; margin: 0.3rem 0; }
+  .related { margin: 2.6rem 0 0; padding: 1.3rem 1.5rem; background: #f7f7f3; border-radius: 14px; }
+  .related p { margin: 0 0 0.5rem; color: var(--ink); font-weight: 600; }
+  .related a { color: var(--accent); font-weight: 700; text-decoration: none; line-height: 1.6; }
+  .disc { margin-top: 2rem; font-size: 0.9rem; color: var(--sub); opacity: 0.85; line-height: 1.7; }
+  .back { margin-top: 2.5rem; font-size: 0.95rem; }
+  .back a { color: var(--accent); }
+</style>

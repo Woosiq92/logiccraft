@@ -167,6 +167,7 @@
 const STAGES=[{key:"prep",name:"예비 아빠"},{key:"newborn",name:"신생아 (0~100일)"},{key:"common",name:"공통 · 육아 용어"}];
 const GRADES=[[90,"마스터 아빠","gold"],[75,"베테랑 아빠","primary"],[60,"주니어 아빠","primary"],[40,"수습 아빠","muted"],[0,"인턴 아빠","muted"]];
 const LS_BEST="dadexam.best", LS_WRONG="dadexam.wrong";
+const SHARE_BASE="https://logiccraft.co.kr/dadexam/"; // 공유 링크는 항상 웹으로(Capacitor에서도)
 let QS=[], subjects=[], view=document.getElementById("view");
 
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
@@ -184,7 +185,10 @@ async function init(){
   QS.forEach(q=>{const k=q.stage+"|"+q.subject; if(!seen[k])seen[k]={stage:q.stage,subject:q.subject,items:[]}; seen[k].items.push(q);});
   subjects=Object.values(seen);
   document.querySelectorAll(".tabbar button").forEach(b=>b.onclick=()=>go(b.dataset.tab));
-  go("home");
+  const p=new URLSearchParams(location.search);
+  const ch=p.get("ch"), sc=parseInt(p.get("sc"),10);
+  if(ch && subjects.some(s=>s.subject===ch)){ renderChallenge(ch, isFinite(sc)?sc:null); }
+  else go("home");
 }
 function setTab(t){document.querySelectorAll(".tabbar button").forEach(b=>b.classList.toggle("on",b.dataset.tab===t));
   document.querySelector(".tabbar").style.display=t?"flex":"none";}
@@ -280,11 +284,13 @@ function finishQuiz(){
     <div class="${pill(g[2],true)}">${g[1]}</div>
     <div class="r-note">아빠 등급은 재미로 보는 자가점검 결과예요. 공인 자격이 아니에요.</div>
     ${nWrong?`<button class="btn" id="retry">틀린 ${nWrong}문제 다시 풀기</button>`:`<button class="btn" id="retry">한 번 더 풀기</button>`}
+    <button class="btn" id="shareRes" style="margin-top:10px">결과 공유하고 도전장 보내기</button>
     <button class="btn ghost" id="other">다른 과목 풀기</button></div>`;
   document.getElementById("retry").onclick=()=>{
     if(nWrong)startQuiz(quiz.items.filter(q=>quiz.wrong.includes(q.id)),quiz.label,false);
     else startQuiz(quiz.source,quiz.label,true);
   };
+  document.getElementById("shareRes").onclick=e=>shareResult(e.currentTarget,quiz.label,pct,g);
   document.getElementById("other").onclick=()=>go("home");
 }
 
@@ -391,6 +397,72 @@ async function shareCard(btn,d){
     await new Promise(res=>canvas.toBlob(async b=>{await shareBlob(b);res();},"image/png"));
   }catch(e){ alert("이미지를 만들지 못했어요."); }
   finally{ node.remove();btn.disabled=false;btn.textContent=orig; }
+}
+
+/* ---------- 결과 공유 + 도전장 URL ---------- */
+function buildResultCard(d){
+  const [gbg,gcol]=toneColors(d.grade[2]);
+  const w=document.createElement("div");
+  w.style.cssText="position:fixed;left:-9999px;top:0;width:720px;height:720px;box-sizing:border-box;padding:60px;"
+    +"background:#FFFFFF;border-radius:44px;display:flex;flex-direction:column;"
+    +"font-family:-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo','Malgun Gothic',sans-serif;";
+  w.innerHTML=`<div style="display:flex;align-items:center;gap:12px">
+      <div style="width:26px;height:26px;border-radius:9px;background:#2F6E5B"></div>
+      <div style="font-size:24px;font-weight:800;color:#2F6E5B;letter-spacing:-.3px">아빠자격시험</div></div>
+    <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+      <div style="font-size:28px;color:#857E73">${esc(d.subject)}</div>
+      <div style="display:flex;align-items:baseline;gap:8px;margin-top:10px">
+        <div style="font-size:96px;font-weight:800;letter-spacing:-3px;line-height:1;color:#33302B">${d.pct}</div>
+        <div style="font-size:30px;font-weight:700;color:#857E73">점</div></div>
+      <div style="align-self:flex-start;margin-top:22px;padding:13px 32px;border-radius:99px;font-size:29px;font-weight:800;background:${gbg};color:${gcol}">${d.grade[1]}</div>
+      <div style="margin-top:30px;font-size:26px;font-weight:700;color:#2F6E5B">너도 도전해봐 →</div></div>
+    <div style="font-size:19px;line-height:1.5;color:#857E73">재미로 보는 자가점검이에요. 국가공인 자격이 아니에요. · ${d.date}</div>`;
+  return w;
+}
+async function shareResult(btn,subject,pct,grade){
+  const now=new Date(), date=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
+  const url=SHARE_BASE+"?ch="+encodeURIComponent(subject)+"&sc="+pct;
+  const text=`아빠자격시험 '${subject}' ${pct}점 (${grade[1]}) — 너도 도전해봐!`;
+  const orig=btn.textContent;btn.disabled=true;btn.textContent="이미지 만드는 중…";
+  let file=null;
+  if(window.html2canvas){
+    const node=buildResultCard({subject,pct,grade,date});document.body.appendChild(node);
+    try{
+      const canvas=await html2canvas(node,{scale:2,backgroundColor:null,logging:false});
+      const blob=await new Promise(res=>canvas.toBlob(res,"image/png"));
+      if(blob)file=new File([blob],"아빠자격시험.png",{type:"image/png"});
+    }catch(e){}
+    finally{ node.remove(); }
+  }
+  try{
+    if(file&&navigator.canShare&&navigator.canShare({files:[file]})){
+      await navigator.share({files:[file],title:"아빠자격시험",text,url});
+    }else if(navigator.share){
+      await navigator.share({title:"아빠자격시험",text,url});
+    }else{
+      if(file){const u=URL.createObjectURL(file);const a=document.createElement("a");a.href=u;a.download="아빠자격시험.png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),1000);}
+      try{await navigator.clipboard.writeText(url);alert("도전장 링크를 복사했어요.\n"+url);}catch(e){prompt("도전장 링크",url);}
+    }
+  }catch(e){ if(!(e&&e.name==="AbortError")){ try{await navigator.clipboard.writeText(url);}catch(_){} } }
+  finally{ btn.disabled=false;btn.textContent=orig; }
+}
+
+/* ---------- 도전장 받은 화면 ---------- */
+function renderChallenge(subject,pct){
+  history.replaceState(null,"",location.pathname); // URL 정리(새로고침 재트리거 방지)
+  const s=subjects.find(x=>x.subject===subject);
+  const g=(pct!=null)?gradeOf(pct):null;
+  setTab(null);
+  view.innerHTML=`<div class="result">
+    <div class="r-cap">🌱 아빠자격시험 · 받은 도전장</div>
+    <div class="gauge" style="margin-top:28px;background:conic-gradient(var(--primary) ${pct!=null?Math.round(pct*3.6):360}deg, var(--primary-soft) 0deg)">
+      <i>${pct!=null?`<div class="sc">${pct}</div><div class="of">/ 100점</div>`:`<div class="of" style="font-size:15px;font-weight:700;color:var(--primary)">도전!</div>`}</i></div>
+    ${g?`<div class="${pill(g[2],true)}">친구는 ${g[1]}</div>`:""}
+    <div class="r-note" style="margin-top:18px;font-size:14px;color:var(--ink)">친구가 <b>‘${esc(subject)}’</b> 시험에서${pct!=null?` ${pct}점을 받았어요.`:" 도전했어요."}<br>나도 같은 시험을 풀어볼까요?</div>
+    <button class="btn" id="chGo" style="margin-top:24px">나도 이 과목 도전하기</button>
+    <button class="btn ghost" id="chHome">처음부터 둘러보기</button></div>`;
+  document.getElementById("chGo").onclick=()=>startQuiz(s.items,s.subject);
+  document.getElementById("chHome").onclick=()=>go("home");
 }
 
 init();
