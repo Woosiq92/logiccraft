@@ -1,0 +1,259 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+// 출시 전: App Store 심사 준비 중이라 다운로드 버튼은 아직 없음.
+// 공개되면 상단에 StoreButtons(ios=...) 한 줄만 끼우면 됨.
+
+const S = '/screens/matrixiq';
+
+const types = [
+  { name: '행렬추론', c: '#4f7bd0' },
+  { name: '수열추리', c: '#5a5fd6' },
+  { name: '다른 하나', c: '#6a79ff' },
+  { name: '응용수리', c: '#3f9d6b' },
+  { name: '언어논리', c: '#c26b6b' },
+  { name: '공간지각', c: '#2f9e8f' },
+  { name: '분석추론', c: '#7c74d6' },
+  { name: '코딩·해독', c: '#b08a2e' },
+  { name: '흐름 추론', c: '#4a90b8' },
+  { name: '도형 유추', c: '#cf8350' },
+];
+
+const features = [
+  {
+    img: `${S}/diagnosis.png`,
+    alt: '기록 화면 — 추론 레이팅, 성장 델타, 진단 프로필',
+    tag: '진단 → 처방 → 성장',
+    title: '어디서 왜 막히는지 짚어주고, 오른 걸 보여줍니다',
+    body: '어느 유형이 약한지, 어떻게 틀리는지(급한 실수·개념 부족·속도), 특히 어느 세부 패턴이 막히는지 진단합니다. 그 패턴만 집중 드릴하거나 전략 레슨으로 방법을 익히고, 향상은 처음 실력 대비로 확인합니다.',
+  },
+  {
+    img: `${S}/types.png`,
+    alt: '유형 화면 — 10가지 유형 그리드와 유형별 연습',
+    tag: '10가지 유형 · 룰베이스',
+    title: '규칙으로 무한 생성, 문제가 바닥나지 않아요',
+    body: '행렬추론부터 도형 유추까지 10가지 유형을 다룹니다. 모든 문제는 기기 안의 규칙 기반 생성기가 매번 새로 만들어, 다 풀어도 늘 새 문제가 나옵니다. 서버도 AI도 필요 없어 오프라인에서 동작합니다.',
+  },
+  {
+    img: `${S}/question.png`,
+    alt: '문제 풀이 화면 — 행렬추론 문항과 보기',
+    tag: '적응형 난이도',
+    title: '맞히면 어려워지고, 틀리면 쉬워지고',
+    body: '유형마다 난이도가 실력에 맞춰 오르내립니다. 45문항·시간제한 모의로 실전 압박을 연습하고, 틀린 문제는 해설과 함께 다시 봅니다.',
+  },
+  {
+    img: `${S}/dark.png`,
+    alt: '다크 모드 홈 화면',
+    tag: '무료 · 다크 · 한국어/영어',
+    title: '광고도 결제도 없이, 매일 편하게',
+    body: '완전 무료에 광고도 인앱 결제도 없습니다. 시스템·라이트·다크 모드를 지원하고, 앱 안에서 한국어와 영어를 전환합니다. 매일 알림으로 사이클을 놓치지 않아요.',
+  },
+];
+---
+
+<Layout
+  title="매트릭스 인적성 — 추론·수리 적성 훈련, 무료 룰베이스 앱 · 로직크래프트"
+  description="매트릭스 인적성은 도형추리·수열·공간지각 등 추론·수리 적성을 매일 한 사이클로 훈련하고, 약점을 진단해 맞춤으로 성장하는 무료 룰베이스 앱입니다. GSAT·SKCT·NCS 계열 인적성 추론·수리 파트와 멘사식 도형추리 감각을 다집니다."
+  image="/screens/matrixiq/home.png"
+>
+  <!-- HERO -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 매트릭스 인적성</p>
+        <h1>적성검사 추론·수리,<br />매일 한 사이클.</h1>
+        <p class="edu-lede">
+          도형·수열·추리·수리 적성을 매일 조금씩 훈련하는 룰베이스 앱.
+          오늘의 사이클 한 판을 하고, 약점을 진단받아 맞춤으로 성장합니다.
+          완전 무료 · 광고 없음.
+        </p>
+        <ul class="edu-badges">
+          <li>완전 무료 · 광고 없음</li>
+          <li>로그인 없음</li>
+          <li>한국어 · 영어</li>
+          <li>오프라인 동작</li>
+        </ul>
+        <p class="edu-soon">App Store 출시 준비 중</p>
+      </div>
+      <div class="edu-hero-shot">
+        <img src={`${S}/home.png`} alt="매트릭스 인적성 홈 화면 — 오늘의 사이클과 추론 레이팅" loading="eager" width="300" height="650" />
+      </div>
+    </div>
+  </section>
+
+  <!-- TYPES -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow">10가지 유형을 한 앱에</p>
+    <h2>다루는 유형</h2>
+    <ul class="edu-chips">
+      {types.map((a) => (
+        <li><span class="edu-dot" style={`background:${a.c}`}></span>{a.name}</li>
+      ))}
+    </ul>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="wrap edu-features">
+    {features.map((f, i) => (
+      <div class:list={['edu-feature', { flip: i % 2 === 1 }]}>
+        <div class="edu-f-shot">
+          <img src={f.img} alt={f.alt} loading="lazy" width="270" height="585" />
+        </div>
+        <div class="edu-f-copy">
+          <p class="edu-f-tag">{f.tag}</p>
+          <h2>{f.title}</h2>
+          <p>{f.body}</p>
+        </div>
+      </div>
+    ))}
+  </section>
+
+  <!-- CLOSING -->
+  <section class="wrap edu-closing">
+    <ul class="edu-notes">
+      <li>학습 기록은 기기에만 저장되고, 앱을 삭제하면 함께 사라집니다.</li>
+      <li>완전 무료이며 광고와 인앱 결제가 없습니다.</li>
+      <li>IQ나 일반지능(g)을 올려준다고 약속하지 않습니다. 연습으로 느는 것은 문제 유형 친숙도와 시간 대처 능력이며, 점수는 참고용으로 어떤 합격도 보장하지 않습니다. 어휘·독해·상황판단·인성검사는 다루지 않습니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/matrixiq/support">고객 지원 · FAQ</a>
+        <a href="/apps/matrixiq/privacy">개인정보 처리방침</a>
+        <a href="/apps/matrixiq/terms">이용약관</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
+  </section>
+</Layout>
+
+<style>
+  /* ---- hero (full-bleed dark) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #3a48a8 0%, #26307a 40%, #141a44 80%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap: clamp(1.5rem, 5vw, 4rem);
+    align-items: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #9fb4ff; margin: 0;
+  }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #c8d0f0; margin: 1.1rem 0 1.6rem; line-height: 1.8; max-width: 42ch; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #d7ddf5;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-soon {
+    margin: 1.4rem 0 0; font-size: 0.86rem; font-weight: 600;
+    color: #aeb9e6; letter-spacing: 0.01em;
+  }
+  .edu-hero-shot { display: flex; justify-content: center; }
+  .edu-hero-shot img {
+    width: 100%; max-width: 290px; height: auto; display: block;
+    border-radius: 34px; border: 1px solid rgba(255,255,255,.12);
+    box-shadow: 0 40px 80px -30px rgba(0,0,0,.6);
+  }
+
+  /* ---- features ---- */
+  .edu-features { padding-block: 0.5rem; }
+  .edu-feature {
+    display: grid; grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center;
+    padding: 2.6rem 0;
+  }
+  .edu-feature + .edu-feature { border-top: 1px solid var(--line); }
+  .edu-feature.flip .edu-f-shot { order: 2; }
+  .edu-f-shot { display: flex; justify-content: center; }
+  .edu-f-shot img {
+    width: 100%; max-width: 260px; height: auto; display: block;
+    border-radius: 30px; border: 1px solid var(--line-strong);
+    box-shadow: var(--shadow-md);
+  }
+  .edu-f-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: #5a5fd6; margin: 0;
+  }
+  .edu-f-copy h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 0.7rem; line-height: 1.3; }
+  .edu-f-copy p { color: var(--sub); line-height: 1.8; margin: 0; max-width: 460px; }
+
+  /* ---- types ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; }
+
+  /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 62ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: #5a5fd6; }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .edu-hero-inner { grid-template-columns: 1fr; }
+    .edu-hero-shot { order: -1; }
+    .edu-hero-shot img { max-width: 230px; }
+    .edu-hero-copy { text-align: center; }
+    .edu-lede { margin-inline: auto; }
+    .edu-badges { justify-content: center; }
+    .edu-soon { text-align: center; }
+    .edu-feature, .edu-feature.flip { grid-template-columns: 1fr; }
+    .edu-feature.flip .edu-f-shot { order: 0; }
+    .edu-f-copy { text-align: center; }
+    .edu-f-copy p { margin-inline: auto; }
+  }
+</style>
