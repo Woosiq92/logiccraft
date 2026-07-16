@@ -1,8 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
-
-// 출시 전: App Store 심사 준비 중이라 다운로드 버튼은 아직 없음.
-// 공개되면 상단에 StoreButtons(ios=...) 한 줄만 끼우면 됨.
+import StoreButtons from '../../../components/StoreButtons.astro';
 
 const S = '/screens/matrixiq';
 
@@ -73,7 +71,7 @@ const features = [
           <li>한국어 · 영어</li>
           <li>오프라인 동작</li>
         </ul>
-        <p class="edu-soon">App Store 출시 준비 중</p>
+        <StoreButtons ios="https://apps.apple.com/kr/app/id6785131602" />
       </div>
       <div class="edu-hero-shot">
         <img src={`${S}/home.png`} alt="매트릭스 인적성 홈 화면 — 오늘의 사이클과 추론 레이팅" loading="eager" width="300" height="650" />

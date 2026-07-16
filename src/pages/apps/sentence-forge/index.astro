@@ -1,0 +1,248 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+import StoreButtons from '../../../components/StoreButtons.astro';
+
+const axes = [
+  {
+    tag: '읽기',
+    title: '명문장을 문장 단위로 뜯어봅니다',
+    body: '김소월·현진건·이상·정지용·김유정 등 근대문학 명문장 88편을 한 문장씩 해부합니다. 어떤 장치로 그 문장이 살아나는지, 리듬과 어순과 이미지를 짚어가며 좋은 문장의 감각을 익힙니다.',
+  },
+  {
+    tag: '벼리기',
+    title: '일부러 못 쓴 문장을 직접 고칩니다',
+    body: '중복 덜기·번역투 걷기·피동을 능동으로·압축·문장 쪼개기 등 8가지 기법별 연습을 규칙 기반으로 채점합니다. 400개가 넘는 드릴을 고치면 그 자리에서 결과와 모범 예시를 보여줍니다.',
+  },
+  {
+    tag: '문장첩',
+    title: '좋은 문장을 본떠 내 문장을 모읍니다',
+    body: '어디서든 만난 좋은 문장을 분류해 담거나, 명문장을 본떠 쓴 내 문장을 모으는 수집함입니다. 채점하지 않으며, 좋은 표현을 곁에 두고 익히는 공간입니다.',
+  },
+];
+
+const techniques = ['중복 덜기', '번역투 걷기', '피동 → 능동', '압축', '문장 쪼개기'];
+
+const ranks = ['습작생', '문장가', '문장 장인', '명필', '문장의 대가'];
+---
+
+<Layout
+  title="글벼림 — 명문장을 뜯어보고 내 문장을 다듬는 무료 글쓰기 훈련 앱 · 로직크래프트"
+  description="글벼림은 근대문학 명문장 88편을 문장 단위로 해부하고, 400개 넘는 연습으로 내 문장을 직접 다듬는 글쓰기 훈련 앱입니다. 광고·계정·인터넷 없이 기록은 내 폰에만 저장됩니다."
+  image="/og/sentence-forge.png"
+>
+  <!-- HERO -->
+  <section class="edu-hero">
+    <div class="wrap edu-hero-inner">
+      <div class="edu-hero-copy">
+        <img class="edu-hero-icon" src="/icons/sentence-forge.png" alt="글벼림 앱 아이콘" width="88" height="88" loading="eager" />
+        <p class="edu-eyebrow">PRODUCT · 글벼림</p>
+        <h1>읽고 · 고치고 · 모으고,<br />문장을 벼립니다.</h1>
+        <p class="edu-lede">
+          근대문학 명문장을 문장 단위로 뜯어보고, 그 기법으로 내 문장을 직접 고쳐보는
+          글쓰기 훈련 앱. 광고도 계정도 인터넷도 없이, 기록은 내 폰에만 남습니다.
+        </p>
+        <ul class="edu-badges">
+          <li>완전 무료 · 광고 없음</li>
+          <li>인앱결제 없음</li>
+          <li>로그인 없음</li>
+          <li>오프라인 동작</li>
+        </ul>
+        <StoreButtons ios="https://apps.apple.com/kr/app/id6790785003" />
+      </div>
+    </div>
+  </section>
+
+  <!-- THREE AXES -->
+  <section class="wrap edu-areas">
+    <p class="edu-eyebrow">세 축으로 문장력을 키웁니다</p>
+    <h2>읽기 · 벼리기 · 문장첩</h2>
+    <div class="sf-axes">
+      {axes.map((a) => (
+        <div class="sf-axis">
+          <p class="sf-axis-tag">{a.tag}</p>
+          <h3>{a.title}</h3>
+          <p>{a.body}</p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <!-- TECHNIQUES -->
+  <section class="wrap edu-areas sf-tech">
+    <p class="edu-eyebrow">벼리기 · 규칙 기반 채점</p>
+    <h2>문장을 다듬는 기법</h2>
+    <ul class="edu-chips">
+      {techniques.map((t) => (
+        <li><span class="edu-dot"></span>{t}</li>
+      ))}
+      <li class="sf-more">등 8가지</li>
+    </ul>
+    <p class="sf-note">정답은 하나가 아닙니다. 고친 문장을 모범 예시와 견주어, 표현을 익히는 방식입니다.</p>
+  </section>
+
+  <!-- RANKS -->
+  <section class="wrap edu-areas sf-ranks">
+    <p class="edu-eyebrow">고루 채우면 오르는 칭호</p>
+    <h2>습작생에서 문장의 대가까지</h2>
+    <div class="sf-rank-row">
+      {ranks.map((r, i) => (
+        <>
+          {i > 0 && <span class="sf-arrow">→</span>}
+          <span class="sf-rank">{r}</span>
+        </>
+      ))}
+    </div>
+    <p class="sf-note">벼리기 정답 · 명문장 읽기 · 문장첩 담기를 고루 채우면 칭호가 오릅니다. 한 번 오른 칭호는 내려가지 않습니다.</p>
+  </section>
+
+  <!-- CLOSING -->
+  <section class="wrap edu-closing">
+    <ul class="edu-notes">
+      <li>모든 학습 기록은 기기에만 저장되고, 앱을 삭제하면 함께 사라집니다. 성장 탭에서 내보내기·가져오기·초기화가 가능합니다.</li>
+      <li>완전 무료이며 광고와 인앱 결제가 없습니다.</li>
+      <li>수록된 문학 작품은 저작권 보호기간이 끝난 근대문학(저자 사망 후 70년 경과)만 사용합니다.</li>
+    </ul>
+    <nav class="edu-links" aria-label="문서 및 탐색">
+      <span class="edu-doclinks">
+        <a href="/apps/sentence-forge/support">고객 지원 · FAQ</a>
+        <a href="/apps/sentence-forge/privacy">개인정보 처리방침</a>
+        <a href="/apps/sentence-forge/terms">이용약관</a>
+      </span>
+      <a href="/apps" class="edu-back">← 제품 목록</a>
+    </nav>
+  </section>
+</Layout>
+
+<style>
+  /* ---- hero (full-bleed dark, editorial ink) ---- */
+  .edu-hero {
+    background: radial-gradient(120% 120% at 78% 8%, #3a5a4a 0%, #26463a 42%, #14261f 82%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .edu-hero-inner {
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    padding-block: clamp(2.5rem, 6vw, 4.5rem);
+  }
+  .edu-hero-copy { max-width: 640px; }
+  .edu-hero-icon {
+    width: 88px; height: 88px; border-radius: 22px; margin: 0 auto 1.1rem;
+    display: block; box-shadow: 0 20px 44px -18px rgba(0,0,0,.6);
+  }
+  .edu-eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem;
+    letter-spacing: 0.08em; color: #9fd0b6; margin: 0;
+  }
+  .edu-hero-copy h1 {
+    font-size: clamp(2rem, 5.2vw, 3rem); margin: 0.5rem 0 0;
+    line-height: 1.18; letter-spacing: -0.02em; color: #fff;
+  }
+  .edu-lede { color: #cfe0d6; margin: 1.1rem auto 0; line-height: 1.8; max-width: 46ch; }
+  .edu-badges {
+    list-style: none; padding: 0; margin: 1.5rem 0 0;
+    display: flex; flex-wrap: wrap; gap: 0.5rem; justify-content: center;
+  }
+  .edu-badges li {
+    font-size: 0.82rem; color: #dcece3;
+    background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.14);
+    padding: 0.34rem 0.72rem; border-radius: 999px;
+  }
+  .edu-soon {
+    margin: 1.4rem 0 0; font-size: 0.86rem; font-weight: 600;
+    color: #a9c4b6; letter-spacing: 0.01em;
+  }
+
+  /* ---- section headers ---- */
+  .edu-areas { text-align: center; padding-block: clamp(2rem, 4vw, 3rem) 1rem; }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #3f7a5f; margin: 0; }
+  .edu-areas h2 { font-size: clamp(1.4rem, 3vw, 1.7rem); margin: 0.4rem 0 1.3rem; }
+
+  /* ---- three axes cards ---- */
+  .sf-axes {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1rem, 2.5vw, 1.5rem); text-align: left;
+  }
+  .sf-axis {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 16px; padding: 1.4rem 1.35rem; box-shadow: var(--shadow-sm);
+  }
+  .sf-axis-tag {
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.06em; color: #3f7a5f; margin: 0;
+  }
+  .sf-axis h3 { font-size: 1.08rem; margin: 0.45rem 0 0.6rem; line-height: 1.35; }
+  .sf-axis p { color: var(--sub); line-height: 1.75; margin: 0; font-size: 0.94rem; }
+
+  /* ---- technique chips ---- */
+  .sf-tech { padding-top: clamp(1.5rem, 3vw, 2.4rem); }
+  .edu-chips {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-wrap: wrap; justify-content: center; gap: 0.55rem;
+  }
+  .edu-chips li {
+    display: inline-flex; align-items: center; gap: 0.45rem;
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 0.95rem;
+    font-size: 0.92rem; color: var(--ink-soft); box-shadow: var(--shadow-sm);
+  }
+  .edu-dot { width: 9px; height: 9px; border-radius: 999px; flex: none; background: #3f7a5f; }
+  .sf-more { color: var(--muted); font-style: italic; }
+
+  /* ---- ranks ---- */
+  .sf-ranks { padding-top: clamp(1.5rem, 3vw, 2.4rem); }
+  .sf-rank-row {
+    display: flex; flex-wrap: wrap; justify-content: center; align-items: center;
+    gap: 0.5rem 0.7rem;
+  }
+  .sf-rank {
+    background: var(--card); border: 1px solid var(--line);
+    border-radius: 999px; padding: 0.5rem 1rem;
+    font-size: 0.95rem; font-weight: 600; color: var(--ink-soft);
+    box-shadow: var(--shadow-sm);
+  }
+  .sf-arrow { color: #3f7a5f; font-weight: 700; }
+  .sf-note { color: var(--muted); font-size: 0.9rem; line-height: 1.7; margin: 1.2rem auto 0; max-width: 54ch; }
+
+  /* ---- closing ---- */
+  .edu-closing {
+    padding-block: clamp(2rem, 4vw, 2.6rem) 4rem;
+    max-width: 720px;
+    border-top: 1px solid var(--line);
+    margin-top: clamp(1.5rem, 4vw, 2.5rem);
+  }
+  .edu-notes {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 0.55rem; max-width: 66ch;
+  }
+  .edu-notes li {
+    position: relative; padding-left: 0.95rem;
+    color: var(--muted); font-size: 0.88rem; line-height: 1.6;
+  }
+  .edu-notes li::before {
+    content: ''; position: absolute; left: 0; top: 0.62em;
+    width: 4px; height: 4px; border-radius: 999px; background: var(--line-strong);
+  }
+  .edu-links {
+    margin-top: 1.6rem; padding-top: 1.4rem;
+    border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: 0.6rem 1rem; font-size: 0.9rem;
+  }
+  .edu-doclinks { display: flex; flex-wrap: wrap; align-items: center; }
+  .edu-links a {
+    color: var(--muted); text-decoration: none; white-space: nowrap;
+    transition: color .15s ease;
+  }
+  .edu-links a:hover { color: #3f7a5f; }
+  .edu-doclinks a { padding: 0 0.85rem; border-right: 1px solid var(--line-strong); }
+  .edu-doclinks a:first-child { padding-left: 0; }
+  .edu-doclinks a:last-child { border-right: 0; }
+  .edu-back { margin-left: auto; color: var(--ink-soft); font-weight: 500; }
+
+  /* ---- responsive ---- */
+  @media (max-width: 860px) {
+    .sf-axes { grid-template-columns: 1fr; }
+  }
+</style>
