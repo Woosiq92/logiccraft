@@ -357,6 +357,39 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   background: linear-gradient(180deg, var(--st-wonder), var(--st-build) 28%, var(--st-voyage) 55%, var(--st-forge) 78%, var(--st-village));
   transition: height .25s var(--ease);
 }
+
+/* ============================================================
+   Campus band — the Synergeion series as one explorable place
+   ============================================================ */
+.campus { background: var(--paper); padding: clamp(20px, 3vw, 40px) 0 clamp(48px, 6vw, 76px); }
+.campus-card {
+  display: grid; grid-template-columns: 1.08fr .92fr; gap: clamp(28px, 4vw, 60px);
+  align-items: center;
+  background: linear-gradient(158deg, #eef6ef 0%, #e4efe6 100%);
+  border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: clamp(22px, 3vw, 40px); box-shadow: var(--shadow-md);
+}
+.campus-card > * { min-width: 0; }  /* let tracks shrink below the map image's intrinsic width */
+.campus-map {
+  position: relative; display: block; border-radius: var(--radius); overflow: hidden;
+  box-shadow: 0 22px 44px -24px rgba(17,24,58,.5);
+}
+.campus-map img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s var(--ease); }
+.campus-map:hover img { transform: scale(1.03); }
+.campus-badge {
+  position: absolute; top: 14px; left: 14px;
+  font-family: "IBM Plex Mono", monospace; font-size: 11.5px; font-weight: 600; letter-spacing: .02em;
+  color: #2e5b3f; background: rgba(255,255,255,.9); border: 1px solid rgba(46,91,63,.18);
+  padding: 5px 11px; border-radius: 999px; backdrop-filter: blur(4px);
+}
+.campus-desc { color: var(--muted); font-size: 15.5px; margin: 16px 0 0; max-width: 42ch; }
+.campus-cta { margin-top: clamp(22px, 3vw, 30px); }
+
+@media (max-width: 780px) {
+  .campus-card { grid-template-columns: 1fr; gap: 22px; }
+  .campus-body { text-align: center; }
+  .campus-desc { margin-left: auto; margin-right: auto; }
+}
 .stage {
   display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 14px;
   background: var(--card); border: 1px solid var(--line); border-radius: 16px;
