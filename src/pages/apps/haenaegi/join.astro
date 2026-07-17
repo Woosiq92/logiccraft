@@ -1,0 +1,67 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="해내기 초대 — Join a Haenaegi circle"
+  description="친구가 해내기 서클에 초대했어요. 앱에서 열어 수락하세요."
+>
+  <main class="wrap">
+    <div class="card">
+      <div class="logo">해</div>
+      <h1 id="h1">친구가 해내기 서클에 초대했어요</h1>
+      <p id="sub">아래 버튼으로 앱을 열어 수락하세요.</p>
+
+      <div class="code-box">
+        <div class="code-label" id="codeLabel">초대 코드</div>
+        <div class="code" id="code">------</div>
+      </div>
+
+      <a id="openBtn" class="btn" href="#">앱에서 열기</a>
+      <p class="hint" id="hint">앱이 없다면 먼저 해내기를 설치한 뒤, 친구 탭에서 위 코드를 입력하세요.</p>
+    </div>
+  </main>
+
+  <style>
+    .wrap{min-height:70vh;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+    .card{max-width:400px;width:100%;text-align:center;background:#fff;border:1px solid rgba(38,33,28,.08);border-radius:24px;padding:36px 28px;box-shadow:0 12px 30px rgba(38,33,28,.06)}
+    .logo{width:64px;height:64px;border-radius:18px;background:#D5631A;color:#fff;font-weight:800;font-size:34px;line-height:64px;margin:0 auto 18px}
+    h1{font-size:22px;font-weight:800;line-height:1.35;margin:0 0 8px;color:#26211C}
+    #sub{font-size:15px;color:#6b6257;margin:0 0 22px}
+    .code-box{background:#F7F2EC;border-radius:16px;padding:16px;margin-bottom:22px}
+    .code-label{font-size:12px;font-weight:700;color:#9a9182;margin-bottom:6px}
+    .code{font-size:30px;font-weight:800;letter-spacing:4px;color:#D5631A}
+    .btn{display:block;background:#D5631A;color:#fff;font-weight:800;font-size:16px;padding:16px;border-radius:14px;text-decoration:none}
+    .btn:active{opacity:.9}
+    .hint{font-size:13px;color:#9a9182;margin:16px 0 0;line-height:1.5}
+  </style>
+
+  <script is:inline>
+    (function () {
+      var code = (new URLSearchParams(location.search).get('code') || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+      var isEN = (navigator.language || 'en').toLowerCase().indexOf('ko') !== 0;
+      var TX = {
+        h1: isEN ? 'A friend invited you to a Haenaegi circle' : '친구가 해내기 서클에 초대했어요',
+        sub: isEN ? 'Open the app with the button below to accept.' : '아래 버튼으로 앱을 열어 수락하세요.',
+        codeLabel: isEN ? 'Invite code' : '초대 코드',
+        btn: isEN ? 'Open in Haenaegi' : '해내기 앱에서 열기',
+        hint: isEN ? 'No app yet? Install Haenaegi, then enter this code in the Friends tab.' : '앱이 없다면 먼저 해내기를 설치한 뒤, 친구 탭에서 위 코드를 입력하세요.'
+      };
+      document.getElementById('h1').textContent = TX.h1;
+      document.getElementById('sub').textContent = TX.sub;
+      document.getElementById('codeLabel').textContent = TX.codeLabel;
+      document.getElementById('hint').textContent = TX.hint;
+      var btn = document.getElementById('openBtn');
+      btn.textContent = TX.btn;
+      if (code) {
+        document.getElementById('code').textContent = code;
+        var deep = 'haenaegi://join?code=' + code;
+        btn.href = deep;
+        // 앱이 설치돼 있으면 자동으로 열기 시도(없으면 이 페이지에 머무름)
+        setTimeout(function () { location.href = deep; }, 600);
+      } else {
+        btn.style.display = 'none';
+      }
+    })();
+  </script>
+</Layout>
