@@ -338,6 +338,50 @@
   </div>
 </footer>
 
+<style>
+  .coach{position:fixed;inset:0;z-index:80;display:none}
+  .coach.show{display:block}
+  .coach-spot{position:absolute;border-radius:12px;border:2px solid var(--accent2);box-shadow:0 0 0 9999px rgba(4,7,12,.74);transition:all .25s ease;pointer-events:none}
+  .coach-bubble{position:absolute;max-width:300px;background:var(--card);border:1px solid var(--accent);border-radius:14px;padding:15px 16px;box-shadow:0 16px 40px rgba(0,0,0,.5)}
+  .coach-txt{font-size:13.5px;line-height:1.6;color:var(--ink);margin-bottom:12px}
+  .coach-nav{display:flex;align-items:center;gap:10px}
+  .coach-dots{display:flex;gap:5px;margin-left:auto;margin-right:2px}
+  .coach-dots i{width:6px;height:6px;border-radius:999px;background:var(--line)}
+  .coach-dots i.on{background:var(--accent2)}
+  .coach-skip{background:none;border:none;color:var(--faint);font-family:inherit;font-size:12.5px;cursor:pointer}
+  .coach-next{background:var(--accent);border:none;color:#08111f;font-family:inherit;font-weight:800;font-size:13px;padding:8px 16px;border-radius:9px;cursor:pointer}
+</style>
+<script>
+(function(){
+  var LAB='logic';
+  if(localStorage.getItem('semilab_onboarded_'+LAB))return;
+  var STEPS=[
+    {sel:'#modes',text:'세 모드예요. 트랜지스터→게이트, 회로 빌더, 챌린지를 여기서 오갑니다.'},
+    {sel:'#pal',text:'게이트를 눌러 캔버스에 놓고, 출력점을 누른 뒤 입력점을 눌러 배선을 잇습니다.'},
+    {sel:'#ttbl',text:'입력을 바꾸면 신호가 배선을 타고 흐르고, 진리표가 자동으로 채워져요.'}
+  ];
+  var i=0,coach,spot,bubble,txt;
+  function finish(){localStorage.setItem('semilab_onboarded_'+LAB,'1');if(coach)coach.classList.remove('show');}
+  function position(){var el=document.querySelector(STEPS[i].sel);if(!el)return;var r=el.getBoundingClientRect(),pad=8;
+    spot.style.left=(r.left-pad)+'px';spot.style.top=(r.top-pad)+'px';spot.style.width=(r.width+pad*2)+'px';spot.style.height=(r.height+pad*2)+'px';
+    var bw=Math.min(300,window.innerWidth-24),bh=bubble.offsetHeight||150;bubble.style.maxWidth=bw+'px';
+    var top=r.bottom+12;if(top+bh>window.innerHeight-8)top=Math.max(8,r.top-bh-12);
+    var left=Math.min(Math.max(8,r.left),window.innerWidth-bw-8);bubble.style.top=top+'px';bubble.style.left=left+'px';}
+  function show(){var el=document.querySelector(STEPS[i].sel);
+    if(!el){if(i>=STEPS.length-1){finish();return;}i++;return show();}
+    el.scrollIntoView({block:'center',behavior:'smooth'});txt.textContent=STEPS[i].text;
+    var ds=coach.querySelectorAll('.coach-dots i');for(var k=0;k<ds.length;k++)ds[k].classList.toggle('on',k===i);
+    coach.querySelector('.coach-next').textContent=(i>=STEPS.length-1)?'시작하기':'다음';
+    coach.classList.add('show');setTimeout(position,320);}
+  function start(){coach=document.createElement('div');coach.className='coach';
+    coach.innerHTML='<div class="coach-spot"></div><div class="coach-bubble"><div class="coach-txt"></div><div class="coach-nav"><button class="coach-skip">건너뛰기</button><span class="coach-dots">'+STEPS.map(function(){return '<i></i>'}).join('')+'</span><button class="coach-next">다음</button></div></div>';
+    document.body.appendChild(coach);spot=coach.querySelector('.coach-spot');bubble=coach.querySelector('.coach-bubble');txt=coach.querySelector('.coach-txt');
+    coach.querySelector('.coach-skip').addEventListener('click',finish);
+    coach.querySelector('.coach-next').addEventListener('click',function(){if(i>=STEPS.length-1){finish();}else{i++;show();}});
+    window.addEventListener('resize',position);i=0;setTimeout(show,500);}
+  if(document.readyState==='complete')start();else window.addEventListener('load',function(){setTimeout(start,400);});
+})();
+</script>
 <button class="gloss-btn" onclick="document.getElementById('glossModal').classList.add('show')">📖 용어</button>
 <div class="gloss-modal" id="glossModal" onclick="if(event.target===this)this.classList.remove('show')">
   <div class="gloss-panel">
