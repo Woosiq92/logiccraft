@@ -3,8 +3,9 @@ import Layout from '../layouts/Layout.astro';
 import ListRow from '../components/ListRow.astro';
 import { products } from '../data/products.js';
 
-const eduItems = products.filter((p) => p.section === 'edu');
-const dailyItems = products.filter((p) => p.section === 'daily');
+const eduItems = products.filter((p) => p.section === 'edu' && !p.lab);
+const dailyItems = products.filter((p) => p.section === 'daily' && !p.lab);
+const labItems = products.filter((p) => p.lab);
 // Wonder 는 피처 카드로 별도 렌더(아래 마크업). Build 는 series(카운트용)라 데이터에 카드 필드가 없어 인라인 정의.
 const buildCard = { group: 'thinking', slug: 'build', icon: 'build', name: 'Synergeion Build', chip: '6–9세', type: 'app', desc: '직접 만들고 부수며 원리를 익히는 사고력 놀이.' };
 
@@ -187,6 +188,19 @@ const eduCount = eduGroups.reduce((n, g) => n + g.count, 0);
         </div>
         <div class="list-rows">
           {dailyItems.map((p) => <ListRow p={p} />)}
+        </div>
+      </div>
+
+      <!-- 실험실 -->
+      <div class="section-block">
+        <div class="cat-head lab reveal">
+          <span class="label">베타 실험실</span>
+          <span class="rule"></span>
+          <span class="count">{String(labItems.length).padStart(2, '0')}</span>
+        </div>
+        <p class="section-lead" style="margin: -14px 0 22px">가볍게 실험 중인 웹 도구들.</p>
+        <div class="list-rows">
+          {labItems.map((p) => <ListRow p={p} />)}
         </div>
       </div>
 

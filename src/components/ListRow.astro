@@ -7,6 +7,7 @@ const external = p.type === 'web';
 <a class="lrow reveal" href={href} {...(external ? { target: '_blank', rel: 'noopener' } : {})}>
   <img class="lrow-icon" src={`/icons/${p.icon}.png`} alt="" />
   <h3>{p.name}</h3>
+  {p.lab && <span class="beta-badge">베타</span>}
   <span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span>
   <p class="lrow-desc">{p.desc}</p>
   <span class="lrow-arr" aria-hidden="true"><span class="arr">→</span></span>

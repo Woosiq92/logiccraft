@@ -4,6 +4,7 @@
 //   section: 'edu' | 'daily' → 카드 그리드. 'series' → 카운트용(카드는 Synergeion 타임라인에서 별도 렌더).
 //   type: 'app'(ios/play) | 'web'(web). ios/play 가 null 이면 "(예정)" 버튼.
 //   group(edu 전용): 'thinking'(어린이 사고력) | 'exam'(시험·자격) | 'practical'(실용·자기주도) → 홈 교육 하위 분류.
+//   lab: true → 아직 다듬는 중인 웹 도구. 교육/일상 목록에서 빠지고 "실험실" 섹션으로 모임(홈·apps 공통).
 export const products = [
   // Synergeion 시리즈 (카운트용 · 카드는 타임라인에서 렌더)
   { name: 'Synergeion Wonder', type: 'app', section: 'series' },
@@ -20,12 +21,12 @@ export const products = [
   { section: 'edu', group: 'practical', slug: 'prompt-dojo', icon: 'prompt-dojo', name: '프롬프트 도장', chip: 'AI 프롬프트', type: 'web', desc: 'AI가 답하는 방식에 기반해, 좋은 프롬프트의 5가지를 문제로 풀며 익히는 훈련. 기초부터 코딩·글쓰기·영상까지 무료로, 가입·설치 없이.', web: 'https://logiccraft.co.kr/prompt-dojo/' },
   { section: 'edu', group: 'practical', slug: 'sentence-forge', icon: 'sentence-forge', name: '글벼림', chip: '글쓰기·문장력', type: 'app', desc: '근대문학 명문장 88편을 문장 단위로 뜯어보고, 400개 넘는 연습으로 내 문장을 직접 다듬는 글쓰기 훈련 앱. 광고·계정·인터넷 없이, 기록은 내 폰에만.', ios: 'https://apps.apple.com/kr/app/id6790785003', play: null },
   // 일상
-  { section: 'daily', slug: 'wedding-map', icon: 'wedding-map', name: '웨딩맵', chip: '결혼 준비', warm: true, type: 'web', desc: '전국 결혼식장(민간·공공·호텔)을 지도에서 한눈에 보고, 받은 견적을 표로 비교해 정하는 도구. 가입·설치 없이 양가와 공유까지.', web: 'https://logiccraft.co.kr/wedding-map/' },
+  { section: 'daily', slug: 'wedding-map', icon: 'wedding-map', name: '웨딩맵', chip: '결혼 준비', warm: true, lab: true, type: 'web', desc: '전국 결혼식장(민간·공공·호텔)을 지도에서 한눈에 보고, 받은 견적을 표로 비교해 정하는 도구. 가입·설치 없이 양가와 공유까지.', web: 'https://logiccraft.co.kr/wedding-map/' },
   { section: 'daily', slug: 'ourfootprint', icon: 'ourfootprint', name: '커플맵로그', chip: '지도', warm: true, type: 'app', desc: '둘이 다녀온 동네가 색으로 칠해지는 커플 점령 지도. 우리만의 맛집 등급도 직접 만들어요.', ios: 'https://apps.apple.com/kr/app/id6769797672', play: 'https://play.google.com/store/apps/details?id=com.logiccraft.ourfootprint' },
-  { section: 'daily', slug: 'dadexam', icon: 'dadexam', name: '아빠자격시험', chip: '예비·초보 아빠', warm: true, type: 'web', desc: '아빠 시점으로 임신·출산·신생아 육아 상식을 시험처럼 점검하고, 틀린 문제는 근거와 함께 배우는 자가점검. 15과목, 가입·설치 없이 무료. 재미로 보는 점검이며 국가공인 자격이 아닙니다.', web: 'https://logiccraft.co.kr/dadexam/' },
+  { section: 'daily', slug: 'dadexam', icon: 'dadexam', name: '아빠자격시험', chip: '예비·초보 아빠', warm: true, lab: true, type: 'web', desc: '아빠 시점으로 임신·출산·신생아 육아 상식을 시험처럼 점검하고, 틀린 문제는 근거와 함께 배우는 자가점검. 15과목, 가입·설치 없이 무료. 재미로 보는 점검이며 국가공인 자격이 아닙니다.', web: 'https://logiccraft.co.kr/dadexam/' },
   { section: 'daily', slug: 'stockwatch', icon: 'stockwatch', name: '불안한개미', chip: '주식 시세', warm: true, type: 'app', desc: '매매 없이 시세만 — 거치대·위젯·잠금화면으로 보는 한국 주식 시세.', ios: 'https://apps.apple.com/kr/app/id6772662894', play: 'https://play.google.com/store/apps/details?id=com.logiccraft.stockwatch' },
   { section: 'daily', slug: 'yangmyeon', icon: 'yangmyeon', name: '양면', chip: '중도정치', warm: true, type: 'web', desc: '하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한 논거를 나란히. 어느 쪽이 옳은지 정해주지 않고, 무엇이 사실이고 무엇이 해석인지 구분하도록 돕는 사이트.', web: 'https://중도정치.kr' },
-  { section: 'daily', slug: 'stage-radar', icon: 'stage-radar', name: '공연 발견', chip: '공연·페스티벌', warm: true, type: 'web', desc: '오늘 비는 날 갈 수 있는 공연·페스티벌만 — 끝난 것·상설은 빼고 날짜·지역·장르·가격으로 고르고, 라인업 검색과 인기순까지. 공연예술통합전산망(KOPIS) 데이터.', web: 'https://stage-radar-production.up.railway.app' },
-  { section: 'daily', slug: 'goalcast', icon: 'goalcast', name: '목표 캘린더', chip: '목표·할 일', warm: true, type: 'web', desc: '한 해의 큰 목표를 월→주→일 할 일로 쪼개 관리하는 달력. 목표별 색·진행률로 무엇에 얼마나 다가갔는지 한눈에. 가입·설치 없이 브라우저에 저장.', web: 'https://logiccraft.co.kr/goalcast/' },
+  { section: 'daily', slug: 'stage-radar', icon: 'stage-radar', name: '공연 발견', chip: '공연·페스티벌', warm: true, lab: true, type: 'web', desc: '오늘 비는 날 갈 수 있는 공연·페스티벌만 — 끝난 것·상설은 빼고 날짜·지역·장르·가격으로 고르고, 라인업 검색과 인기순까지. 공연예술통합전산망(KOPIS) 데이터.', web: 'https://stage-radar-production.up.railway.app' },
+  { section: 'daily', slug: 'goalcast', icon: 'goalcast', name: '목표 캘린더', chip: '목표·할 일', warm: true, lab: true, type: 'web', desc: '한 해의 큰 목표를 월→주→일 할 일로 쪼개 관리하는 달력. 목표별 색·진행률로 무엇에 얼마나 다가갔는지 한눈에. 가입·설치 없이 브라우저에 저장.', web: 'https://logiccraft.co.kr/goalcast/' },
   { section: 'daily', icon: 'classvote', name: '학급 도구', chip: '투표·사다리·뽑기', warm: true, type: 'web', desc: '반장·부반장 선거를 종이 없이 — 선생님이 코드·QR을 띄우면 학생들이 각자 폰으로 투표하고 실시간 개표까지. 발표 순서·역할·당번은 사다리 타기와 랜덤 번호 뽑기로. 가입·설치 없이 무료.', web: 'https://classvote-production-6bee.up.railway.app' },
 ];

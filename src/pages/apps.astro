@@ -6,8 +6,9 @@ import { products } from '../data/products.js';
 const appCount = products.filter((p) => p.type === 'app').length;
 const webCount = products.filter((p) => p.type === 'web').length;
 const cats = [
-  { label: '교육', cls: '', items: products.filter((p) => p.section === 'edu') },
-  { label: '일상', cls: ' daily', items: products.filter((p) => p.section === 'daily') },
+  { label: '교육', cls: '', items: products.filter((p) => p.section === 'edu' && !p.lab) },
+  { label: '일상', cls: ' daily', items: products.filter((p) => p.section === 'daily' && !p.lab) },
+  { label: '베타 실험실', cls: ' lab', items: products.filter((p) => p.lab), lead: '가볍게 실험 중인 웹 도구들.' },
 ];
 ---
 
@@ -109,6 +110,7 @@ const cats = [
             <span class="rule"></span>
             <span class="count">{String(c.items.length).padStart(2, '0')}</span>
           </div>
+          {c.lead && <p class="section-lead" style="margin: -14px 0 24px">{c.lead}</p>}
           <div class="card-grid">
             {c.items.map((p) => <ProductCard p={p} />)}
           </div>

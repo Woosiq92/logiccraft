@@ -5,7 +5,7 @@ const { p } = Astro.props;
 <article class="pcard reveal">
   <div class="top">
     <img class="icon" src={`/icons/${p.icon}.png`} alt="" />
-    <div><div class="name-row"><h3>{p.name}</h3><span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span></div></div>
+    <div><div class="name-row"><h3>{p.name}</h3>{p.lab && <span class="beta-badge">베타</span>}<span class={p.warm ? 'chip warm' : 'chip'}>{p.chip}</span></div></div>
   </div>
   <p class="desc">{p.desc}</p>
   <div class="links">
