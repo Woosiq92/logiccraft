@@ -528,7 +528,7 @@ function combPass(byId,inW){
     if(n.type==='INPUT')return;
     if(n.type==='DFF'){n.value=n.q?1:0;return;}
     const c=inCount(n.type),vs=[];
-    for(let i=0;i<c;i++){const w=inW[n.id+':'+i];vs.push(w?byId[w.from].value:0);}
+    for(let i=0;i<c;i++){const w=inW[n.id+':'+i];vs.push((w&&byId[w.from])?byId[w.from].value:0);}
     n.value=gateOut(n.type,vs);
   });
 }
@@ -541,10 +541,12 @@ function evaluate(){
   // 2) 순차 소자 업데이트 — 클럭 0→1 상승에지에만 D를 래치
   const dffs=nodes.filter(n=>n.type==='DFF');
   if(dffs.length){
-    dffs.forEach(n=>{
+    // 모든 DFF의 D·CLK를 먼저 스냅샷 — 여러 DFF 동시 클럭 시 갱신 순서 레이스 방지(시프트 레지스터)
+    const snap=dffs.map(n=>{
       const wd=inW[n.id+':0'],wc=inW[n.id+':1'];
-      const D=wd?byId[wd.from].value:0;
-      const CLK=wc?byId[wc.from].value:0;
+      return{n,D:(wd&&byId[wd.from])?byId[wd.from].value:0,CLK:(wc&&byId[wc.from])?byId[wc.from].value:0};
+    });
+    snap.forEach(({n,D,CLK})=>{
       if(CLK&&!n.prevClk)n.q=D?1:0; // 상승에지 저장
       n.prevClk=CLK;
       n.value=n.q?1:0;
@@ -552,7 +554,7 @@ function evaluate(){
     // 새 상태를 하류로 다시 전파
     for(let p=0;p<passes;p++)combPass(byId,inW);
   }
-  wires.forEach(w=>w.value=byId[w.from].value);
+  wires.forEach(w=>w.value=byId[w.from]?byId[w.from].value:0);
 }
 
 /* ---- rendering ---- */

@@ -415,8 +415,12 @@ const P={waferD:300,defectDensity:0.10,oxTemp:1000,oxTime:30,source:'193',dose:3
   etchTime:40,aniso:90,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,
   metalW:120,metalMat:'Cu',dicePrecision:96};
 
+// param bounds (from slider min/max) — guards against NaN/out-of-band input
+const PLIM={};STEPS.forEach(s=>s.flds.forEach(f=>{if(f.type!=='select')PLIM[f.k]=[f.min,f.max];}));
+
 // ---------- CORE COMPUTE (rule-based physics) ----------
 function computeAll(p){
+  p={...p};for(const k in PLIM){const v=+p[k];p[k]=isFinite(v)?clamp(v,PLIM[k][0],PLIM[k][1]):PLIM[k][0];}
   // step2 oxide (Deal-Grove simplified): thickness grows with sqrt(time), faster when hotter
   const tox=2.7*Math.sqrt(p.oxTime)*Math.exp((p.oxTemp-1000)/160); // nm
   // step3 litho: CD from source resolution, dose, focus

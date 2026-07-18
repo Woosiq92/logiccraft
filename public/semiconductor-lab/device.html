@@ -432,7 +432,7 @@ function pnCalc(){
   if(V < -Vbr){ I -= Is*1e6*(Math.exp((-V-Vbr)/0.6)-1); broke=true; }
   // series-resistance soft clamp so forward curve has a realistic knee
   const Imax=0.025; // 25 mA display cap
-  if(I>Imax) I=Imax;
+  if(I>Imax) I=Imax; else if(I<-Imax) I=-Imax;
   // region keyed off bias polarity (V>0 = 순방향, V<0 = 역방향)
   if(broke) region='breakdown';
   else if(V>0.001) region='forward';
