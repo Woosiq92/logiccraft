@@ -1,0 +1,59 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="반도체 실험실 — 웨이퍼부터 회로까지 만들며 배우는 룰베이스 실험실 · 로직크래프트"
+  description="반도체 실험실은 웨이퍼를 공정에 통과시켜 칩을 만들고, pn 접합과 MOSFET을 조작하고, 트랜지스터로 논리 회로를 짜보는 룰베이스 웹 실험실입니다. 조 단위 팹이라 개인은 못 만드는 반도체를 브라우저 안에서, 가입·설치 없이 무료로."
+  image="/og/semiconductor-lab.png"
+>
+  <section class="edu-hero">
+    <div class="wrap web-hero-inner">
+      <div class="web-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 반도체 실험실</p>
+        <h1>반도체를 직접 만들고,<br />손으로 익힌다.</h1>
+        <p class="web-lede">
+          웨이퍼를 산화·노광·식각·도핑 공정에 통과시켜 칩을 만들고, pn 접합과 MOSFET을
+          조작하고, 트랜지스터로 논리 회로를 짜보는 룰베이스 실험실입니다. 조 단위 팹이라
+          개인은 못 만드는 반도체를 브라우저 안에서 돌려봅니다.
+        </p>
+        <div class="web-cta"><a class="cta" href="https://logiccraft.co.kr/semiconductor-lab/">실험실 열기 →</a></div>
+        <p class="web-note">
+          세 개의 실험실로 이어집니다. 팹 공정은 아홉 단계 파라미터로 수율을 좌우하고,
+          소자 물리는 도핑과 전압으로 캐리어와 특성 곡선을 움직이며, 회로 빌더는 게이트를
+          모아 가산기까지 짓습니다. 가입·설치 없이 무료로.
+        </p>
+      </div>
+      <div class="web-hero-shot">
+        <img src="/screens/semiconductor-lab/hero.png" alt="반도체 실험실 화면 — 팹 공정 라인의 아홉 단계 선택과 웨이퍼 단면도, 최종 수율 94퍼센트와 굿다이 개수, 산화 온도·시간 슬라이더" width="1120" height="752" loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap web-links">
+    <p class="links"><a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
+  .web-hero-inner { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
+  .web-hero-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .web-lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
+  .web-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
+  .web-note { color: #aab4dc; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
+  .web-hero-shot { display: flex; justify-content: center; }
+  .web-hero-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+  .web-links { padding-block: 2rem 4rem; }
+  .links { font-size: 0.95rem; }
+  @media (max-width: 860px) {
+    .web-hero-inner { grid-template-columns: 1fr; }
+    .web-hero-shot { order: -1; }
+    .web-hero-copy { text-align: center; }
+    .web-lede, .web-note { margin-inline: auto; }
+    .web-cta { display: flex; justify-content: center; }
+  }
+</style>
