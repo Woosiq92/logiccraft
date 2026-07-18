@@ -82,9 +82,24 @@
 
   .path{margin-top:34px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:22px 22px}
   .path h3{font-size:15px;font-weight:800;margin-bottom:14px}
-  .steps{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:13px;color:var(--dim)}
-  .steps .s{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-weight:600;color:var(--ink)}
-  .steps .arw{color:var(--faint)}
+  .track{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-bottom:16px}
+  .track button{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:700;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .15s}
+  .track button.act{background:var(--accent);color:#08111f}
+  .prog{display:grid;grid-template-columns:1fr;gap:10px;margin-top:2px}
+  @media(min-width:640px){.prog{grid-template-columns:repeat(3,1fr)}}
+  .pstep{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 15px;text-decoration:none;transition:transform .15s,border-color .15s;position:relative}
+  .pstep:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .pstep .pnum{font-size:11px;font-weight:800;color:var(--faint);letter-spacing:.08em}
+  .pstep .pname{font-size:15px;font-weight:800;margin:3px 0 10px;color:var(--ink)}
+  .pstep .pbars{display:flex;flex-direction:column;gap:6px}
+  .pstep .pbar{display:flex;align-items:center;gap:8px;font-size:11.5px;color:var(--dim)}
+  .pstep .pbar .lbl{width:52px;flex-shrink:0}
+  .pstep .tube{flex:1;height:6px;background:var(--bg);border-radius:999px;overflow:hidden}
+  .pstep .fill{height:100%;background:var(--go);border-radius:999px;transition:width .4s}
+  .pstep .pct{width:34px;text-align:right;flex-shrink:0;color:var(--faint)}
+  .pstep.next{border-color:var(--accent2)}
+  .pstep .nextbadge{position:absolute;top:12px;right:12px;font-size:10px;font-weight:800;color:var(--accent2);background:rgba(34,211,238,.12);border:1px solid rgba(34,211,238,.3);padding:2px 7px;border-radius:999px}
+  .path .hint{font-size:12.5px;color:var(--dim);margin-top:12px}
 
   footer{border-top:1px solid var(--line);padding:30px 0 46px;text-align:center;color:var(--faint);font-size:12.5px}
   footer b{color:var(--dim);font-weight:700}
@@ -153,13 +168,13 @@
     </div>
 
     <div class="path">
-      <h3>추천 동선</h3>
-      <div class="steps">
-        <span class="s">소자 물리</span><span class="arw">→</span>
-        <span class="s">팹 공정</span><span class="arw">→</span>
-        <span class="s">회로 빌더</span>
-        <span style="margin-left:6px">왜 동작하는지 먼저, 어떻게 만드는지 다음, 무엇이 되는지 마지막.</span>
+      <h3>학습 진도 · 동선</h3>
+      <div class="track" id="trackSel">
+        <button data-tk="concept" class="act">개념 우선</button>
+        <button data-tk="make">제작 우선</button>
       </div>
+      <div class="prog" id="progGrid"></div>
+      <p class="hint" id="pathHint"></p>
     </div>
   </div>
 </section>
@@ -168,5 +183,43 @@
   <b>반도체 실험실</b> · 룰베이스 · LLM 없음 · 오프라인 동작<br>
   logiccraft — 만들며 배우는 도구
 </div></footer>
+
+<script>
+(function(){
+  var LABS={fab:{name:'팹 공정',file:'fab.html'},device:{name:'소자 물리',file:'device.html'},logic:{name:'회로 빌더',file:'logic.html'}};
+  var ORDER={concept:['device','fab','logic'],make:['fab','device','logic']};
+  var HINT={concept:'왜 동작하는지 먼저, 어떻게 만드는지 다음, 무엇이 되는지 마지막.',
+            make:'일단 만들어보고, 왜 되는지 파고들고, 무엇이 되는지 확인.'};
+  function prog(){try{return JSON.parse(localStorage.getItem('semilab_progress')||'{}')}catch(e){return{}}}
+  function track(){return localStorage.getItem('semilab_track')||'concept'}
+  function render(){
+    var p=prog(), tk=track(), order=ORDER[tk], nextKey=null;
+    for(var i=0;i<order.length;i++){var d=p[order[i]]||{}; if((d.stars||0)<(d.starsN||99)){nextKey=order[i];break;}}
+    var grid=document.getElementById('progGrid'); grid.innerHTML='';
+    order.forEach(function(k,idx){
+      var d=p[k]||{}, L=LABS[k];
+      var st=d.stars||0, stN=d.starsN||(k==='logic'?7:5), ck=d.checks||0, ckN=d.checksN||3;
+      var stPct=Math.round(st/stN*100), ckPct=Math.round(ck/ckN*100), isNext=(k===nextKey);
+      var a=document.createElement('a');
+      a.className='pstep'+(isNext?' next':''); a.href=L.file;
+      a.innerHTML=(isNext?'<span class="nextbadge">이어서</span>':'')+
+        '<div class="pnum">STEP '+(idx+1)+'</div><div class="pname">'+L.name+'</div>'+
+        '<div class="pbars">'+
+        '<div class="pbar"><span class="lbl">챌린지</span><span class="tube"><span class="fill" style="width:'+stPct+'%"></span></span><span class="pct">'+st+'/'+stN+'</span></div>'+
+        '<div class="pbar"><span class="lbl">개념체크</span><span class="tube"><span class="fill" style="width:'+ckPct+'%"></span></span><span class="pct">'+ck+'/'+ckN+'</span></div>'+
+        '</div>';
+      grid.appendChild(a);
+    });
+    document.getElementById('pathHint').textContent=HINT[tk];
+    var btns=document.querySelectorAll('#trackSel button');
+    for(var j=0;j<btns.length;j++) btns[j].classList.toggle('act', btns[j].getAttribute('data-tk')===tk);
+  }
+  document.getElementById('trackSel').addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    localStorage.setItem('semilab_track', b.getAttribute('data-tk')); render();
+  });
+  render();
+})();
+</script>
 </body>
 </html>
