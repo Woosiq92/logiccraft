@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>한국형 로켓 입문 — 합법적으로 하늘에 쏘는 법</title>
+<meta name="description" content="미국식 '차고 로켓'을 한국에서. 물로켓부터 고체연료 허가 경로까지, 합법적으로 로켓을 만들고 쏘는 단계별 가이드.">
+<style>
+  :root{
+    --bg:#0c0f17;
+    --bg2:#11151f;
+    --card:#161b26;
+    --line:#242c3a;
+    --ink:#e8ecf3;
+    --dim:#9aa5b6;
+    --faint:#697285;
+    --accent:#ff6b35;
+    --accent2:#ffb020;
+    --sky:#5aa9ff;
+    --go:#3ecf8e;
+    --warn:#ffcf4a;
+    --stop:#ff5a6a;
+    --r:16px;
+    --max:820px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;
+    line-height:1.72;
+    -webkit-font-smoothing:antialiased;
+    letter-spacing:-0.01em;
+  }
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 22px}
+
+  /* nav */
+  nav{
+    position:sticky;top:0;z-index:50;
+    background:rgba(12,15,23,.82);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{display:flex;align-items:center;gap:18px;height:56px;overflow-x:auto;scrollbar-width:none}
+  nav .wrap::-webkit-scrollbar{display:none}
+  nav .brand{font-weight:800;font-size:15px;white-space:nowrap;color:var(--ink)}
+  nav .brand span{color:var(--accent)}
+  nav a{color:var(--dim);text-decoration:none;font-size:13.5px;white-space:nowrap;transition:color .15s}
+  nav a:hover{color:var(--ink)}
+
+  /* hero */
+  header{
+    position:relative;
+    padding:78px 0 64px;
+    text-align:center;
+    overflow:hidden;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(60% 90% at 50% -10%, rgba(255,107,53,.16), transparent 70%),
+      radial-gradient(50% 60% at 80% 10%, rgba(90,169,255,.10), transparent 70%);
+  }
+  .kicker{
+    display:inline-block;font-size:12.5px;font-weight:700;letter-spacing:.06em;
+    color:var(--accent2);background:rgba(255,176,32,.10);
+    border:1px solid rgba(255,176,32,.25);padding:6px 13px;border-radius:999px;margin-bottom:22px;
+  }
+  header h1{
+    font-size:clamp(30px,6.4vw,46px);line-height:1.16;font-weight:800;letter-spacing:-0.03em;
+    margin-bottom:18px;
+  }
+  header h1 em{font-style:normal;color:var(--accent)}
+  header p.lead{font-size:clamp(16px,2.4vw,18.5px);color:var(--dim);max-width:600px;margin:0 auto 30px}
+  .cta{display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center}
+  .btn{
+    display:inline-block;padding:12px 22px;border-radius:12px;font-weight:700;font-size:14.5px;
+    text-decoration:none;transition:transform .12s,filter .15s;
+  }
+  .btn:active{transform:translateY(1px)}
+  .btn.primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#1a1206}
+  .btn.primary:hover{filter:brightness(1.06)}
+  .btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+  .btn.ghost:hover{border-color:var(--faint)}
+
+  /* sections */
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  .eyebrow{font-size:12.5px;font-weight:700;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:12px}
+  h2{font-size:clamp(23px,4.2vw,30px);font-weight:800;letter-spacing:-0.02em;line-height:1.25;margin-bottom:14px}
+  h3{font-size:19px;font-weight:700;margin:28px 0 10px;letter-spacing:-0.01em}
+  p{color:var(--dim);margin-bottom:14px}
+  p strong,li strong{color:var(--ink);font-weight:700}
+  a.inline{color:var(--sky);text-decoration:none;border-bottom:1px solid rgba(90,169,255,.3)}
+
+  /* compare */
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}
+  .compare .col{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px}
+  .compare .col.us{border-color:rgba(90,169,255,.3)}
+  .compare .col.kr{border-color:rgba(255,107,53,.3)}
+  .compare .flag{font-size:13px;font-weight:800;letter-spacing:.04em;margin-bottom:14px}
+  .compare .us .flag{color:var(--sky)}
+  .compare .kr .flag{color:var(--accent)}
+  .compare ul{list-style:none;display:flex;flex-direction:column;gap:11px}
+  .compare li{font-size:14px;color:var(--dim);padding-left:22px;position:relative;line-height:1.55}
+  .compare li::before{position:absolute;left:0;top:0}
+  .compare .us li::before{content:"○";color:var(--sky)}
+  .compare .kr li::before{content:"✕";color:var(--accent)}
+
+  /* roadmap */
+  .road{display:flex;flex-direction:column;gap:16px;margin-top:26px;counter-reset:step}
+  .step{
+    background:var(--card);border:1px solid var(--line);border-radius:var(--r);
+    padding:22px 22px 22px 24px;position:relative;overflow:hidden;
+  }
+  .step::before{
+    content:"";position:absolute;left:0;top:0;bottom:0;width:4px;
+  }
+  .step.s0::before{background:var(--go)}
+  .step.s1::before{background:var(--sky)}
+  .step.s2::before{background:var(--accent)}
+  .step .top{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:8px}
+  .step .num{
+    font-size:12px;font-weight:800;padding:4px 10px;border-radius:999px;letter-spacing:.03em;
+  }
+  .s0 .num{background:rgba(62,207,142,.14);color:var(--go)}
+  .s1 .num{background:rgba(90,169,255,.14);color:var(--sky)}
+  .s2 .num{background:rgba(255,107,53,.14);color:var(--accent)}
+  .step h3{margin:0;font-size:18.5px}
+  .step .tag{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;margin-left:auto}
+  .tag.legal{background:rgba(62,207,142,.12);color:var(--go)}
+  .tag.gate{background:rgba(255,207,74,.12);color:var(--warn)}
+  .step p{margin-bottom:0;font-size:14.5px}
+
+  /* build steps */
+  .build{counter-reset:b;margin-top:24px;display:flex;flex-direction:column;gap:2px}
+  .bstep{display:flex;gap:16px;padding:16px 0;border-top:1px solid var(--line)}
+  .bstep:first-child{border-top:none}
+  .bstep .n{
+    flex-shrink:0;width:32px;height:32px;border-radius:9px;background:var(--bg2);border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;color:var(--accent2);
+  }
+  .bstep .bd h4{font-size:15.5px;font-weight:700;margin-bottom:3px}
+  .bstep .bd p{font-size:14px;margin:0}
+
+  /* callout */
+  .note{border-radius:var(--r);padding:18px 20px;margin:22px 0;font-size:14.5px;display:flex;gap:14px;line-height:1.6}
+  .note .ic{font-size:20px;flex-shrink:0;line-height:1.4}
+  .note.tip{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.25)}
+  .note.warn{background:rgba(255,207,74,.07);border:1px solid rgba(255,207,74,.28)}
+  .note.stop{background:rgba(255,90,106,.07);border:1px solid rgba(255,90,106,.28)}
+  .note b{color:var(--ink)}
+  .note p{margin:0;color:var(--dim)}
+
+  /* physics diagram */
+  .phys{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:26px 22px;margin-top:24px;text-align:center}
+  .phys svg{max-width:100%;height:auto}
+  .phys .cap{font-size:13px;color:var(--faint);margin-top:14px}
+
+  /* law cards */
+  .laws{display:flex;flex-direction:column;gap:14px;margin-top:24px}
+  .law{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px 22px}
+  .law h4{font-size:16px;font-weight:700;margin-bottom:6px;display:flex;align-items:center;gap:9px}
+  .law h4 .dot{width:8px;height:8px;border-radius:50%;background:var(--accent);flex-shrink:0}
+  .law p{font-size:14px;margin:0}
+
+  /* checklist */
+  .check{list-style:none;margin-top:22px;display:flex;flex-direction:column;gap:11px}
+  .check li{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:13px 16px;font-size:14.5px;color:var(--dim);display:flex;gap:12px;align-items:flex-start}
+  .check li .box{flex-shrink:0;width:20px;height:20px;border-radius:6px;border:2px solid var(--go);display:flex;align-items:center;justify-content:center;color:var(--go);font-size:12px;font-weight:900;margin-top:2px}
+
+  /* links */
+  .reslist{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:22px}
+  .res{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+  .res .t{font-weight:700;font-size:15px;margin-bottom:4px}
+  .res .d{font-size:13px;color:var(--faint);line-height:1.5}
+
+  /* rails (levelup) */
+  .railintro{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;margin-top:24px}
+  .railintro .big{font-size:16.5px;color:var(--ink);font-weight:700;margin-bottom:8px;line-height:1.5}
+  .railintro p{margin:0;font-size:14.5px}
+  .rails{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:16px}
+  .rail{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:22px;position:relative;overflow:hidden}
+  .rail::after{content:"";position:absolute;left:0;top:0;right:0;height:4px}
+  .rail.skill::after{background:var(--go)}
+  .rail.access::after{background:var(--accent)}
+  .rail .rh{display:flex;align-items:baseline;gap:9px;margin-bottom:5px;flex-wrap:wrap}
+  .rail .rh .lbl{font-size:17px;font-weight:800}
+  .rail.skill .rh .lbl{color:var(--go)}
+  .rail.access .rh .lbl{color:var(--accent)}
+  .rail .rh .sub{font-size:11.5px;font-weight:700;color:var(--faint)}
+  .rail .rd{font-size:13px;color:var(--faint);margin:0 0 18px;line-height:1.5}
+  .rungs{list-style:none;display:flex;flex-direction:column;gap:12px}
+  .rungs li{display:flex;gap:12px;align-items:flex-start}
+  .rungs .lv{flex-shrink:0;min-width:30px;height:26px;padding:0 7px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;letter-spacing:.02em}
+  .skill .rungs .lv{background:rgba(62,207,142,.12);color:var(--go)}
+  .access .rungs .lv{background:rgba(255,107,53,.12);color:var(--accent)}
+  .rungs .rt{font-size:13px;line-height:1.5;color:var(--dim)}
+  .rungs .rt b{color:var(--ink);font-weight:700;display:block;font-size:14px;margin-bottom:2px}
+
+  footer{padding:48px 0 60px;text-align:center}
+  footer p{font-size:13px;color:var(--faint);margin-bottom:6px}
+  footer .disc{font-size:12px;color:var(--faint);max-width:560px;margin:16px auto 0;line-height:1.6;opacity:.85}
+
+  @media(max-width:640px){
+    .compare{grid-template-columns:1fr}
+    .reslist{grid-template-columns:1fr}
+    .rails{grid-template-columns:1fr}
+    section{padding:52px 0}
+    header{padding:60px 0 50px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">한국형 <span>로켓</span> 입문</div>
+    <a href="lab.html" style="color:var(--accent);font-weight:700">🚀 실험실</a>
+    <a href="#diff">미국 vs 한국</a>
+    <a href="#road">3단계 경로</a>
+    <a href="#build">물로켓 제작</a>
+    <a href="#physics">안정성 원리</a>
+    <a href="#law">법 지도</a>
+    <a href="#levelup">레벨업</a>
+    <a href="#safety">안전</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="kicker">차고 로켓, 한국에서 합법적으로</span>
+    <h1>하늘에 뭔가를 쏘는 법은<br><em>아무도 알려주지 않았다</em></h1>
+    <p class="lead">미국은 뒷마당에서 로켓을 쏜다. 한국은 로켓이 어려운 게 아니라, 무엇이 합법이고 어디에 허가를 받는지를 몰라서 다들 포기한다. 그 지도를 여기 그린다.</p>
+    <div class="cta">
+      <a href="lab.html" class="btn primary">🚀 로켓 실험실 열기 →</a>
+      <a href="#build" class="btn ghost">오늘 당장 만들기</a>
+    </div>
+  </div>
+</header>
+
+<section id="diff">
+  <div class="wrap">
+    <div class="eyebrow">먼저 짚을 것</div>
+    <h2>왜 한국은 "차고 로켓"이 어려운가</h2>
+    <p>미국에서 개인이 모형로켓 모터를 마트에서 사서 뒷마당에 쏘는 건, 그 추진제가 폭발물 규제에서 상당히 풀려 있기 때문이다. 한국은 정반대다. 로켓 모터 속 추진제는 예외 없이 <strong>화약류</strong>로 분류된다. 이 한 가지 차이가 전부를 바꾼다.</p>
+    <div class="compare">
+      <div class="col us">
+        <div class="flag">🇺🇸 미국</div>
+        <ul>
+          <li>모형로켓 모터를 온라인·마트에서 구입</li>
+          <li>APCP 추진제가 폭발물 규제에서 대체로 면제</li>
+          <li>공인 발사장·클럽(NAR/TRA)이 촘촘하게 존재</li>
+          <li>뒷마당·공터 발사 문화가 합법 테두리 안에 있음</li>
+        </ul>
+      </div>
+      <div class="col kr">
+        <div class="flag">🇰🇷 한국</div>
+        <ul>
+          <li>추진제는 전부 화약류 — 제조·소지·사용 모두 허가 대상</li>
+          <li>미국 모터 직구도 화약류 수입허가 없이는 불법</li>
+          <li>일정 고도 이상 발사는 항공안전법 공역 승인 필요</li>
+          <li>개인의 무허가 고체연료 제조는 형사처벌 대상</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note stop">
+      <div class="ic">🚫</div>
+      <p><b>이 가이드가 안내하지 않는 것.</b> 집에서 추진제를 배합·합성하는 화학 레시피는 다루지 않는다. 한국에서 명백한 불법이고, 사고 위험이 크다. 대신 화약 없이도 진짜 로켓 공학의 90%를 배우는 길과, 고체연료까지 가는 합법 경로를 안내한다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="road">
+  <div class="wrap">
+    <div class="eyebrow">전체 그림</div>
+    <h2>3단계 경로</h2>
+    <p>규제를 우회하는 게 아니라, 규제 밖에서 깊이를 만들고 → 필요하면 정식 경로로 넘어간다. 대부분은 0·1단계에서 이미 충분히 로켓을 배운다.</p>
+    <div class="road">
+      <div class="step s0">
+        <div class="top">
+          <span class="num">STEP 0</span>
+          <h3>물로켓</h3>
+          <span class="tag legal">100% 합법 · 오늘 당장</span>
+        </div>
+        <p>탄산 페트병 + 자전거 펌프. 뉴턴 3법칙·추력·질량비·안정성을 그대로 체감한다. 여기서 로켓 공학의 대부분을 배운다.</p>
+      </div>
+      <div class="step s1">
+        <div class="top">
+          <span class="num">STEP 1</span>
+          <h3>고고도 물로켓 · 압축공기</h3>
+          <span class="tag legal">합법 · 고도 주의</span>
+        </div>
+        <p>복합 동체, 낙하산 사출, 고도 100m+. 물리는 진짜 로켓과 같다. 고도가 높아지면 발사 장소·공역만 확인하면 된다.</p>
+      </div>
+      <div class="step s2">
+        <div class="top">
+          <span class="num">STEP 2</span>
+          <h3>고체연료 로켓</h3>
+          <span class="tag gate">허가·단체 경로</span>
+        </div>
+        <p>미국식 차고 로켓의 본체. 개인이 집에서 하는 순간 불법이다. 합법적으로 가는 길은 동아리·자격·정식 발사장 경로뿐. <a href="#law" class="inline">아래 법 지도 참고 →</a></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="build">
+  <div class="wrap">
+    <div class="eyebrow">STEP 0 실전</div>
+    <h2>물로켓, 실제로 만들기</h2>
+    <p>입문이자 원리 학습의 정석. 완제품 발사대 키트는 저렴하고, 나머지는 집에 있는 재료로 충분하다.</p>
+
+    <h3>준비물</h3>
+    <div class="note tip">
+      <div class="ic">🧰</div>
+      <p><b>1.5~2L 탄산 페트병 2~3개</b> (탄산병이어야 압력을 버틴다 — 생수병 금지) · <b>자전거 펌프 + 발사대</b>(고무마개+튜브, 완제품 키트 가능) · <b>물</b> · 노즈콘용 종이·우드락 · <b>핀(날개) 3~4장</b> · 낙하산용 비닐·실(선택)</p>
+    </div>
+
+    <h3>만드는 순서</h3>
+    <div class="build">
+      <div class="bstep"><div class="n">1</div><div class="bd"><h4>물 채우기 — 병 부피의 30~40%</h4><p>너무 적으면 밀어낼 질량이 없고, 너무 많으면 공기 부피가 부족하다. 실험으로 최적점을 찾는 게 핵심 재미다.</p></div></div>
+      <div class="bstep"><div class="n">2</div><div class="bd"><h4>발사대에 꽂고 가압 — 4~6기압</h4><p>자전거 펌프로 천천히. 압력이 높을수록 멀리 가지만 병의 한계(보통 7~8기압)를 넘기지 않는다.</p></div></div>
+      <div class="bstep"><div class="n">3</div><div class="bd"><h4>노즈콘 + 핀으로 안정성 잡기</h4><p>무게중심이 압력중심보다 앞(위)에 오게 한다. 이게 로켓이 똑바로 나는 이유 전부다. <a href="#physics" class="inline">원리 →</a></p></div></div>
+      <div class="bstep"><div class="n">4</div><div class="bd"><h4>넓은 공터에서, 사람 반대 방향으로 발사</h4><p>발사각은 수직에서 약간(약 5~10°)만 기울인다. 발사선은 뒤·옆으로 충분히 물러난다.</p></div></div>
+      <div class="bstep"><div class="n">5</div><div class="bd"><h4>기록하고 바꾸기 — 이게 공학이다</h4><p>물량·압력·핀 크기를 하나씩 바꿔 최고 고도를 추적한다. 변수 하나만 바꿔 비교하면 그대로 실험 리포트가 된다.</p></div></div>
+    </div>
+
+    <div class="note tip">
+      <div class="ic">🪂</div>
+      <p><b>다음 단계로.</b> 물로켓이 손에 익으면 <b>낙하산 사출</b>에 도전한다. 정점에서 노즈콘이 분리되며 낙하산이 펴지게 만드는 것 — 회수 가능한 로켓이 되는 순간, 진짜 로켓 팀이 푸는 문제와 같아진다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="physics">
+  <div class="wrap">
+    <div class="eyebrow">핵심 원리 하나</div>
+    <h2>왜 로켓은 똑바로 나는가</h2>
+    <p>로켓 안정성의 90%는 딱 두 점의 관계로 결정된다. <strong>무게중심(CG)</strong>과 <strong>압력중심(CP)</strong>. 무게중심이 압력중심보다 <strong>앞쪽</strong>에 있으면, 바람에 흔들려도 스스로 자세를 되돌린다. 반대면 텀블링한다.</p>
+    <div class="phys">
+      <svg viewBox="0 0 640 150" role="img" aria-label="무게중심과 압력중심 다이어그램">
+        <!-- rocket body -->
+        <path d="M60 75 L60 55 Q60 55 60 55 L440 55 L470 55 Q510 55 540 75 Q510 95 470 95 L60 95 Z" fill="#1c2230" stroke="#2d3646" stroke-width="1.5"/>
+        <!-- nose cone -->
+        <path d="M540 75 Q510 55 470 55 L470 95 Q510 95 540 75 Z" fill="#ff6b35" opacity="0.85"/>
+        <!-- fins -->
+        <path d="M60 95 L60 130 L120 95 Z" fill="#2d3646"/>
+        <path d="M60 55 L60 20 L120 55 Z" fill="#2d3646"/>
+        <!-- CG marker (front) -->
+        <line x1="410" y1="20" x2="410" y2="130" stroke="#3ecf8e" stroke-width="2" stroke-dasharray="4 4"/>
+        <circle cx="410" cy="75" r="9" fill="#0c0f17" stroke="#3ecf8e" stroke-width="2.5"/>
+        <path d="M410 66 a9 9 0 0 1 0 18 Z" fill="#3ecf8e"/>
+        <text x="410" y="147" fill="#3ecf8e" font-size="12" font-weight="700" text-anchor="middle" font-family="Pretendard,sans-serif">무게중심 CG (앞)</text>
+        <!-- CP marker (back) -->
+        <line x1="200" y1="20" x2="200" y2="130" stroke="#5aa9ff" stroke-width="2" stroke-dasharray="4 4"/>
+        <circle cx="200" cy="75" r="9" fill="#0c0f17" stroke="#5aa9ff" stroke-width="2.5"/>
+        <path d="M200 66 a9 9 0 0 0 0 18 Z" fill="#5aa9ff"/>
+        <text x="200" y="147" fill="#5aa9ff" font-size="12" font-weight="700" text-anchor="middle" font-family="Pretendard,sans-serif">압력중심 CP (뒤)</text>
+        <!-- direction arrow -->
+        <text x="588" y="80" fill="#697285" font-size="13" text-anchor="middle" font-family="Pretendard,sans-serif">→ 비행</text>
+      </svg>
+      <div class="cap">CG가 CP보다 앞에 있으면 안정. 노즈콘에 무게(찰흙 등)를 더하거나 핀을 키워 뒤쪽 CP를 뒤로 밀면 안정성이 올라간다.</div>
+    </div>
+    <div class="note tip">
+      <div class="ic">🎯</div>
+      <p><b>실전 팁.</b> 로켓이 텀블링하면 둘 중 하나다 — 앞에 무게를 더하거나(노즈콘에 찰흙), 뒤 핀을 더 크게 만든다. 이 감각이 잡히면 어떤 로켓이든 안정시킬 수 있다.</p>
+    </div>
+  </div>
+</section>
+
+<section id="law">
+  <div class="wrap">
+    <div class="eyebrow">한국에서 가장 부족한 것</div>
+    <h2>합법 로드맵 — 법 지도</h2>
+    <p>고체연료로 넘어가려면 지식보다 <strong>허가·안전관리 체계</strong>가 먼저다. 이게 미국과의 진짜 차이다. 넘어야 할 관문은 세 가지 법이다.</p>
+    <div class="laws">
+      <div class="law">
+        <h4><span class="dot"></span>총포·도검·화약류 등의 안전관리에 관한 법률</h4>
+        <p>로켓 추진제는 화약류. <b>제조·소지·사용·수입 모두 허가 대상</b>이며, 무허가 제조는 형사처벌된다. 해외 모형로켓 모터를 사 오는 것도 화약류 수입허가가 필요하다.</p>
+      </div>
+      <div class="law">
+        <h4><span class="dot"></span>항공안전법</h4>
+        <p>일정 고도 이상 물체를 쏘아 올리면 <b>공역 승인</b>이 필요하다. 공항 주변·비행금지구역은 물로켓 수준에서도 제약이 있다. 발사 전 발사 지점의 공역을 반드시 확인한다.</p>
+      </div>
+      <div class="law">
+        <h4><span class="dot"></span>소방 · 장소 관련 규정</h4>
+        <p>발사 장소의 화재 위험, 낙하물 안전, 사유지·공공장소 사용 허가. 승인된 발사장·행사를 통하는 이유가 여기 있다.</p>
+      </div>
+    </div>
+
+    <h3>그래서 실제로 가는 길</h3>
+    <div class="build">
+      <div class="bstep"><div class="n">A</div><div class="bd"><h4>대학·아마추어 로켓 동아리에 합류</h4><p>항공대·KAIST·인하대 등 팀은 지도교수·기관을 통해 시험발사 허가·안전관리자·발사장을 확보한다. 개인이 못 뚫는 허가·공역·장소를 조직이 해결해 준다.</p></div></div>
+      <div class="bstep"><div class="n">B</div><div class="bd"><h4>화약류 관련 자격·허가 체계 이해</h4><p>추진제를 다루려면 화약류관리 관련 자격과 관할 경찰서 허가 절차를 알아야 한다. "지식"이 아니라 "허가"가 먼저인 구조다.</p></div></div>
+      <div class="bstep"><div class="n">C</div><div class="bd"><h4>정식 발사장·대회를 통해 발사</h4><p>개인 공터가 아니라 승인된 시험장·아마추어 로켓 대회를 통한다. 안전관리자·발사 승인·회수 절차가 갖춰진 자리에서만 쏜다.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<section id="levelup">
+  <div class="wrap">
+    <div class="eyebrow">진짜 로켓까지</div>
+    <h2>어떻게 실제 로켓 레벨까지 올라가나</h2>
+    <p>미국은 사다리가 하나다. 차고에서 혼자 설계하고, 모터 사고, 사막에서 쏘며 그대로 올라간다. 한국은 이게 둘로 쪼개진다.</p>
+
+    <div class="railintro">
+      <div class="big">이기는 전략 — 혼자 할 수 있는 건 최대치까지 올리고, 막힌 부분만 조직에 꽂는다.</div>
+      <p>로켓 엔지니어링의 <strong>80%는 모터가 아니라 그 주변</strong>이고, 그 80%는 전부 합법이다. GPS 텔레메트리·이중 사출·비행컴퓨터·복합재 동체를 다 갖춘 로켓을 혼자 만들 수 있다. 모터 자리만 비워두고 — 그 자리를 조직이 채운다.</p>
+    </div>
+
+    <div class="rails">
+      <div class="rail skill">
+        <div class="rh"><span class="lbl">실력 사다리</span><span class="sub">혼자 · 100% 합법</span></div>
+        <p class="rd">오늘부터 레벨 3까지 혼자 올라갈 수 있다. 화약 없이.</p>
+        <ul class="rungs">
+          <li><span class="lv">L0</span><span class="rt"><b>공기역학·안정성</b>물/압축공기 로켓. CG/CP, 항력, 회수. 텀블링 안 시키는 감각.</span></li>
+          <li><span class="lv">L1</span><span class="rt"><b>시뮬레이션</b>OpenRocket(무료)로 비행 예측. 실물 없이 고도·안정성 계산. 아마추어와 엔지니어를 가르는 칸.</span></li>
+          <li><span class="lv">L2</span><span class="rt"><b>항전·회수</b>비행컴퓨터 자작 — 기압계·IMU·GPS, 정점 감지 → 이중 사출. 진짜 로켓 문제의 절반, 화약 0.</span></li>
+          <li><span class="lv">L3</span><span class="rt"><b>구조·제조</b>복합재 동체, 3D 프린팅, 모터 마운트, 하중 설계. 물·압축공기로도 검증 가능.</span></li>
+          <li><span class="lv">L4</span><span class="rt"><b>추진 이론</b>De Laval 노즐, 연소, 비추력. 이론·설계·시뮬은 혼자, 실물 연소만 조직.</span></li>
+        </ul>
+      </div>
+      <div class="rail access">
+        <div class="rh"><span class="lbl">접근 사다리</span><span class="sub">조직·기관을 통해</span></div>
+        <p class="rd">실제 추진제 + 실제 공역. 이 문은 개인이 못 연다.</p>
+        <ul class="rungs">
+          <li><span class="lv">문 A</span><span class="rt"><b>대학 로켓팀</b>KAIST·항공대·인하대 등 실험 로켓 학생팀. 기관 명의로 허가·시험대·발사장 확보. 대학생이면 1번.</span></li>
+          <li><span class="lv">문 B</span><span class="rt"><b>국제 대회</b>Spaceport America Cup(IREC) 등. 한국 팀도 나간다. 승인된 발사장에서 km급을 합법으로 쏜다.</span></li>
+          <li><span class="lv">문 C</span><span class="rt"><b>New Space 스타트업</b>이노스페이스·페리지 같은 국내 발사체 회사, 항우연(KARI). 로켓 만드는 게 곧 일이 되는 길.</span></li>
+          <li><span class="lv">문 D</span><span class="rt"><b>해외 아마추어</b>미국 Tripoli/NAR 인증(L1~L3)으로 개인이 합법적으로 고출력 로켓을 만들고 쏜다.</span></li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>그래서 실제 로드맵</h3>
+    <div class="build">
+      <div class="bstep"><div class="n">1</div><div class="bd"><h4>지금 — 물/압축공기로 안정성·회수 감각</h4><p>실력 사다리 L0. 이 가이드의 그 단계.</p></div></div>
+      <div class="bstep"><div class="n">2</div><div class="bd"><h4>병행 — OpenRocket 시뮬레이션 습관화</h4><p>L1. 실물 만들기 전에 계산부터.</p></div></div>
+      <div class="bstep"><div class="n">3</div><div class="bd"><h4>3~6개월 — 비행컴퓨터 자작, 이중 사출 성공</h4><p>L2. 여기까지 오면 이미 "로켓 하는 사람"이다.</p></div></div>
+      <div class="bstep"><div class="n">4</div><div class="bd"><h4>소속 만들기 — 대학팀 합류 or 대회 팀 결성</h4><p>여기서 처음으로 실제 모터를 만진다. L4.</p></div></div>
+      <div class="bstep"><div class="n">5</div><div class="bd"><h4>실물 발사 — 조직의 허가·발사장을 통해</h4><p>접근 사다리를 다 오른 지점.</p></div></div>
+    </div>
+
+    <div class="note tip">
+      <div class="ic">🔑</div>
+      <p><b>놓치기 쉬운 각도.</b> 많은 사람이 "한국은 규제 때문에 안 돼"에서 멈춘다. 하지만 실제로 막힌 건 <b>모터와 발사장 딱 둘</b>뿐, 나머지 전부는 지금 당장 혼자 최고 수준까지 갈 수 있다. 3번까지 혼자 해낸 사람은 어느 대학팀이든 스타트업이든 데려가고 싶어 한다. 문이 열리길 기다리는 게 아니라, 문 앞에 이미 준비된 사람으로 서 있는 것.</p>
+    </div>
+  </div>
+</section>
+
+<section id="safety">
+  <div class="wrap">
+    <div class="eyebrow">타협 없는 부분</div>
+    <h2>안전 체크리스트</h2>
+    <p>물로켓도 6기압이면 위험하다. 아래는 단계와 무관하게 매번 지킨다.</p>
+    <ul class="check">
+      <li><span class="box">✓</span>발사대에 사람이 없는 상태에서만 가압한다. 가압 중 얼굴·몸을 로켓 위로 두지 않는다.</li>
+      <li><span class="box">✓</span>발사 지점 반경을 충분히 비운다. 관람은 뒤·옆에서, 로켓 앞·상방에는 아무도 없게.</li>
+      <li><span class="box">✓</span>보호안경을 쓴다. 파열·오발은 예고 없이 온다.</li>
+      <li><span class="box">✓</span>병 압력 한계를 넘기지 않는다. 낡거나 흠집 난 병은 버린다.</li>
+      <li><span class="box">✓</span>바람이 강한 날, 마른 풀·건조 경보 시엔 쏘지 않는다.</li>
+      <li><span class="box">✓</span>공항 주변·비행금지구역·사람 많은 곳에서는 발사하지 않는다.</li>
+      <li><span class="box">✓</span>고체연료는 개인이 집에서 다루지 않는다. 동아리·허가·발사장 경로로만 간다.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="next">
+  <div class="wrap">
+    <div class="eyebrow">더 가보기</div>
+    <h2>연결되는 곳</h2>
+    <div class="reslist">
+      <div class="res"><div class="t">대학 아마추어 로켓 팀</div><div class="d">항공대·KAIST·인하대 등. 시험발사 허가와 발사장을 갖춘 조직 경로.</div></div>
+      <div class="res"><div class="t">아마추어 로켓 대회</div><div class="d">승인된 발사장에서 합법적으로 쏘아보는 자리. 안전관리 체계가 갖춰져 있다.</div></div>
+      <div class="res"><div class="t">화약류 허가 안내</div><div class="d">관할 경찰서 · 관련 자격. 고체연료로 가려면 반드시 통과할 관문.</div></div>
+      <div class="res"><div class="t">공역 확인</div><div class="d">발사 지점이 비행금지·공항 주변인지 사전 확인. 고고도 발사 필수.</div></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>한국형 로켓 입문 — 하늘에 뭔가를 쏘는 법</p>
+    <p style="color:var(--faint)">규제 밖에서 깊이를 만들고, 필요하면 정식 경로로.</p>
+    <p class="disc">이 페이지는 교육·안내 목적이다. 실제 발사·화약류 취급은 관련 법령과 지역 규정을 반드시 확인하고, 고체연료는 허가·전문 조직을 통해서만 진행한다. 무허가 화약류 제조·사용은 형사처벌 대상이다.</p>
+  </div>
+</footer>
+
+</body>
+</html>

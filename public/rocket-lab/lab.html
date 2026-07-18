@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>로켓 실험실 — 한국에선 못 쏘는 걸 여기서</title>
+<meta name="description" content="룰베이스 로켓 시뮬레이션 샌드박스. 모터·핀·질량·바람을 바꿔가며 비행을 애니메이션으로. 한국 규제 때문에 실제론 못 하는 발사를 앱 안에서.">
+<style>
+  :root{
+    --bg:#0c0f17;--bg2:#11151f;--card:#161b26;--line:#242c3a;
+    --ink:#e8ecf3;--dim:#9aa5b6;--faint:#697285;
+    --accent:#ff6b35;--accent2:#ffb020;--sky:#5aa9ff;--go:#3ecf8e;--warn:#ffcf4a;--stop:#ff5a6a;
+    --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(12,15,23,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:16px;height:56px}
+  nav .brand{font-weight:800;font-size:15px}
+  nav .brand span{color:var(--accent)}
+  nav a{color:var(--dim);text-decoration:none;font-size:13.5px;margin-left:auto}
+  nav a:hover{color:var(--ink)}
+
+  header{padding:40px 0 22px;text-align:center;border-bottom:1px solid var(--line);
+    background:radial-gradient(60% 90% at 50% -20%, rgba(255,107,53,.16), transparent 70%)}
+  .kick{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--accent2);background:rgba(255,176,32,.10);border:1px solid rgba(255,176,32,.25);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+  header h1{font-size:clamp(23px,4.4vw,32px);font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:9px}
+  header h1 em{font-style:normal;color:var(--accent)}
+  header p{color:var(--dim);font-size:14.5px;max-width:560px;margin:0 auto}
+
+  .exps{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;padding:20px 0 2px}
+  .exp{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap}
+  .exp:hover{border-color:var(--faint);color:var(--ink)}
+  .exp.act{background:rgba(255,107,53,.14);border-color:var(--accent);color:var(--accent)}
+
+  .lab{display:grid;grid-template-columns:330px 1fr;gap:18px;padding:22px 0 60px;align-items:start}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .panel h3{font-size:12.5px;font-weight:800;letter-spacing:.04em;color:var(--faint);text-transform:uppercase;margin:20px 0 12px;display:flex;align-items:center;gap:7px}
+  .panel h3:first-child{margin-top:0}
+  .fld{margin-bottom:14px}
+  .fld .lab2{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:6px}
+  .fld .lab2 b{font-weight:600;color:var(--dim)}
+  .fld .lab2 .val{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;font-size:14px}
+  input[type=range]{-webkit-appearance:none;width:100%;height:5px;border-radius:99px;background:var(--bg2);outline:none;border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg)}
+  #wind::-webkit-slider-thumb,#barP::-webkit-slider-thumb,#fill::-webkit-slider-thumb{background:var(--sky)}
+  select{width:100%;background:var(--bg2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  #waterCtrl{background:rgba(90,169,255,.06);border:1px solid rgba(90,169,255,.2);border-radius:12px;padding:14px 14px 2px;margin-top:12px}
+  #waterCtrl .wt{font-size:11.5px;font-weight:700;color:var(--sky);margin-bottom:10px}
+  .launch{width:100%;margin-top:6px;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#1a1206;font-family:inherit;font-weight:800;font-size:15.5px;cursor:pointer;transition:filter .15s}
+  .launch:hover{filter:brightness(1.06)}
+  .launch:active{transform:translateY(1px)}
+  .launch.dirty{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(255,176,32,.5)}50%{box-shadow:0 0 0 5px rgba(255,176,32,0)}}
+
+  .out{display:flex;flex-direction:column;gap:16px}
+  .topgrid{display:grid;grid-template-columns:300px 1fr;gap:16px;align-items:start}
+
+  .skybox{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#0a0d14}
+  .skybox canvas{width:100%;height:auto;display:block}
+  .hud{position:absolute;top:12px;left:14px;pointer-events:none}
+  .hud .alt{font-size:26px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-0.02em;line-height:1;text-shadow:0 1px 6px rgba(0,0,0,.6)}
+  .hud .alt small{font-size:13px;font-weight:600;color:var(--dim)}
+  .hud .ph{font-size:12px;font-weight:700;margin-top:5px;color:var(--accent2)}
+  .replay{position:absolute;bottom:12px;right:12px;background:rgba(22,27,38,.85);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 12px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px)}
+  .replay:hover{border-color:var(--faint)}
+
+  .rightcol{display:flex;flex-direction:column;gap:12px}
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px}
+  .stat .k{font-size:11.5px;color:var(--faint);font-weight:600;margin-bottom:4px}
+  .stat .v{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+  .stat .v small{font-size:12px;font-weight:600;color:var(--dim);margin-left:2px}
+  .stat.dim{opacity:.4}
+  .stat.hero{grid-column:span 2;background:linear-gradient(135deg,rgba(255,107,53,.12),rgba(255,176,32,.06));border-color:rgba(255,107,53,.3)}
+  .stat.hero .v{font-size:32px;color:var(--accent2)}
+  .stat.hero.fail{background:rgba(255,90,106,.1);border-color:rgba(255,90,106,.35)}
+  .stat.hero.fail .v{font-size:22px;color:var(--stop)}
+  .stat .mach{font-size:11px;font-weight:700;color:var(--warn);margin-top:2px}
+
+  .stab{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px 16px;display:flex;align-items:center;gap:12px}
+  .stab .badge{font-size:12.5px;font-weight:800;padding:6px 11px;border-radius:8px;white-space:nowrap}
+  .stab.ok .badge{background:rgba(62,207,142,.14);color:var(--go)}
+  .stab.bad .badge{background:rgba(255,90,106,.14);color:var(--stop)}
+  .stab .txt{font-size:13px;color:var(--dim);line-height:1.45}
+  .stab .txt b{color:var(--ink)}
+
+  .cgcp{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:8px 12px 4px}
+  .cgcp canvas{width:100%;height:auto;display:block}
+
+  .knote{border-radius:13px;padding:13px 15px;font-size:13px;line-height:1.5;display:flex;gap:11px;align-items:flex-start}
+  .knote .ic{font-size:17px;flex-shrink:0}
+  .knote.legal{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.25)}
+  .knote.gate{background:rgba(255,207,74,.07);border:1px solid rgba(255,207,74,.28)}
+  .knote.warn{background:rgba(255,90,106,.07);border:1px solid rgba(255,90,106,.25)}
+  .knote b{color:var(--ink)}
+  .knote span{color:var(--dim)}
+
+  .chartbox{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+  .chartbox .ct{font-size:13px;font-weight:700;color:var(--faint);margin-bottom:10px;display:flex;justify-content:space-between}
+  #chart{width:100%;height:auto;display:block}
+
+  footer{padding:28px 0 50px;text-align:center;border-top:1px solid var(--line)}
+  footer p{font-size:12.5px;color:var(--faint);line-height:1.6;max-width:600px;margin:0 auto}
+
+  @media(max-width:900px){
+    .lab{grid-template-columns:1fr}
+    .topgrid{grid-template-columns:1fr}
+    .skybox{max-width:340px;margin:0 auto;width:100%}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">로켓 <span>실험실</span></div>
+    <a href="index.html">← 가이드로</a>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="kick">한국에선 못 쏘는 걸, 여기서</span>
+    <h1>바람을 넣고 <em>하늘로 쏘아보자</em></h1>
+    <p>모터·핀·질량·바람을 바꾸면 로켓이 어떻게 나는지 애니메이션으로. 실제론 화약류법·공역에 막히는 발사를 앱 안에서 자유롭게 실험하세요.</p>
+    <div class="exps" id="exps"></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="lab">
+    <!-- controls -->
+    <div class="panel">
+      <h3>🔥 추진</h3>
+      <div class="fld">
+        <div class="lab2"><b>모터</b></div>
+        <select id="motor" aria-label="모터 선택"></select>
+      </div>
+      <div id="waterCtrl" style="display:none">
+        <div class="wt">💧 물로켓 설정</div>
+        <div class="fld"><div class="lab2"><b>물 충전량</b><span class="val"><span id="fillV"></span>%</span></div><input type="range" id="fill" min="20" max="60" step="1" value="38" aria-label="물 충전량 퍼센트"></div>
+        <div class="fld"><div class="lab2"><b>공기압</b><span class="val"><span id="barPV"></span> bar</span></div><input type="range" id="barP" min="3" max="9" step="1" value="6" aria-label="공기압 bar"></div>
+      </div>
+
+      <h3>🛰 기체</h3>
+      <div class="fld"><div class="lab2"><b>건조 질량</b><span class="val"><span id="mDryV"></span> g</span></div><input type="range" id="mDry" min="40" max="2000" step="10" value="80" aria-label="건조 질량"></div>
+      <div class="fld"><div class="lab2"><b>동체 지름</b><span class="val"><span id="dV"></span> mm</span></div><input type="range" id="d" min="20" max="120" step="1" value="24" aria-label="동체 지름"></div>
+      <div class="fld"><div class="lab2"><b>전체 길이</b><span class="val"><span id="LV"></span> cm</span></div><input type="range" id="L" min="20" max="150" step="1" value="60" aria-label="전체 길이"></div>
+      <div class="fld"><div class="lab2"><b>노즈콘 길이</b><span class="val"><span id="LnV"></span> cm</span></div><input type="range" id="Ln" min="3" max="40" step="1" value="12" aria-label="노즈콘 길이"></div>
+
+      <h3>🎯 안정성 (핀 · 무게중심)</h3>
+      <div class="fld"><div class="lab2"><b>핀 개수</b><span class="val"><span id="finNV"></span> 개</span></div><input type="range" id="finN" min="0" max="4" step="1" value="3" aria-label="핀 개수"></div>
+      <div class="fld"><div class="lab2"><b>핀 크기 (스팬)</b><span class="val"><span id="finSV"></span> mm</span></div><input type="range" id="finS" min="0" max="120" step="2" value="20" aria-label="핀 크기"></div>
+      <div class="fld"><div class="lab2"><b>무게중심 위치</b><span class="val">앞에서 <span id="cgV"></span>%</span></div><input type="range" id="cg" min="20" max="80" step="1" value="60" aria-label="무게중심 위치"></div>
+
+      <h3>🌬 환경 · 회수</h3>
+      <div class="fld"><div class="lab2"><b>바람 세기</b><span class="val"><span id="windV"></span> m/s</span></div><input type="range" id="wind" min="0" max="15" step="1" value="0" aria-label="바람 세기"></div>
+      <div class="fld"><div class="lab2"><b>낙하산 지름</b><span class="val"><span id="chuteV"></span> cm</span></div><input type="range" id="chute" min="0" max="100" step="2" value="30" aria-label="낙하산 지름"></div>
+
+      <button class="launch" id="go">🚀 발사</button>
+    </div>
+
+    <!-- output -->
+    <div class="out">
+      <div class="topgrid">
+        <div class="skybox">
+          <canvas id="sky" width="300" height="440"></canvas>
+          <div class="hud">
+            <div class="alt"><span id="hudAlt">0</span><small> m</small></div>
+            <div class="ph" id="hudPh">발사 준비</div>
+          </div>
+          <button class="replay" id="replay">↻ 다시</button>
+        </div>
+
+        <div class="rightcol">
+          <div class="stats">
+            <div class="stat hero" id="heroStat"><div class="k">최고 고도 (아포지)</div><div class="v"><span id="oApogee">—</span><small>m</small></div><div class="mach" id="oMach" style="display:none"></div></div>
+            <div class="stat"><div class="k">추력/무게비 (T/W)</div><div class="v"><span id="oTW">—</span></div></div>
+            <div class="stat"><div class="k">최고 속도</div><div class="v"><span id="oV">—</span><small>m/s</small></div></div>
+            <div class="stat"><div class="k">최대 가속도</div><div class="v"><span id="oG">—</span><small>G</small></div></div>
+            <div class="stat" id="tiltStat"><div class="k">최대 기울기</div><div class="v"><span id="oTilt">—</span><small>°</small></div></div>
+            <div class="stat"><div class="k">착지 드리프트</div><div class="v"><span id="oDrift">—</span><small>m</small></div></div>
+          </div>
+          <div class="stab" id="stab">
+            <div class="badge" id="stabBadge">—</div>
+            <div class="txt" id="stabTxt">슬라이더를 움직이면 안정성이 실시간으로 갱신됩니다.</div>
+          </div>
+          <div class="cgcp"><canvas id="cgcp" width="700" height="80"></canvas></div>
+          <div class="knote" id="knote" style="display:none">
+            <div class="ic" id="knoteIc">🇰🇷</div>
+            <div><b id="knoteT"></b> <span id="knoteS"></span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="chartbox">
+        <div class="ct"><span>고도 · 시간 곡선</span><span id="chartMeta" style="color:var(--faint);font-weight:600"></span></div>
+        <canvas id="chart" width="760" height="240"></canvas>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>룰베이스 시뮬레이션 — 2자유도 비행 + 바람 웨더코킹 + 불안정 텀블링 + Barrowman 안정성 근사. 물로켓은 등온 팽창 근사, 고고도 공기밀도·초음속 마하 효과는 미반영이라 초음속·고고도 결과는 과대추정입니다. 학습·실험용이며 실제 설계값과 다를 수 있습니다. 실제 발사·화약류 취급은 관련 법령을 반드시 확인하세요.</p>
+  </div>
+</footer>
+
+<script>
+const g=9.81, rho=1.225, RHOW=1000, PATM=101325;
+const WATER={Vb:0.002, dn:0.009}; // 2L bottle, 9mm nozzle
+
+const MOTORS=[
+  {id:'water', name:'물로켓급 (압축공기) · 합법', kind:'legal'},
+  {id:'A', name:'A 모터 (모형)', I:2.5, tb:0.5, mp:0.004, kind:'model'},
+  {id:'C', name:'C 모터 (모형)', I:10, tb:0.8, mp:0.012, kind:'model'},
+  {id:'E', name:'E 모터 (모형)', I:30, tb:1.0, mp:0.030, kind:'model'},
+  {id:'G', name:'G 모터 (고출력 경계)', I:120, tb:1.4, mp:0.062, kind:'model'},
+  {id:'H', name:'H 모터 (고출력 · 개인 불법)', I:280, tb:1.6, mp:0.11, kind:'hp'},
+  {id:'J', name:'J 모터 (고출력 · 개인 불법)', I:900, tb:2.2, mp:0.35, kind:'hp'},
+];
+
+const $=id=>document.getElementById(id);
+const sliders=['mDry','d','L','Ln','finN','finS','cg','wind','chute','fill','barP'];
+const motorSel=$('motor');
+MOTORS.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m.name;motorSel.appendChild(o);});
+motorSel.value=2;
+
+function syncLabels(){
+  $('mDryV').textContent=$('mDry').value; $('dV').textContent=$('d').value;
+  $('LV').textContent=$('L').value; $('LnV').textContent=$('Ln').value;
+  $('finNV').textContent=$('finN').value; $('finSV').textContent=$('finS').value;
+  $('cgV').textContent=$('cg').value; $('windV').textContent=$('wind').value;
+  $('chuteV').textContent=(+$('chute').value===0)?'없음':$('chute').value;
+  $('fillV').textContent=$('fill').value; $('barPV').textContent=$('barP').value;
+}
+
+// --- stability (Barrowman-lite) with geometry ---
+function stability(){
+  const d=+$('d').value/1000, L=+$('L').value/100, Ln=+$('Ln').value/100;
+  const N=+$('finN').value, s=+$('finS').value/1000;
+  const Xcg=(+$('cg').value/100)*L, R=d/2;
+  const CNn=2, Xn=0.466*Ln;
+  const c=Math.max(0.02, s*0.9);
+  let CNf=0, Xf=Xn;
+  if(N>0 && s>0){
+    CNf=(1+R/(s+R))*(4*N*Math.pow(s/d,2))/(1+Math.sqrt(1+Math.pow(s/c,2)));
+    Xf=(L-c)+0.25*c;
+  }
+  const CNt=CNn+CNf, Xcp=CNt>0?(CNn*Xn+CNf*Xf)/CNt:Xn;
+  return {margin:(Xcp-Xcg)/d, Xcg, Xcp, L, d, Ln, finN:N, finS:s, finC:c};
+}
+
+// --- thrust/weight at launch ---
+function thrustWeight(){
+  const m=MOTORS[+motorSel.value], mDry=+$('mDry').value/1000;
+  let F, wmass=0;
+  if(m.kind==='legal'){
+    const An=Math.PI*(WATER.dn/2)**2, dP=(+$('barP').value)*1e5;
+    F=2*dP*An; wmass=RHOW*WATER.Vb*(+$('fill').value/100);
+  } else { F=m.I/m.tb; }
+  return F/((mDry+wmass)*g);
+}
+
+// --- 2D flight sim: water/solid + wind weathercock + tumble ---
+function simulate(margin){
+  const m=MOTORS[+motorSel.value];
+  const mDry=+$('mDry').value/1000, d=+$('d').value/1000, Cd=0.6;
+  const chuteD=+$('chute').value/100, W=+$('wind').value;
+  const A=Math.PI*(d/2)**2, dt=0.003, railSpeed=15;
+  const isWater=m.kind==='legal';
+  const An=Math.PI*(WATER.dn/2)**2;
+  let Vw = isWater ? WATER.Vb*(+$('fill').value/100) : 0;
+  const Va0 = WATER.Vb - Vw, P0 = PATM + (+$('barP').value)*1e5;
+  const F = isWater ? 0 : m.I/m.tb;
+  let t=0,x=0,y=0,vx=0,vy=0,phi=0,omega=0,maxV=0,maxA=0,maxTilt=0,lifted=false,burning=true,burnoutT=0;
+  const up=[{t:0,x:0,y:0,phi:0}];
+  while(vy>=0 || burning){
+    let thrust=0, mass=mDry;
+    if(isWater){
+      if(Vw>1e-7){
+        const Va=WATER.Vb-Vw, P=P0*(Va0/Va), dP=Math.max(0,P-PATM), ve=Math.sqrt(2*dP/RHOW);
+        thrust=2*dP*An; Vw-=An*ve*dt; mass=mDry+RHOW*Math.max(0,Vw);
+      } else { if(burning){burning=false;burnoutT=t;} }
+    } else {
+      if(t>=m.tb){ if(burning){burning=false;burnoutT=t;} }
+      thrust=burning?F:0; mass=mDry+(burning?m.mp*(1-t/m.tb):0);
+    }
+    const vax=vx-W, vay=vy, vaMag=Math.hypot(vax,vay);
+    if(vy>railSpeed){
+      if(margin>0){
+        const target=Math.atan2(-W,vy)*Math.min(margin/1.5,1.6);
+        const k=Math.min(margin,3)*0.6*vaMag;
+        phi+=Math.max(-1,Math.min(1,k*dt))*(target-phi);
+        phi=Math.max(-0.6,Math.min(0.6,phi));
+      } else {
+        omega += (0.8*(-margin)*vaMag*Math.sign(phi||1) + 0.03*vaMag)*dt;
+        omega=Math.max(-16,Math.min(16,omega));
+        phi+=omega*dt;
+      }
+    }
+    if(Math.abs(phi)>maxTilt)maxTilt=Math.abs(phi);
+    const drag=0.5*rho*Cd*A*vaMag;
+    const ax=(thrust*Math.sin(phi)-drag*vax)/mass, ay=(thrust*Math.cos(phi)-drag*vay)/mass-g;
+    vx+=ax*dt; vy+=ay*dt; x+=vx*dt; y+=vy*dt; t+=dt;
+    if(y>0.5)lifted=true;
+    const spd=Math.hypot(vx,vy); if(spd>maxV)maxV=spd; if(ay>maxA)maxA=ay;
+    if(t>90)break;
+    if(!burning && vy<0) break;
+    if(up.length<500 && t-up[up.length-1].t>=0.035) up.push({t,x,y,phi});
+  }
+  const apogee=Math.max(0,y), tApogee=t, apogeeX=x;
+  if(!burnoutT)burnoutT=t;
+  up.push({t,x,y:Math.max(0,y),phi});
+  // descent
+  const chuteA=chuteD>0?Math.PI*(chuteD/2)**2:A, chuteCd=chuteD>0?1.5:Cd;
+  const down=[{t,x,y:apogee,phi}];
+  let vyd=0;
+  while(y>0 && lifted){
+    const drag=0.5*rho*chuteCd*chuteA*vyd*vyd;
+    vyd+=(g-drag/mDry)*dt; y-=vyd*dt;
+    vx+=(W-vx)*Math.min(1,2*dt); x+=vx*dt; t+=dt;
+    if(t>900)break;
+    if(down.length<300 && t-down[down.length-1].t>=0.15) down.push({t,x,y:Math.max(0,y),phi:0});
+  }
+  down.push({t,x,y:0,phi:0});
+  const descentRate=Math.sqrt(2*mDry*g/(rho*chuteCd*chuteA));
+  return {apogee,apogeeX,drift:lifted?x:0,maxV,maxG:maxA/g,mach:maxV/340,tApogee,
+    maxTiltDeg:maxTilt*180/Math.PI,descentRate,flightTime:t,up,down,motor:m,lifted,burnoutT,tw:thrustWeight()};
+}
+
+// --- CG/CP diagram ---
+function drawCGCP(st){
+  const cv=$('cgcp'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  const padL=16, padR=64, L=st.L, sc=(W-padL-padR)/L, midY=H*0.52, r=9;
+  const x2p=mm=>padL+mm*sc;
+  // fins
+  if(st.finN>0 && st.finS>0){
+    const fc=Math.min(st.finC*sc,26), fs=Math.min(st.finS*sc*0.5+6,20), xt=x2p(L);
+    ctx.fillStyle='#39445a';
+    ctx.beginPath();ctx.moveTo(xt-fc,midY-r);ctx.lineTo(xt,midY-r-fs);ctx.lineTo(xt,midY-r);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(xt-fc,midY+r);ctx.lineTo(xt,midY+r+fs);ctx.lineTo(xt,midY+r);ctx.closePath();ctx.fill();
+  }
+  // body + nose (nose at left)
+  const bg=ctx.createLinearGradient(0,midY-r,0,midY+r);bg.addColorStop(0,'#e9edf4');bg.addColorStop(1,'#b3bcca');
+  ctx.fillStyle=bg;ctx.fillRect(x2p(st.Ln),midY-r,x2p(L)-x2p(st.Ln),2*r);
+  ctx.fillStyle='#ff6b35';ctx.beginPath();ctx.moveTo(x2p(0),midY);ctx.lineTo(x2p(st.Ln),midY-r);ctx.lineTo(x2p(st.Ln),midY+r);ctx.closePath();ctx.fill();
+  // markers
+  function mark(mm,color,label,below){
+    const px=x2p(Math.max(0,Math.min(L,mm)));
+    ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash([2,2]);
+    ctx.beginPath();ctx.moveTo(px,midY-r-6);ctx.lineTo(px,midY+r+6);ctx.stroke();ctx.setLineDash([]);
+    const dy=below?midY+r+13:midY-r-13;
+    ctx.fillStyle=color;ctx.beginPath();ctx.arc(px,dy,4,0,7);ctx.fill();
+    ctx.font='700 11px Pretendard,sans-serif';ctx.textAlign='center';
+    ctx.fillText(label,px,below?dy+15:dy-8);
+  }
+  mark(st.Xcp,'#5aa9ff','CP',false);
+  mark(st.Xcg,'#3ecf8e','CG',true);
+  // margin label
+  ctx.textAlign='left';ctx.font='700 12px Pretendard,sans-serif';
+  const mar=st.margin;
+  ctx.fillStyle = (mar>=1&&mar<=3)?'#3ecf8e':(mar>0?'#ffcf4a':'#ff5a6a');
+  ctx.fillText(mar.toFixed(1)+' 구경', W-padR+6, midY-2);
+  ctx.fillStyle='var(--faint)';ctx.fillStyle='#697285';ctx.font='10px Pretendard,sans-serif';
+  ctx.fillText('여유', W-padR+6, midY+12);
+}
+
+// --- altitude-time chart ---
+function drawChart(up,down,apogee,tApogee){
+  const cv=$('chart'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height,pad={l:50,r:14,t:14,b:26};
+  const all=up.concat(down);
+  ctx.clearRect(0,0,W,H);
+  const tMax=all[all.length-1].t||1, aMax=Math.max(apogee*1.12,10);
+  const X=t=>pad.l+(t/tMax)*(W-pad.l-pad.r);
+  const Y=a=>H-pad.b-(a/aMax)*(H-pad.t-pad.b);
+  ctx.strokeStyle='#242c3a';ctx.fillStyle='#697285';ctx.font='11px Pretendard,sans-serif';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){const a=aMax*i/4,y=Y(a);ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(W-pad.r,y);ctx.stroke();ctx.textAlign='right';ctx.fillText(Math.round(a)+'m',pad.l-7,y+3);}
+  ctx.lineWidth=2.5;
+  const grad=ctx.createLinearGradient(0,pad.t,0,H-pad.b);grad.addColorStop(0,'#ff6b35');grad.addColorStop(1,'#ffb020');
+  ctx.strokeStyle=grad;ctx.beginPath();
+  all.forEach((p,i)=>{const x=X(p.t),y=Y(p.y);i?ctx.lineTo(x,y):ctx.moveTo(x,y);});ctx.stroke();
+  const ax=X(tApogee),ay=Y(apogee);
+  ctx.fillStyle='#ffb020';ctx.beginPath();ctx.arc(ax,ay,4,0,7);ctx.fill();
+  ctx.textAlign='center';ctx.fillStyle='#e8ecf3';ctx.font='700 12px Pretendard,sans-serif';ctx.fillText(Math.round(apogee)+'m',ax,ay-9);
+  ctx.fillStyle='#697285';ctx.font='11px Pretendard,sans-serif';
+  ctx.fillText('0s',pad.l,H-9);ctx.fillText(tMax.toFixed(0)+'s',W-pad.r,H-9);
+}
+
+// --- sky animation ---
+let anim=null, current=null;
+const STARS=[];(function(){let s=98765;const rnd=()=>{s=(s*1103515245+12345)&0x7fffffff;return s/0x7fffffff;};for(let i=0;i<46;i++)STARS.push({x:rnd(),y:rnd()*0.5,r:rnd()*1.1+0.3,a:rnd()*0.5+0.25});})();
+const CLOUDS=[{alt:0.14,fx:0.24,w:30},{alt:0.32,fx:0.7,w:24},{alt:0.55,fx:0.42,w:28}];
+function niceStep(v){const p=Math.pow(10,Math.floor(Math.log10(v)));const n=v/p;return (n<1.5?1:n<3.5?2:n<7.5?5:10)*p;}
+
+function computeScale(r){
+  const cv=$('sky'),W=cv.width,H=cv.height,groundH=26,padX=30,padTop=30;
+  const all=r.up.concat(r.down);
+  let xmin=0,xmax=0; all.forEach(p=>{if(p.x<xmin)xmin=p.x;if(p.x>xmax)xmax=p.x;});
+  const spanX=Math.max(xmax-xmin,1), spanY=Math.max(r.apogee*1.08,8);
+  const scale=Math.min((W-2*padX)/spanX,(H-groundH-padTop)/spanY);
+  const cx=(xmin+xmax)/2;
+  return {W,H,groundH,scale,originPx:W/2 - cx*scale, baseY:H-groundH};
+}
+function w2p(s,x,y){return {px:s.originPx+x*s.scale, py:s.baseY-y*s.scale};}
+
+function drawRocket(ctx,px,py,phi,phase){
+  ctx.save();ctx.translate(px,py);ctx.rotate(phi);
+  if(phase==='down'){
+    ctx.strokeStyle='rgba(200,210,225,.7)';ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(-9,-3);ctx.lineTo(-4,-15);ctx.moveTo(9,-3);ctx.lineTo(4,-15);ctx.moveTo(0,-3);ctx.lineTo(0,-15);ctx.stroke();
+    const cg=ctx.createLinearGradient(0,-24,0,-14);cg.addColorStop(0,'#ff8c42');cg.addColorStop(1,'#ff5a3c');
+    ctx.fillStyle=cg;ctx.beginPath();ctx.arc(0,-15,11,Math.PI,0);ctx.fill();
+    ctx.fillStyle='#e8ecf3';ctx.fillRect(-2.5,-4,5,9);
+  }else{
+    if(phase==='boost'){
+      const gl=ctx.createRadialGradient(0,10,0,0,10,20);gl.addColorStop(0,'rgba(255,180,60,.55)');gl.addColorStop(1,'rgba(255,120,40,0)');
+      ctx.fillStyle=gl;ctx.beginPath();ctx.arc(0,10,20,0,7);ctx.fill();
+      const f=9+Math.random()*7;
+      ctx.fillStyle='#ffe08a';ctx.beginPath();ctx.moveTo(-3.2,8);ctx.lineTo(3.2,8);ctx.lineTo(0,8+f);ctx.closePath();ctx.fill();
+      ctx.fillStyle='#ff6b35';ctx.beginPath();ctx.moveTo(-2,8);ctx.lineTo(2,8);ctx.lineTo(0,8+f*0.6);ctx.closePath();ctx.fill();
+    }
+    ctx.fillStyle='#39445a';ctx.beginPath();ctx.moveTo(-2.6,3);ctx.lineTo(-6.5,9);ctx.lineTo(-2.6,9);ctx.closePath();ctx.fill();
+    ctx.beginPath();ctx.moveTo(2.6,3);ctx.lineTo(6.5,9);ctx.lineTo(2.6,9);ctx.closePath();ctx.fill();
+    const bg=ctx.createLinearGradient(-3,0,3,0);bg.addColorStop(0,'#c9d2e0');bg.addColorStop(0.5,'#f2f5fa');bg.addColorStop(1,'#aab4c6');
+    ctx.fillStyle=bg;ctx.fillRect(-2.8,-4,5.6,13);
+    ctx.fillStyle='#ff6b35';ctx.beginPath();ctx.moveTo(-2.8,-4);ctx.lineTo(2.8,-4);ctx.lineTo(0,-13);ctx.closePath();ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawSky(r,s,idxSamples,cur,phaseLabel){
+  const cv=$('sky'),ctx=cv.getContext('2d');const{W,H,groundH,baseY}=s;
+  const gr=ctx.createLinearGradient(0,0,0,baseY);
+  gr.addColorStop(0,'#070a12');gr.addColorStop(0.42,'#101f37');gr.addColorStop(1,'#2c4d68');
+  ctx.fillStyle=gr;ctx.fillRect(0,0,W,baseY);
+  const starZone=baseY*0.55;
+  STARS.forEach(st=>{const y=st.y*baseY; if(y>starZone)return; ctx.globalAlpha=st.a*(1-y/starZone); ctx.fillStyle='#dfe8ff'; ctx.beginPath();ctx.arc(st.x*W,y,st.r,0,7);ctx.fill();});
+  ctx.globalAlpha=1;
+  const step=niceStep(r.apogee/4||10);
+  ctx.font='10px Pretendard,sans-serif';ctx.textAlign='left';
+  for(let a=step;a<=r.apogee*1.05;a+=step){
+    const y=w2p(s,0,a).py; if(y<8)break;
+    ctx.strokeStyle='rgba(255,255,255,.06)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();
+    ctx.fillStyle='rgba(255,255,255,.32)';ctx.fillText((a>=1000?(a/1000)+'k':a)+'m',5,y-3);
+  }
+  CLOUDS.forEach(cl=>{const y=w2p(s,0,cl.alt*r.apogee).py; if(y>baseY-3||y<8)return; const cx=cl.fx*W; ctx.fillStyle='rgba(228,236,248,.10)'; ctx.beginPath();ctx.ellipse(cx,y,cl.w,cl.w*0.4,0,0,7);ctx.ellipse(cx+cl.w*0.6,y+2,cl.w*0.72,cl.w*0.32,0,0,7);ctx.ellipse(cx-cl.w*0.55,y+2,cl.w*0.6,cl.w*0.3,0,0,7);ctx.fill();});
+  if(150<r.apogee*1.05){
+    const y=w2p(s,0,150).py;
+    ctx.strokeStyle='rgba(255,207,74,.5)';ctx.lineWidth=1;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,207,74,.8)';ctx.textAlign='right';ctx.fillText('공역 승인선 150m',W-5,y-3);ctx.textAlign='left';
+  }
+  const ap=w2p(s,r.apogeeX||0,r.apogee);
+  if(ap.py>10 && r.apogee>1){
+    ctx.strokeStyle='rgba(255,176,32,.45)';ctx.setLineDash([3,3]);ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(ap.px-16,ap.py);ctx.lineTo(ap.px+16,ap.py);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle='rgba(255,207,74,.85)';ctx.font='700 10px Pretendard,sans-serif';ctx.textAlign='center';ctx.fillText('정점 '+Math.round(r.apogee).toLocaleString()+'m',ap.px,ap.py-6);ctx.textAlign='left';
+  }
+  const gg=ctx.createLinearGradient(0,baseY,0,H);gg.addColorStop(0,'#20301a');gg.addColorStop(1,'#141d0f');
+  ctx.fillStyle=gg;ctx.fillRect(0,baseY,W,groundH);
+  ctx.strokeStyle='#3ecf8e';ctx.globalAlpha=.55;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(0,baseY);ctx.lineTo(W,baseY);ctx.stroke();ctx.globalAlpha=1;
+  const pad0=w2p(s,0,0);ctx.fillStyle='#8b96a8';ctx.fillRect(pad0.px-5,baseY-3,10,3);
+  ctx.strokeStyle='#697285';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(pad0.px,baseY-3);ctx.lineTo(pad0.px,baseY-16);ctx.stroke();
+  ctx.strokeStyle='rgba(255,150,70,.6)';ctx.lineWidth=2.2;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<=idxSamples.i;i++){const p=idxSamples.arr[i];const q=w2p(s,p.x,p.y);i?ctx.lineTo(q.px,q.py):ctx.moveTo(q.px,q.py);}
+  if(cur){const q=w2p(s,cur.x,cur.y);ctx.lineTo(q.px,q.py);}ctx.stroke();
+  if(cur){const q=w2p(s,cur.x,cur.y);drawRocket(ctx,q.px,q.py,cur.phi,phaseLabel);}
+}
+
+function animate(r){
+  if(anim)cancelAnimationFrame(anim);
+  const s=computeScale(r);
+  const ascentDur=3.2, descentDur=2.6, bt=r.burnoutT;
+  drawSky(r,s,{arr:r.up,i:0},{x:0,y:0,phi:0},'idle');
+  $('hudAlt').textContent='0';$('hudPh').textContent= r.lifted?'발사 준비':'이륙 실패';
+  if(!r.lifted){ // no flight to animate
+    return;
+  }
+  const start=performance.now();
+  function frame(now){
+    const el=(now-start)/1000;
+    let cur,phaseLabel,idxSamples;
+    if(el<ascentDur){
+      const f=el/ascentDur, fi=f*(r.up.length-1), i=Math.floor(fi), a=r.up[i], b=r.up[Math.min(i+1,r.up.length-1)], k=fi-i;
+      cur={x:a.x+(b.x-a.x)*k, y:a.y+(b.y-a.y)*k, phi:a.phi+(b.phi-a.phi)*k};
+      phaseLabel = a.t<bt?'boost':'coast';
+      idxSamples={arr:r.up,i};
+      $('hudPh').textContent = a.t<bt ? '점화 · 상승' : '관성 상승';
+    }else if(el<ascentDur+descentDur){
+      const f=(el-ascentDur)/descentDur, fi=f*(r.down.length-1), i=Math.floor(fi), a=r.down[i], b=r.down[Math.min(i+1,r.down.length-1)], k=fi-i;
+      cur={x:a.x+(b.x-a.x)*k, y:a.y+(b.y-a.y)*k, phi:0};
+      phaseLabel='down';idxSamples={arr:r.up.concat(r.down.slice(0,i+1)),i:r.up.length-1+i};
+      $('hudPh').textContent = (+$('chute').value>0)?'낙하산 하강':'탄도 하강';
+    }else{
+      cur={x:r.drift,y:0,phi:0};phaseLabel='down';idxSamples={arr:r.up.concat(r.down),i:r.up.length+r.down.length-2};
+      $('hudPh').textContent='착지';$('hudAlt').textContent='0';
+      drawSky(r,s,idxSamples,cur,phaseLabel);return;
+    }
+    $('hudAlt').textContent=Math.round(cur.y).toLocaleString();
+    drawSky(r,s,idxSamples,cur,phaseLabel);
+    anim=requestAnimationFrame(frame);
+  }
+  anim=requestAnimationFrame(frame);
+}
+
+// --- stability badge helper ---
+function setStab(margin, extra){
+  const stab=$('stab'),badge=$('stabBadge'),txt=$('stabTxt');
+  if(margin>=1 && margin<=3){
+    stab.className='stab ok';badge.textContent='안정 ✓';
+    txt.innerHTML='안정 여유 <b>'+margin.toFixed(1)+' 구경</b>. 무게중심이 압력중심보다 앞.'+extra;
+  }else if(margin>3){
+    stab.className='stab ok';badge.textContent='과안정';
+    txt.innerHTML='여유 <b>'+margin.toFixed(1)+' 구경</b> — 너무 안정적이라 바람에 과하게 고개를 든다.'+extra;
+  }else if(margin>0){
+    stab.className='stab bad';badge.textContent='불안정 위험';
+    txt.innerHTML='여유 <b>'+margin.toFixed(1)+' 구경</b> — 1 구경 미만. 핀을 키우거나 앞에 무게를.'+extra;
+  }else{
+    stab.className='stab bad';badge.textContent='텀블링 ✕';
+    txt.innerHTML='압력중심이 무게중심보다 앞 — <b>공중에서 회전</b>해 못 날아간다. 핀을 달거나 키우세요.';
+  }
+}
+
+// --- live update on any input (no launch) ---
+let dirty=false;
+function markDirty(){ if(current){dirty=true;$('go').classList.add('dirty');$('go').textContent='🚀 발사 (변경됨)';} }
+function updateLive(){
+  syncLabels();
+  $('waterCtrl').style.display = MOTORS[+motorSel.value].kind==='legal'?'block':'none';
+  const st=stability();
+  drawCGCP(st);
+  setStab(st.margin,'');
+  const tw=thrustWeight();
+  $('oTW').textContent=tw.toFixed(1);
+  $('oTW').style.color = tw<1?'var(--stop)':'';
+}
+
+// --- full run (launch) ---
+function run(){
+  const st=stability();
+  const r=simulate(st.margin); current=r;
+  dirty=false;$('go').classList.remove('dirty');$('go').textContent='🚀 발사';
+  drawCGCP(st);
+  const hero=$('heroStat');
+  if(!r.lifted){
+    hero.className='stat hero fail';
+    $('oApogee').textContent='이륙 실패';
+    $('oApogee').nextElementSibling.style.display='none';
+  }else{
+    hero.className='stat hero';
+    $('oApogee').textContent=Math.round(r.apogee).toLocaleString();
+    $('oApogee').nextElementSibling.style.display='';
+  }
+  $('oTW').textContent=r.tw.toFixed(1); $('oTW').style.color=r.tw<1?'var(--stop)':'';
+  $('oV').textContent=Math.round(r.maxV);
+  $('oG').textContent=r.maxG.toFixed(1);
+  $('oTilt').textContent=r.maxTiltDeg.toFixed(0);
+  $('tiltStat').classList.toggle('dim', r.maxTiltDeg<1);
+  $('oDrift').textContent=Math.round(r.drift).toLocaleString();
+  // Mach note
+  const om=$('oMach');
+  if(r.mach>1 && r.lifted){ om.style.display='block'; om.textContent='마하 '+r.mach.toFixed(1)+' · 초음속 근사(과대추정)'; }
+  else om.style.display='none';
+  $('chartMeta').textContent = r.lifted ? ('낙하 '+r.descentRate.toFixed(1)+'m/s · 총 '+r.flightTime.toFixed(0)+'s') : '';
+  drawChart(r.up,r.down,r.apogee,r.tApogee);
+  // stability text + weathercock
+  const wind=+$('wind').value;
+  const wc = wind>0 && st.margin>0 && r.lifted ? ' 바람 '+wind+'m/s서 최대 <b>'+r.maxTiltDeg.toFixed(0)+'°</b> 기울어 상승(웨더코킹).' : '';
+  setStab(st.margin, wc);
+  // notes
+  const kn=$('knote');
+  if(!r.lifted){
+    kn.style.display='flex';kn.className='knote warn';$('knoteIc').textContent='🪨';
+    $('knoteT').textContent='추력이 무게를 못 이긴다.';
+    $('knoteS').textContent='T/W '+r.tw.toFixed(2)+' — 발사대를 못 벗어난다. 모터를 키우거나 기체를 가볍게. (안전 발사엔 보통 T/W 5 이상 권장)';
+  }else if(r.motor.kind==='hp'){
+    kn.style.display='flex';kn.className='knote gate';$('knoteIc').textContent='⚠️';
+    $('knoteT').textContent='이건 한국에서 개인이 못 한다.';
+    $('knoteS').textContent='H급 이상 고출력 추진제는 화약류 — 개인 제조·발사 불가. 대학팀·정식 발사장 경로로만.';
+  }else if(r.apogee>150){
+    kn.style.display='flex';kn.className='knote gate';$('knoteIc').textContent='🛫';
+    $('knoteT').textContent='이 고도는 공역 승인 대상.';
+    $('knoteS').textContent=Math.round(r.apogee)+'m는 항공안전법상 승인 없이 못 쏜다. 모형 모터도 한국선 화약류.';
+  }else if(r.motor.kind==='legal'){
+    kn.style.display='flex';kn.className='knote legal';$('knoteIc').textContent='✅';
+    $('knoteT').textContent='이건 실제로 쏠 수 있다.';
+    $('knoteS').textContent='물·압축공기 로켓은 화약류가 아니라 합법. 넓은 공터에서 안전수칙만 지키면 OK.';
+  }else if(r.maxG>45){
+    kn.style.display='flex';kn.className='knote warn';$('knoteIc').textContent='💥';
+    $('knoteT').textContent='가속도 '+r.maxG.toFixed(0)+'G — 기체 파손 수준.';
+    $('knoteS').textContent='실제라면 동체·핀이 버티기 어렵다. 무게를 늘리거나 약한 모터로.';
+  }else{kn.style.display='none';}
+  animate(r);
+}
+
+// --- experiments ---
+const EXPS=[
+  {name:'💧 물로켓 (합법)', set:{motor:'water',mDry:120,d:90,L:35,Ln:8,finN:4,finS:60,cg:36,wind:0,chute:0,fill:38,barP:6}},
+  {name:'🚀 모형 C모터', set:{motor:'C',mDry:80,d:24,L:60,Ln:12,finN:3,finS:20,cg:60,wind:0,chute:30}},
+  {name:'🌬 바람 부는 날', set:{motor:'C',mDry:80,d:24,L:60,Ln:12,finN:3,finS:20,cg:60,wind:8,chute:30}},
+  {name:'💥 핀을 떼면?', set:{motor:'C',mDry:80,d:24,L:60,Ln:12,finN:0,finS:0,cg:60,wind:0,chute:30}},
+  {name:'🪨 이륙 실패', set:{motor:'A',mDry:1200,d:80,L:70,Ln:14,finN:4,finS:40,cg:55,wind:0,chute:40}},
+  {name:'🔥 고출력 H모터', set:{motor:'H',mDry:600,d:50,L:120,Ln:22,finN:4,finS:34,cg:62,wind:3,chute:60}},
+  {name:'🛰 J모터 (2km급)', set:{motor:'J',mDry:1500,d:60,L:150,Ln:30,finN:4,finS:42,cg:62,wind:2,chute:90}},
+];
+const expBar=$('exps');
+EXPS.forEach((e)=>{
+  const b=document.createElement('button');b.className='exp';b.textContent=e.name;
+  b.onclick=()=>{
+    document.querySelectorAll('.exp').forEach(x=>x.classList.remove('act'));b.classList.add('act');
+    motorSel.value=MOTORS.findIndex(m=>m.id===e.set.motor);
+    for(const k in e.set){if(k!=='motor'&&$(k))$(k).value=e.set[k];}
+    updateLive();run();
+  };
+  expBar.appendChild(b);
+});
+
+sliders.forEach(s=>$(s).addEventListener('input',()=>{updateLive();markDirty();}));
+motorSel.addEventListener('change',()=>{updateLive();markDirty();});
+$('go').addEventListener('click',run);
+$('replay').addEventListener('click',()=>{if(current)animate(current);});
+document.querySelectorAll('.exp')[1].click();
+</script>
+</body>
+</html>
