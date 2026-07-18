@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>회로 빌더 — 트랜지스터로 컴퓨터를 짓는다</title>
+<meta name="description" content="룰베이스 디지털 논리 샌드박스. MOS 트랜지스터에서 논리 게이트를, 게이트에서 가산기·래치를 조립하고 신호가 배선을 타고 흐르는 것을 본다. 진리표 자동 생성.">
+<style>
+  :root{
+    --bg:#0a0d14;--bg2:#0f131c;--card:#141a26;--line:#232c3c;
+    --ink:#e9edf5;--dim:#98a3b6;--faint:#6a7488;
+    --accent:#4f9cff;--accent2:#22d3ee;--gold:#ffb84d;--go:#3ecf8e;--warn:#ffcf4a;--stop:#ff5a6a;--violet:#a78bfa;
+    --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(10,13,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:16px;height:56px}
+  nav .brand{font-weight:800;font-size:15px}
+  nav .brand span{color:var(--accent)}
+  nav .links{margin-left:auto;display:flex;gap:16px;align-items:center}
+  nav a{color:var(--dim);text-decoration:none;font-size:13.5px}
+  nav a:hover{color:var(--ink)}
+  nav a.cur{color:var(--accent2);font-weight:700}
+
+  header{padding:38px 0 20px;text-align:center;border-bottom:1px solid var(--line);
+    background:radial-gradient(60% 90% at 50% -20%, rgba(79,156,255,.16), transparent 70%)}
+  .kick{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--accent2);background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.25);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+  header h1{font-size:clamp(23px,4.4vw,32px);font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:9px}
+  header h1 em{font-style:normal;color:var(--accent)}
+  header p{color:var(--dim);font-size:14.5px;max-width:600px;margin:0 auto}
+
+  .modes{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:18px}
+  .md{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:700;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .15s}
+  .md.act{background:var(--accent);color:#08111f}
+
+  .exps{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;padding:18px 0 2px}
+  .exp{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap}
+  .exp:hover{border-color:var(--faint);color:var(--ink)}
+  .exp.act{background:rgba(79,156,255,.14);border-color:var(--accent);color:var(--accent)}
+
+  .chbar{padding:16px 0 2px}
+  .chlevels{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+  .chlv{background:var(--card);border:1px solid var(--line);border-radius:11px;min-width:42px;height:42px;padding:0 8px;font-weight:800;font-size:13px;color:var(--dim);cursor:pointer;position:relative;transition:all .15s}
+  .chlv.act{border-color:var(--accent);color:var(--accent);background:rgba(79,156,255,.12)}
+  .chlv.locked{opacity:.4;cursor:not-allowed}
+  .chlv .s{display:block;font-size:8px;color:var(--warn);line-height:1;margin-top:1px;letter-spacing:1px}
+  .chgoal{max-width:660px;margin:0 auto;text-align:center}
+  .chgoal-t{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap}
+  .chgoal-t .chstars{color:var(--warn);font-size:13px;letter-spacing:2px}
+  .chgoal-d{font-size:13.5px;color:var(--dim);line-height:1.5}
+
+  .section{padding:22px 0 60px}
+  .lab{display:grid;grid-template-columns:270px 1fr;gap:18px;align-items:start}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+  .panel h3{font-size:12px;font-weight:800;letter-spacing:.04em;color:var(--faint);text-transform:uppercase;margin:18px 0 11px;display:flex;align-items:center;gap:7px}
+  .panel h3:first-child{margin-top:0}
+  .pal{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pbtn{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:11px 6px;font-family:inherit;font-weight:700;font-size:13px;color:var(--ink);cursor:pointer;transition:all .15s;text-align:center}
+  .pbtn:hover{border-color:var(--faint)}
+  .pbtn:disabled{opacity:.28;cursor:not-allowed}
+  .pbtn[data-g=INPUT]{border-color:rgba(255,184,77,.4);color:var(--gold)}
+  .pbtn[data-g=OUTPUT]{border-color:rgba(62,207,142,.4);color:var(--go)}
+  .toolrow{display:flex;gap:8px;margin-top:10px}
+  .tbtn{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 6px;font-family:inherit;font-weight:700;font-size:12.5px;color:var(--dim);cursor:pointer;transition:all .15s}
+  .tbtn:hover{border-color:var(--faint);color:var(--ink)}
+  .tbtn.danger:hover{border-color:var(--stop);color:var(--stop)}
+  .help{font-size:12px;color:var(--faint);line-height:1.55;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+  .help b{color:var(--dim)}
+
+  .out{display:flex;flex-direction:column;gap:14px}
+  .canvbox{position:relative;border:1px solid var(--line);border-radius:var(--r);overflow:hidden;background:radial-gradient(120% 120% at 50% 0%, #0e141f, #090c12)}
+  svg.build{width:100%;height:auto;display:block;touch-action:none}
+  .cbadge{position:absolute;top:10px;left:12px;font-size:11px;font-weight:700;color:var(--faint);pointer-events:none;background:rgba(10,13,20,.6);padding:3px 9px;border-radius:7px}
+
+  /* wires + nodes */
+  .wire{fill:none;stroke:#2b3547;stroke-width:3.4;stroke-linecap:round}
+  .wire.on{stroke:var(--accent2);stroke-dasharray:7 7;animation:flow .55s linear infinite;filter:drop-shadow(0 0 3px rgba(34,211,238,.7))}
+  @keyframes flow{to{stroke-dashoffset:-14}}
+  .rubber{stroke:var(--gold);stroke-width:2;stroke-dasharray:4 4;fill:none;pointer-events:none;opacity:.8}
+  .node{cursor:grab}
+  .node .body{fill:#161d2b;stroke:#3a465c;stroke-width:2;rx:9}
+  .node text{font-family:inherit;font-weight:800;fill:var(--ink);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+  .node .sub{font-size:9px;font-weight:700;fill:var(--faint)}
+  .node[data-type=AND] .body{stroke:var(--accent)} .node[data-type=AND] text{fill:var(--accent)}
+  .node[data-type=OR] .body{stroke:var(--violet)} .node[data-type=OR] text{fill:var(--violet)}
+  .node[data-type=NOT] .body{stroke:var(--gold)} .node[data-type=NOT] text{fill:var(--gold)}
+  .node[data-type=NAND] .body{stroke:var(--accent2)} .node[data-type=NAND] text{fill:var(--accent2)}
+  .node[data-type=NOR] .body{stroke:var(--go)} .node[data-type=NOR] text{fill:var(--go)}
+  .node[data-type=XOR] .body{stroke:var(--warn)} .node[data-type=XOR] text{fill:var(--warn)}
+  .node.sel .body{stroke:#fff;stroke-width:2.6}
+  .node.hot .body{filter:drop-shadow(0 0 6px rgba(34,211,238,.55))}
+  .bubble{fill:#161d2b;stroke-width:2}
+  .port{fill:#0a0d14;stroke:#586275;stroke-width:2;cursor:crosshair}
+  .port.pinON{fill:var(--accent2);stroke:var(--accent2)}
+  .port.act{fill:var(--gold);stroke:var(--gold)}
+  .inSwitch .body{fill:#1a1509;stroke:var(--gold)}
+  .inSwitch.on .body{fill:rgba(34,211,238,.18);stroke:var(--accent2)}
+  .inSwitch .val{font-size:19px;fill:var(--faint)}
+  .inSwitch.on .val{fill:var(--accent2)}
+  .led{stroke:#3a465c;stroke-width:2.4;fill:#101722}
+  .led.on{fill:var(--accent2);stroke:var(--accent2);filter:drop-shadow(0 0 7px rgba(34,211,238,.8))}
+
+  .tt{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+  .tt .ttt{font-size:12.5px;font-weight:800;color:var(--faint);text-transform:uppercase;letter-spacing:.04em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+  .tt table{border-collapse:collapse;width:100%;font-variant-numeric:tabular-nums}
+  .tt th,.tt td{padding:6px 4px;text-align:center;font-size:13.5px;border-bottom:1px solid var(--line)}
+  .tt th{font-size:12px;font-weight:800;color:var(--dim)}
+  .tt th.o,.tt td.o{background:rgba(34,211,238,.05)}
+  .tt th.o{color:var(--accent2)}
+  .tt td.one{color:var(--accent2);font-weight:800}
+  .tt td.zero{color:var(--faint)}
+  .tt tr.cur td{background:rgba(255,184,77,.10)}
+  .tt tr.cur td:first-child{box-shadow:inset 3px 0 0 var(--gold)}
+  .ttscroll{overflow-x:auto}
+  .empty{color:var(--faint);font-size:13px;padding:8px 0}
+
+  .knote{border-radius:13px;padding:13px 15px;font-size:13px;line-height:1.55;display:flex;gap:11px;align-items:flex-start}
+  .knote .ic{font-size:17px;flex-shrink:0}
+  .knote.info{background:rgba(79,156,255,.07);border:1px solid rgba(79,156,255,.25)}
+  .knote b{color:var(--ink)}
+  .knote span{color:var(--dim)}
+
+  .chresult{border-radius:14px;padding:14px 16px;display:none;align-items:center;gap:14px;margin-top:2px}
+  .chresult.win{background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.32)}
+  .chresult.lose{background:rgba(255,207,74,.08);border:1px solid rgba(255,207,74,.3)}
+  .chresult .st{font-size:20px;color:var(--warn);letter-spacing:3px;flex-shrink:0}
+  .chresult .big{font-size:14.5px;font-weight:800}
+  .chresult .hint{color:var(--dim);font-size:12.5px;margin-top:2px}
+  .checkbtn{width:100%;margin-top:6px;padding:13px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#08111f;font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:filter .15s}
+  .checkbtn:hover{filter:brightness(1.07)}
+
+  /* transistor lab */
+  .tlab{display:grid;grid-template-columns:1fr 300px;gap:18px;align-items:start}
+  .tsvgbox{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:14px}
+  .tsvgbox svg{width:100%;height:auto;display:block}
+  .tside .gatepick{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .gpk{flex:1;min-width:70px;background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:10px 6px;font-family:inherit;font-weight:700;font-size:13px;color:var(--dim);cursor:pointer;transition:all .15s}
+  .gpk.act{border-color:var(--accent2);color:var(--accent2);background:rgba(34,211,238,.1)}
+  .tinputs{display:flex;gap:10px;margin-bottom:14px}
+  .tin{flex:1;background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center;cursor:pointer;transition:all .15s}
+  .tin .lb{font-size:12px;color:var(--faint);font-weight:700}
+  .tin .vv{font-size:26px;font-weight:800;color:var(--faint);line-height:1.1}
+  .tin.on{border-color:var(--accent2)}
+  .tin.on .vv{color:var(--accent2)}
+  .tres{background:var(--bg2);border:1px solid var(--line);border-radius:12px;padding:14px;display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+  .tres .k{font-size:12px;color:var(--faint);font-weight:700}
+  .tres .ov{font-size:30px;font-weight:800}
+  .tres .ov.on{color:var(--accent2)} .tres .ov.off{color:var(--faint)}
+  .tcount{font-size:12.5px;color:var(--dim);text-align:center;margin-bottom:12px}
+  .tcount b{color:var(--gold)}
+
+  footer{padding:26px 0 50px;text-align:center;border-top:1px solid var(--line)}
+  footer p{font-size:12.5px;color:var(--faint);line-height:1.6;max-width:640px;margin:0 auto}
+
+  @media(max-width:900px){
+    .lab{grid-template-columns:1fr}
+    .tlab{grid-template-columns:1fr}
+    nav .links a.small{display:none}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">반도체 <span>실험실</span></div>
+    <div class="links">
+      <a href="index.html" class="small">홈</a>
+      <a href="fab.html" class="small">팹 공정</a>
+      <a href="device.html" class="small">소자 물리</a>
+      <a href="logic.html" class="cur">회로 빌더</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="kick">트랜지스터에서 컴퓨터까지</span>
+    <h1>트랜지스터를 모아 <em>계산을 짓는다</em></h1>
+    <p>MOS 스위치로 논리 게이트를 만들고, 게이트를 이어 가산기·래치를 조립합니다. 입력을 켜면 신호가 배선을 타고 흐르고, 진리표는 자동으로 채워집니다.</p>
+    <div class="modes" id="modes">
+      <button class="md" data-m="trans">① 트랜지스터 → 게이트</button>
+      <button class="md act" data-m="build">② 회로 빌더</button>
+      <button class="md" data-m="chall">🎯 챌린지</button>
+    </div>
+  </div>
+</header>
+
+<!-- ===================== 레벨 1: 트랜지스터 ===================== -->
+<div class="wrap section" id="secTrans" style="display:none">
+  <div class="knote info" style="margin-bottom:18px">
+    <div class="ic">🔬</div>
+    <div><b>게이트는 트랜지스터로 만들어진다.</b> <span>CMOS는 위쪽 PMOS 그물(풀업)과 아래쪽 NMOS 그물(풀다운)이 한 쌍. PMOS는 게이트 입력이 0일 때, NMOS는 1일 때 도통합니다. 둘 중 켜진 쪽이 출력을 VDD(1) 또는 GND(0)로 끌어당깁니다.</span></div>
+  </div>
+  <div class="tlab">
+    <div class="tsvgbox"><svg id="tsvg" viewBox="0 0 320 300" aria-label="CMOS 트랜지스터 회로도"></svg></div>
+    <div class="tside">
+      <div class="gatepick" id="gatepick">
+        <button class="gpk act" data-g="inv">인버터</button>
+        <button class="gpk" data-g="nand">NAND</button>
+        <button class="gpk" data-g="nor">NOR</button>
+      </div>
+      <div class="tinputs" id="tinputs"></div>
+      <div class="tres"><span class="k">출력</span><span class="ov" id="tOut">–</span></div>
+      <div class="tcount" id="tCount"></div>
+      <div class="knote info"><div class="ic">💡</div><div><span id="tExpl"></span></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== 레벨 2/챌린지: 빌더 ===================== -->
+<div class="wrap section" id="secBuild">
+  <div class="exps" id="exps"></div>
+  <div class="chbar" id="chbar" style="display:none">
+    <div class="chlevels" id="chlevels"></div>
+    <div class="chgoal">
+      <div class="chgoal-t"><span id="chName"></span><span class="chstars" id="chStars"></span></div>
+      <div class="chgoal-d" id="chGoal"></div>
+    </div>
+  </div>
+
+  <div class="lab" style="margin-top:6px">
+    <div class="panel">
+      <h3>🧩 게이트 팔레트</h3>
+      <div class="pal" id="pal"></div>
+      <div class="toolrow">
+        <button class="tbtn" id="delBtn">선택 삭제</button>
+        <button class="tbtn danger" id="clrBtn">전체 지우기</button>
+      </div>
+      <div id="chCheckWrap" style="display:none"><button class="checkbtn" id="checkBtn">🎯 진리표 채점</button></div>
+      <div class="help">
+        <b>배치</b> 팔레트를 누르면 캔버스에 놓입니다.<br>
+        <b>배선</b> 출력 점(오른쪽)을 누른 뒤 입력 점(왼쪽)을 누르면 연결. 입력 점을 그냥 누르면 연결 해제.<br>
+        <b>이동</b> 게이트를 끌어서 옮기고, <b>입력 스위치</b>는 눌러서 0/1 토글.
+      </div>
+    </div>
+
+    <div class="out">
+      <div class="canvbox">
+        <svg id="build" class="build" viewBox="0 0 680 400" aria-label="논리회로 빌더 캔버스"></svg>
+        <div class="cbadge" id="cbadge"></div>
+      </div>
+      <div class="chresult" id="chresult"></div>
+      <div class="tt">
+        <div class="ttt"><span id="ttTitle">진리표</span><span id="ttMeta" style="color:var(--faint);font-weight:600"></span></div>
+        <div class="ttscroll"><div id="ttbl"></div></div>
+      </div>
+      <div class="knote info" id="knote"><div class="ic" id="knoteIc">🧠</div><div><b id="knoteT"></b> <span id="knoteS"></span></div></div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>룰베이스 디지털 논리 시뮬레이터 — 조합 논리는 위상 완화(relaxation) 반복 평가로 계산하고, 래치처럼 피드백이 있는 회로는 여러 번 반복해 상태를 안정화합니다. 트랜지스터 회로도는 CMOS 풀업/풀다운의 도통 원리를 단순화해 보여줍니다. 진리표는 실제 논리와 일치하며 학습용입니다.</p>
+  </div>
+</footer>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+
+/* =========================================================
+   레벨 1 — 트랜지스터 회로도
+   ========================================================= */
+const TGATES={
+  inv:{ins:['A'], up:{arr:'par',n:1}, dn:{arr:'ser',n:1},
+        out:a=>a[0]?0:1,
+        expl:'인버터는 PMOS 1개 + NMOS 1개. A=0이면 PMOS가 도통해 출력을 VDD(1)로, A=1이면 NMOS가 도통해 GND(0)로 끌어당깁니다. 입력을 그대로 뒤집죠.'},
+  nand:{ins:['A','B'], up:{arr:'par',n:2}, dn:{arr:'ser',n:2},
+        out:a=>(a[0]&&a[1])?0:1,
+        expl:'NAND는 트랜지스터 4개. NMOS 2개가 직렬이라 A·B 둘 다 1일 때만 출력이 0. PMOS 2개는 병렬이라 하나라도 0이면 출력이 1. NAND·NOR만 있으면 어떤 게이트든 만들 수 있어 만능 게이트라 부릅니다.'},
+  nor:{ins:['A','B'], up:{arr:'ser',n:2}, dn:{arr:'par',n:2},
+        out:a=>(a[0]||a[1])?0:1,
+        expl:'NOR는 트랜지스터 4개. PMOS 2개가 직렬이라 A·B 모두 0일 때만 출력이 1. NMOS 2개는 병렬이라 하나라도 1이면 출력이 0. NOR도 만능 게이트라 이것만으로 컴퓨터를 만들 수 있습니다.'},
+};
+let tState={g:'inv', A:0, B:0};
+
+function transOn(type, gv){ return type==='P' ? (gv===0) : (gv===1); } // P도통:게이트0, N도통:게이트1
+
+// 그룹(직렬/병렬) 그리기. topY→botY 사이. 반환: 도통 여부
+function drawGroup(cx, topY, botY, spec, type, vals){
+  let seg=''; let boxes=''; let conduct;
+  const on = i => transOn(type, vals[i]);
+  if(spec.arr==='ser'){
+    conduct = Array.from({length:spec.n}, (_,i)=>on(i)).every(Boolean);
+    const col = conduct ? 'var(--go)' : '#2b3547';
+    if(spec.n===1){
+      seg += line(cx,topY,cx,botY,col);
+      boxes += transistor(cx,(topY+botY)/2,type,tGateLabel(0),on(0));
+    }else{
+      const y1=topY+(botY-topY)*0.30, y2=topY+(botY-topY)*0.70;
+      seg += line(cx,topY,cx,y1-15,col)+line(cx,y1+15,cx,y2-15,col)+line(cx,y2+15,cx,botY,col);
+      boxes += transistor(cx,y1,type,tGateLabel(0),on(0))+transistor(cx,y2,type,tGateLabel(1),on(1));
+    }
+  }else{ // parallel
+    conduct = Array.from({length:spec.n}, (_,i)=>on(i)).some(Boolean);
+    const col = conduct ? 'var(--go)' : '#2b3547';
+    if(spec.n===1){
+      seg += line(cx,topY,cx,botY,col);
+      boxes += transistor(cx,(topY+botY)/2,type,tGateLabel(0),on(0));
+    }else{
+      const xs=[cx-44,cx+44], my=(topY+botY)/2;
+      // 각 브랜치는 자기 트랜지스터가 켜졌을 때만 초록
+      xs.forEach((x,i)=>{
+        const bc = on(i)?'var(--go)':'#2b3547';
+        seg += line(x,topY,x,my-15,bc)+line(x,my+15,x,botY,bc);
+        boxes += transistor(x,my,type,tGateLabel(i),on(i));
+      });
+      seg += line(xs[0],topY,xs[1],topY,'#2b3547')+line(xs[0],botY,xs[1],botY,'#2b3547');
+      seg += line(cx,topY,cx,topY,'#2b3547'); // spine handled by rails
+    }
+  }
+  return {svg:seg+boxes, conduct};
+}
+function tGateLabel(i){ return tState.ins[i]; }
+function line(x1,y1,x2,y2,col,w){ return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${col}" stroke-width="${w||3}" stroke-linecap="round"/>`; }
+function transistor(x,y,type,glabel,on){
+  const w=58,h=28, fill=on?'rgba(62,207,142,.18)':'#141a26', st=on?'var(--go)':'#4a5568';
+  const tcol=on?'var(--go)':'var(--dim)';
+  return `<g>
+    <rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="6" fill="${fill}" stroke="${st}" stroke-width="2"/>
+    <line x1="${x-w/2-11}" y1="${y}" x2="${x-w/2}" y2="${y}" stroke="${on?'var(--accent2)':'#586275'}" stroke-width="2.5"/>
+    <circle cx="${x-w/2-13}" cy="${y}" r="2.6" fill="${on?'var(--accent2)':'#586275'}"/>
+    <text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" font-family="inherit" font-weight="800" font-size="12" fill="${tcol}">${type}·${glabel}</text>
+  </g>`;
+}
+function renderTrans(){
+  tState.ins=TGATES[tState.g].ins;
+  const g=TGATES[tState.g], vals=g.ins.map(k=>tState[k]);
+  const VDD=34, OUTY=150, GND=266, cx=132;
+  const up=drawGroup(cx,VDD,OUTY,g.up,'P',vals);
+  const dn=drawGroup(cx,OUTY,GND,g.dn,'N',vals);
+  const out=g.out(vals);
+  // rails
+  let s='';
+  s+=line(46,VDD,cx+56,VDD,'#586275',2.5);
+  s+=`<text x="46" y="${VDD-8}" font-family="inherit" font-weight="800" font-size="11" fill="var(--gold)">VDD (1)</text>`;
+  s+=line(46,GND,cx+56,GND,'#586275',2.5);
+  s+=`<text x="46" y="${GND+16}" font-family="inherit" font-weight="800" font-size="11" fill="var(--dim)">GND (0)</text>`;
+  s+=up.svg+dn.svg;
+  // OUT node + tap to LED
+  const outLit = out===1;
+  s+=line(cx,OUTY,246,OUTY, outLit?'var(--accent2)':'#2b3547', 3);
+  s+=`<circle cx="${cx}" cy="${OUTY}" r="4" fill="${outLit?'var(--accent2)':'#586275'}"/>`;
+  s+=`<circle cx="262" cy="${OUTY}" r="15" fill="${outLit?'var(--accent2)':'#101722'}" stroke="${outLit?'var(--accent2)':'#3a465c'}" stroke-width="2.4" ${outLit?'filter="drop-shadow(0 0 7px rgba(34,211,238,.8))"':''}/>`;
+  s+=`<text x="262" y="${OUTY}" text-anchor="middle" dominant-baseline="central" font-family="inherit" font-weight="800" font-size="14" fill="${outLit?'#08111f':'var(--faint)'}">${out}</text>`;
+  s+=`<text x="262" y="${OUTY-24}" text-anchor="middle" font-family="inherit" font-weight="700" font-size="11" fill="var(--faint)">OUT</text>`;
+  $('tsvg').innerHTML=s;
+  // side panel
+  $('tOut').textContent=out;
+  $('tOut').className='ov '+(out?'on':'off');
+  const cnt=g.up.n+g.dn.n;
+  $('tCount').innerHTML='트랜지스터 <b>'+cnt+'개</b> · PMOS '+g.up.n+' + NMOS '+g.dn.n;
+  $('tExpl').textContent=g.expl;
+  // input toggles
+  const box=$('tinputs'); box.innerHTML='';
+  g.ins.forEach(k=>{
+    const el=document.createElement('div');
+    el.className='tin'+(tState[k]?' on':'');
+    el.innerHTML='<div class="lb">입력 '+k+'</div><div class="vv">'+tState[k]+'</div>';
+    el.onclick=()=>{tState[k]=tState[k]?0:1;renderTrans();};
+    box.appendChild(el);
+  });
+}
+document.querySelectorAll('.gpk').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.gpk').forEach(x=>x.classList.remove('act'));b.classList.add('act');
+  tState.g=b.dataset.g;tState.A=0;tState.B=0;renderTrans();
+});
+
+/* =========================================================
+   레벨 2 — 논리회로 빌더 엔진
+   ========================================================= */
+const VBW=680, VBH=400, NW=70, NH=46;
+let nodes=[], wires=[], idc=0, orderC=0, selId=null, pending=null, drag=null, pointerPos={x:0,y:0};
+const svg=$('build');
+
+const IN_LABELS=['A','B','C','D','E','F','G','H'];
+const OUT_LABELS=['Y','Z','W','V','U','T','S','R'];
+function inCount(t){return t==='INPUT'?0:(t==='OUTPUT'||t==='NOT')?1:2;}
+function outCount(t){return t==='OUTPUT'?0:1;}
+function inverting(t){return t==='NOT'||t==='NAND'||t==='NOR';}
+function autoLabel(t){
+  const used=new Set(nodes.filter(n=>n.type===t).map(n=>n.label));
+  const pool=t==='INPUT'?IN_LABELS:t==='OUTPUT'?OUT_LABELS:null;
+  if(!pool)return t;
+  for(const l of pool)if(!used.has(l))return l;
+  return t+nodes.length;
+}
+function addNode(t,x,y,label){
+  const n={id:'n'+(idc++),type:t,x,y,value:0,order:orderC++,label:label||autoLabel(t)};
+  nodes.push(n);return n;
+}
+function nodeById(id){return nodes.find(n=>n.id===id);}
+function inPortPos(n,p){const c=inCount(n.type);const ys=c<=1?[0.5]:[0.30,0.70];return{x:n.x,y:n.y+NH*ys[p]};}
+function outPortPos(n){return{x:n.x+NW,y:n.y+NH/2};}
+
+function addWire(from,to,toPort){
+  wires=wires.filter(w=>!(w.to===to&&w.toPort===toPort));
+  wires.push({id:'w'+(idc++),from,to,toPort,value:0});
+}
+function removeWireTo(to,toPort){wires=wires.filter(w=>!(w.to===to&&w.toPort===toPort));}
+function removeNode(id){nodes=nodes.filter(n=>n.id!==id);wires=wires.filter(w=>w.from!==id&&w.to!==id);}
+
+function gateOut(t,v){switch(t){
+  case 'OUTPUT':return v[0]?1:0;
+  case 'NOT':return v[0]?0:1;
+  case 'AND':return (v[0]&&v[1])?1:0;
+  case 'OR':return (v[0]||v[1])?1:0;
+  case 'NAND':return (v[0]&&v[1])?0:1;
+  case 'NOR':return (v[0]||v[1])?0:1;
+  case 'XOR':return (v[0]!==v[1])?1:0;
+  default:return 0;
+}}
+function evaluate(){
+  const byId={};nodes.forEach(n=>byId[n.id]=n);
+  const inW={};wires.forEach(w=>inW[w.to+':'+w.toPort]=w);
+  const passes=nodes.length+6;
+  for(let p=0;p<passes;p++){
+    nodes.forEach(n=>{
+      if(n.type==='INPUT')return;
+      const c=inCount(n.type),vs=[];
+      for(let i=0;i<c;i++){const w=inW[n.id+':'+i];vs.push(w?byId[w.from].value:0);}
+      n.value=gateOut(n.type,vs);
+    });
+  }
+  wires.forEach(w=>w.value=byId[w.from].value);
+}
+
+/* ---- rendering ---- */
+function bez(x1,y1,x2,y2){const dx=Math.max(30,Math.abs(x2-x1)/2);return `M${x1} ${y1} C${x1+dx} ${y1} ${x2-dx} ${y2} ${x2} ${y2}`;}
+function nodeSVG(n){
+  const sel=n.id===selId?' sel':'';
+  const hot=n.value?' hot':'';
+  const op=outPortPos(n);
+  const pendAct=(pending&&pending.from===n.id)?' act':'';
+  if(n.type==='INPUT'){
+    return `<g class="node inSwitch${n.value?' on':''}${sel}" data-id="${n.id}" data-type="INPUT" transform="translate(${n.x},${n.y})">
+      <rect class="body" x="0" y="0" width="${NW}" height="${NH}" rx="9"/>
+      <text class="sub" x="14" y="12">${n.label}</text>
+      <text class="val" x="${NW/2}" y="${NH/2+2}">${n.value}</text>
+      <circle class="port pout${n.value?' pinON':''}${pendAct}" data-id="${n.id}" cx="${NW}" cy="${NH/2}" r="7"/>
+    </g>`;
+  }
+  if(n.type==='OUTPUT'){
+    const ip=inPortPos(n,0);
+    return `<g class="node${sel}" data-id="${n.id}" data-type="OUTPUT" transform="translate(${n.x},${n.y})">
+      <rect class="body" x="0" y="0" width="${NW}" height="${NH}" rx="9" style="fill:#101722;stroke:#3a465c"/>
+      <text class="sub" x="14" y="12" style="fill:var(--go)">${n.label}</text>
+      <circle class="led${n.value?' on':''}" cx="${NW/2+6}" cy="${NH/2+2}" r="12"/>
+      <text x="${NW/2+6}" y="${NH/2+2}" style="fill:${n.value?'#08111f':'var(--faint)'};font-size:12px">${n.value}</text>
+      <circle class="port pin" data-id="${n.id}" data-port="0" cx="0" cy="${NH/2}" r="7"/>
+    </g>`;
+  }
+  // gate
+  let ports='';
+  const c=inCount(n.type);
+  for(let i=0;i<c;i++){const ip=inPortPos(n,i);ports+=`<circle class="port pin" data-id="${n.id}" data-port="${i}" cx="0" cy="${ip.y-n.y}" r="7"/>`;}
+  const bub=inverting(n.type)?`<circle class="bubble" cx="${NW+6}" cy="${NH/2}" r="5" stroke="currentColor"/>`:'';
+  const outCx=inverting(n.type)?NW+11:NW;
+  return `<g class="node${sel}${hot}" data-id="${n.id}" data-type="${n.type}" transform="translate(${n.x},${n.y})">
+    <rect class="body" x="0" y="0" width="${NW}" height="${NH}" rx="9"/>
+    <text x="${NW/2}" y="${NH/2+1}" font-size="15">${n.type}</text>
+    ${bub}
+    ${ports}
+    <circle class="port pout${n.value?' pinON':''}${pendAct}" data-id="${n.id}" cx="${outCx}" cy="${NH/2}" r="7"/>
+  </g>`;
+}
+function render(){
+  let s='';
+  wires.forEach(w=>{
+    const a=nodeById(w.from),b=nodeById(w.to);if(!a||!b)return;
+    const p1=outPortPos(a),p2=inPortPos(b,w.toPort);
+    s+=`<path class="wire${w.value?' on':''}" d="${bez(p1.x,p1.y,p2.x,p2.y)}"/>`;
+  });
+  if(pending){const a=nodeById(pending.from);if(a){const p1=outPortPos(a);s+=`<path class="rubber" d="${bez(p1.x,p1.y,pointerPos.x,pointerPos.y)}"/>`;}}
+  nodes.forEach(n=>s+=nodeSVG(n));
+  svg.innerHTML=s;
+}
+
+/* ---- pointer interaction ---- */
+function toSvg(e){const r=svg.getBoundingClientRect();return{x:(e.clientX-r.left)/r.width*VBW,y:(e.clientY-r.top)/r.height*VBH};}
+svg.addEventListener('pointerdown',e=>{
+  const pt=toSvg(e);pointerPos=pt;
+  const port=e.target.closest('.pout,.pin');
+  if(port){
+    e.preventDefault();
+    const id=port.dataset.id;
+    if(port.classList.contains('pout')){
+      pending={from:id};render();
+    }else{
+      const toPort=+port.dataset.port;
+      if(pending){ if(pending.from!==id){addWire(pending.from,id,toPort);} pending=null; }
+      else{ removeWireTo(id,toPort); }
+      evaluate();render();refreshTruth();
+    }
+    return;
+  }
+  const g=e.target.closest('.node');
+  if(g){
+    const n=nodeById(g.dataset.id);
+    drag={id:n.id,dx:pt.x-n.x,dy:pt.y-n.y,moved:false};
+    svg.setPointerCapture(e.pointerId);
+    pending=null;
+    return;
+  }
+  // empty
+  pending=null;selId=null;render();
+});
+svg.addEventListener('pointermove',e=>{
+  pointerPos=toSvg(e);
+  if(drag){
+    const n=nodeById(drag.id);if(!n)return;
+    let nx=pointerPos.x-drag.dx, ny=pointerPos.y-drag.dy;
+    nx=Math.max(0,Math.min(VBW-NW,nx));ny=Math.max(0,Math.min(VBH-NH,ny));
+    if(Math.abs(nx-n.x)>3||Math.abs(ny-n.y)>3)drag.moved=true;
+    n.x=nx;n.y=ny;render();
+  }else if(pending){render();}
+});
+svg.addEventListener('pointerup',e=>{
+  if(drag){
+    const n=nodeById(drag.id);
+    if(!drag.moved&&n){
+      if(n.type==='INPUT'){n.value=n.value?0:1;evaluate();refreshTruth();}
+      else{selId=n.id;}
+    }
+    try{svg.releasePointerCapture(e.pointerId);}catch(_){}
+    drag=null;render();
+  }
+});
+
+/* ---- palette ---- */
+const PAL_GATES=['INPUT','OUTPUT','AND','OR','NOT','NAND','NOR','XOR'];
+const PAL_NAMES={INPUT:'입력',OUTPUT:'출력'};
+let spawnI=0;
+function buildPalette(){
+  const pal=$('pal');pal.innerHTML='';
+  PAL_GATES.forEach(t=>{
+    const b=document.createElement('button');
+    b.className='pbtn';b.dataset.g=t;b.textContent=PAL_NAMES[t]||t;
+    b.onclick=()=>{
+      const x=90+(spawnI%4)*30, y=70+(spawnI%6)*44; spawnI++;
+      const n=addNode(t,x,y);selId=n.id;evaluate();render();refreshTruth();
+    };
+    pal.appendChild(b);
+  });
+}
+function applyPaletteLock(allow){
+  document.querySelectorAll('.pbtn').forEach(b=>{
+    const t=b.dataset.g;
+    b.disabled = allow ? !(t==='INPUT'||t==='OUTPUT'||allow.includes(t)) : false;
+  });
+}
+$('delBtn').onclick=()=>{if(selId){removeNode(selId);selId=null;evaluate();render();refreshTruth();}};
+$('clrBtn').onclick=()=>{
+  if(mode==='chall'){loadCh(curCh);return;}
+  nodes=[];wires=[];selId=null;pending=null;evaluate();render();refreshTruth();
+  $('knote').style.display='none';$('cbadge').textContent='';
+};
+
+/* ---- truth table ---- */
+function getInputs(){return nodes.filter(n=>n.type==='INPUT').sort((a,b)=>a.order-b.order);}
+function getOutputs(){return nodes.filter(n=>n.type==='OUTPUT').sort((a,b)=>a.order-b.order);}
+function buildTruth(){
+  const ins=getInputs(),outs=getOutputs();
+  if(ins.length===0||outs.length===0)return null;
+  if(ins.length>6)return{tooBig:true,ins,outs};
+  const saved=ins.map(n=>n.value);
+  const rows=[];
+  for(let c=0;c<(1<<ins.length);c++){
+    ins.forEach((n,i)=>n.value=(c>>(ins.length-1-i))&1);
+    evaluate();
+    rows.push({in:ins.map(n=>n.value),out:outs.map(n=>n.value)});
+  }
+  ins.forEach((n,i)=>n.value=saved[i]);evaluate();
+  return{ins,outs,rows};
+}
+function refreshTruth(){
+  const t=buildTruth();
+  const box=$('ttbl');
+  if(!t){box.innerHTML='<div class="empty">입력(노란 스위치)과 출력(초록 LED)을 하나씩 놓고 게이트로 연결하면 진리표가 나타납니다.</div>';$('ttMeta').textContent='';return;}
+  if(t.tooBig){box.innerHTML='<div class="empty">입력이 6개를 넘어 진리표가 너무 큽니다(64행 초과). 입력을 줄여보세요.</div>';$('ttMeta').textContent='';return;}
+  const cur=getInputs().map(n=>n.value);
+  let h='<table><thead><tr>';
+  t.ins.forEach(n=>h+='<th>'+n.label+'</th>');
+  t.outs.forEach(n=>h+='<th class="o">'+n.label+'</th>');
+  h+='</tr></thead><tbody>';
+  t.rows.forEach(r=>{
+    const isCur=r.in.every((v,i)=>v===cur[i]);
+    h+='<tr class="'+(isCur?'cur':'')+'">';
+    r.in.forEach(v=>h+='<td class="'+(v?'one':'zero')+'">'+v+'</td>');
+    r.out.forEach(v=>h+='<td class="o '+(v?'one':'zero')+'">'+v+'</td>');
+    h+='</tr>';
+  });
+  h+='</tbody></table>';
+  box.innerHTML=h;
+  $('ttMeta').textContent=t.rows.length+'행 · 입력 '+t.ins.length+' · 출력 '+t.outs.length;
+}
+
+/* =========================================================
+   프리셋 회로
+   ========================================================= */
+const PRES=[
+  {name:'CMOS 인버터 (NOT)', note:['인버터','입력을 그대로 뒤집는 가장 단순한 게이트. 실제 CMOS에서는 트랜지스터 2개로 만들어집니다. A=1이면 Y=0, A=0이면 Y=1.'],
+   nodes:[['A','INPUT',36,177],['g','NOT',300,177],['Y','OUTPUT',560,177]],
+   wires:[['A','g',0],['g','Y',0]]},
+  {name:'2입력 NAND', note:['만능 게이트 NAND','두 입력이 모두 1일 때만 0. NAND 하나로 NOT·AND·OR·XOR 등 모든 게이트를 만들 수 있어 "만능 게이트"라 부릅니다. 실제 칩도 NAND를 대량으로 씁니다.'],
+   nodes:[['A','INPUT',36,110],['B','INPUT',36,250],['g','NAND',320,175],['Y','OUTPUT',560,177]],
+   wires:[['A','g',0],['B','g',1],['g','Y',0]]},
+  {name:'XOR (게이트 조합)', note:['XOR = 서로 다르면 1','두 입력이 다를 때만 1. 기본 게이트로 (A AND ¬B) OR (¬A AND B)로 구성했습니다. XOR는 덧셈의 "합" 자리라서 가산기의 핵심 부품입니다.'],
+   nodes:[['A','INPUT',30,60],['B','INPUT',30,300],['nA','NOT',180,140],['nB','NOT',180,240],['a1','AND',340,80],['a2','AND',340,300],['o','OR',500,190],['Y','OUTPUT',600,190]],
+   wires:[['A','nA',0],['B','nB',0],['A','a1',0],['nB','a1',1],['nA','a2',0],['B','a2',1],['a1','o',0],['a2','o',1],['o','Y',0]]},
+  {name:'1비트 반가산기', note:['반가산기 = XOR + AND','두 비트를 더한다. 합 S = A XOR B, 자리올림 C = A AND B. 1+1=10(2진수)에서 S=0, C=1이 되는 걸 진리표로 확인하세요. 이게 덧셈기의 최소 단위입니다.'],
+   nodes:[['A','INPUT',36,110],['B','INPUT',36,270],['x','XOR',320,110],['a','AND',320,270],['S','OUTPUT',560,110],['C','OUTPUT',560,270]],
+   wires:[['A','x',0],['B','x',1],['A','a',0],['B','a',1],['x','S',0],['a','C',0]]},
+  {name:'1비트 전가산기', note:['전가산기 = 반가산기 2개 + OR','아래 자리에서 올라온 자리올림 Cin까지 세 비트를 더한다. S=(A⊕B)⊕Cin, Cout=(A·B)+((A⊕B)·Cin). 이걸 여러 개 이으면 8비트·64비트 덧셈기가 됩니다.'],
+   nodes:[['A','INPUT',30,50],['B','INPUT',30,160],['Ci','INPUT',30,330],['x1','XOR',210,100],['a1','AND',210,220],['x2','XOR',400,70],['a2','AND',400,220],['o','OR',505,300],['S','OUTPUT',600,70],['Co','OUTPUT',600,320]],
+   wires:[['A','x1',0],['B','x1',1],['A','a1',0],['B','a1',1],['x1','x2',0],['Ci','x2',1],['x1','a2',0],['Ci','a2',1],['a1','o',0],['a2','o',1],['x2','S',0],['o','Co',0]]},
+  {name:'2:1 멀티플렉서', note:['MUX = 신호 선택기','선택선 S로 두 입력 중 하나를 고른다. S=0이면 I0, S=1이면 I1이 Y로. Y=(I0·¬S)+(I1·S). 데이터 경로를 라우팅하는 컴퓨터의 기본 부품입니다.'],
+   nodes:[['S','INPUT',30,50],['I0','INPUT',30,180],['I1','INPUT',30,320],['n','NOT',190,50],['a0','AND',360,140],['a1','AND',360,310],['o','OR',500,220],['Y','OUTPUT',600,220]],
+   wires:[['S','n',0],['I0','a0',0],['n','a0',1],['I1','a1',0],['S','a1',1],['a0','o',0],['a1','o',1],['o','Y',0]]},
+  {name:'SR 래치 (NOR)', note:['래치 = 1비트 기억','교차 연결된 NOR 2개가 상태를 붙든다. S=1로 Q를 세우고, R=1로 지운다. S=R=0이면 직전 값을 기억. 피드백 루프라 반복 평가로 안정화합니다. 이게 메모리의 씨앗입니다.'],
+   nodes:[['S','INPUT',30,90],['R','INPUT',30,300],['n1','NOR',320,110],['n2','NOR',320,290],['Q','OUTPUT',560,110],['Qn','OUTPUT',560,290]],
+   wires:[['R','n1',0],['n2','n1',1],['S','n2',0],['n1','n2',1],['n1','Q',0],['n2','Qn',0]]},
+];
+function loadPreset(idx){
+  const p=PRES[idx];
+  nodes=[];wires=[];idc=0;orderC=0;selId=null;pending=null;
+  const map={};
+  p.nodes.forEach(([key,type,x,y])=>{
+    const label=(type==='INPUT'||type==='OUTPUT')?key:undefined;
+    const n=addNode(type,x,y,label);map[key]=n.id;
+  });
+  p.wires.forEach(([f,t,port])=>addWire(map[f],map[t],port));
+  evaluate();render();refreshTruth();
+  $('cbadge').textContent=p.name;
+  const kn=$('knote');kn.style.display='flex';$('knoteIc').textContent='🧠';
+  $('knoteT').textContent=p.note[0]+' —';$('knoteS').textContent=p.note[1];
+  $('ttTitle').textContent='진리표';
+}
+function buildExps(){
+  const bar=$('exps');bar.innerHTML='';
+  PRES.forEach((p,i)=>{
+    const b=document.createElement('button');b.className='exp';b.textContent=p.name;
+    b.onclick=()=>{document.querySelectorAll('.exp').forEach(x=>x.classList.remove('act'));b.classList.add('act');loadPreset(i);};
+    bar.appendChild(b);
+  });
+}
+
+/* =========================================================
+   챌린지
+   ========================================================= */
+const ALL=['AND','OR','NOT','NAND','NOR','XOR'];
+const CHS=[
+  {id:'lc1',name:'NAND으로 인버터',ins:['A'],outs:['Y'],allow:['NAND'],
+   fn:a=>[a[0]?0:1],
+   goal:'NAND 게이트만 써서 인버터(NOT)를 만들어라. 입력 A를 뒤집어 Y로 내보내면 성공.',
+   hint:'NAND의 두 입력을 같은 신호 A로 묶으면? A NAND A = NOT A. 출력 점 하나를 두 입력에 각각 연결하세요.'},
+  {id:'lc2',name:'NAND으로 AND',ins:['A','B'],outs:['Y'],allow:['NAND'],
+   fn:a=>[(a[0]&&a[1])?1:0],
+   goal:'NAND만으로 AND를 만들어라. 만능 게이트 NAND의 위력을 확인.',
+   hint:'A NAND B는 AND의 반대. 그 결과를 다시 NAND-인버터로 뒤집으면 AND. NAND 2개면 됩니다.'},
+  {id:'lc3',name:'XOR 만들기',ins:['A','B'],outs:['Y'],allow:['AND','OR','NOT','NAND','NOR'],
+   fn:a=>[(a[0]!==a[1])?1:0],
+   goal:'XOR 게이트 없이 기본 게이트만으로 XOR를 구성하라. 서로 다를 때만 1.',
+   hint:'(A AND ¬B) OR (¬A AND B). 또는 (A OR B) AND (A NAND B)도 XOR가 됩니다.'},
+  {id:'lc4',name:'반가산기 완성',ins:['A','B'],outs:['S','C'],allow:ALL,
+   fn:a=>[(a[0]!==a[1])?1:0,(a[0]&&a[1])?1:0],
+   goal:'두 비트를 더하는 반가산기. 합 S=A⊕B, 자리올림 C=A·B. 출력 2개를 모두 목표 진리표에 맞춰라.',
+   hint:'S는 XOR, C는 AND. 출력 노드 두 개(S, C)만 정확하면 순서는 자동으로 맞춰 채점합니다.'},
+  {id:'lc5',name:'전가산기 완성',ins:['A','B','Cin'],outs:['S','Cout'],allow:ALL,
+   fn:a=>{const s=a[0]+a[1]+a[2];return[s&1,s>=2?1:0];},
+   goal:'세 비트(A, B, 자리올림 입력 Cin)를 더해 합 S와 자리올림 Cout. 반가산기 2개 + OR로 만들 수 있다.',
+   hint:'S=(A⊕B)⊕Cin, Cout=(A·B)+((A⊕B)·Cin). XOR 2개, AND 2개, OR 1개.'},
+];
+let mode='build', curCh=0;
+const CHKEY='logicChallengeV1';
+const loadProg=()=>{try{return JSON.parse(localStorage.getItem(CHKEY))||{};}catch(e){return{};}};
+const saveProg=p=>{try{localStorage.setItem(CHKEY,JSON.stringify(p));}catch(e){}};
+const starStr=n=>'★'.repeat(n)+'☆'.repeat(3-n);
+const unlocked=i=>i===0||(loadProg()[CHS[i-1].id]||0)>=1;
+
+function renderLevels(){
+  const box=$('chlevels'),p=loadProg();box.innerHTML='';
+  CHS.forEach((lv,i)=>{
+    const b=document.createElement('button');
+    const open=unlocked(i),best=p[lv.id]||0;
+    b.className='chlv'+(i===curCh?' act':'')+(open?'':' locked');
+    b.innerHTML=(open?('C'+(i+1)):'🔒')+(best>0?'<span class="s">★</span>':'');
+    if(open)b.onclick=()=>loadCh(i);
+    box.appendChild(b);
+  });
+}
+function loadCh(i){
+  if(!unlocked(i))return;
+  curCh=i;const lv=CHS[i];
+  nodes=[];wires=[];idc=0;orderC=0;selId=null;pending=null;
+  lv.ins.forEach((lab,k)=>addNode('INPUT',36,50+k*(300/Math.max(1,lv.ins.length-1||1)),lab));
+  // place outputs
+  const oy=lv.outs.length===1?177:[110,270];
+  lv.outs.forEach((lab,k)=>addNode('OUTPUT',600,lv.outs.length===1?177:oy[k],lab));
+  applyPaletteLock(lv.allow);
+  evaluate();render();refreshTruth();
+  $('chName').textContent='챌린지 '+(i+1)+' · '+lv.name;
+  $('chStars').textContent=starStr(loadProg()[lv.id]||0);
+  $('chGoal').textContent=lv.goal;
+  $('chresult').style.display='none';
+  $('cbadge').textContent='허용 게이트: '+lv.allow.join(', ');
+  renderChTarget(lv);
+  renderLevels();
+}
+function renderChTarget(lv){
+  // show target truth table
+  $('ttTitle').textContent='목표 진리표';
+  let h='<table><thead><tr>';
+  lv.ins.forEach(l=>h+='<th>'+l+'</th>');
+  lv.outs.forEach(l=>h+='<th class="o">'+l+'</th>');
+  h+='</tr></thead><tbody>';
+  for(let c=0;c<(1<<lv.ins.length);c++){
+    const inv=lv.ins.map((_,i)=>(c>>(lv.ins.length-1-i))&1);
+    const ov=lv.fn(inv);
+    h+='<tr>';inv.forEach(v=>h+='<td class="'+(v?'one':'zero')+'">'+v+'</td>');
+    ov.forEach(v=>h+='<td class="o '+(v?'one':'zero')+'">'+v+'</td>');
+    h+='</tr>';
+  }
+  h+='</tbody></table>';
+  $('ttbl').innerHTML=h;$('ttMeta').textContent='이 표와 일치시키면 통과';
+}
+function permutations(arr){
+  if(arr.length<=1)return[arr];
+  const res=[];
+  arr.forEach((v,i)=>{
+    const rest=arr.slice(0,i).concat(arr.slice(i+1));
+    permutations(rest).forEach(p=>res.push([v].concat(p)));
+  });
+  return res;
+}
+function checkChallenge(){
+  const lv=CHS[curCh];
+  const ins=getInputs(),outs=getOutputs();
+  const res=$('chresult');
+  const show=(win,stars,msg,hint)=>{
+    res.className='chresult '+(win?'win':'lose');res.style.display='flex';
+    res.innerHTML='<span class="st">'+starStr(stars)+'</span><div><div class="big">'+msg+'</div>'+(hint?'<div class="hint">💡 '+hint+'</div>':'')+'</div>';
+  };
+  // gate constraint
+  const bad=nodes.find(n=>!['INPUT','OUTPUT'].includes(n.type)&&!lv.allow.includes(n.type));
+  if(bad){show(false,0,bad.type+' 게이트는 이 챌린지에서 쓸 수 없어요. 허용: '+lv.allow.join(', '),lv.hint);return;}
+  if(ins.length!==lv.ins.length){show(false,0,'입력 개수가 달라요 ('+ins.length+' / '+lv.ins.length+'개 필요).',lv.hint);return;}
+  if(outs.length!==lv.outs.length){show(false,0,'출력 개수가 달라요 ('+outs.length+' / '+lv.outs.length+'개 필요).',lv.hint);return;}
+  const t=buildTruth();
+  if(!t||t.tooBig){show(false,0,'회로를 완성해 주세요.',lv.hint);return;}
+  // expected rows
+  const exp=t.rows.map(r=>lv.fn(r.in));
+  // try output permutations
+  const perms=permutations(t.outs.map((_,i)=>i));
+  let ok=false;
+  for(const pm of perms){
+    if(t.rows.every((r,ri)=>pm.every((srcIdx,dstIdx)=>r.out[srcIdx]===exp[ri][dstIdx]))){ok=true;break;}
+  }
+  if(ok){
+    const p=loadProg();p[lv.id]=Math.max(p[lv.id]||0,3);saveProg(p);
+    $('chStars').textContent=starStr(p[lv.id]);renderLevels();
+    show(true,3,'명중! 진리표가 목표와 완전히 일치합니다 🎉',null);
+  }else{
+    // count mismatching rows (best permutation)
+    let best=1e9;
+    for(const pm of perms){
+      let miss=0;t.rows.forEach((r,ri)=>{if(!pm.every((s,d)=>r.out[s]===exp[ri][d]))miss++;});
+      best=Math.min(best,miss);
+    }
+    show(false,0,best+'개 행이 목표와 달라요. 진리표를 비교하며 배선을 고쳐보세요.',lv.hint);
+  }
+}
+$('checkBtn').onclick=checkChallenge;
+
+/* =========================================================
+   모드 전환
+   ========================================================= */
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.md').forEach(b=>b.classList.toggle('act',b.dataset.m===m));
+  $('secTrans').style.display=m==='trans'?'block':'none';
+  $('secBuild').style.display=m==='trans'?'none':'block';
+  if(m==='trans'){renderTrans();return;}
+  const chMode=m==='chall';
+  $('exps').style.display=chMode?'none':'flex';
+  $('chbar').style.display=chMode?'block':'none';
+  $('chCheckWrap').style.display=chMode?'block':'none';
+  $('knote').style.display=chMode?'none':'flex';
+  $('chresult').style.display='none';
+  if(chMode){applyPaletteLock(CHS[curCh].allow);renderLevels();loadCh(curCh);}
+  else{
+    applyPaletteLock(null);
+    const acts=document.querySelectorAll('.exp');
+    const cur=document.querySelector('.exp.act');
+    if(cur)cur.click();else acts[3].click();
+  }
+}
+document.querySelectorAll('.md').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+
+/* init */
+buildPalette();buildExps();renderTrans();
+document.querySelectorAll('.exp')[3].classList.add('act');
+loadPreset(3); // 반가산기로 시작
+</script>
+</body>
+</html>

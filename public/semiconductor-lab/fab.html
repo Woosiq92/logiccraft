@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>팹 공정 라인 — 반도체 실험실</title>
+<meta name="description" content="웨이퍼 한 장을 산화·노광·식각·이온주입·증착·CMP·배선·패키징 공정에 순서대로 통과시켜 칩을 만든다. 파라미터를 바꾸면 수율과 불량이 달라지는 룰베이스 팹 시뮬레이터.">
+<style>
+  :root{
+    --bg:#0a0d14;--bg2:#0f131c;--card:#141a26;--line:#232c3c;
+    --ink:#e9edf5;--dim:#98a3b6;--faint:#6a7488;
+    --accent:#4f9cff;--accent2:#22d3ee;--gold:#ffb84d;--go:#3ecf8e;--warn:#ffcf4a;--stop:#ff5a6a;--violet:#a78bfa;
+    --r:16px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",system-ui,sans-serif;line-height:1.6;-webkit-font-smoothing:antialiased;letter-spacing:-0.01em}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+
+  nav{position:sticky;top:0;z-index:50;background:rgba(10,13,20,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+  nav .wrap{display:flex;align-items:center;gap:16px;height:56px}
+  nav .brand{font-weight:800;font-size:15px}
+  nav .brand span{color:var(--accent)}
+  nav .links{margin-left:auto;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+  nav a{color:var(--dim);text-decoration:none;font-size:13px;padding:6px 11px;border-radius:999px;border:1px solid transparent}
+  nav a:hover{color:var(--ink)}
+  nav a.here{color:var(--accent);border-color:rgba(79,156,255,.35);background:rgba(79,156,255,.1)}
+  nav a.home{color:var(--faint)}
+
+  header{padding:38px 0 20px;text-align:center;border-bottom:1px solid var(--line);
+    background:radial-gradient(60% 90% at 50% -20%, rgba(79,156,255,.16), transparent 70%)}
+  .kick{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.05em;color:var(--accent2);background:rgba(34,211,238,.10);border:1px solid rgba(34,211,238,.25);padding:5px 12px;border-radius:999px;margin-bottom:14px}
+  header h1{font-size:clamp(23px,4.4vw,32px);font-weight:800;letter-spacing:-0.03em;line-height:1.2;margin-bottom:9px}
+  header h1 em{font-style:normal;color:var(--accent)}
+  header p{color:var(--dim);font-size:14.5px;max-width:600px;margin:0 auto}
+
+  .modes{display:inline-flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:4px;margin-top:18px}
+  .md{background:none;border:none;color:var(--dim);font-family:inherit;font-weight:700;font-size:13px;padding:8px 18px;border-radius:999px;cursor:pointer;transition:all .15s}
+  .md.act{background:var(--accent);color:#06101f}
+
+  .exps{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;padding:18px 0 2px}
+  .exp{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 15px;font-size:13px;font-weight:600;color:var(--dim);cursor:pointer;transition:all .15s;white-space:nowrap}
+  .exp:hover{border-color:var(--faint);color:var(--ink)}
+  .exp.act{background:rgba(79,156,255,.14);border-color:var(--accent);color:var(--accent)}
+
+  .chbar{padding:16px 0 2px}
+  .chlevels{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+  .chlv{background:var(--card);border:1px solid var(--line);border-radius:11px;min-width:42px;height:42px;padding:0 6px;font-weight:800;font-size:14px;color:var(--dim);cursor:pointer;position:relative;transition:all .15s}
+  .chlv.act{border-color:var(--accent);color:var(--accent);background:rgba(79,156,255,.12)}
+  .chlv.locked{opacity:.4;cursor:not-allowed}
+  .chlv .s{display:block;font-size:8px;color:var(--warn);line-height:1;margin-top:1px;letter-spacing:1px}
+  .chgoal{max-width:660px;margin:0 auto;text-align:center}
+  .chgoal-t{font-size:16px;font-weight:800;margin-bottom:4px;display:flex;gap:9px;justify-content:center;align-items:center;flex-wrap:wrap}
+  .chgoal-t .chstars{color:var(--warn);font-size:13px;letter-spacing:2px}
+  .chgoal-d{font-size:13.5px;color:var(--dim);line-height:1.5}
+  .chresult{border-radius:14px;padding:14px 16px;display:none;align-items:center;gap:14px;margin-top:2px}
+  .chresult.win{background:rgba(62,207,142,.1);border:1px solid rgba(62,207,142,.32)}
+  .chresult.lose{background:rgba(255,207,74,.08);border:1px solid rgba(255,207,74,.3)}
+  .chresult .st{font-size:20px;color:var(--warn);letter-spacing:3px;flex-shrink:0}
+  .chresult .big{font-size:14.5px;font-weight:800}
+  .chresult .hint{color:var(--dim);font-size:12.5px;margin-top:2px}
+  input:disabled{opacity:.35;cursor:not-allowed}
+  select:disabled{opacity:.5;cursor:not-allowed}
+
+  .lab{display:grid;grid-template-columns:340px 1fr;gap:18px;padding:22px 0 60px;align-items:start}
+
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:20px}
+  .panel .ph{font-size:12.5px;font-weight:800;letter-spacing:.04em;color:var(--faint);text-transform:uppercase;margin-bottom:12px}
+
+  .steplist{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:18px}
+  .stepchip{background:var(--bg2);border:1px solid var(--line);border-radius:10px;padding:8px 4px 7px;cursor:pointer;text-align:center;transition:all .13s;position:relative}
+  .stepchip:hover{border-color:var(--faint)}
+  .stepchip.act{border-color:var(--accent);background:rgba(79,156,255,.12)}
+  .stepchip .n{font-size:16px;line-height:1}
+  .stepchip .t{font-size:9.5px;font-weight:700;color:var(--dim);margin-top:3px;line-height:1.15}
+  .stepchip.act .t{color:var(--ink)}
+  .stepchip .dot{position:absolute;top:5px;right:5px;width:7px;height:7px;border-radius:50%;background:var(--go)}
+  .stepchip.run{border-color:var(--accent2);box-shadow:0 0 0 2px rgba(34,211,238,.3)}
+
+  .activehead{display:flex;align-items:center;gap:9px;margin-bottom:6px}
+  .activehead .ic{font-size:20px}
+  .activehead .nm{font-size:15.5px;font-weight:800}
+  .tip{font-size:12.5px;color:var(--dim);line-height:1.5;background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin-bottom:16px}
+  .tip b{color:var(--accent2)}
+
+  .fld{margin-bottom:14px}
+  .fld .lab2{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;margin-bottom:6px}
+  .fld .lab2 b{font-weight:600;color:var(--dim)}
+  .fld .lab2 .val{font-weight:800;color:var(--ink);font-variant-numeric:tabular-nums;font-size:14px}
+  input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:5px;border-radius:99px;background:var(--bg2);outline:none;border:1px solid var(--line)}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg)}
+  input[type=range]::-moz-range-thumb{width:15px;height:15px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg)}
+  select{width:100%;background:var(--bg2);color:var(--ink);border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+
+  .stepres{background:var(--bg2);border:1px solid var(--line);border-radius:11px;padding:11px 13px;font-size:13px;margin-top:4px}
+  .stepres .r{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
+  .stepres .y{float:right;font-weight:800;font-variant-numeric:tabular-nums}
+  .stepres .df{color:var(--stop);font-size:12px;margin-top:5px;line-height:1.4}
+  .stepres .ok{color:var(--go);font-size:12px;margin-top:5px}
+
+  .launch{width:100%;margin-top:18px;padding:14px;border:none;border-radius:12px;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#06101f;font-family:inherit;font-weight:800;font-size:15.5px;cursor:pointer;transition:filter .15s}
+  .launch:hover{filter:brightness(1.06)}
+  .launch:active{transform:translateY(1px)}
+  .launch.dirty{animation:pulse 1.4s ease-in-out infinite}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(34,211,238,.5)}50%{box-shadow:0 0 0 5px rgba(34,211,238,0)}}
+
+  .out{display:flex;flex-direction:column;gap:16px}
+
+  .xsec{position:relative;border-radius:var(--r);overflow:hidden;border:1px solid var(--line);background:#070a11}
+  .xsec canvas{width:100%;height:auto;display:block}
+  .xhud{position:absolute;top:12px;left:14px;pointer-events:none}
+  .xhud .ph2{font-size:12px;font-weight:700;color:var(--accent2)}
+  .xhud .st2{font-size:15px;font-weight:800;margin-top:2px;text-shadow:0 1px 6px rgba(0,0,0,.7)}
+  .replay{position:absolute;bottom:12px;right:12px;background:rgba(20,26,38,.85);border:1px solid var(--line);color:var(--ink);border-radius:9px;padding:7px 12px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;backdrop-filter:blur(6px)}
+  .replay:hover{border-color:var(--faint)}
+
+  .stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .stat{background:var(--card);border:1px solid var(--line);border-radius:13px;padding:14px}
+  .stat .k{font-size:11.5px;color:var(--faint);font-weight:600;margin-bottom:4px}
+  .stat .v{font-size:21px;font-weight:800;font-variant-numeric:tabular-nums;letter-spacing:-0.02em}
+  .stat .v small{font-size:12px;font-weight:600;color:var(--dim);margin-left:2px}
+  .stat.hero{grid-column:span 2;background:linear-gradient(135deg,rgba(79,156,255,.12),rgba(34,211,238,.06));border-color:rgba(79,156,255,.3)}
+  .stat.hero .v{font-size:34px;color:var(--accent2)}
+  .stat.hero.bad{background:rgba(255,90,106,.1);border-color:rgba(255,90,106,.35)}
+  .stat.hero.bad .v{color:var(--stop)}
+  .stat .sub{font-size:11px;font-weight:700;color:var(--warn);margin-top:3px}
+
+  .brk{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:8px 10px}
+  .brkrow{display:flex;align-items:center;gap:11px;padding:9px 8px;border-radius:10px;cursor:pointer;transition:background .12s}
+  .brkrow:hover{background:var(--bg2)}
+  .brkrow.act{background:rgba(79,156,255,.1)}
+  .brkrow.run{background:rgba(34,211,238,.12)}
+  .brkrow .ic{font-size:16px;width:20px;text-align:center;flex-shrink:0}
+  .brkrow .nm{font-size:13px;font-weight:700;width:96px;flex-shrink:0}
+  .brkrow .bar{flex:1;height:7px;border-radius:99px;background:var(--bg2);overflow:hidden}
+  .brkrow .bar i{display:block;height:100%;border-radius:99px;transition:width .3s}
+  .brkrow .yv{font-size:12.5px;font-weight:800;font-variant-numeric:tabular-nums;width:44px;text-align:right;flex-shrink:0}
+  .brkrow .df2{font-size:11px;color:var(--faint);flex-basis:100%;padding-left:31px;margin-top:2px;display:none}
+  .brkrow.showdf .df2{display:block;color:var(--stop)}
+
+  .knote{border-radius:13px;padding:13px 15px;font-size:13px;line-height:1.5;display:flex;gap:11px;align-items:flex-start}
+  .knote .ic{font-size:17px;flex-shrink:0}
+  .knote.good{background:rgba(62,207,142,.07);border:1px solid rgba(62,207,142,.25)}
+  .knote.warn2{background:rgba(255,207,74,.07);border:1px solid rgba(255,207,74,.28)}
+  .knote.bad2{background:rgba(255,90,106,.07);border:1px solid rgba(255,90,106,.25)}
+  .knote b{color:var(--ink)}
+  .knote span{color:var(--dim)}
+
+  footer{padding:28px 0 50px;text-align:center;border-top:1px solid var(--line)}
+  footer p{font-size:12.5px;color:var(--faint);line-height:1.6;max-width:640px;margin:0 auto}
+
+  @media(max-width:900px){
+    .lab{grid-template-columns:1fr}
+    .brkrow .nm{width:78px}
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">반도체 <span>실험실</span></div>
+    <div class="links">
+      <a class="here" href="fab.html">팹 공정</a>
+      <a href="device.html">소자 물리</a>
+      <a href="logic.html">회로 빌더</a>
+      <a class="home" href="index.html">홈</a>
+    </div>
+  </div>
+</nav>
+
+<header>
+  <div class="wrap">
+    <span class="kick">조 단위 팹을, 웨이퍼 한 장으로</span>
+    <h1>웨이퍼를 공정 라인에 <em>통과시켜 칩을 만든다</em></h1>
+    <p>산화·노광·식각·이온주입·증착·CMP·배선·패키징. 아홉 단계 파라미터를 바꾸면 단면도가 쌓이고 수율이 갈린다. 개인은 절대 못 짓는 팹을 앱 안에서 돌려보자.</p>
+    <div class="modes" id="modes">
+      <button class="md act" data-m="free">🔬 자유 실험</button>
+      <button class="md" data-m="challenge">🎯 챌린지</button>
+    </div>
+    <div class="exps" id="exps"></div>
+    <div class="chbar" id="chbar" style="display:none">
+      <div class="chlevels" id="chlevels"></div>
+      <div class="chgoal">
+        <div class="chgoal-t"><span id="chName"></span><span class="chstars" id="chStars"></span></div>
+        <div class="chgoal-d" id="chGoal"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="lab">
+    <!-- controls -->
+    <div class="panel">
+      <div class="ph">공정 단계 선택</div>
+      <div class="steplist" id="steplist"></div>
+
+      <div class="activehead">
+        <span class="ic" id="aIc">🔥</span>
+        <span class="nm" id="aNm">산화</span>
+      </div>
+      <div class="tip" id="aTip"></div>
+      <div id="aFlds"></div>
+      <div class="stepres" id="aRes"></div>
+
+      <button class="launch" id="go">▶ 공정 실행</button>
+    </div>
+
+    <!-- output -->
+    <div class="out">
+      <div class="xsec">
+        <canvas id="xs" width="640" height="330"></canvas>
+        <div class="xhud">
+          <div class="ph2" id="xPh">웨이퍼 단면도</div>
+          <div class="st2" id="xSt">파라미터를 바꾸면 실시간 갱신</div>
+        </div>
+        <button class="replay" id="replay">↻ 다시 실행</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat hero" id="heroStat">
+          <div class="k">최종 다이 수율</div>
+          <div class="v"><span id="oYield">—</span><small>%</small></div>
+          <div class="sub" id="oBottle"></div>
+        </div>
+        <div class="stat"><div class="k">웨이퍼당 굿다이</div><div class="v"><span id="oChips">—</span><small>개</small></div></div>
+        <div class="stat"><div class="k">웨이퍼당 총 다이</div><div class="v"><span id="oGross">—</span><small>개</small></div></div>
+      </div>
+
+      <div class="chresult" id="chresult"></div>
+
+      <div class="brk" id="brk"></div>
+
+      <div class="knote" id="knote" style="display:none">
+        <div class="ic" id="knoteIc">💡</div>
+        <div><b id="knoteT"></b> <span id="knoteS"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="wrap">
+    <p>룰베이스 팹 시뮬레이션 — Deal-Grove 산화 근사, 레일리 해상도 근사, Poisson 결함 수율 모델을 단순화했습니다. 방향성과 트레이드오프(온도↑→산화↑, 도즈↑→저항↓, 미세공정↑→다이↑·수율↓)는 실제에 맞추되 정확한 수치는 학습·실험용입니다. 실제 팹 공정값과 다를 수 있습니다.</p>
+  </div>
+</footer>
+
+<script>
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+// window score: 1 inside [lo,hi], linear to 0 at [sLo,sHi]
+function win(v,lo,hi,sLo,sHi){
+  if(v>=lo&&v<=hi)return 1;
+  if(v<lo)return clamp((v-sLo)/(lo-sLo),0,1);
+  return clamp((sHi-v)/(sHi-hi),0,1);
+}
+
+// --- light sources for lithography (min printable CD, nm) ---
+const SOURCES={
+  '365':{name:'i-line 365nm',cd:350},
+  '248':{name:'KrF 248nm',cd:180},
+  '193':{name:'ArF 193nm(액침)',cd:38},
+  '13.5':{name:'EUV 13.5nm',cd:13},
+};
+
+// --- step definitions: params + tooltips ---
+const STEPS=[
+  {ic:'🧫',nm:'웨이퍼 준비',
+   tip:'단결정 실리콘 웨이퍼를 세정한다. 큰 웨이퍼일수록 칩을 많이 얻지만, <b>결함 밀도</b>가 높거나 다이가 클수록 결함에 맞을 확률이 커져 수율이 떨어진다(Poisson 모델).',
+   flds:[
+     {k:'waferD',label:'웨이퍼 지름',unit:'mm',min:100,max:300,step:50},
+     {k:'defectDensity',label:'결함 밀도',unit:'/cm²',min:0.02,max:0.40,step:0.02},
+   ]},
+  {ic:'🔥',nm:'산화',
+   tip:'고온에서 실리콘을 태워 <b>산화막(SiO₂)</b>을 기른다. 온도가 높고 시간이 길수록 두꺼워진다(두께 ∝ √시간). 너무 얇으면 게이트가 새고, 너무 두꺼우면 소자가 느려진다.',
+   flds:[
+     {k:'oxTemp',label:'산화 온도',unit:'°C',min:900,max:1150,step:10},
+     {k:'oxTime',label:'산화 시간',unit:'min',min:5,max:120,step:5},
+   ]},
+  {ic:'💡',nm:'포토리소',
+   tip:'포토레지스트를 바르고 마스크를 <b>노광·현상</b>해 패턴을 새긴다. 광원 파장이 짧을수록 가는 선폭(CD)이 가능하지만 공정 여유가 좁다. 과노광은 패턴 붕괴, 언더노광은 미형성.',
+   flds:[
+     {k:'source',label:'노광 광원',type:'select',opts:SOURCES},
+     {k:'dose',label:'노광량',unit:'mJ/cm²',min:12,max:58,step:1},
+     {k:'focus',label:'초점 오차',unit:'nm',min:-150,max:150,step:5},
+   ]},
+  {ic:'🪓',nm:'식각',
+   tip:'노출된 산화막을 깎아낸다. 시간이 길수록 깊게 파이고, <b>이방성</b>이 낮으면 옆으로도 파여(언더컷) 선폭이 무너진다. 과식각은 기판 손상, 부족하면 잔류물 단락.',
+   flds:[
+     {k:'etchTime',label:'식각 시간',unit:'s',min:10,max:90,step:2},
+     {k:'aniso',label:'이방성',unit:'%',min:55,max:100,step:1},
+   ]},
+  {ic:'⚛️',nm:'이온주입',
+   tip:'불순물 이온을 때려 넣어 <b>도핑</b>한다. 도즈가 높을수록 저항이 낮아지지만 결정이 손상되고, 에너지가 클수록 접합이 깊어진다. 너무 얕거나 깊으면 소자가 망가진다.',
+   flds:[
+     {k:'implantExp',label:'도즈(10ⁿ)',unit:'ions/cm²',min:13.0,max:16.0,step:0.1},
+     {k:'energy',label:'주입 에너지',unit:'keV',min:10,max:200,step:5},
+   ]},
+  {ic:'🌫️',nm:'증착',
+   tip:'CVD/스퍼터로 <b>박막</b>을 입힌다. 증착률이 너무 빠르면 막이 균일하게 덮이지 못하고 보이드가 생긴다. 균일도가 곧 수율.',
+   flds:[
+     {k:'filmThk',label:'목표 두께',unit:'nm',min:100,max:1000,step:20},
+     {k:'depRate',label:'증착률',unit:'nm/min',min:20,max:200,step:5},
+   ]},
+  {ic:'🪞',nm:'CMP',
+   tip:'화학·기계적 연마로 표면을 <b>평탄화</b>한다. 덜 갈면 울퉁불퉁해 다음 노광 초점이 안 맞고, 과하게 갈면 배선·유전체가 파여(디싱) 손상된다.',
+   flds:[
+     {k:'cmpTime',label:'연마 시간',unit:'s',min:10,max:90,step:2},
+     {k:'cmpPressure',label:'연마 압력',unit:'psi',min:1,max:8,step:1},
+   ]},
+  {ic:'🔌',nm:'금속배선',
+   tip:'Al/Cu로 <b>배선</b>을 연결한다. 배선이 좁을수록 전류밀도가 커져 <b>일렉트로마이그레이션</b>으로 끊길 위험이 크다. Cu가 Al보다 더 좁은 선을 견딘다.',
+   flds:[
+     {k:'metalW',label:'배선폭',unit:'nm',min:14,max:500,step:2},
+     {k:'metalMat',label:'배선 재료',type:'select',opts:{'Al':{name:'알루미늄(Al)'},'Cu':{name:'구리(Cu)'}}},
+   ]},
+  {ic:'📦',nm:'패키징·테스트',
+   tip:'웨이퍼를 <b>다이싱</b>해 칩으로 자르고 테스트해 굿다이만 골라낸다(다이 소팅). 다이싱 정밀도가 낮으면 칩 에지에 크랙이 생긴다.',
+   flds:[
+     {k:'dicePrecision',label:'다이싱 정밀도',unit:'%',min:80,max:100,step:1},
+   ]},
+];
+
+// default params
+const P={waferD:300,defectDensity:0.10,oxTemp:1000,oxTime:30,source:'193',dose:35,focus:0,
+  etchTime:40,aniso:90,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,
+  metalW:120,metalMat:'Cu',dicePrecision:96};
+
+// ---------- CORE COMPUTE (rule-based physics) ----------
+function computeAll(p){
+  // step2 oxide (Deal-Grove simplified): thickness grows with sqrt(time), faster when hotter
+  const tox=2.7*Math.sqrt(p.oxTime)*Math.exp((p.oxTemp-1000)/160); // nm
+  // step3 litho: CD from source resolution, dose, focus
+  const src=SOURCES[p.source];
+  const CD=clamp(src.cd*Math.pow(35/p.dose,0.5),src.cd*0.55,src.cd*2); // over-expose→smaller, under→larger
+  // step4 etch: 0.4 nm/s, target = clear the oxide
+  const etchDepth=0.4*p.etchTime;
+  const undercut=etchDepth*(1-p.aniso/100);
+  const overRatio=etchDepth/Math.max(tox,1);
+  // step5 implant
+  const dose5=Math.pow(10,p.implantExp);
+  const Xj=3*Math.sqrt(p.energy); // junction depth nm
+  const Rs=1e17/dose5; // sheet resistance ohm/sq
+  // step6 deposition uniformity
+  const U=clamp(100-Math.max(0,p.depRate-80)*0.28-Math.max(0,40-p.depRate)*0.15,40,100);
+  // step7 CMP planarization ratio (1 = ideal)
+  const cmpRatio=(p.cmpTime*p.cmpPressure)/200;
+  // step8 metal EM
+  const emThr=p.metalMat==='Cu'?50:200; // min safe width nm
+  const wRatio=p.metalW/emThr;
+  const Rrel=120/p.metalW; // relative resistance
+  // die geometry: smaller CD -> smaller die -> more dies (and higher per-die yield)
+  const dieArea=clamp(60*Math.pow(CD/90,2),0.3,400); // mm^2
+  const usable=Math.PI*Math.pow(p.waferD/2,2)*0.90; // mm^2
+  const diesGross=Math.floor(usable/dieArea);
+  const dieAreaCm2=dieArea/100;
+
+  const steps=[];
+  // 1 wafer/defect (Poisson)
+  {const y=Math.exp(-p.defectDensity*dieAreaCm2);
+   let df=null; if(y<0.85)df='다이가 크거나 결함 밀도가 높아 결함에 맞는 다이가 많다';
+   steps.push({y,result:`다이 ${dieArea.toFixed(1)}mm² · 웨이퍼당 ${diesGross.toLocaleString()} 다이`,defect:df});}
+  // 2 oxidation
+  {const y=win(tox,10,22,4,42);
+   let df=null; if(tox<10)df='산화막이 얇아 게이트 절연이 파괴·누설된다'; else if(tox>22)df='산화막이 두꺼워 문턱전압↑, 소자가 느려진다';
+   steps.push({y,result:`산화막 두께 ${tox.toFixed(1)} nm`,defect:df});}
+  // 3 litho
+  {const focusTol=clamp(src.cd*0.9,26,150);
+   const yDose=win(p.dose,28,42,18,54), yFocus=win(p.focus,-focusTol*0.6,focusTol*0.6,-focusTol*1.6,focusTol*1.6);
+   const y=yDose*yFocus;
+   let df=null;
+   if(p.dose>50)df='과노광으로 패턴이 붕괴·브리지된다';
+   else if(p.dose<20)df='언더노광으로 패턴이 형성되지 않는다';
+   else if(Math.abs(p.focus)>focusTol)df='초점 이탈로 선폭이 흐려진다(미세 공정일수록 초점 여유가 좁다)';
+   steps.push({y,result:`선폭(CD) ${CD.toFixed(0)} nm · ${src.name}`,defect:df});}
+  // 4 etch
+  {const y=win(overRatio,1.0,1.7,0.6,3.0)*win(p.aniso,82,100,55,100);
+   let df=null;
+   if(overRatio<1.0)df='식각 부족: 산화막 잔류물로 단락된다';
+   else if(overRatio>2.3)df='과식각으로 게이트·기판이 손상된다';
+   else if(p.aniso<75)df='등방 식각 언더컷으로 선폭이 손상된다';
+   steps.push({y,result:`식각 깊이 ${etchDepth.toFixed(1)} nm · 언더컷 ${undercut.toFixed(1)} nm`,defect:df});}
+  // 5 implant
+  {const y=win(p.implantExp,14.2,15.2,13.3,15.8)*win(p.energy,40,120,15,195);
+   let df=null;
+   if(p.implantExp>15.5)df='과도핑으로 결정이 비정질화·손상된다';
+   else if(p.implantExp<13.8)df='도핑 부족: 채널이 고저항이 된다';
+   else if(p.energy>150)df='주입이 깊어 단채널 효과로 누설된다';
+   else if(p.energy<25)df='접합이 얕아 접촉 불량이 난다';
+   steps.push({y,result:`접합깊이 ${Xj.toFixed(0)} nm · 면저항 ${Rs.toFixed(0)} Ω/□`,defect:df});}
+  // 6 deposition
+  {const y=win(U,92,100,78,100);
+   let df=null; if(p.depRate>140)df='증착률 과다로 막 균일도 저하·보이드 발생'; else if(U<88)df='증착 균일도가 낮다';
+   steps.push({y,result:`박막 ${p.filmThk} nm · 균일도 ${U.toFixed(0)}%`,defect:df});}
+  // 7 CMP
+  {const y=win(cmpRatio,0.82,1.2,0.5,1.65);
+   let df=null; if(cmpRatio>1.3)df='과연마로 배선·유전체가 파인다(디싱)'; else if(cmpRatio<0.75)df='평탄화 부족: 후속 노광 초점이 안 맞는다';
+   steps.push({y,result:`평탄화 비율 ${cmpRatio.toFixed(2)} (1.0 이상적)`,defect:df});}
+  // 8 metal
+  {const y=win(wRatio,1.0,6,0.45,12);
+   let df=null; if(wRatio<1.0)df=`배선이 좁아 일렉트로마이그레이션 단선 위험${p.metalMat==='Al'?' — Cu로 바꾸면 더 좁아도 견딘다':''}`;
+   steps.push({y,result:`배선폭 ${p.metalW} nm · ${p.metalMat} · 상대저항 ${Rrel.toFixed(2)}`,defect:df});}
+  // 9 packaging
+  {const y=clamp(0.80+(p.dicePrecision-80)/20*0.19,0.80,0.99);
+   let df=null; if(p.dicePrecision<90)df='다이싱 정밀도 부족으로 칩 에지에 크랙이 생긴다';
+   steps.push({y,result:`다이싱 정밀도 ${p.dicePrecision}% · 패키지 수율 ${(y*100).toFixed(0)}%`,defect:df});}
+
+  let totalYield=1; steps.forEach(s=>totalYield*=s.y);
+  const goodDies=Math.max(0,Math.floor(diesGross*totalYield));
+  // bottleneck = lowest-yield step
+  let bi=0; steps.forEach((s,i)=>{if(s.y<steps[bi].y)bi=i;});
+  return {tox,CD,src,etchDepth,undercut,Xj,Rs,U,cmpRatio,dieArea,diesGross,totalYield,goodDies,steps,bottleneck:bi,p:{...p}};
+}
+
+// ---------- CROSS-SECTION DRAWING ----------
+function drawXsec(upto,C){
+  const cv=$('xs'),ctx=cv.getContext('2d'),W=cv.width,H=cv.height;
+  ctx.clearRect(0,0,W,H);
+  // bg
+  const bg=ctx.createLinearGradient(0,0,0,H);bg.addColorStop(0,'#0a0f18');bg.addColorStop(1,'#070a11');
+  ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  const marX=40, wafW=W-marX*2, subTop=H-90, subBot=H-24;
+  const cxL=marX, cxR=marX+wafW;
+  const gapW=wafW*0.20, gapL=marX+wafW*0.30, gapR=gapL+gapW; // etch/contact opening (channel edges)
+  const midL=gapL, midR=gapR;
+  const fail=i=>C.steps[i].y<0.55; // draw defect tint if step badly failed
+
+  // 1 substrate (always if upto>=1)
+  if(upto>=1){
+    const sg=ctx.createLinearGradient(0,subTop,0,subBot);sg.addColorStop(0,'#7b8598');sg.addColorStop(1,'#4a5364');
+    ctx.fillStyle=sg;ctx.fillRect(cxL,subTop,wafW,subBot-subTop);
+    ctx.fillStyle='rgba(255,255,255,.08)';ctx.font='700 11px sans-serif';ctx.textAlign='left';
+    ctx.fillText('Si 단결정 기판',cxL+8,subBot-8);
+  }
+  // 5 doped source/drain wells (gold) inside substrate near openings
+  if(upto>=5){
+    const xjPx=clamp(C.Xj/2.2,8,44);
+    [[cxL,midL],[midR,cxR]].forEach(([a,b])=>{
+      const gg=ctx.createLinearGradient(0,subTop,0,subTop+xjPx);
+      gg.addColorStop(0,'#ffcf7a');gg.addColorStop(1,'rgba(255,184,77,.15)');
+      ctx.fillStyle=gg;ctx.fillRect(a,subTop,b-a,xjPx);
+    });
+    if(fail(4)){ctx.fillStyle='rgba(255,90,106,.28)';ctx.fillRect(midL,subTop,midR-midL,10);}
+  }
+  // 2 oxide layer (teal). blanket until step4, then only in channel (between wells)
+  if(upto>=2){
+    const toxPx=clamp(C.tox/0.7,5,34);
+    const oxTop=subTop-toxPx;
+    ctx.fillStyle=fail(1)?'#3b6b74':'#1f8f9e';
+    if(upto>=4){ // patterned: oxide remains only in channel + field edges, openings cleared
+      ctx.fillRect(cxL,oxTop,midL-cxL,toxPx);        // field left
+      ctx.fillRect(midR,oxTop,cxR-midR,toxPx);       // field right
+      const chL=midL+(midR-midL)*0.28, chR=midR-(midR-midL)*0.28;
+      ctx.fillRect(chL,oxTop,chR-chL,toxPx);         // gate oxide in channel
+    }else{
+      ctx.fillRect(cxL,oxTop,wafW,toxPx);            // blanket oxide
+    }
+    ctx.fillStyle='rgba(34,211,238,.75)';ctx.font='700 10px sans-serif';ctx.textAlign='right';
+    ctx.fillText('SiO₂ '+C.tox.toFixed(0)+'nm',cxR-4,oxTop-4);
+  }
+  // 3 photoresist (violet) on top with two developed openings — only shown at step3 (before etch)
+  if(upto===3){
+    const prH=18, toxPx=clamp(C.tox/0.7,5,34), prTop=subTop-toxPx-prH;
+    ctx.fillStyle=fail(2)?'#6b5a9e':'#a78bfa';
+    ctx.fillRect(cxL,prTop,midL-cxL,prH);
+    ctx.fillRect(midR,prTop,cxR-midR,prH);
+    const chL=midL+(midR-midL)*0.28, chR=midR-(midR-midL)*0.28;
+    ctx.fillRect(chL,prTop,chR-chL,prH);
+    ctx.fillStyle='rgba(167,139,250,.85)';ctx.font='700 10px sans-serif';ctx.textAlign='left';
+    ctx.fillText('PR 패턴 · CD '+C.CD.toFixed(0)+'nm',cxL+6,prTop-4);
+  }
+  // 6 deposited film (blanket). 7 CMP flattens it
+  let filmTop=subTop-clamp(C.tox/0.7,5,34);
+  if(upto>=6){
+    const toxPx=clamp(C.tox/0.7,5,34);
+    const filmH=clamp(C.p.filmThk/22,10,40);
+    if(upto>=7){ // planarized: flat top
+      filmTop=subTop-toxPx-filmH;
+      ctx.fillStyle=fail(5)?'#5b6472':'#9aa4b6';
+      ctx.fillRect(cxL,filmTop,wafW,(subTop-toxPx)-filmTop);
+      // fill the etched openings down to wells too
+      ctx.fillRect(midL,subTop-toxPx,midR-midL,toxPx);
+      if(fail(6)){ctx.strokeStyle='var(--stop)';ctx.strokeStyle='#ff5a6a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(cxL+wafW*0.5,filmTop);ctx.lineTo(cxL+wafW*0.5+8,filmTop+((subTop-toxPx)-filmTop));ctx.stroke();}
+    }else{ // conformal wavy (not yet planar)
+      ctx.fillStyle='#8a94a6';
+      const base=subTop-toxPx;
+      ctx.beginPath();ctx.moveTo(cxL,base);
+      for(let x=cxL;x<=cxR;x+=6){const dip=(x>midL&&x<midR)?filmH*0.5:0;ctx.lineTo(x,base-filmH+dip);}
+      ctx.lineTo(cxR,base);ctx.closePath();ctx.fill();
+    }
+  }
+  // 8 metal lines (light gray bars) on top
+  if(upto>=8){
+    const mTop=filmTop-14;
+    const wPx=clamp(C.p.metalW/14,4,40);
+    ctx.fillStyle=fail(7)?'#7a8496':'#dbe1ec';
+    [gapL, marX+wafW*0.62].forEach(x=>{ctx.fillRect(x,mTop,wPx*3,12);});
+    // contact plugs down to wells
+    ctx.fillRect(midL+4,mTop,6,filmTop-mTop+6);
+    ctx.fillRect(midR-10,mTop,6,filmTop-mTop+6);
+    ctx.fillStyle='rgba(219,225,236,.8)';ctx.font='700 10px sans-serif';ctx.textAlign='left';
+    ctx.fillText(C.p.metalMat+' 배선 '+C.p.metalW+'nm',cxL+6,mTop-4);
+    if(fail(7)){ctx.fillStyle='rgba(255,90,106,.5)';ctx.fillRect(gapL,mTop,wPx*3,3);}
+  }
+  // 9 package encapsulation outline + done stamp
+  if(upto>=9){
+    ctx.strokeStyle='rgba(62,207,142,.55)';ctx.lineWidth=2;ctx.setLineDash([6,4]);
+    ctx.strokeRect(cxL-10,filmTop-30,wafW+20,(subBot)-(filmTop-30));ctx.setLineDash([]);
+    ctx.fillStyle='var(--go)';ctx.fillStyle='#3ecf8e';ctx.font='800 12px sans-serif';ctx.textAlign='right';
+    ctx.fillText('패키지 완성 ✓',cxR-2,filmTop-36);
+  }
+  // scale ruler note
+  ctx.fillStyle='rgba(255,255,255,.28)';ctx.font='10px sans-serif';ctx.textAlign='left';
+  ctx.fillText('← 웨이퍼 단면 (수직 스케일 과장) →',cxL,26);
+}
+
+// ---------- UI STATE ----------
+let active=1, current=null, dirty=false, running=false, anim=null;
+let mode='free', curLevel=0;
+
+function buildStepList(){
+  const box=$('steplist');box.innerHTML='';
+  STEPS.forEach((s,i)=>{
+    const b=document.createElement('button');b.className='stepchip'+(i===active?' act':'');
+    b.setAttribute('aria-label',(i+1)+'단계 '+s.nm);
+    b.innerHTML=`<div class="n">${s.ic}</div><div class="t">${s.nm}</div><span class="dot" id="dot${i}"></span>`;
+    b.onclick=()=>{active=i;renderActive();};
+    box.appendChild(b);
+  });
+}
+function fldHtml(f){
+  if(f.type==='select'){
+    let o='';for(const k in f.opts)o+=`<option value="${k}">${f.opts[k].name}</option>`;
+    return `<div class="fld"><div class="lab2"><b>${f.label}</b></div><select id="in_${f.k}" aria-label="${f.label}">${o}</select></div>`;
+  }
+  return `<div class="fld"><div class="lab2"><b>${f.label}</b><span class="val"><span id="v_${f.k}"></span> ${f.unit}</span></div>
+    <input type="range" id="in_${f.k}" min="${f.min}" max="${f.max}" step="${f.step}" aria-label="${f.label}"></div>`;
+}
+function renderActive(){
+  const s=STEPS[active];
+  $('aIc').textContent=s.ic;$('aNm').textContent=(active+1)+'. '+s.nm;$('aTip').innerHTML=s.tip;
+  $('aFlds').innerHTML=s.flds.map(fldHtml).join('');
+  s.flds.forEach(f=>{
+    const el=$('in_'+f.k);
+    if(f.type==='select'){el.value=P[f.k];el.onchange=()=>{P[f.k]=el.value;onChange();};}
+    else{el.value=P[f.k];el.oninput=()=>{P[f.k]=parseFloat(el.value);onChange();};}
+  });
+  applyLock();
+  document.querySelectorAll('.stepchip').forEach((c,i)=>c.classList.toggle('act',i===active));
+  updateLive();
+}
+function syncActiveLabels(){
+  STEPS[active].flds.forEach(f=>{
+    if(f.type==='select')return;
+    const el=$('v_'+f.k);if(el)el.textContent=(f.step<1)?P[f.k].toFixed(2):P[f.k];
+  });
+}
+
+function buildBreakdown(){
+  const box=$('brk');box.innerHTML='';
+  STEPS.forEach((s,i)=>{
+    const r=document.createElement('div');r.className='brkrow';r.id='brk'+i;
+    r.innerHTML=`<span class="ic">${s.ic}</span><span class="nm">${i+1}. ${s.nm}</span>
+      <span class="bar"><i id="bar${i}"></i></span><span class="yv" id="yv${i}">—</span>
+      <span class="df2" id="df${i}"></span>`;
+    r.onclick=()=>{active=i;renderActive();};
+    box.appendChild(r);
+  });
+}
+function yColor(y){return y>=0.9?'var(--go)':y>=0.7?'var(--warn)':'var(--stop)';}
+
+function refreshOutputs(C){
+  // breakdown
+  C.steps.forEach((s,i)=>{
+    const pct=Math.round(s.y*100);
+    $('yv'+i).textContent=pct+'%';$('yv'+i).style.color=yColor(s.y);
+    const bar=$('bar'+i);bar.style.width=pct+'%';bar.style.background=yColor(s.y);
+    const row=$('brk'+i);
+    row.classList.toggle('act',i===active);
+    row.classList.toggle('showdf',!!s.defect);
+    $('df'+i).textContent=s.defect?('⚠ '+s.defect):'';
+    $('dot'+i).style.background=yColor(s.y);
+  });
+  // stats
+  const ty=C.totalYield;
+  $('oYield').textContent=(ty*100).toFixed(1);
+  $('heroStat').classList.toggle('bad',ty<0.5);
+  $('oChips').textContent=C.goodDies.toLocaleString();
+  $('oGross').textContent=C.diesGross.toLocaleString();
+  const b=C.steps[C.bottleneck];
+  $('oBottle').textContent=ty>=0.85?'전 단계 안정':('병목: '+(C.bottleneck+1)+'. '+STEPS[C.bottleneck].nm+' ('+Math.round(b.y*100)+'%)');
+  // active step result line
+  const as=C.steps[active];
+  $('aRes').innerHTML=`<span class="r">${as.result}</span><span class="y" style="color:${yColor(as.y)}">수율 ${Math.round(as.y*100)}%</span>`+
+    (as.defect?`<div class="df">⚠ ${as.defect}</div>`:`<div class="ok">✓ 이 단계 정상 범위</div>`);
+}
+
+function updateLive(){
+  syncActiveLabels();
+  const C=computeAll(P);current=C;
+  refreshOutputs(C);
+  if(!running)drawXsec(9,C);
+  if(!running){$('xPh').textContent='웨이퍼 단면도';$('xSt').textContent='최종 수율 '+(C.totalYield*100).toFixed(0)+'% · 굿다이 '+C.goodDies.toLocaleString()+'개';}
+}
+function onChange(){
+  updateLive();
+  if(!running){dirty=true;$('go').classList.add('dirty');$('go').textContent='▶ 공정 실행 (변경됨)';}
+}
+
+// ---------- RUN ANIMATION ----------
+function run(){
+  if(running)return;
+  const C=computeAll(P);current=C;
+  running=true;dirty=false;$('go').classList.remove('dirty');$('go').textContent='▶ 공정 실행';
+  $('knote').style.display='none';
+  let i=0;const stepDur=460;
+  function stage(){
+    if(i>=STEPS.length){finishRun(C);return;}
+    document.querySelectorAll('.stepchip').forEach((c,k)=>c.classList.toggle('run',k===i));
+    document.querySelectorAll('.brkrow').forEach((r,k)=>r.classList.toggle('run',k===i));
+    drawXsec(i+1,C);
+    $('xPh').textContent='공정 진행 '+(i+1)+'/9';
+    $('xSt').textContent=(i+1)+'. '+STEPS[i].nm+' — 수율 '+Math.round(C.steps[i].y*100)+'%';
+    i++;anim=setTimeout(stage,stepDur);
+  }
+  stage();
+}
+function finishRun(C){
+  running=false;
+  document.querySelectorAll('.stepchip').forEach(c=>c.classList.remove('run'));
+  document.querySelectorAll('.brkrow').forEach(r=>r.classList.remove('run'));
+  drawXsec(9,C);
+  $('xPh').textContent='공정 완료';
+  $('xSt').textContent='최종 수율 '+(C.totalYield*100).toFixed(1)+'% · 굿다이 '+C.goodDies.toLocaleString()+'개';
+  showReport(C);
+  if(mode==='challenge')evaluateChallenge(C);
+}
+function showReport(C){
+  if(mode==='challenge'){$('knote').style.display='none';return;}
+  const kn=$('knote'),ty=C.totalYield,b=C.steps[C.bottleneck];
+  kn.style.display='flex';
+  if(ty>=0.85){
+    kn.className='knote good';$('knoteIc').textContent='🎉';
+    $('knoteT').textContent='양산급 수율.';
+    $('knoteS').textContent='웨이퍼 한 장에서 굿다이 '+C.goodDies.toLocaleString()+'개. 선폭 '+C.CD.toFixed(0)+'nm 공정이 안정적으로 흐른다.';
+  }else if(ty>=0.5){
+    kn.className='knote warn2';$('knoteIc').textContent='🛠';
+    $('knoteT').textContent='병목 단계를 잡으면 수율이 오른다.';
+    $('knoteS').textContent=(C.bottleneck+1)+'. '+STEPS[C.bottleneck].nm+' 단계가 '+Math.round(b.y*100)+'%로 가장 낮다. '+(b.defect||'이 단계 파라미터를 최적 범위로.');
+  }else{
+    kn.className='knote bad2';$('knoteIc').textContent='💥';
+    $('knoteT').textContent='이 웨이퍼는 대부분 폐기된다.';
+    $('knoteS').textContent=(C.bottleneck+1)+'. '+STEPS[C.bottleneck].nm+' 단계 수율 '+Math.round(b.y*100)+'%. '+(b.defect||'')+' 여러 단계가 최적 범위를 벗어났다.';
+  }
+}
+
+// ---------- PRESETS ----------
+const EXPS=[
+  {name:'⚙️ 이상적 최적화',set:{waferD:300,defectDensity:0.06,oxTemp:1000,oxTime:30,source:'193',dose:35,focus:0,etchTime:40,aniso:92,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,metalW:120,metalMat:'Cu',dicePrecision:98}},
+  {name:'🏭 레거시 180nm 안정',set:{waferD:200,defectDensity:0.08,oxTemp:1000,oxTime:36,source:'248',dose:34,focus:0,etchTime:34,aniso:90,implantExp:14.8,energy:70,filmThk:500,depRate:70,cmpTime:38,cmpPressure:5,metalW:220,metalMat:'Al',dicePrecision:97}},
+  {name:'💎 미세 7nm 도전',set:{waferD:300,defectDensity:0.05,oxTemp:980,oxTime:22,source:'13.5',dose:34,focus:0,etchTime:30,aniso:96,implantExp:14.9,energy:55,filmThk:200,depRate:60,cmpTime:38,cmpPressure:5,metalW:26,metalMat:'Cu',dicePrecision:99}},
+  {name:'🫗 산화막 너무 두껍게',set:{waferD:300,defectDensity:0.08,oxTemp:1130,oxTime:110,source:'193',dose:35,focus:0,etchTime:36,aniso:90,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,metalW:120,metalMat:'Cu',dicePrecision:96}},
+  {name:'🪓 과식각 재현',set:{waferD:300,defectDensity:0.08,oxTemp:1000,oxTime:30,source:'193',dose:35,focus:0,etchTime:86,aniso:64,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,metalW:120,metalMat:'Cu',dicePrecision:96}},
+  {name:'🌑 언더노광 재현',set:{waferD:300,defectDensity:0.08,oxTemp:1000,oxTime:30,source:'193',dose:15,focus:120,etchTime:36,aniso:90,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,metalW:120,metalMat:'Cu',dicePrecision:96}},
+  {name:'🧱 큰 다이 저수율',set:{waferD:300,defectDensity:0.34,oxTemp:1000,oxTime:30,source:'248',dose:35,focus:0,etchTime:36,aniso:90,implantExp:14.7,energy:80,filmThk:400,depRate:80,cmpTime:40,cmpPressure:5,metalW:220,metalMat:'Al',dicePrecision:96}},
+];
+function applyPreset(set){for(const k in set)P[k]=set[k];renderActive();}
+const expBar=$('exps');
+EXPS.forEach(e=>{
+  const b=document.createElement('button');b.className='exp';b.textContent=e.name;
+  b.onclick=()=>{document.querySelectorAll('.exp').forEach(x=>x.classList.remove('act'));b.classList.add('act');applyPreset(e.set);run();};
+  expBar.appendChild(b);
+});
+
+// ---------- CHALLENGE MODE ----------
+const CHKEY='fabChallengeV1';
+const BASE=EXPS[0].set; // ideal baseline
+const CHALLENGES=[
+  {id:'l1',name:'첫 산화막',free:['oxTemp','oxTime'],step:1,
+   goal:'산화 온도·시간만 조절해 산화막을 목표 창(10~22nm)에 넣고 최종 수율 85% 이상.',
+   hint:'온도↑ 또는 시간↑이면 산화막이 두꺼워진다. 두께 ∝ √시간. 15nm 부근이 안전.',
+   set:{...BASE,oxTemp:900,oxTime:5},
+   check:C=>({pass:C.totalYield>=0.85&&C.steps[1].y>=0.9,val:C.tox.toFixed(0)+'nm 산화막 · 수율 '+(C.totalYield*100).toFixed(0)+'%'})},
+  {id:'l2',name:'노광 정렬',free:['dose','focus'],step:2,
+   goal:'노광량과 초점만으로 포토 단계 수율 90% 이상, 최종 85% 이상.',
+   hint:'노광량은 28~42, 초점은 0에 가깝게. 과노광은 붕괴, 언더노광은 미형성.',
+   set:{...BASE,dose:16,focus:130},
+   check:C=>({pass:C.steps[2].y>=0.9&&C.totalYield>=0.85,val:'포토 수율 '+(C.steps[2].y*100).toFixed(0)+'% · CD '+C.CD.toFixed(0)+'nm'})},
+  {id:'l3',name:'미세공정 도전',free:['source','dose','focus'],step:2,
+   goal:'광원까지 바꿔 선폭(CD) 14nm 이하로 정상 다이를 만든다. 포토 수율 80% 이상.',
+   hint:'EUV(13.5nm)를 골라야 14nm 이하가 나온다. 대신 초점 여유가 좁으니 0 근처로.',
+   set:{...BASE,source:'193',dose:35,focus:40},
+   check:C=>({pass:C.CD<=14&&C.steps[2].y>=0.8,val:'CD '+C.CD.toFixed(0)+'nm · 포토 수율 '+(C.steps[2].y*100).toFixed(0)+'%'})},
+  {id:'l4',name:'식각·도핑 정밀',free:['etchTime','aniso','implantExp','energy'],step:3,
+   goal:'식각과 이온주입 네 파라미터를 맞춰 두 단계 모두 90% 이상.',
+   hint:'식각은 산화막을 겨우 뚫는 정도(과식각 금지)+이방성 높게. 도핑은 도즈 14.7·에너지 80 근처.',
+   set:{...BASE,etchTime:86,aniso:60,implantExp:15.9,energy:190},
+   check:C=>({pass:C.steps[3].y>=0.9&&C.steps[4].y>=0.9,val:'식각 '+(C.steps[3].y*100).toFixed(0)+'% · 도핑 '+(C.steps[4].y*100).toFixed(0)+'%'})},
+  {id:'l5',name:'수율 90% 마스터',free:['oxTemp','oxTime','dose','focus','etchTime','aniso','implantExp','energy','depRate','cmpTime','cmpPressure','metalW','dicePrecision'],step:0,
+   goal:'거의 전 단계를 열었다. 아홉 단계를 모두 조율해 최종 수율 90%를 넘겨라.',
+   hint:'병목 단계(가장 낮은 %)부터 잡아라. 하나만 낮아도 곱해져서 전체가 무너진다.',
+   set:{...BASE,oxTemp:1130,dose:24,focus:90,etchTime:70,aniso:70,implantExp:15.4,cmpTime:20,metalW:30,metalMat:'Al',dicePrecision:88},
+   check:C=>({pass:C.totalYield>=0.90,val:'최종 수율 '+(C.totalYield*100).toFixed(1)+'%'})},
+];
+const starStr=n=>'★'.repeat(n)+'☆'.repeat(3-n);
+const loadProg=()=>{try{return JSON.parse(localStorage.getItem(CHKEY))||{}}catch(e){return{}}};
+const saveProg=p=>{try{localStorage.setItem(CHKEY,JSON.stringify(p))}catch(e){}};
+const unlocked=i=>i===0||(loadProg()[CHALLENGES[i-1].id]||0)>=1;
+
+function renderLevels(){
+  const box=$('chlevels'),p=loadProg();box.innerHTML='';
+  CHALLENGES.forEach((lv,i)=>{
+    const b=document.createElement('button');const open=unlocked(i),best=p[lv.id]||0;
+    b.className='chlv'+(i===curLevel?' act':'')+(open?'':' locked');
+    b.innerHTML=(open?('L'+(i+1)):'🔒')+(best>0?'<span class="s">'+'★'.repeat(best)+'</span>':'');
+    if(open)b.onclick=()=>loadLevel(i);
+    box.appendChild(b);
+  });
+}
+function applyLock(){
+  const lock=mode==='challenge';
+  STEPS.forEach(s=>s.flds.forEach(f=>{
+    const el=$('in_'+f.k);if(!el)return;
+    el.disabled=lock && !CHALLENGES[curLevel].free.includes(f.k);
+  }));
+}
+function loadLevel(i){
+  if(!unlocked(i))return;
+  curLevel=i;const lv=CHALLENGES[i];
+  for(const k in lv.set)P[k]=lv.set[k];
+  active=lv.step;renderActive();
+  $('chName').textContent='LEVEL '+(i+1)+' · '+lv.name;
+  $('chStars').textContent=starStr(loadProg()[lv.id]||0);
+  $('chGoal').textContent=lv.goal;
+  $('chresult').style.display='none';
+  renderLevels();
+}
+function evaluateChallenge(C){
+  const lv=CHALLENGES[curLevel],res=lv.check(C);
+  const stars=res.pass?(C.totalYield>=0.9?3:C.totalYield>=0.8?2:2):(C.totalYield>=0.6?1:0);
+  const box=$('chresult');
+  box.className='chresult '+(res.pass?'win':'lose');box.style.display='flex';
+  const finalStars=res.pass?Math.max(2,stars):stars;
+  box.innerHTML='<span class="st">'+starStr(finalStars)+'</span><div><div class="big">'+
+    (res.pass?'목표 달성! ':'아직이야 — ')+res.val+'</div>'+
+    (res.pass?'':'<div class="hint">💡 '+lv.hint+'</div>')+'</div>';
+  if(finalStars>0){const p=loadProg();p[lv.id]=Math.max(p[lv.id]||0,finalStars);saveProg(p);$('chStars').textContent=starStr(p[lv.id]);renderLevels();}
+}
+
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.md').forEach(b=>b.classList.toggle('act',b.dataset.m===m));
+  if(m==='challenge'){
+    $('exps').style.display='none';$('chbar').style.display='block';$('knote').style.display='none';
+    renderLevels();loadLevel(curLevel);
+  }else{
+    $('chbar').style.display='none';$('exps').style.display='flex';$('chresult').style.display='none';
+    STEPS.forEach(s=>s.flds.forEach(f=>{const el=$('in_'+f.k);if(el)el.disabled=false;}));
+    document.querySelectorAll('.exp')[0].click();
+  }
+}
+document.querySelectorAll('.md').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.m)));
+
+$('go').addEventListener('click',run);
+$('replay').addEventListener('click',()=>{if(anim)clearTimeout(anim);running=false;run();});
+
+// ---------- INIT ----------
+buildStepList();buildBreakdown();
+active=1;renderActive();
+document.querySelectorAll('.exp')[0].classList.add('act');
+updateLive();
+</script>
+</body>
+</html>
