@@ -109,7 +109,7 @@
   .shell{flex:1;min-width:0;min-height:100vh;display:flex;flex-direction:column;
     padding:0 clamp(16px,4vw,40px) 120px}
   main{flex:1;display:flex;flex-direction:column;width:100%;max-width:940px;margin:0 auto}
-  .result,.chal{margin-block:auto;width:100%;max-width:560px;margin-inline:auto}
+  .result,.chal,.couple{margin-block:auto;width:100%;max-width:560px;margin-inline:auto}
 
   /* ---- home masthead ---- */
   .mast{padding:14px 2px 6px}
@@ -129,6 +129,19 @@
   .prog .pt{font-size:12.5px;opacity:.8}
   .prog .pv{font-size:15.5px;font-weight:700;margin-top:2px}
   .prog .pv b{font-variant-numeric:tabular-nums}
+
+  /* ---- 이어서 하기(재방문) ---- */
+  .cont{margin-top:22px}
+  .cont-h{font-size:13px;font-weight:800;color:var(--muted);letter-spacing:.02em;padding:0 2px 10px}
+  .cont-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+  .cont-card{display:flex;flex-direction:column;align-items:flex-start;gap:3px;text-align:left;padding:15px 16px;border-radius:var(--r);
+    background:var(--card);border:1px solid var(--line);box-shadow:var(--shadow);transition:.12s}
+  .cont-card:active{transform:scale(.99)}
+  .cont-card .cc-ic{font-size:18px}
+  .cont-card .cc-t{font-size:14.5px;font-weight:800;color:var(--ink);margin-top:4px;line-height:1.3}
+  .cont-card .cc-s{font-size:12px;color:var(--muted)}
+  .cont-foot{margin-top:11px;font-size:12px;color:var(--faint);padding:0 2px}
+  @media (max-width:479px){ .cont-row{grid-template-columns:1fr} }
 
   /* ---- stage sections ---- */
   .stage{margin-top:30px}
@@ -229,6 +242,16 @@
   .seal.gold{background:var(--honey-soft);color:var(--honey-ink)} .seal.gold .st{background:var(--honey)}
   .seal.pine{background:var(--pine-soft);color:var(--pine-ink)} .seal.pine .st{background:var(--pine)}
   .seal.muted{background:var(--line-soft);color:var(--muted)} .seal.muted .st{background:var(--faint)}
+  .r-record{margin:14px auto 0;display:inline-block;padding:7px 16px;border-radius:99px;background:var(--pine-soft);color:var(--pine-ink);font-size:13px;font-weight:700;font-variant-numeric:tabular-nums}
+  .learned{margin:20px auto 0;max-width:440px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px 18px;box-shadow:var(--shadow)}
+  .learned.solid{background:var(--pine-soft);border-color:transparent}
+  .learned-h{font-size:13.5px;font-weight:800;color:var(--pine-ink);margin-bottom:10px}
+  .learned-i{padding:10px 0;border-top:1px solid var(--line-soft)}
+  .learned-i:first-of-type{border-top:none;padding-top:2px}
+  .learned .li-q{font-size:13.5px;font-weight:700;color:var(--ink);line-height:1.45}
+  .learned .li-a{font-size:13px;color:var(--muted);line-height:1.55;margin-top:4px}
+  .learned.solid .li-a{color:var(--pine-ink)}
+  .learned-more{margin-top:10px;font-size:12px;color:var(--faint);font-weight:600}
   .r-note{margin:14px auto 0;max-width:34ch;font-size:12px;line-height:1.55;color:var(--muted)}
 
   /* ---- pages (wrong / report) ---- */
@@ -255,6 +278,8 @@
   .rp-row .hd{display:flex;justify-content:space-between;align-items:baseline}
   .rp-row .n{font-size:14px;font-weight:600}
   .rp-row .s{font-size:13px;font-weight:800;color:var(--pine-ink);font-variant-numeric:tabular-nums}
+  .rp-row .rp-tries{font-size:11px;font-weight:600;color:var(--faint)}
+  .rp-row .rp-recent{font-weight:600;color:var(--muted)}
   .rp-bar{margin-top:7px;height:9px;border-radius:99px;background:var(--line-soft);overflow:hidden}
   .rp-bar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--pine),var(--pine-deep))}
 
@@ -272,6 +297,47 @@
 
   /* ---- challenge ---- */
   .chal{padding:12px 2px;text-align:center;animation:rise .3s ease}
+  .chal-top{text-align:left;margin-bottom:4px}
+  .tease{margin:20px auto 0;max-width:460px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+  .tease-lb{font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--honey-ink);font-weight:700}
+  .tease-q{margin-top:8px;font-size:16px;font-weight:700;line-height:1.5;color:var(--ink)}
+  .tease-opts{margin-top:14px;display:flex;flex-direction:column;gap:8px}
+  .topt{display:flex;align-items:center;gap:11px;padding:13px 14px;border:1px solid var(--line);border-radius:13px;background:var(--card);color:var(--ink);font-size:14px;text-align:left;transition:.12s}
+  .topt .ob{flex:0 0 auto;width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:700;background:var(--line-soft);color:var(--muted)}
+  .topt.correct{border-color:var(--pine);background:var(--pine-soft)} .topt.correct .ob{background:var(--pine);color:#fff}
+  .topt.wrong{border-color:#C4574D;background:rgba(196,87,77,.08)} .topt.wrong .ob{background:#C4574D;color:#fff}
+  .topt.dim{opacity:.5}
+  .tease-fb{margin-top:14px;padding:14px;border-radius:13px;background:var(--line-soft)}
+  .tease-fb b{font-size:14px} .tease-fb.ok b{color:var(--pine-ink)} .tease-fb.no b{color:#C4574D}
+  .tease-fb .exp{margin-top:6px;font-size:13.5px;line-height:1.55;color:var(--muted)}
+  .tease-fb .src{margin-top:8px;font-size:12px;color:var(--faint)}
+  /* ---- 부부 공동 준비 ---- */
+  .couple{padding:12px 2px;text-align:center;animation:rise .3s ease}
+  .couple .env{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--honey-ink)}
+  .couple-h{margin-top:14px;font-size:24px;font-weight:800;line-height:1.32;letter-spacing:-.4px;color:var(--ink)}
+  .couple-sub{margin-top:12px;font-size:14.5px;color:var(--muted);line-height:1.5} .couple-sub b{color:var(--ink)}
+  .cmetric{display:flex;gap:10px;margin:20px auto 0;max-width:440px}
+  .cm{flex:1;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 8px;box-shadow:var(--shadow)}
+  .cm b{display:block;font-size:26px;font-weight:800;color:var(--pine-ink);font-variant-numeric:tabular-nums}
+  .cm span{font-size:11.5px;color:var(--muted)}
+  .cm.gap b{color:var(--honey-ink)}
+  .crows{margin:18px auto 0;max-width:440px;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:6px 16px 14px;box-shadow:var(--shadow)}
+  .cgrp-h{font-size:12px;font-weight:800;color:var(--muted);padding:14px 0 6px;letter-spacing:.02em}
+  .cgrp-h.gap{color:var(--honey-ink)} .cgrp-h.done{color:var(--pine-ink)}
+  .crow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line-soft)}
+  .crow .cico{flex:0 0 auto;font-size:16px}
+  .crow .cn{flex:1;min-width:0;font-size:13.5px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .cst{flex:0 0 auto;display:inline-flex;align-items:center;gap:5px}
+  .cst-l{font-size:10.5px;color:var(--faint);font-weight:600}
+  .cdot{width:12px;height:12px;border-radius:50%;background:var(--line);display:inline-block}
+  .cdot.on{background:var(--pine)}
+  .couple-foot{margin:16px auto 0;font-size:12.5px;color:var(--faint)}
+  .couple-sec{margin-top:26px;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px;box-shadow:var(--shadow)}
+  .couple-sec .cs-h{font-size:15px;font-weight:800;color:var(--pine-ink)}
+  .couple-sec .cs-d{margin-top:8px;font-size:13.5px;color:var(--muted);line-height:1.5}
+  .couple-sec .cmetric{margin-top:14px} .couple-sec .crows{margin-top:12px;box-shadow:none}
+  .couple-sec.empty2{text-align:center}
+  .cont-foot.cf-link{display:block;width:100%;text-align:left;background:none;border:none;cursor:pointer;color:var(--honey-ink);font-weight:700;font-size:12.5px;padding:0 2px}
   .chal .env{font-family:var(--mono);font-size:11.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--honey-ink)}
   .chal .who{margin-top:20px;font-size:16px;color:var(--muted)}
   .chal .who b{color:var(--ink)}
@@ -333,19 +399,45 @@
 </div></nav>
 
 <script>
-const STAGES=[{key:"prep",name:"예비 아빠",ico:"🤰"},{key:"newborn",name:"신생아 · 0~100일",ico:"👶"},{key:"common",name:"공통 · 육아 용어",ico:"📖"}];
+const STAGES=[
+  {key:"prep",name:"예비 아빠",ico:"🤰"},
+  {key:"newborn",name:"신생아 · 0~100일",ico:"👶"},
+  {key:"baby",name:"영유아 · 100일~돌",ico:"🍼"},
+  {key:"safety",name:"안전 · 사고 예방",ico:"🚨"},
+  {key:"sick",name:"아플 때 · 판단",ico:"🌡️"},
+  {key:"dad",name:"아빠의 자리",ico:"🧔"},
+  {key:"admin",name:"제도 · 지원",ico:"📋"},
+  {key:"common",name:"공통 · 육아 용어",ico:"📖"}];
 const GRADES=[[90,"마스터 아빠","gold"],[75,"베테랑 아빠","pine"],[60,"주니어 아빠","pine"],[40,"수습 아빠","muted"],[0,"인턴 아빠","muted"]];
 const LS_BEST="dadexam.best", LS_WRONG="dadexam.wrong", LS_THEME="dadexam.theme";
+const LS_LAST="dadexam.last", LS_SEEN="dadexam.seen", LS_TRIES="dadexam.tries", LS_PARTNER="dadexam.partner", LS_COVERED="dadexam.covered";
 const SHARE_BASE="https://logiccraft.co.kr/dadexam/";
 const QUIZ_N=10;
 const view=document.getElementById("view");
-let QS=[], subjects=[], mem={best:{},wrong:[]};
-try{ mem.best=JSON.parse(localStorage.getItem(LS_BEST))||{}; mem.wrong=JSON.parse(localStorage.getItem(LS_WRONG))||[]; }catch(e){}
+let QS=[], subjects=[], CANON=[], mem={best:{},wrong:[],last:{},seen:{},tries:{},partner:null,covered:{}};
+try{ mem.best=JSON.parse(localStorage.getItem(LS_BEST))||{}; mem.wrong=JSON.parse(localStorage.getItem(LS_WRONG))||[];
+  mem.last=JSON.parse(localStorage.getItem(LS_LAST))||{}; mem.seen=JSON.parse(localStorage.getItem(LS_SEEN))||{}; mem.tries=JSON.parse(localStorage.getItem(LS_TRIES))||{};
+  mem.partner=JSON.parse(localStorage.getItem(LS_PARTNER))||null; mem.covered=JSON.parse(localStorage.getItem(LS_COVERED))||{}; }catch(e){}
 const saveBest=()=>{try{localStorage.setItem(LS_BEST,JSON.stringify(mem.best))}catch(e){}};
 const saveWrong=()=>{try{localStorage.setItem(LS_WRONG,JSON.stringify(mem.wrong))}catch(e){}};
+const saveLast=()=>{try{localStorage.setItem(LS_LAST,JSON.stringify(mem.last));localStorage.setItem(LS_TRIES,JSON.stringify(mem.tries));}catch(e){}};
+const saveSeen=()=>{try{localStorage.setItem(LS_SEEN,JSON.stringify(mem.seen));localStorage.setItem(LS_COVERED,JSON.stringify(mem.covered));}catch(e){}};
+const savePartner=()=>{try{mem.partner?localStorage.setItem(LS_PARTNER,JSON.stringify(mem.partner)):localStorage.removeItem(LS_PARTNER)}catch(e){}};
+/* 부부 공동 준비 — 커버리지를 URL로 주고받음(과목당 1글자: 0=미응시, 1~5=점검 강도) */
+const covBand=name=>{const b=mem.best[name];return b==null?0:Math.max(1,Math.ceil(b/20));};
+const encodeCov=()=>CANON.map(covBand).join("");
+const decodeCov=str=>{const o={};String(str||"").split("").forEach((c,i)=>{if(CANON[i])o[CANON[i]]=Math.min(5,parseInt(c,10)||0);});return o;};
+const coupleBuckets=theirs=>{const both=[],one=[],none=[];CANON.forEach(name=>{const m=covBand(name),t=theirs[name]||0;
+  if(m>0&&t>0)both.push(name);else if(m>0||t>0)one.push({name,me:m>0});else none.push(name);});return{both,one,none};};
 const esc=s=>String(s).replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
 const gradeOf=p=>GRADES.find(g=>p>=g[0]);
 const shuffle=a=>{for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+/* 보기 순서 섞기 — 정답이 늘 1번에 오는 걸 막는다. O/X(2지)는 순서가 의미라 그대로 둔다. */
+const shuffleChoices=q=>{
+  if(!q||!q.choices||q.choices.length!==4)return q;
+  const order=shuffle(q.choices.map((_,i)=>i));
+  return {...q, choices:order.map(i=>q.choices[i]), answer:order.indexOf(q.answer)};
+};
 
 /* theme toggle (persisted) */
 document.querySelectorAll(".themebtn").forEach(btn=>btn.onclick=()=>{
@@ -366,9 +458,16 @@ async function init(){
   const seen={};
   QS.forEach(q=>{const k=q.stage+"|"+q.subject; if(!seen[k])seen[k]={stage:q.stage,subject:q.subject,items:[]}; seen[k].items.push(q);});
   subjects=Object.values(seen);
+  CANON=subjects.map(s=>s.subject).sort();
+  // 문항 데이터가 바뀌어 사라진 오답 id 정리 (홈 오답 카운트와 오답노트 표시 일치)
+  const qids=new Set(QS.map(q=>q.id));
+  const cleanWrong=mem.wrong.filter(id=>qids.has(id));
+  if(cleanWrong.length!==mem.wrong.length){mem.wrong=cleanWrong;saveWrong();}
   document.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
-  const p=new URLSearchParams(location.search), ch=p.get("ch"), sc=parseInt(p.get("sc"),10);
-  if(ch && subjects.some(s=>s.subject===ch)) renderChallenge(ch, isFinite(sc)?sc:null);
+  const p=new URLSearchParams(location.search), ch=p.get("ch"), sc=parseInt(p.get("sc"),10), qid=p.get("q");
+  const cov=p.get("cov"), cpl=p.get("couple");
+  if(cov) renderCouple(cpl?decodeURIComponent(cpl):"", cov);
+  else if(ch && subjects.some(s=>s.subject===ch)) renderChallenge(ch, isFinite(sc)?sc:null, qid);
   else go("home");
 }
 
@@ -386,19 +485,46 @@ function renderHome(){
       <div><div class="pt">지금까지 평균</div><div class="pv"><b>${done.length}</b>과목 점검 · <b>${g[1]}</b></div></div></div>`;
   }
   h+=`</section>`;
+  // 재방문자 = 학습 이어가기 표면(A). 첫 방문자는 깔끔한 시험 진입(B)만.
+  const isReturning=done.length>0||Object.keys(mem.tries||{}).length>0;
+  if(isReturning){
+    const wrongN=mem.wrong.length;
+    const nextSub=subjects.find(s=>best[s.subject]==null)
+      ||done.slice().sort((a,b)=>best[a.subject]-best[b.subject])[0];
+    h+=`<section class="cont"><div class="cont-h">이어서 하기</div><div class="cont-row">`;
+    if(wrongN)h+=`<button class="cont-card" id="cReview"><span class="cc-ic">📕</span><span class="cc-t">오답 ${wrongN}개 복습</span><span class="cc-s">틀린 문제만 모아 다시</span></button>`;
+    if(nextSub)h+=`<button class="cont-card" id="cNext"><span class="cc-ic">▶</span><span class="cc-t">${esc(nextSub.subject)}</span><span class="cc-s">${best[nextSub.subject]==null?"아직 안 푼 과목":`최고 ${best[nextSub.subject]}점 · 다시 도전`}</span></button>`;
+    h+=`</div>`;
+    if(mem.partner&&mem.partner.cov){
+      const none=coupleBuckets(decodeCov(mem.partner.cov)).none.length;
+      h+=`<button class="cont-foot cf-link" id="cCouple">🌱 우리 준비도 · 둘 다 아직 ${none}과목 →</button>`;
+    }else{
+      h+=`<div class="cont-foot">아내·남편과 함께 준비해요 — 성적표에서 초대를 보낼 수 있어요.</div>`;
+    }
+    h+=`</section>`;
+  }
   STAGES.forEach((st,i)=>{
     const subs=subjects.filter(s=>s.stage===st.key); if(!subs.length)return;
     h+=`<section class="stage"><div class="stage-hd"><span class="no">${String(i+1).padStart(2,"0")}</span><span class="t">${esc(st.name)}</span><span class="ln"></span><span class="c">${subs.length}과목</span></div><div class="subs">`;
-    subs.forEach(s=>{const b=best[s.subject];
-      const badge=b==null?`<span class="badge none">미응시</span>`:`<span class="badge ${b>=90?"top":"have"}">최고 ${b}</span>`;
+    subs.forEach(s=>{const b=best[s.subject], l=mem.last[s.subject];
+      const badge=b==null?`<span class="badge none">미응시</span>`
+        :(l!=null&&l!==b)?`<span class="badge ${b>=90?"top":"have"}">최고 ${b} · 최근 ${l}</span>`
+        :`<span class="badge ${b>=90?"top":"have"}">최고 ${b}</span>`;
       h+=`<button class="subj" data-subj="${esc(s.subject)}">
         <span class="ico">${st.ico}</span>
-        <span style="flex:1;min-width:0"><span class="nm" style="display:block">${esc(s.subject)}</span><span class="mt">${s.items.length>QUIZ_N?`${s.items.length}문항 중 ${QUIZ_N}개 출제`:`${s.items.length}문항`}</span></span>
+        <span style="flex:1;min-width:0"><span class="nm" style="display:block">${esc(s.subject)}</span><span class="mt">${mem.covered[s.subject]?"전 문항 학습 완료 ✓":s.items.length>QUIZ_N?`${s.items.length}문항 중 ${QUIZ_N}개 출제`:`${s.items.length}문항`}</span></span>
         ${badge}<span class="chev">›</span></button>`;
     });
     h+=`</div></section>`;
   });
   view.innerHTML=h;
+  const cCouple=document.getElementById("cCouple");
+  if(cCouple)cCouple.onclick=()=>go("report");
+  const cReview=document.getElementById("cReview");
+  if(cReview)cReview.onclick=()=>startQuiz(QS.filter(q=>mem.wrong.includes(q.id)),"오답 다시 풀기",false);
+  const cNext=document.getElementById("cNext");
+  if(cNext){const ns=subjects.find(s=>best[s.subject]==null)||subjects.filter(s=>best[s.subject]!=null).sort((a,b)=>best[a.subject]-best[b.subject])[0];
+    if(ns)cNext.onclick=()=>startQuiz(ns.items,ns.subject);}
   view.querySelectorAll("[data-subj]").forEach(el=>el.onclick=()=>{
     const s=subjects.find(x=>x.subject===el.dataset.subj); startQuiz(s.items,s.subject);
   });
@@ -407,8 +533,26 @@ function renderHome(){
 /* ---------- QUIZ ---------- */
 let quiz=null;
 function startQuiz(pool,label,sample=true){
-  let play=shuffle(pool.slice());
-  if(sample&&play.length>QUIZ_N)play=play.slice(0,QUIZ_N);
+  let play;
+  if(sample&&pool.length>QUIZ_N){
+    // 아직 안 나온 문항을 먼저 출제 → 여러 번 풀면 전 문항을 고루 접함
+    let seen=new Set(mem.seen[label]||[]);
+    const unseen=shuffle(pool.filter(q=>!seen.has(q.id)));
+    if(unseen.length>=QUIZ_N){
+      play=unseen.slice(0,QUIZ_N);
+    }else{
+      // 남은 미출제부터 채우고 나머지는 새 사이클에서 → seen 리셋
+      // 이 지점에 온다는 건 이번 판으로 전 문항을 한 번씩 다 접했다는 뜻
+      play=unseen.concat(shuffle(pool.filter(q=>seen.has(q.id)))).slice(0,QUIZ_N);
+      seen=new Set();
+      if(subjects.some(s=>s.subject===label))mem.covered[label]=true;
+    }
+    play.forEach(q=>seen.add(q.id));
+    mem.seen[label]=[...seen]; saveSeen();
+  }else{
+    play=shuffle(pool.slice());
+  }
+  play=play.map(shuffleChoices);
   quiz={source:pool,items:play,label,i:0,correct:0,wrong:[],results:[],answered:false};
   setTab(null);renderQuiz();window.scrollTo(0,0);
 }
@@ -473,8 +617,25 @@ function pick(idx){
 }
 function finishQuiz(){
   const pct=Math.round(quiz.correct/quiz.items.length*100), g=gradeOf(pct), nWrong=quiz.wrong.length;
-  if(mem.best[quiz.label]==null||pct>mem.best[quiz.label]){mem.best[quiz.label]=pct;saveBest();}
+  const isSubject=subjects.some(s=>s.subject===quiz.label);
+  const prevBest=mem.best[quiz.label];
+  const isNewBest=prevBest==null||pct>prevBest;
+  if(isNewBest){mem.best[quiz.label]=pct;saveBest();}
+  if(isSubject){mem.last[quiz.label]=pct;mem.tries[quiz.label]=(mem.tries[quiz.label]||0)+1;saveLast();}
   const w=new Set(mem.wrong);quiz.items.forEach(q=>{if(quiz.wrong.includes(q.id))w.add(q.id);else w.delete(q.id);});mem.wrong=[...w];saveWrong();
+  // 오늘 새로 알게 된 것 = 이번에 틀린 문제의 핵심 (결과의 진짜 주인공)
+  const learned=quiz.items.filter(q=>quiz.wrong.includes(q.id));
+  const learnHtml = learned.length
+    ? `<div class="learned"><div class="learned-h">🌱 오늘 새로 알게 된 것</div>${learned.slice(0,3).map(q=>`<div class="learned-i"><div class="li-q">${esc(q.q)}</div><div class="li-a">${esc(q.explain)}</div></div>`).join("")}${learned.length>3?`<div class="learned-more">외 ${learned.length-3}가지는 오답노트에 담아뒀어요</div>`:""}</div>`
+    : `<div class="learned solid"><div class="learned-h">✓ 이미 탄탄한 부분이에요</div><div class="learned-i"><div class="li-a">이 과목은 전부 맞혔어요. 다른 과목도 점검해볼까요?</div></div></div>`;
+  // 결과 CTA — 혼자 쓰는 사람은 '다음 과목'으로 학습을 잇고, 상대가 있으면 '되보내기'를 앞세움
+  const hasPartner=!!(mem.partner&&mem.partner.cov);
+  const nextS=subjects.find(s=>mem.best[s.subject]==null&&s.subject!==quiz.label)
+    ||subjects.filter(s=>s.subject!==quiz.label).sort((a,b)=>(mem.best[a.subject]==null?0:mem.best[a.subject])-(mem.best[b.subject]==null?0:mem.best[b.subject]))[0];
+  const primaryBtn = hasPartner
+    ? `<button class="cta honey" id="couple">우리 준비도 되보내기</button>`
+    : nextS ? `<button class="cta honey" id="nextsub">다음 과목 · ${esc(nextS.subject)}</button>`
+    : `<button class="cta honey" id="couple">아내·남편과 함께 준비하기</button>`;
   const R=94, C=2*Math.PI*R;
   view.innerHTML=`<section class="result">
     <div class="r-kick">채점 완료</div><div class="r-sub">${esc(quiz.label)}</div>
@@ -483,16 +644,21 @@ function finishQuiz(){
       <circle cx="105" cy="105" r="${R}" fill="none" stroke="var(--pine)" stroke-width="14" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-pct/100)).toFixed(1)}"/>
     </svg><div class="in"><div class="sc">${pct}</div><div class="of">/ 100점</div></div></div>
     <div class="seal ${g[2]}"><span class="st">${g[2]==="gold"?"★":"●"}</span>${g[1]}</div>
+    ${isSubject?`<div class="r-record">${isNewBest?(prevBest==null?"첫 응시 기록이에요 🌱":`새 최고 기록! (이전 ${prevBest}점)`):`이번 ${pct}점 · 최고 ${mem.best[quiz.label]}점 유지 · ${mem.tries[quiz.label]}회째`}</div>`:""}
+    ${learnHtml}
     <div class="r-note">아빠 등급은 재미로 보는 자가점검 결과예요. 공인 자격이 아니에요.</div>
     <div class="stack">
+      ${primaryBtn}
       <button class="cta" id="retry">${nWrong?`틀린 ${nWrong}문제 다시 풀기`:"한 번 더 풀기"}</button>
-      <button class="cta honey" id="share">결과 공유하고 도전장 보내기</button>
       <button class="cta ghost" id="other">다른 과목 풀기</button></div></section>`;
   document.getElementById("retry").onclick=()=>{
     if(nWrong)startQuiz(quiz.items.filter(q=>quiz.wrong.includes(q.id)),quiz.label,false);
     else startQuiz(quiz.source,quiz.label,true);
   };
-  document.getElementById("share").onclick=e=>shareResult(e.currentTarget,quiz.label,pct,g);
+  const nb=document.getElementById("nextsub");
+  if(nb&&nextS)nb.onclick=()=>startQuiz(nextS.items,nextS.subject);
+  const cpb=document.getElementById("couple");
+  if(cpb)cpb.onclick=e=>shareCouple(e.currentTarget);
   document.getElementById("other").onclick=()=>go("home");
 }
 
@@ -514,48 +680,150 @@ function renderWrong(){
 }
 
 /* ---------- REPORT ---------- */
+function coupleSectionHtml(){
+  if(mem.partner&&mem.partner.cov){
+    const theirs=decodeCov(mem.partner.cov), tl=mem.partner.name?esc(mem.partner.name):"상대";
+    const {both,one,none}=coupleBuckets(theirs);
+    return `<div class="couple-sec"><div class="cs-h">🌱 우리 준비도</div>
+      <div class="cmetric"><div class="cm"><b>${both.length}</b><span>함께 점검</span></div>
+        <div class="cm"><b>${one.length}</b><span>한 사람만</span></div>
+        <div class="cm gap"><b>${none.length}</b><span>둘 다 아직</span></div></div>
+      <div class="crows">${mergedRowsHtml(theirs,tl)}</div>
+      <div class="stack" style="margin-top:14px"><button class="cta honey" id="coupleBtn">우리 준비도 되보내기</button></div></div>`;
+  }
+  return `<div class="couple-sec empty2"><div class="cs-h">🌱 함께 준비</div>
+    <div class="cs-d">아내·남편과 준비 현황을 합쳐 빈칸을 같이 채워요.</div>
+    <div class="stack" style="margin-top:14px"><button class="cta honey" id="coupleBtn">아내·남편에게 초대 보내기</button></div></div>`;
+}
 function renderReport(){
   const best=mem.best, done=subjects.filter(s=>best[s.subject]!=null);
   if(!done.length){view.innerHTML=`<section class="page"><div class="page-h">성적표</div>
-    <div class="empty"><div class="e-ic">📊</div><div class="e-t">아직 응시한 과목이 없어요</div><div class="e-d">시험을 풀면 성적표가 채워져요.</div></div></section>`;return;}
+    <div class="empty"><div class="e-ic">📊</div><div class="e-t">아직 응시한 과목이 없어요</div><div class="e-d">시험을 풀면 성적표가 채워져요.</div></div>
+    ${coupleSectionHtml()}</section>`;
+    const cb0=document.getElementById("coupleBtn"); if(cb0)cb0.onclick=e=>shareCouple(e.currentTarget); return;}
   const avg=Math.round(done.reduce((a,s)=>a+best[s.subject],0)/done.length), g=gradeOf(avg);
   const now=new Date(), ds=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
   let h=`<section class="page"><div class="page-h">성적표</div><div class="page-s">과목별 최고점과 평균이에요.</div>
     <div class="avg"><div style="flex:1"><div class="lb">평균 점수</div><div class="bignum"><b>${avg}</b><span>점</span></div></div>
       <div class="seal ${g[2]}" style="margin:0"><span class="st">${g[2]==="gold"?"★":"●"}</span>${g[1]}</div></div>
     <div class="rp">`;
-  done.forEach(s=>{const b=best[s.subject];h+=`<div class="rp-row"><div class="hd"><span class="n">${esc(s.subject)}</span><span class="s">${b}점</span></div><div class="rp-bar"><i style="width:${b}%"></i></div></div>`;});
-  h+=`</div><div class="sharewrap"><div class="share-lb">공유용 점검 카드</div>
+  done.forEach(s=>{const b=best[s.subject], l=mem.last[s.subject], t=mem.tries[s.subject];
+    const meta=t?`<span class="rp-tries">${t}회 응시</span>`:"";
+    const sub=(l!=null&&l!==b)?`<span class="rp-recent"> · 최근 ${l}</span>`:"";
+    h+=`<div class="rp-row"><div class="hd"><span class="n">${esc(s.subject)} ${meta}</span><span class="s">${b}점${sub}</span></div><div class="rp-bar"><i style="width:${b}%"></i></div></div>`;});
+  h+=`</div>`;
+  h+=coupleSectionHtml();
+  h+=`<div class="sharewrap"><div class="share-lb">공유용 점검 카드</div>
     <div class="share"><div class="sb">🌱 아빠자격시험</div>
       <div class="sm"><b>육아 상식 점검 완료</b><div class="smeta">${done.length}과목 점검 · 평균 ${avg}점 · ${g[1]}</div></div>
       <div class="sfoot">재미로 보는 자가점검이에요. 국가공인 자격이 아니에요.</div></div>
-    <div class="stack" style="margin-top:14px"><button class="cta honey" id="shareBtn">이미지로 저장 · 공유</button></div>
+    <div class="stack" style="margin-top:14px"><button class="cta ghost" id="shareBtn">이미지로 저장 · 공유</button></div>
   </div></section>`;
   view.innerHTML=h;
   const sb=document.getElementById("shareBtn");
   sb.onclick=()=>shareCard(sb,{count:done.length,avg,grade:g,date:ds});
+  const cb=document.getElementById("coupleBtn");
+  if(cb)cb.onclick=e=>shareCouple(e.currentTarget);
 }
 
 /* ---------- CHALLENGE (받은 도전장) ---------- */
-function renderChallenge(subject,pct){
+function renderChallenge(subject,pct,qid){
   history.replaceState(null,"",location.pathname);
   const s=subjects.find(x=>x.subject===subject);
   const g=(pct!=null)?gradeOf(pct):null;
   const R=90, C=2*Math.PI*R, deg=pct!=null?pct:100;
+  const tease=qid?shuffleChoices(QS.find(x=>x.id===qid&&x.subject===subject)):null;
   setTab(null);
   view.innerHTML=`<section class="chal">
+    <div class="chal-top"><button class="icon-btn" id="cback" aria-label="닫기">‹</button></div>
     <div class="env">🌱 받은 도전장</div>
     <div class="gauge" style="margin-top:18px"><svg width="210" height="210" viewBox="0 0 210 210">
       <circle cx="105" cy="105" r="${R}" fill="none" stroke="var(--line-soft)" stroke-width="13"/>
       <circle cx="105" cy="105" r="${R}" fill="none" stroke="var(--honey)" stroke-width="13" stroke-linecap="round" stroke-dasharray="${C.toFixed(1)}" stroke-dashoffset="${(C*(1-deg/100)).toFixed(1)}"/>
     </svg><div class="in">${pct!=null?`<div class="sc">${pct}</div><div class="of">/ 100점</div>`:`<div class="of" style="font-size:17px;font-weight:800;color:var(--honey-ink)">도전!</div>`}</div></div>
     ${g?`<div class="seal ${g[2]}"><span class="st">${g[2]==="gold"?"★":"●"}</span>친구는 ${g[1]}</div>`:""}
-    <div class="who">친구가 <b>‘${esc(subject)}’</b> 시험에서${pct!=null?` ${pct}점을 받았어요.`:" 도전했어요."}<br>나도 같은 시험을 풀어볼까요?</div>
+    <div class="who">친구가 <b>‘${esc(subject)}’</b> 시험에서${pct!=null?` ${pct}점을 받았어요.`:" 도전했어요."}<br>${tease?"먼저 이 문제부터 풀어볼까요?":"나도 같은 시험을 풀어볼까요?"}</div>
+    ${tease?`<div class="tease" id="tease">
+      <div class="tease-lb">미리보기 문제</div>
+      <div class="tease-q">${esc(tease.q)}</div>
+      <div class="tease-opts" id="teaseOpts">${tease.choices.map((c,idx)=>`<button class="topt" data-i="${idx}"><span class="ob">${idx+1}</span><span style="flex:1">${esc(c)}</span></button>`).join("")}</div>
+      <div id="teaseFb"></div></div>`:""}
     <div class="stack" style="margin-top:24px">
-      <button class="cta honey" id="cgo">나도 이 과목 도전하기</button>
+      <button class="cta honey" id="cgo">${tease?"이 과목 전체 도전하기":"나도 이 과목 도전하기"}</button>
       <button class="cta ghost" id="chome">처음부터 둘러보기</button></div></section>`;
+  document.getElementById("cback").onclick=()=>go("home");
   document.getElementById("cgo").onclick=()=>startQuiz(s.items,s.subject);
   document.getElementById("chome").onclick=()=>go("home");
+  if(tease){
+    let done=false;
+    document.querySelectorAll("#teaseOpts .topt").forEach(b=>b.onclick=()=>{
+      if(done)return;done=true;
+      const idx=+b.dataset.i, ok=idx===tease.answer;
+      document.querySelectorAll("#teaseOpts .topt").forEach((el,i)=>{el.disabled=true;
+        if(i===tease.answer){el.classList.add("correct");el.querySelector(".ob").textContent="✓";}
+        else if(i===idx){el.classList.add("wrong");el.querySelector(".ob").textContent="✕";}
+        else el.classList.add("dim");});
+      document.getElementById("teaseFb").innerHTML=`<div class="tease-fb ${ok?"ok":"no"}"><b>${ok?"✓ 정답이에요":"✕ 아쉬워요"}</b><div class="exp">${esc(tease.explain)}</div><div class="src">📎 ${esc(tease.source)}</div></div>`;
+    });
+  }
+}
+
+/* ---------- COUPLE (부부 공동 준비) ---------- */
+function stageIco(name){const s=subjects.find(x=>x.subject===name);return (STAGES.find(st=>st.key===(s||{}).stage)||{}).ico||"•";}
+function mergedRowsHtml(theirs,theirLabel){
+  const {both,one,none}=coupleBuckets(theirs);
+  const dot=(on,band)=>on?`<span class="cdot on" style="opacity:${0.5+0.1*band}"></span>`:`<span class="cdot"></span>`;
+  const row=name=>{const m=covBand(name),t=theirs[name]||0;
+    return `<div class="crow"><span class="cico">${stageIco(name)}</span><span class="cn">${esc(name)}</span>
+      <span class="cst"><span class="cst-l">나</span>${dot(m>0,m)}</span>
+      <span class="cst"><span class="cst-l">${esc(theirLabel)}</span>${dot(t>0,t)}</span></div>`;};
+  let h="";
+  if(none.length)h+=`<div class="cgrp-h gap">둘 다 아직 · ${none.length}과목</div>`+none.map(row).join("");
+  if(one.length)h+=`<div class="cgrp-h">한 사람만 · ${one.length}과목</div>`+one.map(o=>row(o.name)).join("");
+  if(both.length)h+=`<div class="cgrp-h done">둘 다 점검 · ${both.length}과목</div>`+both.map(row).join("");
+  return h;
+}
+function renderCouple(name,covStr){
+  history.replaceState(null,"",location.pathname);
+  const theirs=decodeCov(covStr);
+  mem.partner={name:name||"",cov:covStr}; savePartner();
+  const theirLabel=name?esc(name):"상대";
+  const {both,one,none}=coupleBuckets(theirs);
+  const total=CANON.length;
+  setTab(null);
+  view.innerHTML=`<section class="couple">
+    <div class="chal-top"><button class="icon-btn" id="cback" aria-label="닫기">‹</button></div>
+    <div class="env">🌱 함께 준비</div>
+    <h2 class="couple-h">${name?`${esc(name)}님이<br>함께 준비하자고 보냈어요`:"함께 준비 초대가 왔어요"}</h2>
+    <div class="couple-sub">둘의 기록을 합친 <b>우리 준비도</b>예요. 빈칸을 같이 채워요.</div>
+    <div class="cmetric"><div class="cm"><b>${both.length}</b><span>함께 점검</span></div>
+      <div class="cm"><b>${one.length}</b><span>한 사람만</span></div>
+      <div class="cm gap"><b>${none.length}</b><span>둘 다 아직</span></div></div>
+    <div class="crows">${mergedRowsHtml(theirs,theirLabel)}</div>
+    <div class="stack" style="margin-top:22px">
+      <button class="cta honey" id="cgap">${none.length?"둘 다 안 본 과목부터 풀기":one.length?"한 사람만 본 과목 풀기":"우리 준비도 다시 보기"}</button>
+      <button class="cta" id="csend">우리 준비도 되보내기</button>
+      <button class="cta ghost" id="chome">전체 과목 둘러보기</button></div>
+    <div class="couple-foot">${both.length}/${total}과목을 함께 점검했어요.</div></section>`;
+  document.getElementById("cback").onclick=()=>go("home");
+  document.getElementById("chome").onclick=()=>go("home");
+  document.getElementById("csend").onclick=e=>shareCouple(e.currentTarget);
+  document.getElementById("cgap").onclick=()=>{
+    const target=none[0]||(one.find(o=>!o.me)||{}).name||one[0]&&one[0].name;
+    const s=target?subjects.find(x=>x.subject===target):null;
+    if(s)startQuiz(s.items,s.subject); else go("home");
+  };
+}
+async function shareCouple(btn){
+  const cov=encodeCov();
+  const url=SHARE_BASE+"?couple=&cov="+cov;
+  const text="아빠자격시험 — 우리 함께 육아 준비해요. 내 준비 현황을 보냈어요. 열어서 우리 준비도를 같이 봐요!";
+  const orig=btn.textContent;btn.disabled=true;btn.textContent="링크 준비 중…";
+  try{
+    if(navigator.share){ await navigator.share({title:"아빠자격시험 · 함께 준비",text,url}); }
+    else{ try{await navigator.clipboard.writeText(url);alert("함께 준비 링크를 복사했어요.\n"+url);}catch(e){prompt("함께 준비 링크",url);} }
+  }catch(e){ if(!(e&&e.name==="AbortError")){ try{await navigator.clipboard.writeText(url);}catch(_){} } }
+  finally{ btn.disabled=false;btn.textContent=orig; }
 }
 
 /* ---------- 공유 카드 이미지화 (html2canvas) ---------- */
@@ -591,7 +859,10 @@ function buildResultCard(d){
         <div style="font-size:96px;font-weight:800;letter-spacing:-3px;line-height:1;color:#26231E">${d.pct}</div>
         <div style="font-size:30px;font-weight:700;color:#8A8073">점</div></div>
       <div style="align-self:flex-start;margin-top:22px;padding:13px 32px;border-radius:99px;font-size:29px;font-weight:800;background:${gbg};color:${gcol}">${d.grade[1]}</div>
-      <div style="margin-top:30px;font-size:26px;font-weight:700;color:#C0842F">너도 도전해봐 →</div></div>
+      ${d.tease?`<div style="margin-top:28px;padding:22px 24px;border-radius:24px;background:#FBF3E3">
+        <div style="font-size:20px;font-weight:800;color:#C0842F">이 문제, 너는 풀 수 있어?</div>
+        <div style="margin-top:10px;font-size:23px;font-weight:700;line-height:1.4;color:#26231E">${esc(d.tease)}</div></div>`
+      :`<div style="margin-top:30px;font-size:26px;font-weight:700;color:#C0842F">너도 도전해봐 →</div>`}</div>
     <div style="font-size:19px;line-height:1.5;color:#8A8073">재미로 보는 자가점검이에요. 국가공인 자격이 아니에요. · ${d.date}</div>`;
   return w;
 }
@@ -618,12 +889,18 @@ async function shareCard(btn,d){
 }
 async function shareResult(btn,subject,pct,grade){
   const now=new Date(), date=`${now.getFullYear()}.${now.getMonth()+1}.${now.getDate()}`;
-  const url=SHARE_BASE+"?ch="+encodeURIComponent(subject)+"&sc="+pct;
-  const text=`아빠자격시험 '${subject}' ${pct}점 (${grade[1]}) — 너도 도전해봐!`;
+  // 도전장에 진짜 문제 1개를 실어 보냄 — 내가 틀린 문제 우선(정직·개인적), 없으면 중간 문항
+  const teaseId=(quiz&&quiz.wrong&&quiz.wrong.length)?quiz.wrong[0]
+    :(quiz&&quiz.items&&quiz.items.length)?quiz.items[Math.floor(quiz.items.length/2)].id:null;
+  const teaseQ=teaseId&&quiz?quiz.items.find(q=>q.id===teaseId):null;
+  const url=SHARE_BASE+"?ch="+encodeURIComponent(subject)+"&sc="+pct+(teaseId?"&q="+encodeURIComponent(teaseId):"");
+  const text=teaseQ?`아빠자격시험 '${subject}' ${pct}점 (${grade[1]}) — 이 문제, 너는 풀 수 있어? 함께 도전!`
+    :`아빠자격시험 '${subject}' ${pct}점 (${grade[1]}) — 너도 도전해봐!`;
   const orig=btn.textContent;btn.disabled=true;btn.textContent="이미지 만드는 중…";
   let file=null;
   if(window.html2canvas){
-    const node=buildResultCard({subject,pct,grade,date});document.body.appendChild(node);
+    const teaseText=teaseQ?(teaseQ.q.length>68?teaseQ.q.slice(0,66)+"…":teaseQ.q):null;
+    const node=buildResultCard({subject,pct,grade,date,tease:teaseText});document.body.appendChild(node);
     try{
       const canvas=await html2canvas(node,{scale:2,backgroundColor:null,logging:false});
       const blob=await new Promise(res=>canvas.toBlob(res,"image/png"));
