@@ -6,12 +6,12 @@
 <meta name="theme-color" content="#2F6E5B">
 <link rel="manifest" href="./manifest.json">
 <title>아빠자격시험 — 예비·초보 아빠 육아 상식 시험 (무료 자가점검)</title>
-<meta name="description" content="예비·초보 아빠가 육아 상식을 시험처럼 점검하고, 틀린 문제는 근거와 함께 배우는 자가점검. 임신·출산·신생아 15과목, 가입·설치 없이 무료. 재미로 보는 점검이며 국가공인 자격이 아닙니다.">
+<meta name="description" content="예비·초보 아빠가 육아 상식을 시험처럼 점검하고, 틀린 문제는 근거와 함께 배우는 자가점검. 임신·출산부터 영유아 안전·응급까지 30과목, 가입·설치 없이 무료. 재미로 보는 점검이며 국가공인 자격이 아닙니다.">
 <link rel="canonical" href="https://logiccraft.co.kr/dadexam/">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="아빠자격시험">
 <meta property="og:title" content="아빠자격시험 — 예비·초보 아빠 육아 상식 시험">
-<meta property="og:description" content="아빠 시점 육아 상식을 시험처럼 점검하고, 오답은 근거와 함께 배워요. 임신·출산·신생아 15과목, 가입·설치 없이 무료. 국가공인 자격 아님.">
+<meta property="og:description" content="아빠 시점 육아 상식을 시험처럼 점검하고, 오답은 근거와 함께 배워요. 임신·출산부터 영유아 안전·응급까지 30과목, 가입·설치 없이 무료. 국가공인 자격 아님.">
 <meta property="og:url" content="https://logiccraft.co.kr/dadexam/">
 <meta property="og:image" content="https://logiccraft.co.kr/og/dadexam.png">
 <meta property="og:image:width" content="1200">
@@ -478,7 +478,7 @@ function renderHome(){
   let h=`<section class="mast">
     <div class="kicker">예비·초보 아빠 · 육아 상식 자가점검</div>
     <h1>나는 몇 점짜리 아빠일까?</h1>
-    <p class="tag">예비·초보 아빠 육아 상식을 시험으로 점검하고 등급을 받아요. 임신·출산·신생아 15과목, 틀린 문제는 근거와 함께.</p>
+    <p class="tag">예비·초보 아빠 육아 상식을 시험으로 점검하고 등급을 받아요. 임신·출산부터 영유아 안전·응급까지 30과목, 틀린 문제는 근거와 함께.</p>
     <div class="disc"><span>🌱</span><span><b>재미로 보는 자가점검이에요.</b> 국가공인 자격이 아니고, 의료 조언을 대신하지 않아요.</span></div>`;
   if(avg!=null){const g=gradeOf(avg);
     h+=`<div class="prog"><div class="ring"><svg width="56" height="56"><circle cx="28" cy="28" r="24" fill="none" stroke="rgba(255,255,255,.22)" stroke-width="5"/><circle cx="28" cy="28" r="24" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-dasharray="${(2*Math.PI*24).toFixed(1)}" stroke-dashoffset="${(2*Math.PI*24*(1-avg/100)).toFixed(1)}" transform="rotate(-90 28 28)"/></svg><i>${avg}</i></div>
