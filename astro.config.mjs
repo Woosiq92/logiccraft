@@ -14,6 +14,7 @@ export default defineConfig({
       'https://logiccraft.co.kr/rocket-lab/',
       'https://logiccraft.co.kr/semiconductor-lab/',
       'https://logiccraft.co.kr/school-os/',
+      'https://logiccraft.co.kr/matrixiq-test/',
     ],
   })],
 });

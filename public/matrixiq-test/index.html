@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>매트릭스 인적성 — 60초 추론 퀵테스트</title>
+<meta name="description" content="설치 없이 60초. 도형·수열·추리 6문항으로 추론 레이팅을 재보세요. 룰베이스 무한 생성.">
+<meta property="og:title" content="내 추론 레이팅은? · 60초 퀵테스트">
+<meta property="og:description" content="설치 없이 도형·수열·추리 6문항. 당신의 추론 레이팅에 도전.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --indigo:#5b6cff; --indigo-soft:#eef0ff; --ink:#0e1330; --ink2:#1a2046; --ink3:#2a3057; --ink4:#3a4060;
+    --muted:#8b90ab; --muted2:#9aa0bd; --muted3:#6a7090; --muted4:#5a6080;
+    --bg:#fafbff; --card:#fff; --soft:#f4f6fc; --line:#e6e9f5; --soft-line:#eaedf7; --track:#eef0f6;
+    --ok:#1ca672; --ok-soft:#e7f7f0; --no:#e5484d; --no-soft:#fdecec;
+    --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+    --sans:'Pretendard',-apple-system,BlinkMacSystemFont,'Apple SD Gothic Neo',sans-serif;
+  }
+  * { box-sizing:border-box; }
+  html,body { margin:0; padding:0; }
+  body { background:var(--bg); color:var(--ink); font-family:var(--sans); -webkit-font-smoothing:antialiased; }
+  #app { max-width:460px; margin:0 auto; padding:22px 20px 40px; min-height:100vh; }
+  .wm { display:flex; align-items:center; gap:9px; margin-bottom:2px; }
+  .wm-name { font-size:16px; font-weight:700; letter-spacing:-.01em; }
+  .wm-tag { font-family:var(--mono); font-size:9.5px; color:var(--muted2); letter-spacing:.08em; margin-left:auto; }
+  .lang { display:flex; gap:6px; margin:14px 0 0; }
+  .lang button { flex:none; border:1px solid var(--line); background:var(--card); color:var(--muted3); border-radius:8px; padding:5px 11px; font-size:12px; font-family:var(--sans); cursor:pointer; }
+  .lang button.on { border-color:var(--indigo); color:var(--indigo); font-weight:600; }
+  /* 인트로 */
+  .intro { text-align:center; padding:44px 6px 0; }
+  .intro-badge { display:inline-block; font-size:12px; font-weight:700; color:var(--indigo); background:var(--indigo-soft); border-radius:9px; padding:6px 14px; letter-spacing:.02em; }
+  .intro-h { font-size:30px; font-weight:700; letter-spacing:-.02em; line-height:1.24; margin:18px 0 0; }
+  .intro-h b { color:var(--indigo); }
+  .intro-d { font-size:14px; color:var(--muted4); line-height:1.6; margin:14px 0 0; word-break:keep-all; }
+  .primary { display:flex; width:100%; align-items:center; justify-content:center; gap:8px; border:none;
+    background:var(--indigo); color:#fff; border-radius:13px; height:54px; font-size:16px; font-weight:600;
+    font-family:var(--sans); cursor:pointer; box-shadow:0 6px 16px rgba(91,108,255,.28); margin-top:26px; }
+  .primary:active { transform:translateY(1px); }
+  .ghost { display:block; width:100%; margin-top:10px; padding:13px; border:1px solid var(--line);
+    border-radius:12px; background:var(--card); color:var(--muted3); font-size:14px; font-family:var(--sans); cursor:pointer; }
+  .intro-note { font-size:11.5px; color:var(--muted2); margin-top:16px; line-height:1.5; }
+  /* 진행 */
+  .qh { display:flex; align-items:center; justify-content:space-between; margin:6px 0 4px; }
+  .qh-prog { font-family:var(--mono); font-size:13px; color:var(--muted3); }
+  .qh-pill { font-size:11px; font-weight:700; color:var(--indigo); background:var(--indigo-soft); padding:3px 9px; border-radius:7px; }
+  .qbar { height:6px; background:var(--track); border-radius:4px; overflow:hidden; margin-bottom:18px; }
+  .qbar-fill { height:100%; background:var(--indigo); border-radius:4px; transition:width .3s; }
+  .q-prompt { font-size:14px; color:var(--muted4); line-height:1.5; margin:0 0 14px; word-break:keep-all; }
+  /* 엔진 출력 (앱 style.css에서 추출) */
+  .stem-card { background:var(--soft); border:1px solid var(--soft-line); border-radius:18px; padding:14px; margin-bottom:16px; }
+  .opts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:9px; }
+  .opt { position:relative; background:var(--card); border:1px solid var(--line); border-radius:12px; aspect-ratio:1;
+    display:flex; align-items:center; justify-content:center; padding:15px; min-width:0; cursor:pointer;
+    font-family:var(--mono); font-size:22px; font-weight:600; color:var(--ink2); }
+  .opt:active { transform:scale(0.97); }
+  .opt-lab { position:absolute; top:7px; left:9px; font-family:var(--mono); font-size:10px; color:var(--muted2); }
+  .opt.locked { cursor:default; } .opt.locked:active { transform:none; }
+  .opt.right { border:2px solid var(--ok); background:var(--ok-soft); }
+  .opt.wrong { border:2px solid var(--no); background:var(--no-soft); }
+  .opt-mark { position:absolute; top:6px; right:6px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:700; }
+  .opt.right .opt-mark { background:var(--ok); } .opt.wrong .opt-mark { background:var(--no); }
+  .opt-num { font-family:var(--mono); font-size:22px; font-weight:600; color:var(--ink2); }
+  .mx-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .mx-cell { background:var(--card); border:1px solid var(--line); border-radius:11px; display:flex; align-items:center; justify-content:center; aspect-ratio:1; padding:14px; min-width:0; }
+  .mx-cell.mx-q { border:1.6px dashed #c2c9ee; color:var(--indigo); font-family:var(--mono); font-size:34px; font-weight:600; }
+  .cellsvg { width:100%; height:100%; max-width:92px; min-width:0; display:block; }
+  .seq { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:8px; font-family:var(--mono); font-size:28px; font-weight:600; color:var(--ink2); padding:8px 0; }
+  .seq-c { color:var(--ink3); } .seq-q { color:var(--indigo); } .seq-n { font-variant-numeric:tabular-nums; }
+  .odd-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:8px; }
+  .odd-cell { position:relative; background:var(--card); border:1px solid var(--line); border-radius:11px; padding:12px; display:flex; align-items:center; justify-content:center; aspect-ratio:1; min-width:0; }
+  .odd-lab { position:absolute; top:5px; left:8px; font-family:var(--mono); font-size:10px; color:var(--muted2); }
+  .calc-q { font-size:16px; line-height:1.6; color:var(--ink2); text-align:center; padding:14px 8px; word-break:keep-all; }
+  .dt-wrap { display:flex; flex-direction:column; gap:12px; padding:4px 2px; }
+  .dt-cap { font-size:12px; color:var(--muted); text-align:center; }
+  .dt { width:100%; border-collapse:collapse; }
+  .dt th,.dt td { border:1px solid var(--line); padding:9px 4px; text-align:center; font-size:14px; }
+  .dt th { background:var(--soft); color:var(--muted3); font-weight:600; }
+  .dt td { font-family:var(--mono); color:var(--ink2); }
+  .dt-q { font-size:15px; font-weight:600; color:var(--ink2); text-align:center; line-height:1.5; word-break:keep-all; }
+  .verbal-q { text-align:left; padding:4px 2px; }
+  .vq-facts { display:flex; flex-direction:column; gap:7px; font-size:14px; line-height:1.5; color:var(--ink3); }
+  .vq-ask { margin-top:14px; font-size:14px; font-weight:600; color:var(--ink); line-height:1.5; }
+  .code-ex { font-family:var(--mono); font-size:17px; letter-spacing:.08em; color:var(--ink2); }
+  .diag-flow { font-family:var(--mono); font-size:15px; color:var(--ink2); line-height:1.7; word-break:break-word; }
+  .ana-fig { display:flex; flex-direction:column; align-items:center; gap:10px; padding:6px 0; }
+  .af-row { display:flex; align-items:center; gap:14px; }
+  .af-cell { width:72px; height:72px; background:var(--card); border:1px solid var(--line); border-radius:12px; display:flex; align-items:center; justify-content:center; }
+  .af-cell svg { width:100%; height:100%; }
+  .af-q { font-family:var(--mono); font-size:26px; font-weight:700; color:var(--indigo); border-style:dashed; }
+  .af-arrow { font-size:20px; color:var(--muted3); } .af-rel { font-size:11px; color:var(--muted); font-family:var(--mono); letter-spacing:.04em; }
+  .opts-text { display:flex; flex-direction:column; gap:9px; }
+  .opt-row { display:flex; align-items:center; gap:11px; width:100%; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:13px 14px; cursor:pointer; font-family:var(--sans); color:var(--ink2); }
+  .opt-row:active { transform:scale(0.99); }
+  .opt-rlab { flex:none; width:22px; height:22px; border-radius:6px; background:var(--soft); display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:11px; color:var(--muted3); }
+  .opt-rtext { font-size:13.5px; line-height:1.45; word-break:keep-all; }
+  .opt-row.locked { cursor:default; } .opt-row.locked:active { transform:none; }
+  .opt-row.right { border:2px solid var(--ok); background:var(--ok-soft); } .opt-row.wrong { border:2px solid var(--no); background:var(--no-soft); }
+  .opt-row.right .opt-rlab { background:var(--ok); color:#fff; } .opt-row.wrong .opt-rlab { background:var(--no); color:#fff; }
+  .sp-q { display:flex; flex-direction:column; align-items:center; gap:14px; padding:6px 0; }
+  .sp-fig { width:128px; } .sp-fig .cellsvg { max-width:128px; }
+  .sp-ask { font-size:14px; font-weight:600; color:var(--ink); text-align:center; line-height:1.5; }
+  .fb { margin-top:14px; font-size:13px; border-radius:12px; padding:12px 14px; line-height:1.5; }
+  .fb.ok { background:var(--ok-soft); color:#0a7d4f; } .fb.no { background:var(--no-soft); color:#b4453a; }
+  @keyframes pop { 0%{transform:scale(.9);} 55%{transform:scale(1.05);} 100%{transform:scale(1);} }
+  .opt.right,.opt-row.right { animation:pop .32s ease; }
+  /* 결과 점수카드 (앱 sc- 계열 이식) */
+  .score-card { margin:6px 0 18px; padding:24px 20px 18px; border-radius:22px; text-align:center; color:#fff; overflow:hidden;
+    background:linear-gradient(150deg,#5b6cff 0%,#7b86ff 55%,#9b7bff 100%); box-shadow:0 12px 30px rgba(91,108,255,.34); }
+  .sc-kick { font-size:11px; font-weight:700; letter-spacing:.18em; color:rgba(255,255,255,.72); }
+  .sc-rate { font-family:var(--mono); font-size:72px; font-weight:700; line-height:1; margin-top:6px; }
+  .sc-band { display:inline-block; margin-top:12px; padding:5px 16px; font-size:13px; font-weight:700; letter-spacing:.04em;
+    background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); border-radius:999px; }
+  .sc-line { margin-top:16px; font-size:13px; color:rgba(255,255,255,.9); line-height:1.5; }
+  .sc-foot { margin-top:16px; font-family:var(--mono); font-size:10px; letter-spacing:.06em; color:rgba(255,255,255,.55); }
+  .res-h { font-size:22px; font-weight:700; text-align:center; margin:4px 0 2px; }
+  .res-sub { font-size:13px; color:var(--muted4); text-align:center; line-height:1.55; margin:0 0 4px; word-break:keep-all; }
+  .honest { font-size:11px; color:var(--muted2); text-align:center; line-height:1.5; margin-top:18px; }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script src="./engine.js"></script>
+<script>
+(function () {
+  'use strict';
+  var qp = new URLSearchParams(location.search);
+  var LANG = (qp.get('lang') || (/^en/i.test(navigator.language || '') ? 'en' : 'ko'));
+  if (LANG !== 'en') LANG = 'ko';
+  function t(ko, en) { return LANG === 'en' ? en : ko; }
+  ENGINE.setLang(LANG);
+
+  // 앱 URL — 공유 루프 CTA. 출시 후 실제 스토어 링크로 교체 가능.
+  var STORE = 'https://apps.apple.com/app/id0000000000';   // TODO: iOS 라이브 App Store URL
+  var PLAY = 'https://play.google.com/store/apps/details?id=kr.logiccraft.matrixiq';
+  var LANDING = 'https://logiccraft.co.kr/apps/matrixiq/';
+
+  var TOTAL = 6;
+  // 유형 순서: 쉬운·직관적인 것부터(이탈 방지). 도형·수열 중심 = 언어무관 훅.
+  var PLAN = ['sequence', 'matrix', 'odd', 'figural', 'spatial', 'calc'];
+  var s = null;   // 세션
+
+  function el(html) { document.getElementById('app').innerHTML = html; }
+  function bandOf(r) {
+    return r >= 1400 ? t('최상급', 'Elite') : r >= 1250 ? t('상급', 'Advanced')
+      : r >= 1100 ? t('중급', 'Intermediate') : r >= 950 ? t('기초', 'Basic') : t('입문', 'Beginner');
+  }
+
+  function header() {
+    return '<div class="wm">' +
+      '<svg width="26" height="26" viewBox="0 0 104 104"><rect width="104" height="104" rx="24" fill="#eef1f8"/>' +
+      cellsMark() + '</svg>' +
+      '<span class="wm-name">' + t('매트릭스 인적성', 'Matrix Aptitude') + '</span>' +
+      '<span class="wm-tag">RULE-BASED</span></div>';
+  }
+  function cellsMark() {
+    var r = '', p = [24.5, 44.5, 64.5];
+    for (var y = 0; y < 3; y++) for (var x = 0; x < 3; x++) {
+      var last = x === 2 && y === 2;
+      r += '<rect x="' + p[x] + '" y="' + p[y] + '" width="15" height="15" rx="4.5" ' +
+        (last ? 'fill="#5b6cff"' : 'fill="#fff" stroke="#0e1330" stroke-width="3"') + '/>';
+    }
+    return r;
+  }
+
+  function viewIntro() {
+    el(header() +
+      '<div class="lang"><button id="ko"' + (LANG === 'ko' ? ' class="on"' : '') + '>한국어</button>' +
+      '<button id="en"' + (LANG === 'en' ? ' class="on"' : '') + '>English</button></div>' +
+      '<div class="intro">' +
+        '<span class="intro-badge">' + t('60초 퀵테스트', '60-second test') + '</span>' +
+        '<h1 class="intro-h">' + t('내 <b>추론 레이팅</b>은<br>몇 점일까?', "What's your<br><b>reasoning rating</b>?") + '</h1>' +
+        '<p class="intro-d">' + t('도형·수열·추리 6문항으로 지금 실력을 재봅니다. 설치도 로그인도 필요 없어요.',
+          'Six figure, sequence and reasoning questions measure you right now. No install, no login.') + '</p>' +
+        '<button class="primary" id="start">' + t('시작하기', 'Start') + ' <span>→</span></button>' +
+        '<p class="intro-note">' + t('룰베이스로 매번 새 문제가 나와요. IQ·지능 향상을 주장하지 않습니다.',
+          'Fresh questions every time. It does not claim to raise IQ or intelligence.') + '</p>' +
+      '</div>');
+    document.getElementById('start').onclick = startTest;
+    document.getElementById('ko').onclick = function () { setLang('ko'); };
+    document.getElementById('en').onclick = function () { setLang('en'); };
+  }
+  function setLang(l) { if (l === LANG) return; var u = new URL(location); u.searchParams.set('lang', l); location = u; }
+
+  function startTest() {
+    s = { idx: 0, rating: 1000, correct: 0, per: {} };
+    nextQ();
+  }
+  function nextQ() {
+    if (s.idx >= TOTAL) return viewResult();
+    var type = PLAN[s.idx];
+    // 적응형 난이도: 레이팅→목표 난이도 (950~1550 → d1~5)
+    var d = Math.max(1, Math.min(5, Math.round((s.rating - 800) / 150)));
+    s.q = ENGINE.generate(type, d);
+    s.d = d; s.answered = false;
+    renderQ();
+  }
+  function renderQ() {
+    var q = s.q, pct = Math.round(s.idx / TOTAL * 100);
+    el(header() +
+      '<div class="qh"><span class="qh-prog">' + (s.idx + 1) + ' / ' + TOTAL + '</span>' +
+      '<span class="qh-pill">' + t('난이도 L', 'Level L') + s.d + '</span></div>' +
+      '<div class="qbar"><div class="qbar-fill" style="width:' + pct + '%"></div></div>' +
+      '<p class="q-prompt">' + promptFor(q.type) + '</p>' +
+      '<div class="stem-card">' + q.stemHTML + '</div>' +
+      '<div id="opts">' + optsHtml(q) + '</div>' +
+      '<div id="fb"></div>');
+    bindOpts();
+  }
+  function promptFor(type) {
+    var m = {
+      matrix: t('빈칸에 들어갈 도형은?', 'Which fits the blank?'),
+      sequence: t('물음표에 들어갈 값은?', 'What comes next?'),
+      odd: t('규칙에서 벗어난 하나는?', 'Which one breaks the rule?'),
+      calc: t('알맞은 값을 고르세요.', 'Pick the right value.'),
+      spatial: t('조건에 맞는 도형은?', 'Which figure matches?'),
+      figural: t('관계를 적용한 결과는?', 'Apply the relation.')
+    };
+    return m[type] || t('정답을 고르세요.', 'Choose the answer.');
+  }
+  function optsHtml(q, locked, picked) {
+    var textOpt = q.text || q.type === 'verbal';
+    if (textOpt) {
+      return '<div class="opts-text">' + q.options.map(function (o, i) {
+        var k = '', mk = '';
+        if (locked != null) { if (i === q.answer) k = ' right'; else if (i === picked) k = ' wrong'; }
+        return '<div class="opt-row' + (locked != null ? ' locked' : '') + k + '" data-i="' + i + '">' +
+          '<span class="opt-rlab">' + 'ABCDEF'[i] + '</span><span class="opt-rtext">' + o + '</span></div>';
+      }).join('') + '</div>';
+    }
+    return '<div class="opts">' + q.options.map(function (o, i) {
+      var k = '', mk = '';
+      if (locked != null) {
+        if (i === q.answer) { k = ' right'; mk = '<span class="opt-mark">✓</span>'; }
+        else if (i === picked) { k = ' wrong'; mk = '<span class="opt-mark">✕</span>'; }
+      }
+      return '<div class="opt' + (locked != null ? ' locked' : '') + k + '" data-i="' + i + '">' +
+        '<span class="opt-lab">' + 'ABCDEF'[i] + '</span>' + o + mk + '</div>';
+    }).join('') + '</div>';
+  }
+  function bindOpts() {
+    document.querySelectorAll('#opts [data-i]').forEach(function (b) {
+      b.addEventListener('click', function () { answer(parseInt(b.getAttribute('data-i'), 10)); });
+    });
+  }
+  function answer(i) {
+    if (s.answered) return;
+    s.answered = true;
+    var q = s.q, ok = (i === q.answer);
+    // Elo 갱신 (앱과 동일 공식)
+    var probR = 800 + s.d * 150, exp = 1 / (1 + Math.pow(10, (probR - s.rating) / 400));
+    s.rating = Math.max(300, Math.min(2600, Math.round(s.rating + 32 * ((ok ? 1 : 0) - exp))));
+    if (ok) s.correct++;
+    s.per[q.type] = ok;
+    document.getElementById('opts').innerHTML = optsHtml(q, true, i);
+    document.getElementById('fb').innerHTML =
+      '<div class="fb ' + (ok ? 'ok' : 'no') + '">' + (ok ? t('정답', 'Correct') : t('오답', 'Not quite')) +
+      ' · ' + (q.explain || '') + '</div>' +
+      '<button class="primary" id="next">' + (s.idx + 1 >= TOTAL ? t('결과 보기', 'See result') : t('다음', 'Next')) + ' <span>→</span></button>';
+    document.getElementById('next').onclick = function () { s.idx++; nextQ(); };
+  }
+
+  function viewResult() {
+    var ro = s.rating, band = bandOf(ro);
+    var line = t(s.correct + ' / ' + TOTAL + ' 정답 · ' + band + ' 밴드',
+                 s.correct + ' / ' + TOTAL + ' correct · ' + band + ' band');
+    el(header() +
+      '<div class="score-card">' +
+        '<div class="sc-kick">' + t('추론 레이팅', 'REASONING RATING') + '</div>' +
+        '<div class="sc-rate">' + ro + '</div>' +
+        '<div class="sc-band">' + band + '</div>' +
+        '<div class="sc-line">' + line + '</div>' +
+        '<div class="sc-foot">logiccraft.co.kr/apps/matrixiq</div>' +
+      '</div>' +
+      '<h2 class="res-h">' + t('여기서 끝이 아니에요', 'This is just a taste') + '</h2>' +
+      '<p class="res-sub">' + t('앱에서는 10가지 유형을 매일 훈련하고, 약점을 진단하고, 이름 지은 캐릭터가 함께 자라요.',
+        'The app trains 10 types daily, diagnoses your weak spots, and a buddy you name grows with you.') + '</p>' +
+      '<button class="primary" id="dl">' + t('앱에서 계속하기', 'Continue in the app') + ' <span>→</span></button>' +
+      '<button class="ghost" id="retry">' + t('다시 풀기', 'Try again') + '</button>' +
+      '<p class="honest">' + t('점수는 이 앱의 자체 레이팅으로, IQ나 합격을 보장하지 않습니다.',
+        'The score is this app’s own rating and guarantees no IQ or exam result.') + '</p>');
+    document.getElementById('dl').onclick = gotoStore;
+    document.getElementById('retry').onclick = startTest;
+  }
+  function gotoStore() {
+    var ua = navigator.userAgent || '';
+    if (/android/i.test(ua)) location = PLAY;
+    else if (/iphone|ipad|ipod/i.test(ua)) location = STORE;
+    else location = LANDING;
+  }
+
+  document.documentElement.lang = LANG;
+  viewIntro();
+})();
+</script>
+</body>
+</html>
