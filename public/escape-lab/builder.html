@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>방탈출 조립기 — 교사용</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#141a2e; --panel2:#1b2340; --line:#2a3350;
+    --text:#e8ecf6; --dim:#8a93a6; --amber:#ffd76a; --amber2:#b97a2a; --green:#5fd39a;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  .wrap{max-width:760px;margin:0 auto;padding:28px 16px 60px}
+  .badge{display:inline-block;font-size:12px;letter-spacing:.14em;color:var(--amber);border:1px solid var(--amber2);border-radius:999px;padding:4px 12px;margin-bottom:12px}
+  h1{font-size:28px;margin-bottom:8px}
+  .sub{color:var(--dim);font-size:14px;line-height:1.65;margin-bottom:26px;max-width:560px}
+  h2{font-size:16px;margin:26px 0 10px;color:var(--amber)}
+  label.field{display:block;margin-bottom:14px;font-size:13.5px;color:var(--dim)}
+  input[type=text],textarea{
+    display:block;width:100%;margin-top:6px;background:var(--panel);border:1px solid var(--line);
+    border-radius:10px;color:var(--text);padding:10px 12px;font-size:15px;font-family:inherit;
+  }
+  textarea{resize:vertical;min-height:64px;line-height:1.6}
+  input:focus,textarea:focus,select:focus{outline:none;border-color:var(--amber2)}
+
+  .p-row{
+    display:flex;align-items:center;gap:12px;background:var(--panel);
+    border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;flex-wrap:wrap;
+  }
+  .p-row.off{opacity:.45}
+  .p-row input[type=checkbox]{width:18px;height:18px;accent-color:#ffd76a;cursor:pointer}
+  .p-row .icon{font-size:24px}
+  .p-info{flex:1;min-width:150px}
+  .p-info .nm{font-size:15px;font-weight:700}
+  .p-info .dd{font-size:12px;color:var(--dim);margin-top:2px;line-height:1.5}
+  .p-ctrl{display:flex;gap:8px;align-items:center}
+  .p-ctrl label{font-size:11.5px;color:var(--dim)}
+  select{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:7px 8px;font-size:13.5px;font-family:inherit;cursor:pointer;
+  }
+
+  .out{
+    background:var(--panel);border:1px solid var(--amber2);border-radius:16px;
+    padding:18px;margin-top:26px;
+  }
+  .out .code-line{font-size:14px;color:var(--dim);margin-bottom:10px}
+  .out .code-line b{color:var(--amber);font-size:20px;letter-spacing:.3em;font-weight:800}
+  .url-box{
+    background:#0d1226;border:1px solid var(--line);border-radius:10px;padding:10px 12px;
+    font-family:ui-monospace,monospace;font-size:12px;color:var(--dim);
+    word-break:break-all;max-height:88px;overflow-y:auto;margin-bottom:12px;
+  }
+  .out-btns{display:flex;gap:8px;flex-wrap:wrap}
+  .btn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:10px 16px;font-size:14px;cursor:pointer;font-family:inherit;text-decoration:none;display:inline-block;
+  }
+  .btn:hover{border-color:var(--amber2)}
+  .btn.primary{background:var(--amber);color:#1a1405;border-color:var(--amber);font-weight:700}
+  .copied{color:var(--green);font-size:13px;align-self:center}
+  .warn-line{color:#ff6b6b;font-size:13.5px;margin-top:8px}
+  .tip{font-size:12.5px;color:#525b73;line-height:1.7;margin-top:22px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="badge">TEACHER TOOLS</div>
+  <h1>🧩 방탈출 조립기</h1>
+  <p class="sub">
+    수업 단원에 맞춰 잠금장치를 고르면 방탈출 링크가 만들어진다.<br>
+    서버·계정 없이 링크 하나로 동작 — 학급 채팅방에 붙여넣거나 프로젝터로 띄우면 끝.
+  </p>
+
+  <h2>1. 방 소개</h2>
+  <label class="field">방 제목
+    <input type="text" id="f-title" maxlength="40" value="우리 반 탈출 미션">
+  </label>
+  <label class="field">도입 문구 (칠판에 띄울 스토리)
+    <textarea id="f-story" maxlength="200">수업 준비실 문이 잠겨 버렸다! 장치를 풀어 비밀번호 숫자를 모으자.</textarea>
+  </label>
+
+  <h2>2. 잠금장치 고르기</h2>
+  <div id="p-list"></div>
+
+  <h2>3. 링크 만들기</h2>
+  <div class="out">
+    <div class="code-line">문 비밀번호 (교사만 알기): <b id="code-preview"></b></div>
+    <div class="url-box" id="url-out"></div>
+    <div class="out-btns">
+      <button class="btn primary" id="copy-btn">📋 링크 복사</button>
+      <a class="btn" id="preview-link" target="_blank" rel="noopener">▶ 미리 해보기</a>
+      <span class="copied" id="copied-msg"></span>
+    </div>
+    <div class="warn-line" id="warn-line"></div>
+  </div>
+
+  <p class="tip">
+    팁 · 각 잠금의 초등/중등/심화는 교육과정 단원에 맞춰 설계되어 있다 — 지금 배우는 단원의 잠금만 골라도 된다.<br>
+    팁 · 잠금장치마다 수준을 따로 정할 수 있다 — 모둠 수준에 맞춰 섞어 보자.<br>
+    팁 · 비밀번호 숫자를 바꾸면 반마다 다른 답이 된다(옆 반 정답 공유 방지).<br>
+    팁 · 진행 시간은 잠금 2개면 약 15분, 4개면 한 차시(40분), 6개는 블록 수업(80분) 안팎.
+  </p>
+</div>
+
+<script>
+'use strict';
+// index.html의 PUZZLES 레지스트리와 짝을 맞춘 메타 (id·기본 숫자 동일해야 함)
+const PUZZLE_META = [
+  { id:'circuit', icon:'⚡', name:'배전반 (전기 회로)', digit:'4',
+    diffs:{easy:'과학 6-2 전기의 이용 · 회로 꾸미기', mid:'과학 6-2 · 직렬과 병렬', hard:'중2 전기와 자기 · 단락(심화)'} },
+  { id:'balance', icon:'⚖️', name:'카운터웨이트 저울 (무게와 지레)', digit:'7',
+    diffs:{easy:'과학 4-1 물체의 무게 · 수평 잡기', mid:'중3 일과 에너지 · 지레의 원리', hard:'고교 물리 · 돌림힘(심화)'} },
+  { id:'cipher', icon:'🔢', name:'시약장 다이얼 (수의 규칙)', digit:'2',
+    diffs:{easy:'수학 4 규칙 찾기', mid:'수학 5-6 규칙과 대응', hard:'수학 심화 · 수열 추론'} },
+  { id:'ph', icon:'🧪', name:'지시약 혼합대 (산과 염기)', digit:'9',
+    diffs:{easy:'과학 5-2 산과 염기 · 지시약', mid:'중등 · 중화 반응 조합', hard:'통합과학 · 탐구 설계(심화)'} },
+  { id:'mirror', icon:'🔦', name:'광학 장치 (빛의 반사)', digit:'5',
+    diffs:{easy:'과학 4-2 그림자와 거울', mid:'중1 빛과 파동 · 반사 법칙', hard:'심화 · 광학 경로 설계'} },
+  { id:'moon', icon:'🌓', name:'달 관측판 (달의 위상)', digit:'1',
+    diffs:{easy:'과학 6-1 지구와 달의 운동', mid:'중3 태양계 · 위상과 음력', hard:'심화 · 위상과 관측 시각'} },
+];
+const DIFF_LABEL = {easy:'초등', mid:'중등', hard:'심화'};
+
+function encodeCfg(obj){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return encodeURIComponent(btoa(bin));
+}
+
+// 퍼즐 행 렌더
+const pList = document.getElementById('p-list');
+pList.innerHTML = PUZZLE_META.map(p=>`
+  <div class="p-row" data-p="${p.id}">
+    <input type="checkbox" class="f-use" checked>
+    <span class="icon">${p.icon}</span>
+    <div class="p-info">
+      <div class="nm">${p.name}</div>
+      <div class="dd" data-dd></div>
+    </div>
+    <div class="p-ctrl">
+      <label>난이도</label>
+      <select class="f-diff">
+        ${Object.keys(DIFF_LABEL).map(d=>`<option value="${d}" ${d==='mid'?'selected':''}>${DIFF_LABEL[d]}</option>`).join('')}
+      </select>
+      <label>숫자</label>
+      <select class="f-digit">
+        ${'0123456789'.split('').map(n=>`<option ${n===p.digit?'selected':''}>${n}</option>`).join('')}
+      </select>
+    </div>
+  </div>`).join('');
+
+function readForm(){
+  const locks = [];
+  document.querySelectorAll('.p-row').forEach(row=>{
+    const use = row.querySelector('.f-use').checked;
+    row.classList.toggle('off', !use);
+    const meta = PUZZLE_META.find(p=>p.id===row.dataset.p);
+    const diff = row.querySelector('.f-diff').value;
+    row.querySelector('[data-dd]').textContent = meta.diffs[diff];
+    if(use) locks.push({ p:row.dataset.p, d:diff, g:row.querySelector('.f-digit').value });
+  });
+  return {
+    t: document.getElementById('f-title').value.trim() || '우리 반 탈출 미션',
+    s: document.getElementById('f-story').value.trim(),
+    l: locks,
+  };
+}
+
+function update(){
+  const cfg = readForm();
+  const warn = document.getElementById('warn-line');
+  const urlOut = document.getElementById('url-out');
+  const codeEl = document.getElementById('code-preview');
+  if(cfg.l.length===0){
+    warn.textContent = '잠금장치를 하나 이상 골라야 한다.';
+    urlOut.textContent = ''; codeEl.textContent = '—';
+    document.getElementById('preview-link').removeAttribute('href');
+    return;
+  }
+  warn.textContent = '';
+  codeEl.textContent = cfg.l.map(x=>x.g).join('');
+  const url = new URL('index.html', location.href).href + '#cfg=' + encodeCfg(cfg);
+  urlOut.textContent = url;
+  document.getElementById('preview-link').href = url;
+}
+
+document.addEventListener('input', update);
+document.addEventListener('change', update);
+
+document.getElementById('copy-btn').addEventListener('click', async ()=>{
+  const url = document.getElementById('url-out').textContent;
+  if(!url) return;
+  const msg = document.getElementById('copied-msg');
+  try{
+    await navigator.clipboard.writeText(url);
+    msg.textContent = '복사됨!';
+  }catch(e){
+    // 클립보드 권한이 없으면 선택만 도와준다
+    const range = document.createRange();
+    range.selectNodeContents(document.getElementById('url-out'));
+    const sel = getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    msg.textContent = '⌘C로 복사하세요';
+  }
+  setTimeout(()=>msg.textContent='', 2000);
+});
+
+update();
+</script>
+</body>
+</html>

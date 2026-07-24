@@ -1,0 +1,2996 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>수학·과학 방탈출 — 4개의 방</title>
+<style>
+  :root{
+    --bg:#0b1020; --panel:#141a2e; --panel2:#1b2340; --line:#2a3350;
+    --text:#e8ecf6; --dim:#8a93a6; --amber:#ffd76a; --amber2:#b97a2a;
+    --green:#5fd39a; --red:#ff6b6b; --blue:#6aa8ff;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{
+    background:var(--bg); color:var(--text); min-height:100vh;
+    font-family:"Pretendard Variable",Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
+  }
+  .screen{display:none; max-width:760px; margin:0 auto; padding:20px 16px 48px}
+  .screen.on{display:block}
+
+  /* ---------- intro ---------- */
+  .intro-badge{display:inline-block;font-size:12px;letter-spacing:.14em;color:var(--amber);border:1px solid var(--amber2);border-radius:999px;padding:4px 12px;margin:36px 0 14px}
+  h1{font-size:34px;line-height:1.2;margin-bottom:12px}
+  .intro-story{color:var(--dim);line-height:1.75;font-size:15px;margin-bottom:28px;max-width:520px}
+  .diff-grid{display:grid;gap:10px}
+  .diff-card{
+    background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px;
+    cursor:pointer;text-align:left;color:var(--text);font-family:inherit;transition:border-color .15s, transform .1s;
+  }
+  .diff-card:hover{border-color:var(--amber2)}
+  .diff-card:active{transform:scale(.99)}
+  .diff-card .dt{font-size:17px;font-weight:700;margin-bottom:4px}
+  .diff-card .dd{font-size:13px;color:var(--dim);line-height:1.5}
+  .diff-card .tag{font-size:11px;color:var(--amber);margin-left:8px;font-weight:500}
+
+  /* ---------- room ---------- */
+  .room-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:8px 0 4px;flex-wrap:wrap}
+  .room-head h2{font-size:20px}
+  .room-meta{font-size:13px;color:var(--dim);display:flex;gap:14px}
+  .room-meta .timer{color:var(--amber);font-variant-numeric:tabular-nums}
+  .room-story{font-size:13px;color:var(--dim);line-height:1.6;margin-bottom:18px}
+  /* 벽면 탐색 씬 */
+  .scene-wrap{position:relative;background:#07090f;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  #scene3d canvas{display:block;width:100%;touch-action:none;cursor:grab}
+  .nav-arrow{
+    position:absolute;top:50%;transform:translateY(-50%);z-index:2;
+    background:rgba(13,18,38,.78);border:1px solid var(--line);color:var(--amber);
+    font-size:17px;width:40px;height:58px;border-radius:12px;cursor:pointer;font-family:inherit;
+  }
+  .nav-arrow.left{left:10px}.nav-arrow.right{right:10px}
+  .nav-arrow:hover{border-color:var(--amber2)}
+  .wall-label{
+    position:absolute;top:10px;left:12px;font-size:11.5px;color:var(--dim);letter-spacing:.1em;
+    background:rgba(13,18,38,.75);padding:4px 10px;border-radius:8px;
+  }
+  .note-pop{
+    position:absolute;left:12px;right:12px;bottom:12px;z-index:3;
+    background:rgba(13,18,38,.95);border:1px solid var(--amber2);border-radius:12px;
+    padding:12px 16px;font-size:13.5px;line-height:1.6;display:none;cursor:pointer;
+  }
+  .note-pop.on{display:block}
+  .note-pop .nm{color:var(--amber);font-weight:700;margin-bottom:2px;font-size:12px}
+  .scene-foot{display:flex;justify-content:space-between;align-items:center;margin-top:10px;gap:12px;flex-wrap:wrap}
+  .ctrl-hint{font-size:12px;color:var(--dim)}
+  .wall-label:empty{display:none}
+  .digit-chips{display:flex;gap:6px;align-items:center}
+  .chips-label{font-size:12px;color:var(--dim);margin-right:2px}
+  .digit-chip{
+    min-width:34px;height:34px;border-radius:9px;border:1px solid var(--line);
+    display:flex;align-items:center;justify-content:center;font-weight:800;font-size:15px;
+    color:#525b73;background:var(--panel);
+  }
+  .digit-chip.got{color:#08130d;background:var(--green);border-color:var(--green);animation:popIn .4s}
+
+  /* ---------- modal ---------- */
+  .overlay{
+    display:none;position:fixed;inset:0;background:rgba(4,6,14,.82);z-index:10;
+    align-items:flex-start;justify-content:center;overflow-y:auto;padding:24px 12px;
+  }
+  .overlay.on{display:flex}
+  .modal{
+    background:var(--panel);border:1px solid var(--line);border-radius:18px;
+    width:100%;max-width:640px;padding:20px;
+  }
+  .modal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+  .modal-head h3{font-size:18px}
+  .x-btn{background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;padding:4px 8px;font-family:inherit}
+  .modal-desc{font-size:13px;color:var(--dim);line-height:1.6;margin-bottom:12px}
+  .stage{background:#0d1226;border:1px solid var(--line);border-radius:12px;overflow:hidden}
+  .stage svg{display:block;width:100%;height:auto}
+  .status-line{
+    margin-top:12px;font-size:14px;min-height:22px;line-height:1.5;
+  }
+  .status-line.ok{color:var(--green);font-weight:700}
+  .status-line.warn{color:var(--red)}
+  .status-line.info{color:var(--dim)}
+  .modal-foot{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;align-items:center}
+  .btn{
+    background:var(--panel2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:9px 16px;font-size:14px;cursor:pointer;font-family:inherit;
+  }
+  .btn:hover{border-color:var(--amber2)}
+  .btn.primary{background:var(--amber);color:#1a1405;border-color:var(--amber);font-weight:700}
+  .hint-box{
+    margin-top:10px;font-size:13px;color:var(--blue);line-height:1.6;
+    border-left:3px solid var(--blue);padding:2px 0 2px 10px;
+  }
+
+  /* inventory (balance) */
+  .inv-row{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;align-items:center}
+  .inv-label{font-size:12px;color:var(--dim);margin-right:2px}
+  .w-btn{
+    border:1.5px solid var(--amber2);background:#231a08;color:var(--amber);
+    border-radius:10px;padding:8px 12px;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;
+  }
+  .w-btn.sel{background:var(--amber);color:#1a1405}
+  .w-btn:disabled{opacity:.25;cursor:default}
+
+  /* keypad */
+  .kp-display{
+    background:#0d1226;border:1px solid var(--line);border-radius:10px;
+    font-size:28px;letter-spacing:.4em;text-align:center;padding:12px;min-height:58px;
+    font-variant-numeric:tabular-nums;color:var(--amber);
+  }
+  .kp-display.shake{animation:shake .35s}
+  @keyframes shake{20%{transform:translateX(-7px)}40%{transform:translateX(7px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+  .kp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+  .kp-grid .btn{font-size:18px;padding:13px 0;text-align:center}
+
+  /* dials (cipher) */
+  .seq-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line)}
+  .seq-row:last-of-type{border-bottom:none}
+  .seq-terms{font-size:17px;letter-spacing:.06em;font-variant-numeric:tabular-nums}
+  .seq-terms .q{color:var(--amber);font-weight:800}
+  .dial{display:flex;flex-direction:column;align-items:center;gap:3px}
+  .dial button{background:var(--panel2);border:1px solid var(--line);color:var(--dim);border-radius:8px;width:36px;height:24px;cursor:pointer;font-size:11px;font-family:inherit}
+  .dial button:hover{border-color:var(--amber2);color:var(--amber)}
+  .dial .val{font-size:22px;font-weight:800;color:var(--amber);width:42px;height:40px;display:flex;align-items:center;justify-content:center;background:#0d1226;border:1px solid var(--amber2);border-radius:10px}
+  .lever-row{display:flex;justify-content:center;padding:14px}
+  .cab.shake{animation:shake .35s}
+  .log-box{
+    margin:12px 16px 4px;padding:10px 14px;background:#101632;border:1px solid var(--line);
+    border-radius:10px;font-size:12.5px;color:#b8a97a;line-height:1.7;
+  }
+  .moon-dial .val{width:52px;height:52px;padding:4px}
+  .moon-dial .ph-name{font-size:11px;color:var(--dim);margin-top:2px}
+  .curri-badge{
+    display:inline-block;font-size:11.5px;color:#7ea0d8;background:#12203a;
+    border:1px solid #23406a;border-radius:999px;padding:3px 11px;margin-bottom:12px;
+  }
+
+  /* 이야기 조각 */
+  .pieces-btn{
+    background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;
+    padding:3px 10px;font-size:12.5px;cursor:pointer;font-family:inherit;
+  }
+  .pieces-btn:hover{border-color:var(--amber2);color:var(--amber)}
+  .piece-card{text-align:center;padding:18px 14px;background:#101632;border:1px solid var(--line);border-radius:14px}
+  .piece-card .piece-meta{color:var(--amber);font-size:12.5px;margin:8px 0 12px;letter-spacing:.08em}
+  .piece-card .piece-text{font-size:14.5px;line-height:1.85;max-width:460px;margin:0 auto}
+  .piece-card .piece-digit{margin-top:14px;font-size:13px;color:var(--dim)}
+  .piece-card .piece-digit b{color:var(--green);font-size:22px;margin-left:6px}
+  .piece-row{display:flex;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line);align-items:flex-start;text-align:left}
+  .piece-row:last-of-type{border-bottom:none}
+  .pr-body{flex:1}
+  .pr-meta{font-size:12px;color:var(--amber);margin-bottom:4px}
+  .pr-text{font-size:13px;color:var(--dim);line-height:1.65}
+  .door-strip{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px;justify-content:center}
+  .ds-item{
+    display:flex;align-items:center;gap:5px;background:#101632;border:1px solid var(--line);
+    border-radius:8px;padding:4px 9px;font-weight:700;color:var(--amber);font-size:15px;
+  }
+  #win-story{max-width:600px;margin:0 auto 28px}
+  .ending-lines{font-size:14px;line-height:1.95;color:var(--dim);text-align:center;margin-bottom:22px}
+  .win-pieces{display:grid;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 14px}
+
+  /* beakers (ph) */
+  .ph-wrap{display:flex;gap:12px;padding:12px 14px 14px;flex-wrap:wrap}
+  .beaker-card{flex:1;min-width:210px;background:#101632;border:1px solid var(--line);border-radius:12px;padding:12px;text-align:center}
+  .beaker-card h4{font-size:12.5px;color:var(--dim);margin-bottom:6px;font-weight:600}
+  .beaker-card svg{width:96px;height:auto;margin:0 auto}
+  .ph-meter{font-family:ui-monospace,monospace;font-size:14px;color:var(--green);background:#08140c;border:1px solid #1d4d2e;border-radius:6px;display:inline-block;padding:2px 12px;margin:4px 0}
+  .beaker-info{font-size:12.5px;color:var(--dim);margin-top:2px}
+  .reagent-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:10px}
+  .reagent-row .btn{padding:7px 10px;font-size:12.5px}
+  .ph-chart{display:flex;gap:3px;padding:10px 14px 0;flex-wrap:wrap}
+  .ph-chip{flex:1;min-width:50px;border-radius:6px;padding:5px 2px;text-align:center;font-size:10.5px;color:#0b0e18;font-weight:700;line-height:1.35}
+  .target-swatch{display:flex;align-items:center;gap:8px;padding:12px 14px 0;font-size:13.5px;color:var(--text)}
+  .target-swatch i{width:18px;height:18px;border-radius:5px;display:inline-block}
+
+  /* 연출 */
+  @keyframes popIn{0%{transform:scale(.3)}70%{transform:scale(1.15)}100%{transform:scale(1)}}
+  #blackout{position:fixed;inset:0;background:#000;z-index:50;display:none;align-items:center;justify-content:center;pointer-events:none}
+  #blackout.on{display:flex;animation:blackfade 2.2s forwards}
+  #blackout span{color:#8a93a6;font-size:13px;letter-spacing:.25em;animation:flicker 1.7s}
+  @keyframes blackfade{0%{opacity:1}70%{opacity:1}100%{opacity:0}}
+  @keyframes flicker{0%,18%,23%,50%,54%{opacity:0}20%,40%,60%,100%{opacity:1}}
+  #flash{position:fixed;inset:0;background:#fff;z-index:60;opacity:0;pointer-events:none}
+  #flash.on{animation:flashout 1.1s forwards}
+  @keyframes flashout{0%{opacity:0}25%{opacity:1}100%{opacity:0}}
+
+  /* win */
+  .win-wrap{text-align:center;padding-top:70px}
+  .win-wrap .big{font-size:52px;margin-bottom:14px}
+  .win-wrap h2{font-size:28px;margin-bottom:10px}
+  .win-stats{color:var(--dim);font-size:15px;line-height:1.8;margin-bottom:30px}
+  .win-stats b{color:var(--amber);font-weight:700}
+
+  footer{max-width:760px;margin:0 auto;padding:0 16px 28px;font-size:11.5px;color:#525b73}
+
+  /* selftest */
+  .st-list{font-family:ui-monospace,monospace;font-size:13px;line-height:1.9;padding:24px}
+  .st-list .pass{color:var(--green)} .st-list .fail{color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- ================= intro ================= -->
+<div class="screen on" id="screen-intro">
+  <div class="intro-badge">MATH · SCIENCE ESCAPE</div>
+  <h1>수학·과학 방탈출</h1>
+  <p class="intro-story" id="room-pick-lead">방을 고르면 이야기가 시작된다. 어느 방이든 원리를 이해해야만 열린다.</p>
+  <div class="diff-grid" id="room-grid">
+    <button class="diff-card" data-room="lab">
+      <div class="dt">🔦 블랙아웃 실험실 <span class="tag">과학실 미스터리</span></div>
+      <div class="dd">정전된 과학실. 누군가 남긴 여섯 개의 장치와 마지막 수업.</div>
+    </button>
+    <button class="diff-card" data-room="mansion">
+      <div class="dt">🎩 사라진 마술사의 저택 <span class="tag">유령 소문 · 트릭 폭로</span></div>
+      <div class="dd">유령이 나온다는 저택. 소문의 정체는 정말 전부 과학일까.</div>
+    </button>
+    <button class="diff-card" data-room="frequency">
+      <div class="dt">📡 오래된 주파수 <span class="tag">폐쇄된 관측소 · 시간을 건너온 교신</span></div>
+      <div class="dd">수십 년 전의 릴테이프가 저절로 재생된다. 여섯 번의 교신을 이어 들으면 철문이 열린다.</div>
+    </button>
+    <button class="diff-card" data-room="mars">
+      <div class="dt">🚀 붉은 행성 기지 <span class="tag">화성 생존 · 카운트다운</span></div>
+      <div class="dd">모래폭풍이 지나간 기지. 선임이 남긴 절차 카드로 시스템을 복구하고 발사 윈도우에 올라타자.</div>
+    </button>
+  </div>
+  <div id="diff-section" style="display:none">
+    <p class="intro-story" id="opening-lines" style="margin-top:26px"></p>
+    <div class="diff-grid">
+    <button class="diff-card" data-diff="easy">
+      <div class="dt">초등 <span class="tag">3~6학년 교육과정</span></div>
+      <div class="dd">전기 회로 꾸미기 · 수평 잡기 · 규칙 찾기 · 산과 염기 · 그림자와 거울 · 달의 위상</div>
+    </button>
+    <button class="diff-card" data-diff="mid">
+      <div class="dt">중등 <span class="tag">중1~3 교육과정</span></div>
+      <div class="dd">직렬/병렬 · 지레의 원리 · 수의 규칙 · 중화 반응 · 반사 법칙 · 위상과 음력</div>
+    </button>
+    <button class="diff-card" data-diff="hard">
+      <div class="dt">심화 <span class="tag">고교·영재·동아리</span></div>
+      <div class="dd">단락 회로 · 돌림힘 · 수열 추론 · 탐구 설계 · 광학 경로 · 관측 추리</div>
+    </button>
+    </div>
+  </div>
+</div>
+
+<!-- ================= room ================= -->
+<div class="screen" id="screen-room">
+  <div class="room-head">
+    <h2 id="room-title">🔦 블랙아웃 실험실</h2>
+    <div class="room-meta">
+      <span id="diff-label"></span>
+      <button class="pieces-btn" id="pieces-btn">📖 조각 <span id="piece-count">0</span>/<span id="pieces-total">6</span></button>
+      <span>💡 힌트 <span id="hint-count">0</span></span>
+      <span class="timer" id="timer">00:00</span>
+    </div>
+  </div>
+  <p class="room-story" id="room-story"></p>
+  <div class="scene-wrap">
+    <div id="scene3d"></div>
+    <button class="nav-arrow left" id="nav-l" aria-label="왼쪽 보기">◀</button>
+    <button class="nav-arrow right" id="nav-r" aria-label="오른쪽 보기">▶</button>
+    <div class="wall-label" id="hover-label"></div>
+    <div class="note-pop" id="note-pop"></div>
+  </div>
+  <div class="scene-foot">
+    <div class="ctrl-hint">🖱 드래그로 둘러보기 · 물건 클릭 = 조사 · ◀ ▶ 90° 회전</div>
+    <div class="digit-chips" id="digit-chips"></div>
+  </div>
+</div>
+
+<!-- ================= win ================= -->
+<div class="screen" id="screen-win">
+  <div class="win-wrap">
+    <div class="big">🎉</div>
+    <h2>탈출 성공!</h2>
+    <p class="win-stats" id="win-stats"></p>
+    <div id="win-story"></div>
+    <button class="btn primary" onclick="location.href=location.pathname">다시 도전하기</button>
+  </div>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+<div id="blackout"><span>· · · 비상 전원 가동 중 · · ·</span></div>
+<div id="flash"></div>
+
+<footer>수학·과학 방탈출 · 방 4종 × 잠금 6종 × 초등/중등/심화(교육과정 연계) · 룰베이스(오프라인 동작) · 교사용 조립기: builder.html</footer>
+
+<script src="vendor/three.min.js"></script>
+<script>
+'use strict';
+/* =========================================================================
+   퍼즐 모듈 아키텍처 (조립기 대비)
+   - 퍼즐 = { name, icon, digit, config(diff), mount(el, cfg, api) } 로 독립.
+   - 방(ROOM)은 퍼즐 id 목록만 참조 → 추후 교사 조립기가 이 레지스트리를
+     그대로 재사용해 방을 조립한다.
+   ========================================================================= */
+
+const $ = s => document.querySelector(s);
+const state = { diff:null, solved:{}, hintsUsed:0, start:null, disc:{}, found:{} };
+
+/* ======================= 회로(배전반) 퍼즐 ======================= */
+
+function circuitConfig(diff){
+  // 노드 좌표. 공통 레일.
+  const N = {
+    P:[265,330], Nn:[335,330],                    // 배터리 +,−
+    L1:[90,60], L2:[90,170], L3:[90,330],
+    R1:[510,60], R2:[510,170], R3:[510,330],
+  };
+  const wire = (id,a,b,on,fixed,bend)=>({id,a,b,type:'wire',on:!!on,fixed:!!fixed,bend:bend||0});
+  const bulb = (id,a,b,label)=>({id,a,b,type:'bulb',on:true,fixed:true,label});
+
+  if(diff==='easy'){
+    Object.assign(N,{C:[250,60],D:[350,60]});
+    return {
+      nodes:N,
+      edges:[
+        {id:'bat',a:'P',b:'Nn',type:'battery',on:true,fixed:true},
+        wire('wPL3','P','L3',1,1), wire('wR3N','R3','Nn',1,1),
+        wire('t1','L3','L1',1), wire('t2','L1','C'), wire('t3','D','R1'),
+        wire('t4','R1','R3'), wire('t5','C','D',1,0,-48),
+        bulb('b1','C','D'),
+      ],
+      goal:{full:['b1'],off:[]},
+      solution:['t1','t2','t3','t4'],
+      curri:'과학 6-2 전기의 이용 · 전기 회로 꾸미기',
+      desc:'전선을 눌러 켜고 끄면서, 전기가 배터리 +에서 전구를 지나 −로 돌아오는 길을 만들어 보자. 전구에 환하게 불이 들어오면 열린다.',
+      hints:[
+        '전기는 +에서 나와 전구를 지나 −로 돌아오는, 끊기지 않은 한 바퀴 길이 필요하다.',
+        '전구 위의 곡선 전선은 전구를 건너뛰는 지름길. 켜져 있으면 전기가 전구를 지나가지 않는다. 꺼 두자.',
+      ],
+    };
+  }
+  if(diff==='mid'){
+    Object.assign(N,{C1:[250,60],D1:[350,60],C2:[250,170],D2:[350,170]});
+    return {
+      nodes:N,
+      edges:[
+        {id:'bat',a:'P',b:'Nn',type:'battery',on:true,fixed:true},
+        wire('wPL3','P','L3',1,1), wire('wR3N','R3','Nn',1,1),
+        wire('wL32','L3','L2',1,1), wire('wR23','R2','R3',1,1),
+        wire('t1','L2','L1'), wire('t2','L1','C1'), wire('t3','D1','R1'),
+        wire('t4','R1','R2'), wire('t5','L2','C2'), wire('t6','D2','R2'),
+        wire('t7','D1','C2'),
+        bulb('b1','C1','D1','A'), bulb('b2','C2','D2','B'),
+      ],
+      goal:{full:['b1','b2'],off:[]},
+      solution:['t1','t2','t3','t4','t5','t6'],
+      curri:'과학 6-2 전기의 이용 · 직렬연결과 병렬연결',
+      desc:'전구 A와 B를 둘 다 최대 밝기로 켜야 한다. 한 줄로 이으면 밝기가 절반이 된다 — 전구마다 자기 길을 만들어 주자.',
+      hints:[
+        '전구 두 개가 한 길에 있으면(직렬) 둘 다 어두워진다. 각 전구가 배터리와 저마다의 길로 이어져야(병렬) 환해진다.',
+        '대각선 전선은 두 전구를 한 줄로 묶는 함정. 꺼 두고, 전구 A와 B 각각의 양쪽 끝을 레일에 따로 이어 보자.',
+      ],
+    };
+  }
+  // hard
+  Object.assign(N,{C:[170,60],D:[265,60],E:[335,60],F:[430,60],G:[250,170],H:[350,170]});
+  return {
+    nodes:N,
+    edges:[
+      {id:'bat',a:'P',b:'Nn',type:'battery',on:true,fixed:true},
+      wire('wPL3','P','L3',1,1), wire('wR3N','R3','Nn',1,1),
+      wire('wL32','L3','L2',1,1), wire('wL21','L2','L1',1,1),
+      wire('wR12','R1','R2',1,1), wire('wR23','R2','R3',1,1),
+      wire('wDE','D','E',1,1),
+      wire('t1','L1','C'), wire('t2','F','R1'), wire('t3','D','F',0,0,-52),
+      wire('t4','L2','G'), wire('t5','H','R2'), wire('t6','G','H',0,0,-44),
+      bulb('bA','C','D','A'), bulb('bB','E','F','B'), bulb('bC','G','H','C'),
+    ],
+    goal:{full:['bA','bC'],off:['bB']},
+    solution:['t1','t2','t3','t4','t5'],
+    curri:'중2 과학 전기와 자기 · 회로와 단락(심화)',
+    desc:'전구 A와 C는 최대 밝기로 켜고, 전구 B는 꺼야 한다. 단, B는 A와 한 줄에 붙어 있어 전선을 뽑을 수 없다. 합선(전구 없는 한 바퀴)이 생기면 실패.',
+    hints:[
+      '전구를 끄는 방법은 길을 끊는 것만이 아니다. 전구 양 끝을 전선으로 이어 지름길을 만들면(단락) 전기가 전구를 건너뛴다.',
+      '위쪽 곡선 전선으로 B를 건너뛰게 하고, 아래 전구 C의 회로는 정상 연결. 아래쪽 곡선 전선은 C를 단락시켜 합선을 일으키는 함정이다.',
+    ],
+  };
+}
+
+// 룰베이스 회로 판정
+function evalCircuit(cfg){
+  const edges = cfg.edges;
+  const bat = edges.find(e=>e.type==='battery');
+  const bulbs = edges.filter(e=>e.type==='bulb');
+  const wires = edges.filter(e=>e.type==='wire' && e.on);
+
+  const buildAdj = list => {
+    const m = {};
+    list.forEach(e=>{
+      (m[e.a]=m[e.a]||[]).push({to:e.b,e}); (m[e.b]=m[e.b]||[]).push({to:e.a,e});
+    });
+    return m;
+  };
+  // 전선만으로 두 노드가 이어지면 그 사이 전구는 단락(꺼짐)
+  const wAdj = buildAdj(wires);
+  const wireConnected = (u,v)=>{
+    const seen = new Set([u]); const q=[u];
+    while(q.length){ const n=q.shift(); if(n===v) return true;
+      (wAdj[n]||[]).forEach(x=>{ if(!seen.has(x.to)){seen.add(x.to);q.push(x.to);} }); }
+    return false;
+  };
+  const shorted = {};
+  bulbs.forEach(b=>{ shorted[b.id] = wireConnected(b.a,b.b); });
+
+  // 전도 경로: 켜진 전선 + 단락되지 않은 전구
+  const cond = wires.concat(bulbs.filter(b=>!shorted[b.id]));
+  const cAdj = buildAdj(cond);
+  // 배터리 +→− 단순 경로 전부 열거 (그래프가 작아 DFS로 충분)
+  const paths = [];
+  (function dfs(node, visited, used){
+    if(node===bat.b){ paths.push(used.slice()); return; }
+    (cAdj[node]||[]).forEach(x=>{
+      if(visited.has(x.to)) return;
+      visited.add(x.to); used.push(x.e);
+      dfs(x.to, visited, used);
+      used.pop(); visited.delete(x.to);
+    });
+  })(bat.a, new Set([bat.a]), []);
+
+  let shortCircuit=false; const lit={}, full={};
+  paths.forEach(p=>{
+    const bs = p.filter(e=>e.type==='bulb');
+    if(bs.length===0) shortCircuit=true;
+    bs.forEach(b=>{ lit[b.id]=true; if(bs.length===1) full[b.id]=true; });
+  });
+  return {shorted, lit, full, shortCircuit};
+}
+
+function circuitGoalMet(cfg, ev){
+  ev = ev || evalCircuit(cfg);
+  return !ev.shortCircuit
+    && cfg.goal.full.every(id=>ev.full[id])
+    && cfg.goal.off.every(id=>!ev.lit[id]);
+}
+
+function circuitStatus(cfg, ev){
+  if(ev.shortCircuit) return ['warn','⚠️ 합선! 전기가 전구를 거치지 않고 그대로 흐르고 있다. 전선이 뜨겁다.'];
+  if(circuitGoalMet(cfg,ev)) return ['ok', cfg.__success || '철컥 — 배전반에 불이 들어오고, 방 한쪽이 환해졌다!'];
+  const offBad = cfg.goal.off.find(id=>ev.lit[id]);
+  if(offBad) return ['warn','꺼야 할 전구에 불이 들어와 있다.'];
+  const needDim = cfg.goal.full.find(id=>ev.lit[id] && !ev.full[id]);
+  if(needDim) return ['warn','전구가 어둡다… 밝기가 절반뿐이다. 전기가 전구 두 개를 한 줄로 지나는 중.'];
+  return ['info','전기가 아직 돌지 않는다. 전선을 눌러 회로를 완성하자.'];
+}
+
+function mountCircuit(el, cfg, api){
+  const svgWrap = document.createElement('div');
+  svgWrap.className = 'stage';
+  const status = document.createElement('div');
+  status.className = 'status-line';
+  el.appendChild(svgWrap); el.appendChild(status);
+  let done = false;
+
+  const pos = id => cfg.nodes[id];
+  const mid = e => { const a=pos(e.a), b=pos(e.b); return [(a[0]+b[0])/2,(a[1]+b[1])/2]; };
+  const edgePath = e => {
+    const a=pos(e.a), b=pos(e.b);
+    if(e.bend){ const m=mid(e); return `M ${a[0]} ${a[1]} Q ${m[0]} ${m[1]+e.bend} ${b[0]} ${b[1]}`; }
+    return `M ${a[0]} ${a[1]} L ${b[0]} ${b[1]}`;
+  };
+
+  function render(){
+    const ev = evalCircuit(cfg);
+    let s = `<svg viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">`;
+    // 전선
+    cfg.edges.filter(e=>e.type==='wire').forEach(e=>{
+      const on = e.on;
+      const col = e.fixed ? '#66708c' : (on ? '#ffd76a' : '#39425f');
+      const dash = (!e.fixed && !on) ? 'stroke-dasharray="7 6"' : '';
+      const glow = (!e.fixed && on) ? 'filter="drop-shadow(0 0 3px rgba(255,215,106,.7))"' : '';
+      s += `<path d="${edgePath(e)}" fill="none" stroke="${col}" stroke-width="4" stroke-linecap="round" ${dash} ${glow}/>`;
+      if(!e.fixed){
+        s += `<path d="${edgePath(e)}" fill="none" stroke="rgba(0,0,0,0)" stroke-width="26" data-edge="${e.id}" style="cursor:pointer"/>`;
+      }
+    });
+    // 전구
+    cfg.edges.filter(e=>e.type==='bulb').forEach(b=>{
+      const m = mid(b);
+      const isFull = ev.full[b.id], isLit = ev.lit[b.id] && !ev.shorted[b.id];
+      const fill = isFull ? '#ffd76a' : (isLit ? '#a06a24' : '#1a2138');
+      const ring = isFull ? '#ffe9ae' : (isLit ? '#c98f45' : '#55618a');
+      const glow = isFull ? 'filter="drop-shadow(0 0 12px rgba(255,215,106,.9))"'
+                 : (isLit ? 'filter="drop-shadow(0 0 5px rgba(200,140,60,.6))"' : '');
+      s += `<circle cx="${m[0]}" cy="${m[1]}" r="15" fill="${fill}" stroke="${ring}" stroke-width="2.5" ${glow}/>`;
+      s += `<line x1="${m[0]-6}" y1="${m[1]+3}" x2="${m[0]+6}" y2="${m[1]+3}" stroke="${ring}" stroke-width="1.6"/>`;
+      s += `<line x1="${m[0]}" y1="${m[1]+3}" x2="${m[0]}" y2="${m[1]-6}" stroke="${ring}" stroke-width="1.6"/>`;
+      if(b.label) s += `<text x="${m[0]}" y="${m[1]+36}" fill="#8a93a6" font-size="13" text-anchor="middle" font-weight="700">${b.label}</text>`;
+      if(ev.shorted[b.id]) s += `<text x="${m[0]}" y="${m[1]-24}" fill="#ff6b6b" font-size="11" text-anchor="middle">단락됨</text>`;
+    });
+    // 배터리
+    {
+      const a=pos('P'), b=pos('Nn'); const cx=(a[0]+b[0])/2, cy=a[1];
+      s += `<line x1="${a[0]}" y1="${cy}" x2="${cx-10}" y2="${cy}" stroke="#66708c" stroke-width="4"/>`;
+      s += `<line x1="${cx+10}" y1="${cy}" x2="${b[0]}" y2="${cy}" stroke="#66708c" stroke-width="4"/>`;
+      s += `<line x1="${cx-10}" y1="${cy-16}" x2="${cx-10}" y2="${cy+16}" stroke="#e8ecf6" stroke-width="3.5"/>`;
+      s += `<line x1="${cx+10}" y1="${cy-9}" x2="${cx+10}" y2="${cy+9}" stroke="#e8ecf6" stroke-width="3.5"/>`;
+      s += `<text x="${cx-24}" y="${cy-20}" fill="#ffd76a" font-size="15" text-anchor="middle" font-weight="700">+</text>`;
+      s += `<text x="${cx+24}" y="${cy-20}" fill="#8a93a6" font-size="15" text-anchor="middle" font-weight="700">−</text>`;
+    }
+    // 노드 점
+    Object.keys(cfg.nodes).forEach(id=>{
+      const p=cfg.nodes[id];
+      s += `<circle cx="${p[0]}" cy="${p[1]}" r="4" fill="#55618a"/>`;
+    });
+    s += `</svg>`;
+    svgWrap.innerHTML = s;
+
+    const [cls,msg] = circuitStatus(cfg,ev);
+    status.className = 'status-line '+cls;
+    status.textContent = msg;
+
+    if(!done && circuitGoalMet(cfg,ev)){
+      done = true;
+      setTimeout(()=>api.solve(), 900);
+    }
+  }
+
+  svgWrap.addEventListener('click', ev=>{
+    if(done) return;
+    const t = ev.target.closest('[data-edge]');
+    if(!t) return;
+    const e = cfg.edges.find(x=>x.id===t.dataset.edge);
+    if(e && !e.fixed){ e.on = !e.on; render(); }
+  });
+  render();
+}
+
+/* ======================= 저울(카운터웨이트) 퍼즐 ======================= */
+
+function balanceConfig(diff){
+  if(diff==='easy') return {
+    fixed:[{m:6,d:-2}], slots:[2], inv:[1,2,3,5], maxCount:Infinity,
+    solution:[{m:1,d:2},{m:2,d:2},{m:3,d:2}],
+    readout:'weight',
+    curri:'과학 4-1 물체의 무게 · 수평 잡기',
+    desc:'한쪽에 6kg짜리 고정 추가 걸려 있다. 반대쪽 같은 자리에 추를 걸어 수평을 만들면 걸쇠가 풀린다. 추를 고른 뒤 고리를 누르면 걸린다.',
+    hints:['양쪽 거리가 같으면 무게만 똑같이 맞추면 된다.','왼쪽은 6kg. 추 여러 개를 같은 고리에 겹쳐 걸어 6kg을 만들어 보자.'],
+  };
+  if(diff==='mid') return {
+    fixed:[{m:4,d:-3}], slots:[1,2,3,4], inv:[1,2,3,5], maxCount:Infinity,
+    solution:[{m:3,d:4}],
+    readout:'torque',
+    curri:'중3 과학 일과 에너지 · 지레의 원리',
+    desc:'이번엔 거리가 다르다. 시소가 기우는 힘은 무게×거리. 오른쪽의 무게×거리 합을 왼쪽과 똑같이 맞춰 수평을 만들자.',
+    hints:['가벼운 추도 멀리 걸면 무거운 추만큼 힘을 낸다. 왼쪽은 4×3=12.','무게×거리 합이 12가 되면 된다. 예: 3kg을 거리 4에.'],
+  };
+  return {
+    fixed:[{m:2,d:-4},{m:3,d:-2}], slots:[1,2,3,4], inv:[1,2,3,5], maxCount:2,
+    solution:[{m:5,d:2},{m:1,d:4}],
+    readout:'torque',
+    curri:'고교 물리 · 돌림힘과 평형(심화)',
+    desc:'왼쪽에 추 두 개가 걸려 있고, 걸 수 있는 추는 딱 2개. 돌림힘(무게×거리)의 합을 정확히 맞춰야 한다.',
+    hints:['돌림힘 = 무게×거리. 왼쪽의 합은 2×4 + 3×2 = 14.','추 2개로 14 만들기. 5×2 + 1×4 같은 조합을 찾아보자.'],
+  };
+}
+
+const torqueSum = list => list.reduce((s,w)=>s + w.m*w.d, 0);
+function balanceSolved(cfg, placed){
+  return placed.length>0 && torqueSum(cfg.fixed) + torqueSum(placed) === 0;
+}
+
+function mountBalance(el, cfg, api){
+  const svgWrap = document.createElement('div');
+  svgWrap.className = 'stage';
+  const status = document.createElement('div');
+  status.className = 'status-line';
+  const invRow = document.createElement('div');
+  invRow.className = 'inv-row';
+  el.appendChild(svgWrap); el.appendChild(invRow); el.appendChild(status);
+
+  const inv = cfg.inv.map((m,i)=>({m, i, used:false}));
+  const placed = []; // {m,d,invIdx}
+  let selected = null, done = false;
+
+  const PX = 52, CX = 300, CY = 200;
+  const rot = (x,y,ang) => {
+    const dx=x-CX, dy=y-CY, c=Math.cos(ang), s=Math.sin(ang);
+    return [CX+dx*c-dy*s, CY+dx*s+dy*c];
+  };
+
+  function render(){
+    const t = torqueSum(cfg.fixed)+torqueSum(placed);
+    const ang = Math.max(-9, Math.min(9, t*1.5)) * Math.PI/180;
+    let s = `<svg viewBox="0 0 600 380" xmlns="http://www.w3.org/2000/svg">`;
+    // 받침대
+    s += `<polygon points="${CX-26},330 ${CX+26},330 ${CX},${CY+4}" fill="#2a3350" stroke="#55618a" stroke-width="2"/>`;
+    s += `<line x1="120" y1="330" x2="480" y2="330" stroke="#2a3350" stroke-width="5" stroke-linecap="round"/>`;
+    // 빔
+    const [bx1,by1] = rot(CX-4.6*PX, CY, ang), [bx2,by2] = rot(CX+4.6*PX, CY, ang);
+    s += `<line x1="${bx1}" y1="${by1}" x2="${bx2}" y2="${by2}" stroke="#8a93a6" stroke-width="7" stroke-linecap="round"/>`;
+    s += `<circle cx="${CX}" cy="${CY}" r="7" fill="#ffd76a"/>`;
+    // 거리 눈금
+    for(let d=-4; d<=4; d++){
+      if(d===0) continue;
+      const [tx,ty] = rot(CX+d*PX, CY, ang);
+      s += `<line x1="${tx}" y1="${ty-6}" x2="${tx}" y2="${ty+6}" stroke="#55618a" stroke-width="2"/>`;
+      s += `<text x="${tx}" y="${ty-13}" fill="#525b73" font-size="11" text-anchor="middle">${Math.abs(d)}</text>`;
+    }
+    // 무게추 그리기 helper
+    const drawW = (w, idx, stack, isFixed) => {
+      const [hx,hy] = rot(CX+w.d*PX, CY, ang);
+      const top = hy+10, bh = 34, y = top+16+stack*(bh+4);
+      const fill = isFixed ? '#39425f' : '#7a5410';
+      const line = isFixed ? '#66708c' : '#ffd76a';
+      s += `<line x1="${hx}" y1="${hy}" x2="${hx}" y2="${y}" stroke="${line}" stroke-width="1.6"/>`;
+      s += `<rect x="${hx-22}" y="${y}" width="44" height="${bh}" rx="8" fill="${fill}" stroke="${line}" stroke-width="1.6" ${isFixed?'':`data-placed="${idx}" style="cursor:pointer"`}/>`;
+      s += `<text x="${hx}" y="${y+22}" fill="${isFixed?'#8a93a6':'#ffd76a'}" font-size="13.5" font-weight="700" text-anchor="middle" ${isFixed?'':`data-placed="${idx}" style="cursor:pointer"`}>${w.m}kg</text>`;
+    };
+    // 스택 계산
+    const stacks = {};
+    cfg.fixed.forEach(w=>{ const k=w.d; drawW(w, -1, stacks[k]=(stacks[k]??-1)+1, true); });
+    placed.forEach((w,idx)=>{ const k=w.d; drawW(w, idx, stacks[k]=(stacks[k]??-1)+1, false); });
+    // 고리(슬롯)
+    cfg.slots.forEach(d=>{
+      const [hx,hy] = rot(CX+d*PX, CY, ang);
+      s += `<circle cx="${hx}" cy="${hy+10}" r="9" fill="none" stroke="${selected!==null?'#ffd76a':'#55618a'}" stroke-width="2" stroke-dasharray="3 3" data-slot="${d}" style="cursor:pointer"/>`;
+      s += `<circle cx="${hx}" cy="${hy+10}" r="20" fill="rgba(0,0,0,0)" data-slot="${d}" style="cursor:pointer"/>`;
+    });
+    s += `</svg>`;
+    svgWrap.innerHTML = s;
+
+    // 인벤토리
+    invRow.innerHTML = `<span class="inv-label">추 보관함 →</span>` + inv.map(w=>
+      `<button class="w-btn ${selected===w.i?'sel':''}" data-inv="${w.i}" ${w.used?'disabled':''}>${w.m}kg</button>`
+    ).join('') + (cfg.maxCount!==Infinity ? `<span class="inv-label" style="margin-left:auto">사용 가능: ${cfg.maxCount-placed.length}개</span>` : '');
+
+    // 상태
+    const L = -torqueSum(cfg.fixed), R = torqueSum(placed);
+    const solved = balanceSolved(cfg, placed);
+    if(done || solved){
+      status.className='status-line ok'; status.textContent = cfg.__success || '수평이다! 철컹 — 카운터웨이트 걸쇠가 풀렸다.';
+    } else {
+      status.className='status-line info';
+      const read = cfg.readout==='torque'
+        ? `왼쪽 돌림힘 ${L} · 오른쪽 돌림힘 ${R}`
+        : `왼쪽 ${cfg.fixed.reduce((s,w)=>s+w.m,0)}kg · 오른쪽 ${placed.reduce((s,w)=>s+w.m,0)}kg`;
+      const tilt = t===0 ? '' : (t<0 ? ' — 왼쪽으로 기울어 있다' : ' — 오른쪽으로 기울어 있다');
+      status.textContent = read + tilt;
+    }
+    if(!done && solved){ done=true; setTimeout(()=>api.solve(), 900); }
+  }
+
+  el.addEventListener('click', ev=>{
+    if(done) return;
+    const invBtn = ev.target.closest('[data-inv]');
+    if(invBtn){ const i=+invBtn.dataset.inv;
+      if(!inv[i].used){ selected = (selected===i? null : i); render(); } return; }
+    const slot = ev.target.closest('[data-slot]');
+    if(slot && selected!==null){
+      if(placed.length >= cfg.maxCount){
+        status.className='status-line warn'; status.textContent=`추는 ${cfg.maxCount}개까지만 걸 수 있다!`;
+        return;
+      }
+      placed.push({m:inv[selected].m, d:+slot.dataset.slot, invIdx:selected});
+      inv[selected].used = true; selected = null; render(); return;
+    }
+    const pw = ev.target.closest('[data-placed]');
+    if(pw){ const idx=+pw.dataset.placed; const w=placed.splice(idx,1)[0];
+      inv[w.invIdx].used=false; render(); }
+  });
+  render();
+}
+
+/* ======================= 시약장 다이얼(수열) 퍼즐 ======================= */
+
+function cipherConfig(diff){
+  if(diff==='easy') return {
+    seqs:[ {terms:[1,3,5,7],ans:9}, {terms:[9,8,7,6],ans:5}, {terms:[0,2,4,6],ans:8} ],
+    curri:'수학 4 규칙 찾기 · 수의 배열에서 규칙',
+    desc:'자물쇠에 다이얼이 세 개. 기록의 숫자 줄마다 마지막 칸이 비어 있다. 각 줄의 규칙을 찾아 다이얼을 맞추고 레버를 당기자.',
+    hints:[
+      '숫자들이 한 칸마다 얼마씩 커지거나 작아지는지 살펴보자.',
+      '첫 줄은 2씩 커진다 — 7 다음은 9. 나머지 줄도 같은 방식으로 찾자.',
+    ],
+  };
+  if(diff==='mid') return {
+    seqs:[ {terms:[1,1,2,3,5],ans:8}, {terms:[16,8,4,2],ans:1}, {terms:[81,27,9],ans:3} ],
+    curri:'수학 5-6 규칙과 대응 · 곱셈·나눗셈 규칙',
+    desc:'이번 숫자 줄의 규칙은 더하기·빼기만이 아니다. 각 줄의 숨은 규칙을 찾아 다이얼을 맞추자.',
+    hints:[
+      '앞의 두 수를 더해 보거나, 이웃한 수를 나눠 보자.',
+      '첫 줄은 앞 두 수의 합(피보나치), 둘째 줄은 절반씩, 셋째 줄은 3으로 나누기.',
+    ],
+  };
+  return {
+    seqs:[ {terms:[1,9,2,8,3,7],ans:4}, {terms:[7,4,1,8],ans:5}, {terms:[1,4,9,6,5],ans:6} ],
+    curri:'수학 심화 · 수열 추론(영재·동아리)',
+    desc:'숫자열이 심상치 않다. 수열 두 개가 섞여 있거나, 큰 수의 일부만 적혀 있을지도 모른다.',
+    hints:[
+      '첫 줄은 한 칸씩 건너 읽어 보자. 둘째 줄은 빼다가 0 아래로 내려가면 10을 더한 것처럼 움직인다.',
+      '둘째 줄: 3씩 빼되 음수가 되면 10을 더한다(7→4→1→8→5). 셋째 줄: 제곱수 1,4,9,16,25,36…의 일의 자리.',
+    ],
+  };
+}
+
+function cipherSolved(cfg, vals){
+  return cfg.seqs.every((s,i)=>vals[i]===s.ans);
+}
+
+function mountCipher(el, cfg, api){
+  const stage = document.createElement('div');
+  stage.className = 'stage';
+  const status = document.createElement('div');
+  status.className = 'status-line info';
+  status.textContent = '다이얼을 맞춘 뒤 레버를 당기자.';
+  el.appendChild(stage); el.appendChild(status);
+
+  const vals = cfg.seqs.map(()=>0);
+  let done = false;
+
+  function render(){
+    stage.innerHTML = `<div class="cab" id="cab">` + cfg.seqs.map((s,i)=>`
+      <div class="seq-row">
+        <div class="seq-terms">${s.terms.join(' · ')} · <span class="q">?</span></div>
+        <div class="dial">
+          <button data-d="${i}" data-v="1" aria-label="올리기">▲</button>
+          <div class="val">${vals[i]}</div>
+          <button data-d="${i}" data-v="-1" aria-label="내리기">▼</button>
+        </div>
+      </div>`).join('') +
+      `<div class="lever-row"><button class="btn primary" id="lever">🔓 레버 당기기</button></div></div>`;
+  }
+
+  stage.addEventListener('click', ev=>{
+    if(done) return;
+    const b = ev.target.closest('[data-d]');
+    if(b){ const i=+b.dataset.d; vals[i]=(vals[i]+ +b.dataset.v+10)%10; render(); return; }
+    if(ev.target.closest('#lever')){
+      if(cipherSolved(cfg, vals)){
+        done = true;
+        status.className='status-line ok';
+        status.textContent = cfg.__success || '덜컥 — 마지막 숫자가 맞물리며 시약장 문이 열렸다!';
+        setTimeout(()=>api.solve(), 900);
+      } else {
+        const cab = stage.querySelector('#cab');
+        cab.classList.remove('shake'); void cab.offsetWidth; cab.classList.add('shake');
+        status.className='status-line warn';
+        status.textContent='자물쇠가 꿈쩍도 하지 않는다. 어딘가 틀렸다.';
+      }
+    }
+  });
+  render();
+}
+
+/* ======================= 지시약 혼합대(산·염기) 퍼즐 ======================= */
+
+// 양배추 지시약 근사 색상표
+const PH_BANDS = [
+  {min:1,  max:2,  name:'빨강', color:'#d63a3a'},
+  {min:3,  max:4,  name:'주황', color:'#e8833a'},
+  {min:5,  max:6,  name:'분홍', color:'#e06a9f'},
+  {min:7,  max:7,  name:'보라', color:'#8a5fd3'},
+  {min:8,  max:9,  name:'파랑', color:'#4a7fd6'},
+  {min:10, max:11, name:'초록', color:'#3fae6a'},
+  {min:12, max:13, name:'노랑', color:'#d6c23a'},
+];
+const phBand = ph => PH_BANDS.find(b=>ph>=b.min && ph<=b.max);
+
+function phConfig(diff){
+  if(diff==='easy') return {
+    start:3, limit:Infinity, hasTest:false,
+    reagents:[{name:'비눗물',eff:+1},{name:'식초',eff:-1}],
+    targetBand:'보라',
+    solution:[+1,+1,+1,+1],
+    curri:'과학 5-2 산과 염기 · 지시약과 중화',
+    desc:'산성 용액이 담겨 있다. 지시약 때문에 주황빛이다. 색상표를 보고 시약을 한 방울씩 떨어뜨려, 중성인 보라색으로 만들자.',
+    hints:[
+      '산성(빨강 쪽)과 염기성(노랑 쪽)은 서로를 지운다 — 중화 반응이다.',
+      '비눗물 한 방울은 pH를 1칸 올리고, 식초는 1칸 내린다. 지금 pH 3에서 보라(pH 7)까지 몇 방울?',
+    ],
+  };
+  if(diff==='mid') return {
+    start:3, limit:4, hasTest:false,
+    reagents:[{name:'암모니아수',eff:+3},{name:'소다수',eff:+1},{name:'식초',eff:-2}],
+    targetBand:'파랑',
+    solution:[+3,+3],
+    curri:'중등 과학 산과 염기 · 중화 반응의 양적 감각',
+    desc:'이번 용기는 4방울까지만 넣을 수 있다. 그 이상은 넘친다. 시약 효과를 조합해 파랑(pH 8~9)을 만들자.',
+    hints:[
+      '시약마다 pH를 움직이는 칸수가 다르다. 시작은 pH 3.',
+      '암모니아수(+3) 두 방울이면 3→9. 또는 +3 +1 +1로 8도 된다.',
+    ],
+  };
+  return {
+    start:11, limit:3, hasTest:true,
+    reagents:[{name:'시약 X',eff:-3},{name:'시약 Y',eff:+1},{name:'시약 Z',eff:0}],
+    targetBand:'분홍',
+    solution:[-3,-3],
+    curri:'통합과학 · 미지 시약 탐구 설계(심화)',
+    desc:'라벨이 지워진 시약 세 병. 본 용기의 pH 측정기는 고장 나 색만 보인다. 다행히 테스트 용기의 측정기는 살아 있다. 실험으로 각 시약의 효과를 알아낸 뒤, 본 용기에 3방울 안으로 분홍(pH 5~6)을 만들자.',
+    hints:[
+      '테스트 용기에 시약을 하나씩 넣어 pH 숫자가 얼마나 변하는지 기록하자. 그게 실험이다.',
+      'X는 −3, Y는 +1, Z는 0(그냥 물)이다. 시작 pH 11에서 분홍(5~6)까지 — X 두 방울이면 5.',
+    ],
+  };
+}
+
+function phApply(start, effs){
+  let p = start;
+  effs.forEach(e=>{ p = Math.max(1, Math.min(13, p+e)); });
+  return p;
+}
+function phSolvedCheck(cfg, effs){
+  if(effs.length===0 || effs.length>cfg.limit) return false;
+  return phBand(phApply(cfg.start, effs)).name === cfg.targetBand;
+}
+
+function mountPh(el, cfg, api){
+  const stage = document.createElement('div');
+  stage.className = 'stage';
+  const status = document.createElement('div');
+  status.className = 'status-line';
+  el.appendChild(stage); el.appendChild(status);
+
+  const tb = PH_BANDS.find(b=>b.name===cfg.targetBand);
+  const main = {drops:[]};
+  const test = {ph:cfg.start};
+  let done = false;
+
+  const beakerSVG = ph => {
+    const b = phBand(ph);
+    return `<svg viewBox="0 0 120 130" width="110" xmlns="http://www.w3.org/2000/svg">
+      <path d="M36 72 L84 72 L84 112 Q84 118 78 118 L42 118 Q36 118 36 112 Z" fill="${b.color}" opacity=".88"/>
+      <path d="M32 10 L32 112 Q32 122 42 122 L78 122 Q88 122 88 112 L88 10" fill="none" stroke="#66708c" stroke-width="3" stroke-linecap="round"/>
+      <line x1="26" y1="10" x2="38" y2="10" stroke="#66708c" stroke-width="3" stroke-linecap="round"/>
+      <line x1="82" y1="10" x2="94" y2="10" stroke="#66708c" stroke-width="3" stroke-linecap="round"/>
+    </svg>`;
+  };
+
+  function render(){
+    const mainPh = phApply(cfg.start, main.drops);
+    const mb = phBand(mainPh);
+    let html = `
+      <div class="target-swatch">목표 색: <i style="background:${tb.color}"></i> ${tb.name} (pH ${tb.min}${tb.max!==tb.min?'~'+tb.max:''})</div>
+      <div class="ph-chart">${PH_BANDS.map(b=>`<div class="ph-chip" style="background:${b.color}">${b.name}<br>${b.min}${b.max!==b.min?'~'+b.max:''}</div>`).join('')}</div>
+      <div class="ph-wrap">
+        <div class="beaker-card">
+          <h4>본 용기${cfg.hasTest?' · 측정기 고장(색만 보임)':''}</h4>
+          ${beakerSVG(mainPh)}
+          <div class="beaker-info">색: <span style="color:${mb.color};font-weight:700">${mb.name}</span>${cfg.hasTest?'':` · pH ${mainPh}`} · 방울 ${main.drops.length}${cfg.limit!==Infinity?'/'+cfg.limit:''}</div>
+          <div class="reagent-row">
+            ${cfg.reagents.map((r,i)=>`<button class="btn" data-drop="main" data-i="${i}">💧 ${r.name}</button>`).join('')}
+            <button class="btn" data-reset="main">🚿 비우기</button>
+          </div>
+        </div>`;
+    if(cfg.hasTest){
+      html += `
+        <div class="beaker-card">
+          <h4>테스트 용기 · 측정기 정상</h4>
+          ${beakerSVG(test.ph)}
+          <div><span class="ph-meter">pH ${test.ph}</span></div>
+          <div class="reagent-row">
+            ${cfg.reagents.map((r,i)=>`<button class="btn" data-drop="test" data-i="${i}">💧 ${r.name}</button>`).join('')}
+            <button class="btn" data-reset="test">🚿 비우기</button>
+          </div>
+        </div>`;
+    }
+    html += `</div>`;
+    stage.innerHTML = html;
+
+    if(done || phSolvedCheck(cfg, main.drops)){
+      status.className='status-line ok';
+      status.textContent = cfg.__success || '삐빅 — 감지기가 초록빛으로 바뀌었다!';
+      if(!done){ done=true; setTimeout(()=>api.solve(), 900); }
+    } else if(cfg.limit!==Infinity && main.drops.length>=cfg.limit){
+      status.className='status-line warn';
+      status.textContent='용기가 가득 찼는데 목표 색이 아니다. 비우고 다시 계산해 보자.';
+    } else {
+      status.className='status-line info';
+      status.textContent='시약을 골라 본 용기에 떨어뜨리자.';
+    }
+  }
+
+  stage.addEventListener('click', ev=>{
+    if(done) return;
+    const d = ev.target.closest('[data-drop]');
+    if(d){
+      const eff = cfg.reagents[+d.dataset.i].eff;
+      if(d.dataset.drop==='main'){
+        if(cfg.limit!==Infinity && main.drops.length>=cfg.limit) return;
+        main.drops.push(eff);
+      } else {
+        test.ph = Math.max(1, Math.min(13, test.ph+eff));
+      }
+      render(); return;
+    }
+    const r = ev.target.closest('[data-reset]');
+    if(r){
+      if(r.dataset.reset==='main') main.drops.length=0;
+      else test.ph = cfg.start;
+      render();
+    }
+  });
+  render();
+}
+
+/* ======================= 광학 장치(빛의 반사) 퍼즐 ======================= */
+// 격자 위 레이저: 거울(/ \)을 놓아 빛을 감지기(T)까지. 반사 법칙 룰베이스.
+// 셀: '.'=빈칸(거울 배치 가능) '#'=벽 'T'=감지기 'F'=필터(반드시 통과) 'R'=경보 감지기(닿으면 실패)
+
+function mirrorConfig(diff){
+  if(diff==='easy') return {
+    rows:['...#.','....#','.....','....T'],
+    emitter:{y:0}, limit:2,
+    solution:{'2,0':'\\','2,3':'\\'},
+    curri:'과학 4-2 그림자와 거울 · 빛의 직진과 반사',
+    desc:'레이저가 벽을 향해 헛되이 빛나고 있다. 빈 칸을 눌러 거울(↘ ↙)을 놓고, 빛을 꺾어 감지기(◎)에 맞히자. 거울은 2개뿐.',
+    hints:['빛은 곧게 나아가다 거울을 만나면 직각으로 꺾인다.','레이저 줄기 위에 거울 하나로 아래로 꺾고, 감지기 줄에서 한 번 더 꺾자.'],
+  };
+  if(diff==='mid') return {
+    rows:['.#...T','..#.#.','...#..','....#.','......'],
+    emitter:{y:2}, limit:3,
+    solution:{'1,2':'\\','1,4':'\\','5,4':'/'},
+    curri:'중1 과학 빛과 파동 · 반사 법칙(입사각=반사각)',
+    desc:'벽이 늘어 길이 막혔다. 거울 3개로 빛의 경로를 설계하자. 거울에서 입사각과 반사각은 항상 같다 — 그래서 빛은 정확히 90°로 꺾인다.',
+    hints:['막힌 길은 우회해야 한다. 아래로 내려갔다가 오른쪽 끝에서 위로 올리는 경로를 그려 보자.','레이저 칸에서 아래로 → 바닥 줄에서 오른쪽으로 → 오른쪽 끝 줄에서 위로.'],
+  };
+  return {
+    rows:['...R.T','......','...F..','..#..R','....#.'],
+    emitter:{y:4}, limit:3,
+    solution:{'1,4':'/','1,2':'/','5,2':'/'},
+    curri:'중1 빛과 파동 심화 · 광학 경로 설계',
+    desc:'이번 감지기는 까다롭다. 빛이 반드시 필터(◇)를 통과한 뒤 감지기(◎)에 닿아야 하고, 붉은 경보 감지기(▲)에 닿으면 실패다. 거울 3개로 경로를 설계하라.',
+    hints:['조건이 둘: ◇를 지나고, ▲는 피한다. 필터가 있는 가로줄을 활용하자.','왼쪽에서 위로 올린 뒤, 필터 줄에서 오른쪽으로 관통시키고, 오른쪽 끝에서 위로.'],
+  };
+}
+
+function mirrorTrace(cfg, mirrors){
+  const rows = cfg.rows, H = rows.length, W = rows[0].length;
+  let x = -1, y = cfg.emitter.y, dx = 1, dy = 0;
+  const path = [[x,y]];
+  let hit=false, passedF=false, hitR=false, steps=0;
+  while(steps++ < 300){
+    x += dx; y += dy;
+    if(x<0 || x>=W || y<0 || y>=H) break;
+    path.push([x,y]);
+    const cell = rows[y][x];
+    if(cell==='#') break;
+    if(cell==='T'){ hit=true; break; }
+    if(cell==='F') passedF=true;
+    if(cell==='R'){ hitR=true; break; }
+    const m = mirrors[x+','+y];
+    if(m==='/'){ const t=dx; dx=-dy; dy=-t; }
+    else if(m==='\\'){ const t=dx; dx=dy; dy=t; }
+  }
+  return {hit, passedF, hitR, path};
+}
+
+function mirrorSolved(cfg, mirrors){
+  if(Object.keys(mirrors).length > cfg.limit) return false;
+  const t = mirrorTrace(cfg, mirrors);
+  const needF = cfg.rows.some(r=>r.includes('F'));
+  return t.hit && !t.hitR && (!needF || t.passedF);
+}
+
+function mountMirror(el, cfg, api){
+  const stage = document.createElement('div');
+  stage.className = 'stage';
+  const status = document.createElement('div');
+  status.className = 'status-line';
+  el.appendChild(stage); el.appendChild(status);
+
+  const mirrors = {};
+  let done = false;
+  const H = cfg.rows.length, W = cfg.rows[0].length;
+  const CS = 64, OX = 70, OY = 26;
+  const cc = (x,y)=>[OX+x*CS+CS/2, OY+y*CS+CS/2];
+
+  function render(){
+    const tr = mirrorTrace(cfg, mirrors);
+    const vw = OX+W*CS+26, vh = OY+H*CS+26;
+    let s = `<svg viewBox="0 0 ${vw} ${vh}" xmlns="http://www.w3.org/2000/svg">`;
+    // 격자 + 셀
+    for(let y=0;y<H;y++) for(let x=0;x<W;x++){
+      const cell = cfg.rows[y][x];
+      const [px,py] = [OX+x*CS, OY+y*CS];
+      const [mx,my] = cc(x,y);
+      s += `<rect x="${px+2}" y="${py+2}" width="${CS-4}" height="${CS-4}" rx="8" fill="${cell==='#'?'#232c4e':'#101632'}" stroke="#2a3350" stroke-width="1.5" ${cell==='.'?`data-cell="${x},${y}" style="cursor:pointer"`:''}/>`;
+      if(cell==='T') s += `<circle cx="${mx}" cy="${my}" r="13" fill="none" stroke="${tr.hit&&mirrorSolved(cfg,mirrors)?'#5fd39a':'#8a93a6'}" stroke-width="3"/><circle cx="${mx}" cy="${my}" r="5" fill="${tr.hit?'#5fd39a':'#39425f'}"/>`;
+      if(cell==='F') s += `<rect x="${mx-10}" y="${my-10}" width="20" height="20" rx="3" fill="none" stroke="#6aa8ff" stroke-width="2.5" transform="rotate(45 ${mx} ${my})"/>`;
+      if(cell==='R') s += `<path d="M${mx} ${my-11} L${mx+11} ${my+9} L${mx-11} ${my+9} Z" fill="none" stroke="#ff6b6b" stroke-width="2.5"/>`;
+      const m = mirrors[x+','+y];
+      if(m) s += `<line x1="${m==='/'?mx-16:mx-16}" y1="${m==='/'?my+16:my-16}" x2="${m==='/'?mx+16:mx+16}" y2="${m==='/'?my-16:my+16}" stroke="#cfd8ec" stroke-width="5" stroke-linecap="round"/>`;
+      if(cell==='.') s += `<rect x="${px+2}" y="${py+2}" width="${CS-4}" height="${CS-4}" fill="rgba(0,0,0,0)" data-cell="${x},${y}" style="cursor:pointer"/>`;
+    }
+    // 레이저 발사기
+    const [ex,ey] = cc(0, cfg.emitter.y);
+    s += `<rect x="${OX-44}" y="${ey-14}" width="34" height="28" rx="6" fill="#3a1d24" stroke="#7a3040" stroke-width="2.5"/>`;
+    s += `<circle cx="${OX-18}" cy="${ey}" r="4" fill="#ff6b6b"/>`;
+    // 빔
+    if(tr.path.length>1){
+      const pts = tr.path.map(([x,y])=>{ const [cx,cy]=cc(x,y); return `${cx},${cy}`; }).join(' ');
+      s += `<polyline points="${OX-14},${ey} ${pts.split(' ').slice(1).join(' ')}" fill="none" stroke="#ff5c5c" stroke-width="3.5" stroke-linecap="round" opacity=".9" filter="drop-shadow(0 0 5px rgba(255,92,92,.8))"/>`;
+    }
+    s += `</svg>`;
+    stage.innerHTML = s;
+
+    const used = Object.keys(mirrors).length;
+    const solved = mirrorSolved(cfg, mirrors);
+    if(done || solved){
+      status.className='status-line ok'; status.textContent = cfg.__success || '빛줄기가 감지기에 닿자, 치링 — 잠금 고리가 풀렸다!';
+      if(!done){ done=true; setTimeout(()=>api.solve(), 900); }
+    } else if(tr.hitR){
+      status.className='status-line warn'; status.textContent='⚠️ 붉은 경보 감지기에 빛이 닿았다! 경로를 바꾸자.';
+    } else if(tr.hit){
+      status.className='status-line warn'; status.textContent='감지기에 닿았지만 필터(◇)를 거치지 않았다.';
+    } else {
+      status.className='status-line info'; status.textContent=`빈 칸을 눌러 거울 배치 (누를 때마다 ↘ → ↙ → 제거) · 거울 ${used}/${cfg.limit}`;
+    }
+  }
+
+  stage.addEventListener('click', ev=>{
+    if(done) return;
+    const c = ev.target.closest('[data-cell]');
+    if(!c) return;
+    const key = c.dataset.cell;
+    const cur = mirrors[key];
+    if(!cur){
+      if(Object.keys(mirrors).length >= cfg.limit){
+        status.className='status-line warn'; status.textContent=`거울은 ${cfg.limit}개뿐이다. 놓인 거울을 눌러 회수하자.`;
+        return;
+      }
+      mirrors[key]='\\';
+    }
+    else if(cur==='\\') mirrors[key]='/';
+    else delete mirrors[key];
+    render();
+  });
+  render();
+}
+
+/* ======================= 달 관측판(달의 위상) 퍼즐 ======================= */
+
+const MOON_PHASES = ['삭','초승달','상현달','보름달','하현달','그믐달'];
+
+function moonGlyph(i, size){
+  const s = size||40, r = s*0.42, c = s/2;
+  const dark = '#1a2138', light = '#e8e2c8', ring = '#55618a';
+  let inner = `<circle cx="${c}" cy="${c}" r="${r}" fill="${dark}" stroke="${ring}" stroke-width="1.5"/>`;
+  const half = (sweep)=>`<path d="M${c} ${c-r} A${r} ${r} 0 0 ${sweep} ${c} ${c+r} Z" fill="${light}"/>`;
+  const crescent = (sweep)=>`<path d="M${c} ${c-r} A${r} ${r} 0 0 ${sweep} ${c} ${c+r} A${r*0.55} ${r} 0 0 ${sweep} ${c} ${c-r} Z" fill="${light}"/>`;
+  if(i===1) inner += crescent(1);          // 초승(오른쪽 가늘게)
+  else if(i===2) inner += half(1);         // 상현(오른쪽 반)
+  else if(i===3) inner = `<circle cx="${c}" cy="${c}" r="${r}" fill="${light}" stroke="${ring}" stroke-width="1.5"/>`; // 보름
+  else if(i===4) inner += half(0);         // 하현(왼쪽 반)
+  else if(i===5) inner += crescent(0);     // 그믐(왼쪽 가늘게)
+  return `<svg viewBox="0 0 ${s} ${s}" width="${s}" height="${s}" xmlns="http://www.w3.org/2000/svg">${inner}</svg>`;
+}
+
+function moonConfig(diff){
+  if(diff==='easy') return {
+    rowsQ:[
+      {q:'초승달 → 상현달 → 보름달 → ?', ans:4},
+      {q:'상현달 → 보름달 → 하현달 → ?', ans:5},
+      {q:'그믐달 → 삭 → 초승달 → ?', ans:2},
+      {q:'지금 하늘의 달 (동쪽 벽에서 직접 확인)', ans:3},
+    ],
+    log:['관측 일지: 달은 약 30일을 주기로 모양이 변한다.','순서: 삭 → 초승 → 상현 → 보름 → 하현 → 그믐 → 다시 삭'],
+    curri:'과학 6-1 지구와 달의 운동 · 달의 위상 변화',
+    desc:'달의 위상이 새겨진 다이얼 판. 기록의 순서를 참고해, 각 줄에 맞는 위상으로 다이얼을 맞추고 레버를 당기자.',
+    hints:['일지에 적힌 순서를 그대로 따라가면 된다.','보름달 다음은 하현달. 한 칸씩 순서대로 도는 것뿐이다.','마지막 문항의 답은 기록이 아니라 하늘에 있다. 동쪽 벽에서 지금의 달을 직접 확인하자.'],
+  };
+  if(diff==='mid') return {
+    rowsQ:[
+      {q:'음력 7~8일 밤의 달', ans:2},
+      {q:'음력 22~23일 밤의 달', ans:4},
+      {q:'음력 27~28일 새벽의 달', ans:5},
+      {q:'지금 하늘의 달 (동쪽 벽에서 직접 확인)', ans:3},
+    ],
+    log:['관측 일지: 음력 1일 = 삭(보이지 않음) · 음력 15일 = 보름달','주기는 약 30일 — 나머지 날짜는 순서로 추리하라.'],
+    curri:'중3 과학 태양계 · 달의 위상과 음력 날짜',
+    desc:'일지에는 음력 1일과 15일의 위상만 남아 있다. 30일 주기를 이용해 각 날짜의 위상을 추리하자.',
+    hints:['1일 삭에서 15일 보름까지 절반이 지났다. 그 중간(7~8일)은 절반만 찬 달.','1일=삭, 8일≈상현, 15일=보름, 22일≈하현, 28일≈그믐.','마지막 문항의 답은 기록이 아니라 하늘에 있다. 동쪽 벽에서 지금의 달을 직접 확인하자.'],
+  };
+  return {
+    rowsQ:[
+      {q:'해 진 직후, 남쪽 하늘 높이 떠 있던 달', ans:2},
+      {q:'자정 무렵, 동쪽 지평선에서 막 떠오른 달', ans:4},
+      {q:'해 뜨기 직전, 동쪽 하늘에 낮게 걸린 달', ans:5},
+      {q:'지금 하늘의 달 (동쪽 벽에서 직접 확인)', ans:3},
+    ],
+    log:['찢어진 일지: "달이 뜨고 지는 시각은 위상마다 다르다."','"보름달은 해 질 때 떠올라 자정에 남쪽 하늘에 온다."'],
+    curri:'중3 태양계 심화 · 위상과 관측 시각·방위',
+    desc:'이번 일지에는 관측 시각과 방위만 적혀 있다. 각 관측이 어떤 달이었는지 추리해 다이얼을 맞추자.',
+    hints:['상현달은 낮에 떠서 해 질 무렵 남쪽 하늘에 높이 보인다.','자정에 동쪽에서 떠오르면 하현달, 새벽 동쪽 하늘 낮게 보이면 그믐달이다.','마지막 문항의 답은 기록이 아니라 하늘에 있다. 동쪽 벽에서 지금의 달을 직접 확인하자.'],
+  };
+}
+
+function moonSolved(cfg, vals){
+  return cfg.rowsQ.every((r,i)=>vals[i]===r.ans);
+}
+
+function mountMoon(el, cfg, api){
+  const stage = document.createElement('div');
+  stage.className = 'stage';
+  const status = document.createElement('div');
+  status.className = 'status-line info';
+  status.textContent = '다이얼을 맞춘 뒤 레버를 당기자.';
+  el.appendChild(stage); el.appendChild(status);
+
+  const vals = cfg.rowsQ.map(()=>0);
+  let done = false;
+
+  function render(){
+    stage.innerHTML = `<div class="cab" id="mcab">
+      <div class="log-box">${cfg.log.map(l=>`<div>📜 ${l}</div>`).join('')}</div>` +
+      cfg.rowsQ.map((r,i)=>`
+      <div class="seq-row">
+        <div class="seq-terms" style="font-size:15px">${r.q}</div>
+        <div class="dial moon-dial">
+          <button data-d="${i}" data-v="1" aria-label="다음 위상">▲</button>
+          <div class="val">${moonGlyph(vals[i], 40)}</div>
+          <button data-d="${i}" data-v="-1" aria-label="이전 위상">▼</button>
+          <div class="ph-name">${MOON_PHASES[vals[i]]}</div>
+        </div>
+      </div>`).join('') +
+      `<div class="lever-row"><button class="btn primary" id="mlever">🔓 레버 당기기</button></div></div>`;
+  }
+
+  stage.addEventListener('click', ev=>{
+    if(done) return;
+    const b = ev.target.closest('[data-d]');
+    if(b){ const i=+b.dataset.d; vals[i]=(vals[i]+ +b.dataset.v+6)%6; render(); return; }
+    if(ev.target.closest('#mlever')){
+      if(moonSolved(cfg, vals)){
+        done = true;
+        status.className='status-line ok';
+        status.textContent = cfg.__success || '달칵 — 관측판이 돌아가며 숨은 칸이 열렸다!';
+        setTimeout(()=>api.solve(), 900);
+      } else {
+        const cab = stage.querySelector('#mcab');
+        cab.classList.remove('shake'); void cab.offsetWidth; cab.classList.add('shake');
+        status.className='status-line warn';
+        status.textContent='관측판이 꿈쩍도 하지 않는다. 위상이 틀렸다.';
+      }
+    }
+  });
+  render();
+}
+
+/* ======================= 퍼즐 레지스트리 & 방 정의 ======================= */
+
+const PUZZLES = {
+  circuit:{ name:'배전반', icon:'⚡', digit:'4',
+    config:circuitConfig, mount:mountCircuit,
+    reward:'배전반 안쪽, 형광 페인트로 쓰인 숫자' },
+  balance:{ name:'카운터웨이트 저울', icon:'⚖️', digit:'7',
+    config:balanceConfig, mount:mountBalance,
+    reward:'풀린 걸쇠 밑면에 새겨진 숫자' },
+  cipher:{ name:'시약장 다이얼', icon:'🔢', digit:'2',
+    config:cipherConfig, mount:mountCipher,
+    reward:'시약장 안 쪽지에 적힌 숫자' },
+  ph:{ name:'지시약 혼합대', icon:'🧪', digit:'9',
+    config:phConfig, mount:mountPh,
+    reward:'비커 바닥에 드러난 숫자' },
+  mirror:{ name:'광학 장치', icon:'🔦', digit:'5',
+    config:mirrorConfig, mount:mountMirror,
+    reward:'감지기 덮개 안쪽의 숫자' },
+  moon:{ name:'달 관측판', icon:'🌓', digit:'1',
+    config:moonConfig, mount:mountMoon,
+    reward:'관측판 뒷면에 새겨진 숫자' },
+};
+
+// 방 정의: 잠금 = {id, diff, digit}. diff가 null이면 방 전체 난이도를 따른다.
+// 교사 조립기(builder.html)는 #cfg= 해시로 이 구조를 통째로 주입한다.
+function defaultRoom(){
+  return {
+    title:THEME.title,
+    story:THEME.roomStory,
+    custom:false,
+    locks:THEME.lockOrder.map(id=>({id, diff:null, digit:lockMeta(id).digit})),
+  };
+}
+// 최종 키패드 입력 코드: 기본 방=테마 조각 순서, 맞춤 방=수집 순서(칩 순서)
+function doorEntryCode(){
+  if(ROOM.custom) return DOOR_CODE;
+  return ROOM.locks.slice().sort((a,b)=>pieceOf(a.id).ord - pieceOf(b.id).ord).map(l=>l.digit).join('');
+}
+let ROOM = null;          // THEMES 정의 후 초기화 (아래 참조)
+let DOOR_CODE = '';
+const DIFF_LABEL = {easy:'초등', mid:'중등', hard:'심화'};
+
+/* ======================= 방 프레임 ======================= */
+
+function show(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));
+  $('#'+id).classList.add('on');
+}
+
+function startRoom(diff){
+  state.diff = diff; state.start = Date.now();
+  $('#diff-label').textContent = DIFF_LABEL[diff] || '맞춤 방';
+  $('#room-title').textContent = '🔦 ' + ROOM.title;
+  $('#room-story').textContent = ROOM.story;
+  show('screen-room');
+  camYaw = 0; camPitch = 0; targetYaw = null;
+  try{ init3D(); }
+  catch(e){
+    $('#scene3d').innerHTML = '<div style="padding:48px 20px;text-align:center;color:#8a93a6;font-size:14px;line-height:1.7">이 브라우저에서는 3D(WebGL)를 켤 수 없다.<br>최신 크롬·엣지·사파리로 열어 주세요.</div>';
+  }
+  refresh3D();
+  const bo = $('#blackout');
+  bo.classList.add('on');
+  setTimeout(()=>bo.classList.remove('on'), 2300);
+  setInterval(()=>{
+    if(!state.start) return;
+    const t = Math.floor((Date.now()-state.start)/1000);
+    $('#timer').textContent = String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+  }, 1000);
+}
+
+/* ---------- 벽면 탐색 씬 ---------- */
+
+
+// 클릭 가능한 오브젝트. lock 오브젝트는 첫 클릭에 '발견' 플레이버 → 다음 클릭에 퍼즐.
+// decor 중 일부는 퍼즐과 이어지는 단서를 품는다.
+const SCENE_OBJECTS = {
+  door:        {type:'door'},
+  poster_ph:   {type:'decor', name:'지시약 색상표', text:'노랑은 산성, 파랑은 염기성. 둘이 만나면 초록에서 멈춘다. 여백에 손글씨 한 줄. "사람도 비슷하더구나."'},
+  clock:       {type:'decor', name:'멈춘 시계', text:'정전이 난 저녁 아홉 시에 멈춰 있다. 그 밤 하늘을 올려다본 사람은, 몇 시의 달을 본 걸까.'},
+  ext:         {type:'decor', name:'소화기', text:'먼지 한 톨 없는 소화기. 점검표 마지막 칸에 서명 대신 작은 초승달이 그려져 있다.'},
+  lock_circuit:{type:'lock', lockId:'circuit', discover:'배전반 덮개에 빛바랜 라벨이 붙어 있다. "전기도 마음도, 길이 있어야 흐른단다."'},
+  window:      {type:'decor', name:'창문', text:'캄캄한 운동장 너머로 크고 둥근 달이 떠 있다. 오늘 달의 모양을 기억해 두자.'},
+  cables:      {type:'decor', name:'전선 다발', text:'천장에서 내려온 전선 다발이 배전반 쪽으로 가지런히 묶여 있다. 누군가 정전을 미리 알았던 것처럼.'},
+  poster_short:{type:'decor', name:'주의 포스터', text:'"전기는 쉬운 길만 골라 흐른다." 전구를 건너뛰는 지름길이 생기면, 빛 없이 열만 남는다.'},
+  lock_ph:     {type:'lock', lockId:'ph', discover:'혼합대 위에 병 세 개와 감지기. 메모가 붙어 있다. "너무 시거나 너무 쓴 날에는, 중간을 찾아보렴."'},
+  lock_balance:{type:'lock', lockId:'balance', discover:'실험 테이블 위 카운터웨이트 저울. 팔 안쪽에 작은 글씨가 있다. "작은 것을 얕보지 말 것."'},
+  drawer:      {type:'decor', name:'서랍', text:'서랍 안에서 쪽지를 찾았다. "무거운 것을 이기고 싶다면 힘을 키우기보다 자리를 옮겨 보렴. 받침점에서 멀수록, 작은 무게도 커진단다."'},
+  valve:       {type:'decor', name:'가스 밸브', text:'밸브는 전부 잠겨 있고, 손잡이마다 가는 리본이 묶여 있다. 리본 끝 쪽지에 "마지막 점검 완료. 걱정 말렴."'},
+  lock_cipher: {type:'lock', lockId:'cipher', discover:'먼지 쌓인 천을 걷어내자, 다이얼 자물쇠가 달린 시약장이 드러났다! 자물쇠 옆에 쪽지 한 장. "규칙을 찾은 사람만 여시길."'},
+  lock_mirror: {type:'lock', lockId:'mirror', discover:'레이저와 거울이 놓인 광학 장치. 받침대에 새겨진 글씨. "빛은 거짓말을 못 한단다. 다만 방향을 바꿀 뿐."'},
+  lock_moon:   {type:'lock', lockId:'moon', discover:'달의 모양이 빙 둘러 새겨진 관측판. 한가운데에 이렇게 적혀 있다. "모든 것에는 차오르는 때와 기우는 때가 있지."'},
+  books:       {type:'decor', name:'책장', text:'낡은 책 "수의 정원"이 꽂혀 있다. 접힌 갈피에 메모가 있다. "다음 수는 늘, 앞의 수들이 데려온단다."'},
+  bucket:      {type:'decor', name:'양동이', text:'잘 마른 걸레가 개켜져 있다. 바닥의 물자국이 반질해서, 비상등 불빛이 거울처럼 비친다.'},
+};
+
+// 이야기 조각 (SCENARIO.md 정본) — ord = 달 순서(삭0→그믐5) = 윤슬 인생 연대기.
+// 최종 키패드는 이 순서로 입력해야 열린다. 맞춤 방(조립기)은 조각 없이 수집 순서 입력.
+const STORY = {
+  pieces:{
+    ph:      {ord:0, phase:'삭',   form:'낡은 일기의 한 페이지',
+      text:'"도하: 슬아, 너는 꼭 파랑 같아. 나: 너는 노랑이잖아." 그날 실컷 다퉜다. 그리고 처음으로, 초록에서 만났다.'},
+    mirror:  {ord:1, phase:'초승달', form:'사진 뒷면의 메모',
+      text:'과학관 봉사 마지막 날. 한 아이가 물었다. "왜 과학을 좋아해요?" 그 질문에 부딪혀 내 길이 꺾였다. 선생님이 되기로 했다.'},
+    circuit: {ord:2, phase:'상현달', form:'옛 스승의 편지',
+      text:'"윤 선생. 길이 끊긴 것 같은가. 그럼 한 칸만 이어 보게. 전기도 사람도, 길이 생기면 다시 흐른다네."'},
+    balance: {ord:3, phase:'보름달', form:'바다 건너 온 엽서',
+      text:'"선생님 덕분에 여기까지 왔어요." 그 아래 작은 글씨. "짧은 한 줄인데, 멀리서 와서 무거웠다. 기울었던 마음이 수평을 찾았다."'},
+    cipher:  {ord:4, phase:'하현달', form:'관측 일지 여백의 메모',
+      text:'"십 년 치 기록을 나란히 놓았다. 다음 해 하늘이 보인다. 지나온 것들이, 다가올 것을 가리킨다."'},
+    moon:    {ord:5, phase:'그믐달', form:'떠나기 전 점검 목록',
+      text:'"하나, 가스 밸브 잠그기. 둘, 소화기 점검. 셋, 마지막 수업 걸기. 그믐에 떠난다. 달이 비어 보여도, 다음 보름은 이미 오고 있다."'},
+  },
+  doorHint:'키패드 옆에 작은 새김이 있다. "달이 차고 기우는 순서대로." 조각 속 달 그림이 곧 순서다.',
+  ending:[
+    '여섯 개의 숫자, 여섯 장의 기록. 달이 차고 기울 듯, 한 사람의 이야기가 완성됐다.',
+    '문이 열리자 보름달 빛이 복도까지 길게 들어온다. 키패드 옆, 마지막 메모 한 장.',
+    '"잘 풀었구나. 여기서 배운 것들도 전기처럼 흘러가 어딘가의 어둠을 밝히기를. 다음 보름, 별마루 천문대에서 만나자. — 윤슬"',
+  ],
+};
+
+/* ---------- 테마(방) 레지스트리 ----------
+   방 = 텍스트 팩 + 3D 씬 + 조각 순서 규칙. 퍼즐 엔진·난이도·교육과정은 전 테마 공유.
+   locks/objects는 기본값(PUZZLES/SCENE_OBJECTS) 위에 덮어쓰는 오버라이드. */
+
+function actGlyph(ord, size){
+  const s = size||40;
+  return `<svg viewBox="0 0 40 40" width="${s}" height="${s}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="2" y="9" width="36" height="22" rx="4" fill="#3a2d1e" stroke="#c9a55a" stroke-width="2" stroke-dasharray="3 2"/>
+    <text x="20" y="25" fill="#ffd76a" font-size="12.5" text-anchor="middle" font-weight="700">${ord+1}막</text>
+  </svg>`;
+}
+
+function reelGlyph(ord, size){
+  const s = size||40;
+  return `<svg viewBox="0 0 40 40" width="${s}" height="${s}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="3" y="6" width="34" height="22" rx="4" fill="#16222c" stroke="#4a7f8c" stroke-width="2"/>
+    <circle cx="13" cy="17" r="5" fill="none" stroke="#7fc4d4" stroke-width="2"/>
+    <circle cx="27" cy="17" r="5" fill="none" stroke="#7fc4d4" stroke-width="2"/>
+    <line x1="13" y1="22" x2="27" y2="22" stroke="#7fc4d4" stroke-width="1.5"/>
+    <text x="20" y="38" fill="#7fc4d4" font-size="10" text-anchor="middle" font-weight="700">${ord+1}신</text>
+  </svg>`;
+}
+
+function marsGlyph(ord, size){
+  const s = size||40;
+  return `<svg viewBox="0 0 40 40" width="${s}" height="${s}" xmlns="http://www.w3.org/2000/svg">
+    <rect x="4" y="7" width="32" height="26" rx="5" fill="#3a1610" stroke="#e8833a" stroke-width="2"/>
+    <text x="20" y="25" fill="#ffb066" font-size="13" text-anchor="middle" font-weight="800">T-${6-ord}</text>
+  </svg>`;
+}
+
+const THEMES = {
+  lab:{
+    id:'lab', icon:'🔦', title:'블랙아웃 실험실',
+    opening:[
+      '과학의 밤 행사가 끝나 갈 무렵, 학교 전체가 어둠에 잠겼다.',
+      '비상등이 켜진 과학실. 문은 잠기고, 키패드만 붉게 깜빡인다.',
+      '칠판에 낯익은 글씨가 남아 있다. "정전이 되면, 이 방은 수업이 된다."',
+      '누가 이 수업을 남겼을까. 여섯 개의 장치가 그 답을 나눠 갖고 있다.',
+    ],
+    roomStory:'◀ ▶ 로 주위를 둘러보며 방 안을 조사하자. 장치를 풀면 숫자와 함께 이야기 조각이 나온다.',
+    doorName:'실험실 문', doorHint:STORY.doorHint,
+    pieceIcon:'📖', pieceWord:'이야기 조각', pieceFoundTitle:'이야기 조각을 찾았다',
+    digitLine:'달 그림 옆에 적힌 숫자', chipsLabel:'숫자 조각',
+    collectNudge:'조각마다 달 그림이 다르다. 이 달들이 어떤 순서를 이루는지 생각해 두자.',
+    cipherHiddenLabel:'천이 덮인 무언가',
+    lockOrder:['circuit','balance','cipher','ph','mirror','moon'],
+    glyph:(ord,size)=>moonGlyph(ord,size),
+    locks:{}, objects:{},
+    pieces:STORY.pieces, ending:STORY.ending,
+    scene:()=>buildLabScene(),
+  },
+  mansion:{
+    id:'mansion', icon:'🎩', title:'사라진 마술사의 저택',
+    opening:[
+      '언덕 위 낡은 저택. 마술사가 사라진 뒤, 밤마다 이상한 일이 벌어진다는 소문이 돌았다.',
+      '촛불이 저절로 켜지고, 문이 혼자 열리고, 허공에 유령이 떠다닌다고.',
+      '소문을 확인하러 들어선 순간, 무대 조명이 켜지고 축음기가 지직거렸다.',
+      '"마지막 쇼에 오신 것을 환영하네. 커튼콜까지, 부디 즐겁게."',
+    ],
+    roomStory:'◀ ▶ 로 저택을 둘러보며 조사하자. 장치를 풀 때마다 유령 소문 하나가 과학으로 밝혀지고, 티켓 조각이 나온다.',
+    doorName:'커튼콜 문',
+    doorHint:'키패드 옆 새김. "커튼콜은 공연 순서대로." 로비의 공연 포스터와 티켓의 막 번호를 떠올리자.',
+    pieceIcon:'🎫', pieceWord:'티켓 조각', pieceFoundTitle:'티켓 조각을 찾았다',
+    digitLine:'티켓에 적힌 숫자', chipsLabel:'티켓 숫자',
+    collectNudge:'티켓마다 막 번호가 다르다. 공연 포스터의 프로그램 순서를 떠올리자.',
+    cipherHiddenLabel:'잠긴 낡은 공책',
+    lockOrder:['moon','ph','circuit','mirror','balance','cipher'],
+    glyph:(ord,size)=>actGlyph(ord,size),
+    locks:{
+      circuit:{ name:'저절로 켜지는 촛대', icon:'🕯️', digit:'8', reward:'촛대 받침에 붙은 티켓 조각',
+        discover:'은촛대의 초를 만져 보니 차갑다. 심지 속에 꼬마전구, 받침 아래엔 끊긴 전선이 숨어 있다.',
+        success:'철컥 — 길이 이어지자 촛대 여섯 개가 한꺼번에 불을 밝혔다!' },
+      balance:{ name:'혼자 열리는 비밀문', icon:'🚪', digit:'3', reward:'문틈에 끼워진 티켓 조각',
+        discover:'책장 뒤에 숨은 비밀문. 문 위 도르래에 모래주머니가 매달려 있고, 바닥에 모래가 가늘게 쌓여 있다.',
+        success:'수평이다! 철컹 — 걸쇠가 풀리며 비밀문이 스르르 열렸다.' },
+      cipher:{ name:'예언 노트', icon:'🔮', digit:'6', reward:'노트 갈피의 티켓 조각',
+        discover:'"예언 노트"라 적힌 낡은 공책. 숫자가 줄지어 있고 마지막 칸만 비어 있다. 빈칸을 채워야 자물쇠가 열릴 모양새다.',
+        success:'덜컥 — 빈칸의 수가 맞아떨어지자 노트를 감은 자물쇠가 풀렸다!' },
+      ph:{ name:'유령 물약', icon:'🧪', digit:'0', reward:'감지기 아래 티켓 조각',
+        discover:'선반 위에 노란 물약과 파란 물약, 그 앞에 감지기. 메모 한 장이 붙어 있다. "유령의 물약? 글쎄, 섞어 보면 알 걸세."',
+        success:'삐빅 — 감지기가 초록빛으로 바뀌었다!' },
+      mirror:{ name:'허공의 유령', icon:'👻', digit:'7', reward:'유리판 뒤 티켓 조각',
+        discover:'무대 옆에 비스듬히 선 커다란 유리판과 거울, 그리고 램프. 유령이 떠올랐다는 자리가 바로 여기다.',
+        success:'빛줄기가 유리판에 닿자, 치링 — 허공에 환한 형상이 떠오르며 잠금 고리가 풀렸다!' },
+      moon:{ name:'보름밤의 최종 쇼', icon:'🌕', digit:'2', reward:'피날레 장치의 티켓 조각',
+        discover:'달의 모양이 빙 둘러 새겨진 커다란 쇼 장치. 한가운데에 이렇게 적혀 있다. "피날레는 아무 밤에나 오지 않는다네."',
+        success:'달칵 — 관측판이 돌아가고, 피날레 장치에 불이 들어왔다!' },
+    },
+    objects:{
+      poster_ph:{ name:'물약 색상표', text:'노랑은 시고, 파랑은 쓰다. 둘이 만나면 초록에서 멈춘다. 밑에 손글씨. "무대 위 변신도 똑같다네."' },
+      poster_short:{ name:'무대 배선 안내문', text:'"무대 조명 배선도. 전기는 쉬운 길만 골라 흐른다." 전구를 건너뛰는 지름길이 생기면, 쇼는 열리지 않는다.' },
+      drawer:{ name:'모래주머니', text:'모래주머니 매듭에 쪽지가 묶여 있다. "무거운 막을 올리고 싶다면 추를 멀리 걸어 보게. 받침에서 멀수록, 작은 추도 힘이 세지."' },
+      books:{ name:'예언 카드 묶음', text:'숫자가 적힌 카드 묶음. 순서대로 넘기면 규칙이 보인다. 마지막 카드 뒷면에 "다음 수는 앞의 수들이 데려온다네."' },
+      window:{ name:'창문', text:'마당 위로 크고 둥근 달이 떠 있다. 오늘은 보름밤이다.' },
+      clock:{ name:'멈춘 괘종시계', text:'저녁 여덟 시에 멈춰 있다. 마지막 쇼의 개막 시각이었을까.' },
+      ext:{ name:'모자와 지팡이', text:'무대 의자에 실크해트와 지팡이가 나란히 놓여 있다. 주인이 곧 돌아올 것처럼 가지런하다.' },
+      cables:{ name:'빈 새장', text:'문이 활짝 열린 새장. 바닥에 흰 깃털 몇 개. 비둘기들은 자유의 몸이 된 지 오래인 듯하다.' },
+      valve:{ name:'거울 액자', text:'복도의 커다란 거울. 모서리에 토끼 그림과 글씨. "거울은 정직하다네. 방향만 바꿀 뿐이지."' },
+      bucket:{ name:'축음기', text:'태엽이 풀린 축음기. 방금까지 누가 틀어 놓은 것처럼, 판이 아주 천천히 멈춰 간다.' },
+    },
+    pieces:{
+      circuit:{ ord:0, phase:'1막 촛불의 춤', form:'트릭 노트 1막',
+        text:'"촛불 트릭의 전부는 가는 전선 한 줄이라네. 무대와 객석 사이에도 그런 줄이 있지. 보이지 않을 뿐, 끊긴 적은 없다네."' },
+      balance:{ ord:1, phase:'2막 스스로 열리는 문', form:'트릭 노트 2막',
+        text:'"무명 시절, 관객이 셋뿐인 시골 무대에 선 적이 있다네. 제일 작고 제일 먼 공연이었는데, 내 저울은 그날 밤 쪽으로 기울었지. 작은 것도 멀리서 오면 힘이 세다네."' },
+      cipher:{ ord:2, phase:'3막 예언', form:'트릭 노트 3막',
+        text:'"고백하자면, 나는 미래를 본 적이 없다네. 어제와 그제를 아주 오래 보았을 뿐이지. 규칙을 찾으면 다음이 보인다네."' },
+      ph:{ ord:3, phase:'4막 변신의 물약', form:'트릭 노트 4막',
+        text:'"라이벌 \'백비둘기\'와 나는 노랑과 파랑처럼 지냈지. 딱 한 번 같은 무대에 섞였는데, 둘이 못 내던 색이 나왔다네. 그 뒤로 매년 초록 무대를 함께 올렸지."' },
+      mirror:{ ord:4, phase:'5막 유령 소환', form:'트릭 노트 5막',
+        text:'"유령의 정체는 비스듬한 유리 한 장이라네. 무서운 것도 각도를 바꾸면 다르게 보이지. 나를 이상한 노인이라 부르던 사람들도, 쇼가 끝나면 웃고 있었다네."' },
+      moon:{ ord:5, phase:'6막 보름달 피날레', form:'트릭 노트 6막',
+        text:'"사라지는 마술의 비밀을 알려 줌세. 돌아올 날을 정해 두는 것이라네. 나는 보름마다 이 무대로 돌아오지. 유령 소문은 덤이고."' },
+    },
+    ending:[
+      '여섯 개의 트릭, 여섯 장의 티켓. 유령의 정체는 전부 과학이었다.',
+      '문이 열리자 촛대가 일제히 불을 밝히고, 빈 무대 위에 흰 토끼 한 마리가 앉아 있다.',
+      '"트릭은 다 알려 줬지. 딱 하나만 빼고. 다음 보름밤, 마당에서 첫 마술 수업을 열겠네. — 고재주"',
+    ],
+    scene:()=>buildMansionScene(),
+  },
+  frequency:{
+    id:'frequency', icon:'📡', title:'오래된 주파수',
+    opening:[
+      '소나기를 피해 들어선 산꼭대기의 낡은 관측소. 철문이 등 뒤에서 닫혔다.',
+      '먼지 낀 수신기가 저절로 켜지더니, 지직, 오래된 목소리가 흘러나온다.',
+      '"이 주파수를 찾은 분에게. 여섯 개의 릴을 찾아 주시길."',
+      '수십 년 전에 녹음된 목소리다. 누가, 왜 이 산꼭대기에 기록을 남겼을까.',
+    ],
+    roomStory:'◀ ▶ 로 관측소를 둘러보며 조사하자. 장치를 풀면 교신 릴테이프가 하나씩 재생된다.',
+    doorName:'관측소 철문',
+    doorHint:'철문 옆 놋쇠판에 새겨진 글씨. "출입 신호는 교신 순서대로, 제1신부터."',
+    pieceIcon:'📼', pieceWord:'교신 릴', pieceFoundTitle:'교신 릴을 찾았다',
+    digitLine:'릴 라벨에 적힌 숫자', chipsLabel:'릴 숫자',
+    collectNudge:'수신기 옆 메모. "릴은 모두 여섯. 시간순으로 이어 들으면 한 사람의 한 해가 완성된다."',
+    cipherHiddenLabel:'방수포가 덮인 보관함',
+    lockOrder:['circuit','balance','cipher','ph','mirror','moon'],
+    glyph:(ord,size)=>reelGlyph(ord,size),
+    locks:{
+      circuit:{ name:'수신기 전원반', icon:'⚡', digit:'6', reward:'릴 걸이의 제3신 테이프',
+        discover:'수신기 뒤의 전원반. 덮개에 손글씨가 남아 있다. "길이 끊기면 신호도 끊긴다."',
+        success:'철컥 — 회로가 이어지자 수신기 눈금판에 불이 들어왔다!' },
+      balance:{ name:'망원경 카운터웨이트', icon:'🔭', digit:'1', reward:'경통 아래 보관함의 제5신 릴',
+        discover:'커다란 망원경이 한쪽으로 기울어 있다. 균형추 레일에 작은 글씨. "작은 추를 얕보지 말 것."',
+        success:'수평이다! 철컹 — 경통이 바로 서며 걸쇠가 풀렸다.' },
+      cipher:{ name:'기록 보관함 다이얼', icon:'🗄️', digit:'9', reward:'연감 사이의 제1신 릴',
+        discover:'"관측 연감 보관함"이라 적힌 철제 캐비닛. 다이얼 세 개가 나란히 붙어 있고, 옆에 쪽지 한 장. "규칙을 아는 사람만."',
+        success:'덜컥 — 세 다이얼이 맞물리며 보관함이 열렸다!' },
+      ph:{ name:'건판 현상대', icon:'🧪', digit:'3', reward:'현상대 아래 서랍의 제4신 릴',
+        discover:'암실 구석의 현상대. 병 두 개와 감지기, 그리고 메모. "너무 독한 날에는 중간을 찾을 것."',
+        success:'삐빅 — 감지기가 초록빛으로 바뀌었다!' },
+      mirror:{ name:'광학 시준 장치', icon:'🪞', digit:'8', reward:'덮개 안쪽의 제2신 릴',
+        discover:'망원경 옆의 시준 장치. 레이저와 작은 거울이 줄지어 있고, 받침에 새겨진 글씨. "빛은 곧게 간다. 꺾는 것은 거울이다."',
+        success:'빛줄기가 수광부에 닿자, 치링 — 덮개가 열렸다!' },
+      moon:{ name:'관측 달력판', icon:'🌓', digit:'4', reward:'숨은 칸의 제6신 릴',
+        discover:'달의 위상이 빙 둘러 새겨진 관측 달력판. 한가운데 문구. "하늘에는 시간표가 있다."',
+        success:'달칵 — 달력판이 돌아가며 숨은 칸이 열렸다!' },
+    },
+    objects:{
+      poster_ph:{ name:'현상 안내문', text:'암실 벽의 현상 안내문. 현상액은 미끌한 염기성, 정지액은 시큼한 산성. 파랑과 노랑이 만나면 중간의 초록에서 멈춘다.' },
+      poster_short:{ name:'배선 주의 게시물', text:'"수신기 배선 주의." 전기는 쉬운 길로만 흐른다. 전구를 건너뛰는 지름길이 생기면, 신호 대신 열만 남는다.' },
+      drawer:{ name:'콘솔 서랍', text:'서랍 속 정비 쪽지. "망원경이 기울면 추를 옮길 것. 받침에서 멀수록, 작은 추가 큰 힘을 낸다."' },
+      books:{ name:'관측 연감 책장', text:'30년 치 관측 연감이 꽂힌 책장. 갈피 메모에 "다음 수는 늘, 앞의 수들이 데려온다."' },
+      window:{ name:'돔 틈 창', text:'돔 틈 너머로 크고 둥근 달이 떠 있다. 오늘 밤의 달을 기억해 두자.' },
+      clock:{ name:'멈춘 벽시계', text:'벽시계가 어느 저녁 아홉 시에 멈춰 있다. 마지막 교신을 마친 시각이었을까.' },
+      ext:{ name:'난방기', text:'난방기 옆 점검표가 반듯하게 걸려 있다. 서명 칸마다 작은 별이 그려져 있다.' },
+      cables:{ name:'안테나 케이블', text:'천장을 가로질러 수신기로 모여드는 안테나 케이블. 산꼭대기 철탑에서 내려온 선이 정성껏 묶여 있다.' },
+      valve:{ name:'돔 개폐 핸들', text:'돔 지붕을 여닫는 둥근 핸들. 손때 묻은 라벨에 "하늘 문. 맑은 밤에만."' },
+      bucket:{ name:'주전자와 양동이', text:'식은 주전자 곁, 비 새는 자리에 양동이가 받쳐져 있다. 옆 메모에 "지붕은 낡아도, 하늘은 늘 새것."' },
+    },
+    pieces:{
+      cipher:{ ord:0, phase:'제1신', form:'관측 일지 낭독',
+        text:'"제1신. 일지를 읽습니다. 30년 치 기록을 나란히 놓자 규칙이 보였습니다. 혜성은 돌아옵니다. 날짜까지 계산을 마쳤습니다. 그럼, 좋은 밤."' },
+      mirror:{ ord:1, phase:'제2신', form:'편지에 답하는 방송',
+        text:'"제2신. 산 아래 분교에서 편지가 왔습니다. \'별은 왜 안 떨어져요?\' 폐쇄 통보로 캄캄하던 날, 이 질문이 거울처럼 내 방향을 꺾었습니다. 떠나는 대신, 남기기로 했습니다."' },
+      circuit:{ ord:2, phase:'제3신', form:'두 목소리의 교신 기록',
+        text:'"제3신. 첫 연결의 기록을 재생합니다. \'여기는 산 아래. 들리십니까?\' \'들립니다, 아주 잘.\' 끊겼던 선을 이은 그 밤부터, 관측소는 혼자가 아니게 됐습니다."' },
+      ph:{ ord:3, phase:'제4신', form:'부치기 전의 편지',
+        text:'"제4신. 폐쇄를 결정한 문 소장에게 쓴 편지를 읽습니다. \'우리는 산성과 염기성처럼 끝과 끝에서 부딪혔습니다. 실컷 부딪히고 나서야 중간의 초록에서 만났군요. 다음 주, 커피 기다리겠습니다.\'"' },
+      balance:{ ord:4, phase:'제5신', form:'해외 답신 전문',
+        text:'"제5신. 지구 반대편 관측소의 답신을 읽습니다. \'그쪽 하늘의 기록, 저희가 이어받습니다.\' 짧은 한 줄이 멀리서 와서, 기울던 마음이 수평을 되찾았습니다."' },
+      moon:{ ord:5, phase:'제6신', form:'점검 방송과 작별',
+        text:'"제6신, 마지막 교신. 돔 잠금, 밸브 잠금, 수신기는 예약 모드. 혜성이 돌아오는 보름밤에 이 방송이 켜지도록 맞춰 두었습니다. 모든 신호에는 돌아오는 때가 있으니까. 그럼, 좋은 밤."' },
+    },
+    ending:[
+      '여섯 번의 교신, 수십 년을 건너온 한 해의 이야기.',
+      '철문이 열리자 맑게 갠 밤하늘이 쏟아지고, 보름달 곁에 긴 꼬리의 혜성이 걸려 있다.',
+      '마지막 릴 끝의 낮은 목소리. "기록은 이어졌습니다. 다음 하늘은 지금 보고 있는 사람의 몫. 그럼, 좋은 밤. — 관측사 서한별"',
+    ],
+    scene:()=>buildFrequencyScene(),
+  },
+  mars:{
+    id:'mars', icon:'🚀', title:'붉은 행성 기지',
+    opening:[
+      '모래폭풍이 지나간 아침, 붉은 행성의 기지가 조용하다. 전력은 내려앉고, 교신은 지직거린다.',
+      '귀환선 발사 윈도우까지 남은 시간은 오늘 저녁까지.',
+      '콘솔에 카드 한 장이 붙어 있다. "이런 날이 올 줄 알고 절차를 남겨 둔다. T-6부터 시작."',
+      '글씨 끝에 헬멧 쓴 웃는 얼굴. 누가 남긴 카드일까.',
+    ],
+    roomStory:'◀ ▶ 로 기지를 둘러보며 조사하자. 장치를 풀면 절차 카드가 한 장씩 나온다.',
+    doorName:'귀환선 에어록',
+    doorHint:'발사 콘솔의 안내문. "발사 코드는 카운트다운 순서, T-6부터 T-1까지."',
+    pieceIcon:'🧾', pieceWord:'절차 카드', pieceFoundTitle:'절차 카드를 찾았다',
+    digitLine:'카드 모서리에 적힌 숫자', chipsLabel:'발사 코드',
+    collectNudge:'콘솔 구석의 메모. "카드는 모두 여섯 장. T의 숫자가 줄어들수록, 출발이 가까워진다."',
+    cipherHiddenLabel:'덮개가 씌워진 콘솔',
+    lockOrder:['circuit','balance','cipher','ph','mirror','moon'],
+    glyph:(ord,size)=>marsGlyph(ord,size),
+    locks:{
+      circuit:{ name:'메인 배전반', icon:'⚡', digit:'2', reward:'배전반 카드 꽂이의 T-6 카드',
+        discover:'메인 배전반의 덮개 안쪽에 카드 꽂이와 화살표. "전력이 먼저다. T-6."',
+        success:'철컥 — 회로가 이어지자 기지 조명이 차례로 켜졌다!' },
+      balance:{ name:'화물 적재 저울', icon:'📦', digit:'0', reward:'화물칸 그물망의 T-2 카드',
+        discover:'귀환선 화물칸의 적재 저울이 한쪽으로 기울어 있다. 경고등 아래 문구. "수평이 아니면 출발 불가."',
+        success:'수평이다! 철컹 — 화물칸 잠금이 풀렸다.' },
+      cipher:{ name:'항법 컴퓨터', icon:'🖥️', digit:'5', reward:'출력구의 T-3 카드',
+        discover:'항법 컴퓨터의 잠금 다이얼 세 개. 화면에 문구가 떠 있다. "로그 복원: 이어질 수를 입력."',
+        success:'덜컥 — 다이얼이 맞물리며 항법 화면이 되살아났다!' },
+      ph:{ name:'물 재생기', icon:'💧', digit:'7', reward:'점검구의 T-5 카드',
+        discover:'물 재생기의 수질 감지기가 붉게 깜빡인다. 옆에 라벨 하나. "한 방울씩, 초록까지."',
+        success:'삐빅 — 감지기가 초록빛으로 바뀌었다!' },
+      mirror:{ name:'통신 안테나 정렬기', icon:'📡', digit:'3', reward:'콘솔 서랍의 T-4 카드',
+        discover:'통신 콘솔의 정렬 장치. 레이저와 반사경이 줄지어 있고, 안내문이 붙어 있다. "빛이 수신부에 닿아야 교신 재개."',
+        success:'빛줄기가 수신부에 닿자, 치링 — 스피커에서 교신음이 살아났다!' },
+      moon:{ name:'발사 관제판', icon:'🌕', digit:'9', reward:'관제판 아래 칸의 T-1 카드',
+        discover:'발사 관제판에 달의 위상 다이얼이 박혀 있다. "지구 시간과 맞아야 창이 열린다."',
+        success:'달칵 — 다이얼이 맞물리며 관제판에 "발사 윈도우 확정"이 떴다!' },
+    },
+    objects:{
+      poster_ph:{ name:'수질 게시물', text:'물 재생기 옆 수질 게시물. 노랑이면 산성, 파랑이면 염기성. 마셔도 되는 물은 중간의 초록.' },
+      poster_short:{ name:'기지 전력 안내', text:'"기지 전력 안내." 전기는 쉬운 길로만 흐른다. 전구를 건너뛰는 지름길이 생기면 모듈이 통째로 꺼진다.' },
+      drawer:{ name:'공구 서랍', text:'서랍 속 적재 요령 쪽지. "무거운 것은 받침 가까이, 가벼운 것은 멀리. 거리도 무게다."' },
+      books:{ name:'항법 로그북', text:'선반의 항법 로그북. 숫자 열이 빼곡하고, 갈피 메모에 "다음 수는 앞의 수들이 데려온다."' },
+      window:{ name:'지구 관측 스크린', text:'푸른 지구 곁에 크고 둥근 달이 떠 있다. 오늘 지구의 밤은 보름이다.' },
+      clock:{ name:'멈춘 기지 시계', text:'기지 시계가 폭풍이 온 새벽 네 시에 멈춰 있다. 전력이 돌아오면 다시 갈 것이다.' },
+      ext:{ name:'예비 헬멧', text:'예비 헬멧 옆에 스티커 한 장. "불낸 적 없음. 앞으로도 없음." 헬멧 쓴 웃는 얼굴이 그려져 있다.' },
+      cables:{ name:'케이블 다발', text:'천장을 따라 배전반으로 모이는 케이블 다발. 하나하나 라벨이 붙어 있다. "미래의 누군가를 위해 정리함."' },
+      valve:{ name:'재생기 밸브', text:'물 재생기 밸브마다 손글씨 라벨. "잠글 땐 편안하게, 열 땐 신중하게."' },
+      bucket:{ name:'모래 양동이', text:'붉은 모래가 반쯤 담긴 양동이. 옆에 메모. "기념품용. 퍼 가도 됨. 많음."' },
+    },
+    pieces:{
+      circuit:{ ord:0, phase:'T-6 전력 복구', form:'체크리스트와 여백 낙서',
+        text:'"T-6 전력. 끊긴 곳을 찾는다, 잇는다, 불이 온다. 기지도 사람도 길이 이어져야 산다." 여백에 낙서 한 줄. "겁나면 콧노래를 부를 것. 효과 있음. 내가 해 봄."' },
+      ph:{ ord:1, phase:'T-5 물 정화', form:'문답 카드',
+        text:'"T-5 물. Q: 물이 너무 시큼하면? A: 반대 성질을 한 방울씩. 중간의 초록에서 멈추면 마셔도 된다." 여백 메모. "극과 극은 물속에서 화해한다. 나랑 선장님처럼."' },
+      mirror:{ ord:2, phase:'T-4 안테나 정렬', form:'손그림 도면',
+        text:'"T-4 안테나. 빛은 곧게만 간다. 답답하면 거울로 꺾어 줄 것." 도면 구석에 한 줄. "지구가 안 보이면, 각도부터 의심할 것."' },
+      cipher:{ ord:3, phase:'T-3 항법 로그', form:'근무 일지 발췌',
+        text:'"T-3 항법. 일지 304일째. 옛 로그를 나란히 놓으니 다음 궤도 수치가 보였다. 기록이 미래를 연다. 그래서 오늘도 다 적는다. 점심 메뉴까지."' },
+      balance:{ ord:4, phase:'T-2 화물 균형', form:'짐 목록',
+        text:'"T-2 적재. 무거운 표본 상자는 받침 가까이, 작은 기념품은 먼 끝 칸에. 작아도 멀리 실으면 저울이 움직인다." 목록 끝에 한 줄. "추억도 그렇다. 멀어질수록 무거워진다."' },
+      moon:{ ord:5, phase:'T-1 발사 윈도우', form:'손편지',
+        text:'"T-1 발사. 여기까지 왔다면 준비는 끝. 발사는 때가 전부다. 달이 차기를 기다렸다가, 지구가 손짓할 때 떠나면 된다. 하늘에서 보자."' },
+    },
+    ending:[
+      '여섯 장의 카드, 여섯 번의 복구. 기지가 다시 숨을 쉬고, 카운트다운이 시작됐다.',
+      '귀환선 조종석에 마지막 카드가 놓여 있다. "T-0. 잘했다, 신입. 조종은 자동이니 창밖 구경이나 할 것. 멀미봉투는 왼쪽. — 임무완"',
+      '창밖으로 붉은 땅이 멀어지고, 저 멀리 푸른 지구와 그 곁의 보름달이 반짝인다.',
+    ],
+    scene:()=>buildMarsScene(),
+  },
+};
+let THEME = THEMES.lab;
+
+// 테마 오버라이드 리졸버
+const lockMeta = id => Object.assign({}, PUZZLES[id], (THEME.locks||{})[id]||{});
+const objMeta = id => Object.assign({}, SCENE_OBJECTS[id], (THEME.objects||{})[id]||{});
+const pieceOf = id => THEME.pieces[id];
+
+// 기본 방 초기화 (THEME 확정 후)
+ROOM = defaultRoom();
+DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+
+/* ---------- 3D 방 엔진 (Three.js r128, vendor/three.min.js 로컬 내장) ---------- */
+// 방 8×3×8m, 카메라는 중앙(0,1.5,0)에서 드래그로 회전. 클릭 = 레이캐스트 → handleObj.
+// 퍼즐은 클릭 시 2D 클로즈업 모달(기존 모듈 그대로) — 3D 방탈출 게임의 표준 문법.
+
+let R3 = null;
+let camYaw = 0, camPitch = 0, targetYaw = null;
+
+function texCanvas(w, h, draw){
+  const c = document.createElement('canvas'); c.width = w; c.height = h;
+  draw(c.getContext('2d'));
+  return new THREE.CanvasTexture(c);
+}
+
+function buildRoomScene(){ return THEME.scene(); }
+
+function buildLabScene(){
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x07090f);
+  const pickables = [];
+  const refs = {};
+  const M = (c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c, roughness:.92, metalness:.04}, o||{}));
+  const B = (w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
+  const CYL = (rt,rb,h,m)=>new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,20), m);
+  const P = (x,y,z,mesh)=>{ mesh.position.set(x,y,z); return mesh; };
+  const G = (objId, ...meshes)=>{
+    const g = new THREE.Group();
+    meshes.forEach(m=>g.add(m));
+    if(objId){ g.userData.obj = objId; pickables.push(g); }
+    scene.add(g); return g;
+  };
+
+  // 방 껍데기 + 바닥
+  const shell = B(8,3,8, new THREE.MeshStandardMaterial({color:0x161d36, roughness:.95, side:THREE.BackSide}));
+  shell.position.y = 1.5; scene.add(shell);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(8,8), M(0x0e1327));
+  floor.rotation.x = -Math.PI/2; floor.position.y = .005; scene.add(floor);
+
+  // 조명: 비상등(깜빡임) + 은은한 채움광
+  scene.add(new THREE.AmbientLight(0x46507a, .75));
+  refs.lamp = new THREE.PointLight(0xffc978, 1.05, 14);
+  refs.lamp.position.set(0, 2.75, 0); scene.add(refs.lamp);
+  scene.add(P(0,2.94,0, B(.5,.06,.5, new THREE.MeshBasicMaterial({color:0xffe9b0}))));
+  const exitGlow = new THREE.PointLight(0x5fd39a, .5, 4);
+  exitGlow.position.set(0, 2.5, -3.6); scene.add(exitGlow);
+  const fill = new THREE.PointLight(0x6aa8ff, .3, 12);
+  fill.position.set(-2, 2.2, 2.5); scene.add(fill);
+
+  // ─ 북쪽(z=-4): 출입문 + 키패드 + EXIT
+  const exitSign = new THREE.Mesh(new THREE.PlaneGeometry(.72,.26),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,96,g=>{
+      g.fillStyle='#0f2a1c'; g.fillRect(0,0,256,96);
+      g.strokeStyle='#1d4d2e'; g.lineWidth=6; g.strokeRect(3,3,250,90);
+      g.fillStyle='#5fd39a'; g.font='700 50px sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText('EXIT',128,50);
+    })}));
+  exitSign.position.set(0,2.58,-3.96); scene.add(exitSign);
+  refs.keypadMat = new THREE.MeshStandardMaterial({color:0x0d1226, emissive:0x232c4e, emissiveIntensity:.6});
+  G('door',
+    P(0,1.16,-3.99, B(1.24,2.36,.05, M(0x2a3350))),
+    P(0,1.13,-3.96, B(1.06,2.26,.07, M(0x1c2442))),
+    P(0,1.62,-3.91, B(.8,.8,.02, M(0x242e52))),
+    P(0,.68,-3.91, B(.8,.8,.02, M(0x242e52))),
+    P(.44,1.05,-3.89, new THREE.Mesh(new THREE.SphereGeometry(.05,14,14), M(0x8a93a6,{metalness:.5,roughness:.4}))),
+    P(.84,1.35,-3.94, B(.17,.26,.06, refs.keypadMat)),
+  );
+
+  // 지시약 색상표 포스터 (pH 단서)
+  const posterPh = new THREE.Mesh(new THREE.PlaneGeometry(.95,.75),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,200,g=>{
+      g.fillStyle='#18203c'; g.fillRect(0,0,256,200);
+      g.strokeStyle='#2f3960'; g.lineWidth=8; g.strokeRect(4,4,248,192);
+      g.fillStyle='#20294a'; g.fillRect(18,20,100,70); g.fillRect(18,105,100,70);
+      ['#d63a3a','#e8833a','#e06a9f','#8a5fd3','#4a7fd6','#3fae6a','#d6c23a']
+        .forEach((c,i)=>{ g.fillStyle=c; g.fillRect(140,20+i*23,96,16); });
+    })}));
+  posterPh.position.set(-2.2,1.7,-3.97);
+  G('poster_ph', posterPh);
+
+  const clock = new THREE.Mesh(new THREE.CircleGeometry(.3,28),
+    new THREE.MeshBasicMaterial({map: texCanvas(128,128,g=>{
+      g.fillStyle='#18203c'; g.beginPath(); g.arc(64,64,62,0,7); g.fill();
+      g.strokeStyle='#2f3960'; g.lineWidth=6; g.beginPath(); g.arc(64,64,58,0,7); g.stroke();
+      g.strokeStyle='#8a93a6'; g.lineWidth=5;
+      g.beginPath(); g.moveTo(64,64); g.lineTo(64,24); g.stroke();
+      g.beginPath(); g.moveTo(64,64); g.lineTo(92,74); g.stroke();
+    })}));
+  clock.position.set(2.35,2.25,-3.97);
+  G('clock', clock);
+
+  G('ext',
+    P(2.7,.3,-3.7, CYL(.09,.09,.5, M(0x6b2a38))),
+    P(2.7,.6,-3.7, CYL(.03,.03,.1, M(0x39425f))),
+  );
+
+  // 달 관측판 (북쪽 벽 오른쪽, 시계 아래)
+  refs.moonRingMat = new THREE.MeshStandardMaterial({color:0xffd76a, emissive:0x6a5218, metalness:.3});
+  const moonRing = new THREE.Mesh(new THREE.TorusGeometry(.38,.03,10,32), refs.moonRingMat);
+  moonRing.position.set(2.35,1.35,-3.95);
+  const moonDisc = new THREE.Mesh(new THREE.CircleGeometry(.36,32),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,256,g=>{
+      g.fillStyle='#101632'; g.beginPath(); g.arc(128,128,126,0,7); g.fill();
+      for(let i=0;i<6;i++){
+        const a = -Math.PI/2 + i*Math.PI/3;
+        const cx = 128+Math.cos(a)*82, cy = 128+Math.sin(a)*82;
+        g.fillStyle='#e8e2c8'; g.beginPath(); g.arc(cx,cy,20,0,7); g.fill();
+        g.fillStyle='#1a2138';
+        if(i===0){ g.beginPath(); g.arc(cx,cy,20,0,7); g.fill(); }        // 삭
+        else if(i<3){ g.beginPath(); g.arc(cx-(3-i)*13,cy,20,0,7); g.fill(); } // 초승·상현
+        else if(i>3){ g.beginPath(); g.arc(cx+(i-3)*13,cy,20,0,7); g.fill(); } // 하현·그믐
+      }
+      g.fillStyle='#ffd76a'; g.beginPath(); g.arc(128,128,8,0,7); g.fill();
+    })}));
+  moonDisc.position.set(2.35,1.35,-3.94);
+  G('lock_moon', moonRing, moonDisc);
+
+  // ─ 동쪽(x=4): 전선 다발 + 배전반 + 창문 + 합선 주의 포스터
+  const cableH = CYL(.022,.022,3.4, M(0x232c4e));
+  cableH.rotation.z = Math.PI/2; cableH.position.set(2.2,2.86,0);
+  G('cables',
+    cableH,
+    P(3.92,2.3,0, CYL(.022,.022,1.2, M(0x232c4e))),
+    P(3.92,2.86,0, CYL(.03,.03,.12, M(0x39425f))),
+  );
+
+  refs.panelFrame = M(0x39425f);
+  refs.lampsCircuit = [0,1,2].map(i=>{
+    const s = new THREE.Mesh(new THREE.SphereGeometry(.045,12,12),
+      new THREE.MeshStandardMaterial({color:0x232c4e, emissive:0x000000}));
+    s.position.set(3.8, 1.0, -.22+i*.22);
+    return s;
+  });
+  const panelFace = new THREE.Mesh(new THREE.PlaneGeometry(1.06,1.36),
+    new THREE.MeshBasicMaterial({map: texCanvas(200,256,g=>{
+      g.fillStyle='#1a2138'; g.fillRect(0,0,200,256);
+      g.strokeStyle='#39425f'; g.lineWidth=10; g.strokeRect(5,5,190,246);
+      g.fillStyle='#ffd76a'; g.font='110px sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText('⚡',100,118);
+    })}));
+  panelFace.rotation.y = -Math.PI/2; panelFace.position.set(3.86,1.55,0);
+  G('lock_circuit',
+    P(3.94,1.55,0, B(.14,1.5,1.16, refs.panelFrame)),
+    panelFace,
+    P(3.84,1.55,.5, B(.06,.3,.05, M(0x66708c,{metalness:.4}))),
+    ...refs.lampsCircuit,
+  );
+
+  const winPane = new THREE.Mesh(new THREE.PlaneGeometry(1.5,1.15), new THREE.MeshBasicMaterial({color:0x05070e}));
+  winPane.rotation.y = -Math.PI/2; winPane.position.set(3.93,1.8,-2.2);
+  // 창밖의 보름달 — 달 관측판 퍼즐의 단서 (SCENARIO: 정전의 밤 = 보름달 밤)
+  const fullMoon = new THREE.Mesh(new THREE.CircleGeometry(.16,26), new THREE.MeshBasicMaterial({color:0xe8e2c8}));
+  fullMoon.rotation.y = -Math.PI/2; fullMoon.position.set(3.905,2.0,-2.45);
+  G('window',
+    P(3.97,1.8,-2.2, B(.05,1.3,1.65, M(0x2f3960))),
+    winPane,
+    fullMoon,
+    P(3.91,1.8,-2.2, B(.02,1.2,.05, M(0x2f3960))),
+    P(3.91,1.8,-2.2, B(.02,.05,1.55, M(0x2f3960))),
+  );
+
+  const posterS = new THREE.Mesh(new THREE.PlaneGeometry(.85,.6),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,180,g=>{
+      g.fillStyle='#241d17'; g.fillRect(0,0,256,180);
+      g.strokeStyle='#4a3a20'; g.lineWidth=8; g.strokeRect(4,4,248,172);
+      g.fillStyle='#e8b93a'; g.font='62px sans-serif'; g.textAlign='center';
+      g.fillText('⚠',128,74);
+      g.fillStyle='#c9a55a'; g.font='700 36px sans-serif';
+      g.fillText('합선 주의',128,142);
+    })}));
+  posterS.rotation.y = -Math.PI/2; posterS.rotation.z = .04; posterS.position.set(3.96,1.65,2.2);
+  G('poster_short', posterS);
+
+  // ─ 남쪽(z=4): 실험 테이블 + 혼합대 + 저울 + 서랍 + 밸브
+  scene.add(
+    P(0,.92,3.5, B(3.8,.1,.85, M(0x263056))),
+    P(-1.7,.46,3.15, B(.12,.92,.12, M(0x1b2340))),
+    P(1.7,.46,3.15, B(.12,.92,.12, M(0x1b2340))),
+    P(-1.7,.46,3.85, B(.12,.92,.12, M(0x1b2340))),
+    P(1.7,.46,3.85, B(.12,.92,.12, M(0x1b2340))),
+  );
+
+  const glassM = new THREE.MeshStandardMaterial({color:0x9fb0d8, transparent:true, opacity:.22, roughness:.2});
+  refs.beakerMidMat = new THREE.MeshStandardMaterial({color:0x4a7fd6, emissive:0x0a1a3a, transparent:true, opacity:.92});
+  G('lock_ph',
+    P(-1.35,1.08,3.45, CYL(.09,.09,.22, glassM)),
+    P(-1.35,1.03,3.45, CYL(.075,.075,.1, new THREE.MeshStandardMaterial({color:0xe8833a, emissive:0x542807}))),
+    P(-1.0,1.11,3.5, CYL(.105,.105,.28, glassM)),
+    P(-1.0,1.05,3.5, CYL(.09,.09,.13, refs.beakerMidMat)),
+    P(-.68,1.07,3.42, CYL(.08,.08,.2, glassM)),
+    P(-.68,1.02,3.42, CYL(.065,.065,.09, new THREE.MeshStandardMaterial({color:0x3fae6a, emissive:0x0c3a1e}))),
+    P(-.4,1.22,3.6, CYL(.02,.02,.5, M(0x39425f))),
+  );
+
+  refs.beam = new THREE.Group();
+  refs.beam.add(B(1.05,.045,.06, M(0x8a93a6,{metalness:.35})));
+  [-.5,.5].forEach(x=>{
+    refs.beam.add(P(x,-.1,0, B(.015,.2,.015, M(0x66708c))));
+    refs.beam.add(P(x,-.21,0, CYL(.13,.11,.025, M(0x66708c))));
+  });
+  refs.beam.position.set(1.35,1.5,3.5);
+  G('lock_balance',
+    P(1.35,.99,3.5, CYL(.16,.18,.05, M(0x39425f))),
+    P(1.35,1.24,3.5, CYL(.035,.05,.55, M(0x39425f))),
+    refs.beam,
+  );
+
+  refs.drawer = new THREE.Group();
+  refs.drawer.add(B(.52,.24,.06, M(0x233058)));
+  refs.drawer.add(P(0,-.02,-.06, B(.18,.03,.03, M(0x8a93a6))));
+  refs.drawer.position.set(0,.78,3.12);
+  refs.note = new THREE.Mesh(new THREE.PlaneGeometry(.3,.2), new THREE.MeshBasicMaterial({color:0xd8d3c0}));
+  refs.note.rotation.x = -Math.PI/2*.85; refs.note.position.set(0,.9,2.95); refs.note.visible = false;
+  scene.add(refs.note);
+  G('drawer', refs.drawer);
+
+  G('valve',
+    P(-2.8,2.05,3.94, new THREE.Mesh(new THREE.TorusGeometry(.13,.035,10,24), M(0x8a5f2a,{metalness:.3}))),
+    P(-2.8,2.35,3.97, CYL(.035,.035,.5, M(0x39425f))),
+  );
+
+  // ─ 서쪽(x=-4): 시약장(천 덮임→다이얼) + 책장 + 양동이
+  refs.dialRingMat = new THREE.MeshStandardMaterial({color:0xffd76a, emissive:0x8a6a20, metalness:.3});
+  refs.dial = new THREE.Group();
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.15,.03,10,26), refs.dialRingMat);
+  ring.rotation.y = Math.PI/2;
+  refs.dial.add(ring);
+  refs.dial.add(P(.02,.09,0, B(.02,.12,.02, refs.dialRingMat)));
+  refs.dial.position.set(-3.42,1.35,0);
+  refs.dial.visible = false;
+  refs.cloth = [
+    P(-3.62,1.6,0, B(.85,1.5,1.7, M(0x3c4366,{roughness:1}))),
+    P(-3.58,.95,.1, B(.8,.9,1.6, M(0x39405e,{roughness:1}))),
+  ];
+  refs.cloth[1].rotation.x = .06;
+  G('lock_cipher',
+    P(-3.72,1.15,0, B(.55,2.3,1.5, M(0x1c2444))),
+    P(-3.44,1.15,0, B(.02,2.2,.03, M(0x10162b))),
+    P(-3.43,1.15,-.12, B(.03,.22,.04, M(0x66708c))),
+    P(-3.43,1.15,.12, B(.03,.22,.04, M(0x66708c))),
+    refs.dial,
+    ...refs.cloth,
+  );
+
+  const bookMeshes = [P(-3.85,1.15,-2.3, B(.4,2.3,1.15, M(0x18203c)))];
+  const bookCols = [0x2a3350,0x3a4468,0x39425f,0x2f3960,0x454f78];
+  for(let s=0;s<4;s++) for(let i=0;i<5;i++){
+    const h = .34+((s*5+i)%3)*.045;
+    const bk = B(.22,h,.16, M(s===1&&i===2 ? 0x8a6f2a : bookCols[(s+i)%5]));
+    bk.position.set(-3.72, .45+s*.55+h/2, -2.72+i*.2);
+    bookMeshes.push(bk);
+  }
+  G('books', ...bookMeshes);
+
+  // 광학 실험 장치 (서쪽 벽, 시약장과 양동이 사이)
+  refs.mirrorLampMat = new THREE.MeshStandardMaterial({color:0x232c4e, emissive:0x000000});
+  const mir1 = B(.02,.22,.16, M(0xcfd8ec,{metalness:.85, roughness:.15}));
+  mir1.position.set(-3.82,1.62,1.15); mir1.rotation.x = .6;
+  const mir2 = B(.02,.22,.16, M(0xcfd8ec,{metalness:.85, roughness:.15}));
+  mir2.position.set(-3.82,1.2,1.72); mir2.rotation.x = -.5;
+  const laserBody = CYL(.045,.045,.24, M(0x6b2a38));
+  laserBody.rotation.z = Math.PI/2; laserBody.position.set(-3.8,1.62,1.72);
+  G('lock_mirror',
+    P(-3.94,1.4,1.45, B(.08,.85,1.0, M(0x1a2138))),
+    laserBody,
+    mir1, mir2,
+    P(-3.84,1.2,1.15, new THREE.Mesh(new THREE.SphereGeometry(.05,12,12), refs.mirrorLampMat)),
+  );
+
+  const mop = CYL(.018,.018,1.15, M(0x5a4a30));
+  mop.position.set(-3.62,.75,2.62); mop.rotation.z = .28; mop.rotation.x = -.12;
+  G('bucket',
+    P(-3.5,.16,2.5, CYL(.15,.12,.32, M(0x232c4e))),
+    mop,
+  );
+
+  return {scene, pickables, refs};
+}
+
+// 저택 씬 — 실험실과 같은 오브젝트 id·refs 계약, 다른 옷
+function buildMansionScene(){
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x0c0805);
+  const pickables = [];
+  const refs = {};
+  const M = (c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c, roughness:.9, metalness:.05}, o||{}));
+  const B = (w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
+  const CYL = (rt,rb,h,m)=>new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,20), m);
+  const P = (x,y,z,mesh)=>{ mesh.position.set(x,y,z); return mesh; };
+  const G = (objId, ...meshes)=>{
+    const g = new THREE.Group();
+    meshes.forEach(m=>g.add(m));
+    if(objId){ g.userData.obj = objId; pickables.push(g); }
+    scene.add(g); return g;
+  };
+
+  // 방 껍데기: 어두운 목재 저택
+  const shell = B(8,3,8, new THREE.MeshStandardMaterial({color:0x2a1d12, roughness:.95, side:THREE.BackSide}));
+  shell.position.y = 1.5; scene.add(shell);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(8,8), M(0x1a110a));
+  floor.rotation.x = -Math.PI/2; floor.position.y = .005; scene.add(floor);
+  // 벽 장식 몰딩
+  [[-3.99,0],[3.99,0]].forEach(([x])=>{
+    const mold = B(.04,.12,8, M(0x4a3520)); mold.position.set(x,2.2,0); scene.add(mold);
+  });
+  scene.add(P(0,2.2,-3.99, B(8,.12,.04, M(0x4a3520))), P(0,2.2,3.99, B(8,.12,.04, M(0x4a3520))));
+
+  // 조명: 샹들리에(따뜻한 촛불빛) + 무대 조명
+  scene.add(new THREE.AmbientLight(0x5a4a3a, .7));
+  refs.lamp = new THREE.PointLight(0xffb066, 1.1, 14);
+  refs.lamp.position.set(0, 2.6, 0); scene.add(refs.lamp);
+  const chand = new THREE.Group();
+  chand.add(CYL(.02,.02,.5, M(0x3a2a18)));
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(.3,.03,8,24), M(0x6a4a22,{metalness:.5}));
+  ring.rotation.x = Math.PI/2; ring.position.y = -.3; chand.add(ring);
+  [0,1,2,3].forEach(i=>{ const a=i*Math.PI/2;
+    chand.add(P(Math.cos(a)*.3,-.22,Math.sin(a)*.3, new THREE.Mesh(new THREE.SphereGeometry(.035,10,10), new THREE.MeshBasicMaterial({color:0xffd9a0})))); });
+  chand.position.set(0,3,0); scene.add(chand);
+  const stageGlow = new THREE.PointLight(0xc9a55a, .45, 8);
+  stageGlow.position.set(0, 1.4, 3.2); scene.add(stageGlow);
+
+  // ─ 북쪽(z=-4): 커튼콜 문 + 붉은 커튼 + 물약 색상표 + 괘종시계
+  const signPlane = new THREE.Mesh(new THREE.PlaneGeometry(1.1,.3),
+    new THREE.MeshBasicMaterial({map: texCanvas(320,88,g=>{
+      g.fillStyle='#3a1017'; g.fillRect(0,0,320,88);
+      g.strokeStyle='#c9a55a'; g.lineWidth=5; g.strokeRect(3,3,314,82);
+      g.fillStyle='#ffd76a'; g.font='700 40px sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText('커튼콜',160,46);
+    })}));
+  signPlane.position.set(0,2.56,-3.96); scene.add(signPlane);
+  refs.keypadMat = new THREE.MeshStandardMaterial({color:0x14100a, emissive:0x3a2d1e, emissiveIntensity:.6});
+  G('door',
+    P(0,1.16,-3.99, B(1.3,2.4,.05, M(0x4a3520))),
+    P(0,1.13,-3.96, B(1.1,2.3,.07, M(0x2e2013))),
+    P(0,1.62,-3.91, B(.82,.8,.02, M(0x3a2a18))),
+    P(0,.68,-3.91, B(.82,.8,.02, M(0x3a2a18))),
+    P(.46,1.05,-3.89, new THREE.Mesh(new THREE.SphereGeometry(.05,14,14), M(0xc9a55a,{metalness:.6,roughness:.3}))),
+    P(.86,1.35,-3.94, B(.17,.26,.06, refs.keypadMat)),
+    P(-1.05,1.4,-3.93, B(.5,2.6,.1, M(0x5a1f28))),
+    P(1.05,1.4,-3.93, B(.5,2.6,.1, M(0x5a1f28))),
+  );
+
+  const posterPh = new THREE.Mesh(new THREE.PlaneGeometry(.9,.7),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,200,g=>{
+      g.fillStyle='#2a1d12'; g.fillRect(0,0,256,200);
+      g.strokeStyle='#6a4a22'; g.lineWidth=8; g.strokeRect(4,4,248,192);
+      [['#d6c23a',40],['#3fae6a',95],['#4a7fd6',150]].forEach(([c,y])=>{
+        g.fillStyle=c; g.beginPath(); g.arc(60,y+10,22,0,7); g.fill();
+      });
+      g.fillStyle='#c9a55a'; g.font='22px sans-serif';
+      g.fillText('노랑 = 산',100,56); g.fillText('초록 = 중간',100,112); g.fillText('파랑 = 염기',100,166);
+    })}));
+  posterPh.position.set(-2.3,1.7,-3.97);
+  G('poster_ph', posterPh);
+
+  G('clock',
+    P(2.5,1.1,-3.8, B(.5,2.0,.3, M(0x3a2a18))),
+    P(2.5,1.75,-3.63, new THREE.Mesh(new THREE.CircleGeometry(.19,26),
+      new THREE.MeshBasicMaterial({map: texCanvas(96,96,g=>{
+        g.fillStyle='#d8d3c0'; g.beginPath(); g.arc(48,48,46,0,7); g.fill();
+        g.strokeStyle='#3a2a18'; g.lineWidth=4;
+        g.beginPath(); g.moveTo(48,48); g.lineTo(48,18); g.stroke();
+        g.beginPath(); g.moveTo(48,48); g.lineTo(24,62); g.stroke();
+      })}))),
+    P(2.5,.7,-3.72, B(.34,.7,.2, M(0x2e2013))),
+  );
+
+  // 모자와 지팡이 (의자 위)
+  G('ext',
+    P(2.9,.35,-3.0, B(.5,.08,.5, M(0x3a2a18))),
+    P(2.9,.18,-3.0, B(.44,.3,.44, M(0x2e2013))),
+    P(2.82,.5,-3.02, CYL(.14,.16,.16, M(0x14100a))),
+    P(2.82,.6,-3.02, CYL(.24,.24,.03, M(0x14100a))),
+    (()=>{ const cane=CYL(.015,.015,.7, M(0xc9a55a,{metalness:.5})); cane.position.set(3.05,.55,-2.95); cane.rotation.z=.4; return cane; })(),
+  );
+
+  // ─ 동쪽(x=4): 빈 새장 + 촛대(회로) + 배선 안내문 + 창문(보름달)
+  const cage = new THREE.Group();
+  cage.add(CYL(.02,.02,.5, M(0x3a2a18)));
+  const cageBody = new THREE.Mesh(new THREE.CylinderGeometry(.22,.25,.4,10,1,true), M(0x6a5a3a,{wireframe:true}));
+  cageBody.position.y = -.5; cage.add(cageBody);
+  cage.position.set(3.5,2.6,-3.2);
+  G('cables', cage);
+
+  refs.panelFrame = M(0x6a4a22,{metalness:.5});
+  refs.lampsCircuit = [0,1,2].map(i=>{
+    const s = new THREE.Mesh(new THREE.SphereGeometry(.05,12,12),
+      new THREE.MeshStandardMaterial({color:0x3a2d1e, emissive:0x000000}));
+    s.position.set(3.8, 1.98, -.34+i*.34);
+    return s;
+  });
+  const candleParts = [];
+  [0,1,2].forEach(i=>{
+    candleParts.push(P(3.82,1.55,-.34+i*.34, CYL(.035,.045,.5, M(0xd8d3c0))));
+    candleParts.push(P(3.82,1.22,-.34+i*.34, CYL(.05,.07,.18, refs.panelFrame)));
+  });
+  G('lock_circuit',
+    P(3.9,1.05,0, B(.16,.14,1.0, refs.panelFrame)),
+    ...candleParts, ...refs.lampsCircuit,
+  );
+
+  const posterS = new THREE.Mesh(new THREE.PlaneGeometry(.85,.62),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,186,g=>{
+      g.fillStyle='#241a10'; g.fillRect(0,0,256,186);
+      g.strokeStyle='#6a4a22'; g.lineWidth=7; g.strokeRect(4,4,248,178);
+      g.fillStyle='#c9a55a'; g.font='700 28px sans-serif'; g.textAlign='center';
+      g.fillText('무대 조명',128,64); g.fillText('배선도',128,100);
+      g.strokeStyle='#8a6a3a'; g.lineWidth=3;
+      g.beginPath(); g.moveTo(40,140); g.lineTo(120,140); g.lineTo(150,158); g.lineTo(216,158); g.stroke();
+    })}));
+  posterS.rotation.y = -Math.PI/2; posterS.rotation.z = .03; posterS.position.set(3.96,1.7,2.4);
+  G('poster_short', posterS);
+
+  const winPane = new THREE.Mesh(new THREE.PlaneGeometry(1.4,1.1), new THREE.MeshBasicMaterial({color:0x0a0d18}));
+  winPane.rotation.y = -Math.PI/2; winPane.position.set(3.93,1.8,-1.8);
+  const fullMoon = new THREE.Mesh(new THREE.CircleGeometry(.16,26), new THREE.MeshBasicMaterial({color:0xe8e2c8}));
+  fullMoon.rotation.y = -Math.PI/2; fullMoon.position.set(3.905,2.0,-2.0);
+  G('window',
+    P(3.97,1.8,-1.8, B(.05,1.25,1.55, M(0x4a3520))),
+    winPane, fullMoon,
+    P(3.91,1.8,-1.8, B(.02,1.15,.05, M(0x4a3520))),
+    P(3.91,1.8,-1.8, B(.02,.05,1.45, M(0x4a3520))),
+  );
+
+  // ─ 남쪽(z=4): 무대 + 유령 물약 + 비밀문(저울) + 모래주머니 + 거울 액자
+  scene.add(P(0,.25,3.4, B(5.4,.5,1.1, M(0x2e2013))));
+  scene.add(P(0,.52,3.4, B(5.5,.06,1.2, M(0x4a3520))));
+
+  const glassM2 = new THREE.MeshStandardMaterial({color:0xbfa77a, transparent:true, opacity:.25, roughness:.2});
+  refs.beakerMidMat = new THREE.MeshStandardMaterial({color:0x4a7fd6, emissive:0x0a1a3a, transparent:true, opacity:.92});
+  G('lock_ph',
+    P(-1.7,.75,3.3, CYL(.09,.11,.36, glassM2)),
+    P(-1.7,.66,3.3, CYL(.075,.09,.16, new THREE.MeshStandardMaterial({color:0xd6c23a, emissive:0x4a4210}))),
+    P(-1.3,.78,3.4, CYL(.1,.12,.4, glassM2)),
+    P(-1.3,.68,3.4, CYL(.085,.1,.18, refs.beakerMidMat)),
+    P(-.95,.73,3.28, CYL(.08,.1,.32, glassM2)),
+    P(-.95,.65,3.28, CYL(.065,.085,.14, new THREE.MeshStandardMaterial({color:0x4a7fd6, emissive:0x101f4a}))),
+  );
+
+  refs.beam = new THREE.Group();
+  refs.beam.add(B(1.0,.045,.06, M(0x6a5a3a,{metalness:.4})));
+  [-.48,.48].forEach(x=>{
+    refs.beam.add(P(x,-.12,0, B(.015,.24,.015, M(0x8a7a5a))));
+    refs.beam.add(P(x,-.28,0, B(.16,.2,.1, M(0x8a6a3a))));
+  });
+  refs.beam.position.set(1.6,2.1,3.7);
+  G('lock_balance',
+    P(1.6,1.3,3.85, B(.9,1.7,.12, M(0x3a2a18))),
+    P(1.28,1.3,3.78, B(.06,1.7,.06, M(0x4a3520))),
+    P(1.6,2.28,3.7, CYL(.09,.09,.06, M(0x6a4a22,{metalness:.5}))),
+    refs.beam,
+  );
+
+  refs.drawer = new THREE.Group();
+  refs.drawer.add(new THREE.Mesh(new THREE.SphereGeometry(.16,12,10), M(0x8a7a5a)));
+  refs.drawer.children[0].scale.set(1,1.25,1);
+  refs.drawer.add(P(0,.2,0, B(.06,.1,.06, M(0x5a4a30))));
+  refs.drawer.position.set(.4,.78,3.12);
+  refs.note = new THREE.Mesh(new THREE.PlaneGeometry(.26,.18), new THREE.MeshBasicMaterial({color:0xd8d3c0}));
+  refs.note.rotation.x = -Math.PI/2*.85; refs.note.position.set(.4,.62,2.9); refs.note.visible = false;
+  scene.add(refs.note);
+  G('drawer', refs.drawer);
+
+  const mirrorFrame = new THREE.Mesh(new THREE.PlaneGeometry(.7,1.0), M(0x9fb0c8,{metalness:.9, roughness:.1}));
+  mirrorFrame.rotation.y = Math.PI; mirrorFrame.position.set(-2.6,1.55,3.95);
+  G('valve',
+    P(-2.6,1.55,3.97, B(.85,1.15,.05, M(0x6a4a22,{metalness:.4}))),
+    mirrorFrame,
+  );
+
+  // ─ 서쪽(x=-4): 예언 노트(수열) + 예언 카드 + 유령 유리판(광학) + 축음기
+  refs.dialRingMat = new THREE.MeshStandardMaterial({color:0xffd76a, emissive:0x8a6a20, metalness:.3});
+  refs.dial = new THREE.Group();
+  const dring = new THREE.Mesh(new THREE.TorusGeometry(.09,.02,10,24), refs.dialRingMat);
+  dring.rotation.y = Math.PI/2; refs.dial.add(dring);
+  refs.dial.position.set(-3.55,1.28,-.6);
+  refs.dial.visible = false;
+  refs.cloth = [
+    P(-3.62,1.22,-.6, B(.3,.06,.5, M(0x5a1f28,{roughness:1}))),
+  ];
+  G('lock_cipher',
+    P(-3.7,.6,-.6, B(.35,1.2,.5, M(0x3a2a18))),
+    P(-3.6,1.22,-.6, (()=>{ const bk=B(.34,.05,.46, M(0xd8d3c0)); bk.rotation.z=.18; return bk; })()),
+    refs.dial, ...refs.cloth,
+  );
+
+  const cardMeshes = [P(-3.85,1.1,-2.4, B(.3,2.2,1.0, M(0x241a10)))];
+  for(let s=0;s<3;s++) for(let i=0;i<4;i++){
+    cardMeshes.push(P(-3.68, .6+s*.6, -2.75+i*.24, (()=>{ const c=B(.02,.22,.16, M(i===2&&s===1?0xc9a55a:0xd8d3c0)); c.rotation.x=(i%2? .06:-.06); return c; })()));
+  }
+  G('books', ...cardMeshes);
+
+  refs.mirrorLampMat = new THREE.MeshStandardMaterial({color:0x3a2d1e, emissive:0x000000});
+  const ghostGlass = new THREE.Mesh(new THREE.PlaneGeometry(.9,1.2),
+    new THREE.MeshStandardMaterial({color:0xbfd0e8, transparent:true, opacity:.16, roughness:.05, side:THREE.DoubleSide}));
+  ghostGlass.position.set(-3.5,1.35,1.5); ghostGlass.rotation.y = Math.PI/2*.55;
+  G('lock_mirror',
+    P(-3.92,1.3,1.5, B(.1,1.0,1.1, M(0x2e2013))),
+    ghostGlass,
+    P(-3.8,.75,1.1, CYL(.05,.07,.22, M(0x6a4a22,{metalness:.5}))),
+    P(-3.82,1.2,2.0, new THREE.Mesh(new THREE.SphereGeometry(.05,12,12), refs.mirrorLampMat)),
+  );
+
+  refs.moonRingMat = new THREE.MeshStandardMaterial({color:0xffd76a, emissive:0x6a5218, metalness:.3});
+  const moonRing = new THREE.Mesh(new THREE.TorusGeometry(.38,.03,10,32), refs.moonRingMat);
+  moonRing.position.set(-2.2,1.5,-3.95);
+  const moonDisc = new THREE.Mesh(new THREE.CircleGeometry(.36,32),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,256,g=>{
+      g.fillStyle='#241a10'; g.beginPath(); g.arc(128,128,126,0,7); g.fill();
+      for(let i=0;i<6;i++){
+        const a = -Math.PI/2 + i*Math.PI/3;
+        const cx = 128+Math.cos(a)*82, cy = 128+Math.sin(a)*82;
+        g.fillStyle='#e8e2c8'; g.beginPath(); g.arc(cx,cy,20,0,7); g.fill();
+        g.fillStyle='#2a1d12';
+        if(i===0){ g.beginPath(); g.arc(cx,cy,20,0,7); g.fill(); }
+        else if(i<3){ g.beginPath(); g.arc(cx-(3-i)*13,cy,20,0,7); g.fill(); }
+        else if(i>3){ g.beginPath(); g.arc(cx+(i-3)*13,cy,20,0,7); g.fill(); }
+      }
+      g.fillStyle='#ffd76a'; g.beginPath(); g.arc(128,128,8,0,7); g.fill();
+    })}));
+  moonDisc.position.set(-2.2,1.5,-3.94);
+  G('lock_moon', moonRing, moonDisc);
+
+  // 축음기
+  const horn = new THREE.Mesh(new THREE.ConeGeometry(.22,.4,18,1,true), M(0xc9a55a,{metalness:.6, side:THREE.DoubleSide}));
+  horn.rotation.z = 2.2; horn.position.set(-3.35,.95,3.1);
+  G('bucket',
+    P(-3.5,.6,3.2, B(.5,.35,.5, M(0x3a2a18))),
+    horn,
+  );
+
+  return {scene, pickables, refs};
+}
+
+// 관측소 씬 — "오래된 주파수"
+function buildFrequencyScene(){
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x060a10);
+  const pickables = [], refs = {};
+  const M = (c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c, roughness:.9, metalness:.08}, o||{}));
+  const B = (w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
+  const CYL = (rt,rb,h,m)=>new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,20), m);
+  const P = (x,y,z,mesh)=>{ mesh.position.set(x,y,z); return mesh; };
+  const G = (objId, ...meshes)=>{
+    const g = new THREE.Group(); meshes.forEach(m=>g.add(m));
+    if(objId){ g.userData.obj = objId; pickables.push(g); }
+    scene.add(g); return g;
+  };
+
+  const shell = B(8,3,8, new THREE.MeshStandardMaterial({color:0x18222e, roughness:.95, side:THREE.BackSide}));
+  shell.position.y = 1.5; scene.add(shell);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(8,8), M(0x111823));
+  floor.rotation.x = -Math.PI/2; floor.position.y = .005; scene.add(floor);
+
+  scene.add(new THREE.AmbientLight(0x3a5266, .8));
+  refs.lamp = new THREE.PointLight(0xd8e8f0, .95, 14);
+  refs.lamp.position.set(0, 2.7, 0); scene.add(refs.lamp);
+  const moonBeam = new THREE.PointLight(0x8fb8d8, .55, 9);
+  moonBeam.position.set(3.2, 2.0, -2.0); scene.add(moonBeam);
+  const deskLampL = new THREE.PointLight(0xffc978, .4, 5);
+  deskLampL.position.set(0, 1.5, 3.0); scene.add(deskLampL);
+
+  // ─ 북쪽: 철문 + 산도표 + 플립시계 + 라디에이터 + 위상판
+  refs.keypadMat = new THREE.MeshStandardMaterial({color:0x0d141c, emissive:0x2a3a4a, emissiveIntensity:.6});
+  G('door',
+    P(0,1.16,-3.99, B(1.3,2.4,.05, M(0x2a3644,{metalness:.4}))),
+    P(0,1.13,-3.95, B(1.08,2.28,.07, M(0x212c38,{metalness:.4}))),
+    P(0,1.9,-3.9, B(.7,.1,.03, M(0x4a5a6c))),
+    P(0,.55,-3.9, B(.7,.1,.03, M(0x4a5a6c))),
+    P(.4,1.1,-3.89, B(.16,.05,.06, M(0x8a97a8,{metalness:.6}))),
+    P(.85,1.35,-3.94, B(.17,.26,.06, refs.keypadMat)),
+  );
+  const posterPh = new THREE.Mesh(new THREE.PlaneGeometry(.9,.7),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,200,g=>{
+      g.fillStyle='#141d28'; g.fillRect(0,0,256,200);
+      g.strokeStyle='#2f4152'; g.lineWidth=8; g.strokeRect(4,4,248,192);
+      ['#d63a3a','#e8833a','#e06a9f','#8a5fd3','#4a7fd6','#3fae6a','#d6c23a']
+        .forEach((c,i)=>{ g.fillStyle=c; g.fillRect(30,22+i*24,120,15); });
+      g.fillStyle='#7fc4d4'; g.font='20px sans-serif'; g.fillText('산도 1~13',165,105);
+    })}));
+  posterPh.position.set(-2.3,1.7,-3.97);
+  G('poster_ph', posterPh);
+  G('clock',
+    P(2.5,2.2,-3.94, B(.62,.34,.1, M(0x0d141c))),
+    P(2.5,2.2,-3.88, new THREE.Mesh(new THREE.PlaneGeometry(.5,.22),
+      new THREE.MeshBasicMaterial({map: texCanvas(200,88,g=>{
+        g.fillStyle='#0a0f16'; g.fillRect(0,0,200,88);
+        g.fillStyle='#7fc4d4'; g.font='700 52px monospace'; g.textAlign='center'; g.textBaseline='middle';
+        g.fillText('21:00',100,46);
+      })}))),
+  );
+  const radParts = [];
+  for(let i=0;i<6;i++) radParts.push(P(2.62+i*.09,.42,-3.8, B(.05,.6,.16, M(0x2f4152))));
+  G('ext', ...radParts);
+  refs.moonRingMat = new THREE.MeshStandardMaterial({color:0x7fc4d4, emissive:0x1d4552, metalness:.3});
+  const fRing = new THREE.Mesh(new THREE.TorusGeometry(.38,.03,10,32), refs.moonRingMat);
+  fRing.position.set(-1.15,1.5,-3.95);
+  const fDisc = new THREE.Mesh(new THREE.CircleGeometry(.36,32),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,256,g=>{
+      g.fillStyle='#101a24'; g.beginPath(); g.arc(128,128,126,0,7); g.fill();
+      for(let i=0;i<6;i++){
+        const a = -Math.PI/2 + i*Math.PI/3;
+        const cx = 128+Math.cos(a)*82, cy = 128+Math.sin(a)*82;
+        g.fillStyle='#e8e2c8'; g.beginPath(); g.arc(cx,cy,20,0,7); g.fill();
+        g.fillStyle='#141d28';
+        if(i===0){ g.beginPath(); g.arc(cx,cy,20,0,7); g.fill(); }
+        else if(i<3){ g.beginPath(); g.arc(cx-(3-i)*13,cy,20,0,7); g.fill(); }
+        else if(i>3){ g.beginPath(); g.arc(cx+(i-3)*13,cy,20,0,7); g.fill(); }
+      }
+      g.fillStyle='#7fc4d4'; g.beginPath(); g.arc(128,128,8,0,7); g.fill();
+    })}));
+  fDisc.position.set(-1.15,1.5,-3.94);
+  G('lock_moon', fRing, fDisc);
+
+  // ─ 동쪽: 케이블 트레이 + 전원반(회로) + 경고판 + 대형 관측창(보름달)
+  const tray = B(.16,.05,5.5, M(0x2f4152)); tray.position.set(3.9,2.8,0);
+  G('cables', tray, P(3.9,2.4,.6, CYL(.02,.02,.8, M(0x4a5a6c))));
+  refs.panelFrame = M(0x2f4152,{metalness:.35});
+  refs.lampsCircuit = [0,1,2].map(i=>{
+    const s = new THREE.Mesh(new THREE.SphereGeometry(.045,12,12),
+      new THREE.MeshStandardMaterial({color:0x1a2530, emissive:0x000000}));
+    s.position.set(3.8, 1.02, .8+i*.22);
+    return s;
+  });
+  const panelFace2 = new THREE.Mesh(new THREE.PlaneGeometry(1.0,1.3),
+    new THREE.MeshBasicMaterial({map: texCanvas(200,256,g=>{
+      g.fillStyle='#141d28'; g.fillRect(0,0,200,256);
+      g.strokeStyle='#2f4152'; g.lineWidth=10; g.strokeRect(5,5,190,246);
+      g.fillStyle='#7fc4d4'; g.font='110px sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText('⚡',100,118);
+    })}));
+  panelFace2.rotation.y = -Math.PI/2; panelFace2.position.set(3.86,1.55,1.1);
+  G('lock_circuit',
+    P(3.94,1.55,1.1, B(.14,1.45,1.1, refs.panelFrame)),
+    panelFace2,
+    P(3.84,1.55,1.62, B(.06,.28,.05, M(0x8a97a8,{metalness:.5}))),
+    ...refs.lampsCircuit,
+  );
+  const posterS = new THREE.Mesh(new THREE.PlaneGeometry(.8,.55),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,176,g=>{
+      g.fillStyle='#1a1408'; g.fillRect(0,0,256,176);
+      g.strokeStyle='#8a6a20'; g.lineWidth=8; g.strokeRect(4,4,248,168);
+      g.fillStyle='#e8b93a'; g.font='58px sans-serif'; g.textAlign='center';
+      g.fillText('⚠',128,72); g.font='700 30px sans-serif'; g.fillText('합선 주의',128,136);
+    })}));
+  posterS.rotation.y = -Math.PI/2; posterS.position.set(3.96,1.6,2.7);
+  G('poster_short', posterS);
+  const winPane2 = new THREE.Mesh(new THREE.PlaneGeometry(2.2,1.5), new THREE.MeshBasicMaterial({color:0x04070d}));
+  winPane2.rotation.y = -Math.PI/2; winPane2.position.set(3.93,1.75,-1.7);
+  const fullMoon2 = new THREE.Mesh(new THREE.CircleGeometry(.24,28), new THREE.MeshBasicMaterial({color:0xe8e2c8}));
+  fullMoon2.rotation.y = -Math.PI/2; fullMoon2.position.set(3.9,2.05,-1.9);
+  G('window',
+    P(3.97,1.75,-1.7, B(.05,1.65,2.35, M(0x2f4152))),
+    winPane2, fullMoon2,
+    P(3.9,1.75,-1.7, B(.02,1.55,.05, M(0x2f4152))),
+  );
+
+  // ─ 남쪽: 관제 콘솔(시료 선반·서랍) + 안테나 균형추(저울) + 스팀 밸브
+  scene.add(P(0,.85,3.55, B(4.2,.08,.8, M(0x2a3644))), P(0,.42,3.7, B(4.0,.8,.5, M(0x1c2732))));
+  const glassM3 = new THREE.MeshStandardMaterial({color:0x9fc4d8, transparent:true, opacity:.22, roughness:.2});
+  refs.beakerMidMat = new THREE.MeshStandardMaterial({color:0x4a7fd6, emissive:0x0a1a3a, transparent:true, opacity:.92});
+  G('lock_ph',
+    P(-1.5,1.0,3.5, CYL(.08,.09,.22, glassM3)),
+    P(-1.5,.96,3.5, CYL(.065,.075,.1, new THREE.MeshStandardMaterial({color:0xe8833a, emissive:0x542807}))),
+    P(-1.2,1.03,3.55, CYL(.09,.1,.28, glassM3)),
+    P(-1.2,.98,3.55, CYL(.075,.085,.12, refs.beakerMidMat)),
+    P(-.92,.99,3.45, CYL(.07,.08,.2, glassM3)),
+    P(-.92,.95,3.45, CYL(.055,.065,.08, new THREE.MeshStandardMaterial({color:0x3fae6a, emissive:0x0c3a1e}))),
+  );
+  refs.beam = new THREE.Group();
+  refs.beam.add(B(1.0,.04,.05, M(0x8a97a8,{metalness:.4})));
+  [-.46,.46].forEach(x=>{
+    refs.beam.add(P(x,-.12,0, B(.014,.24,.014, M(0x6a7a8c))));
+    refs.beam.add(P(x,-.26,0, CYL(.1,.08,.1, M(0x4a5a6c))));
+  });
+  refs.beam.position.set(1.7,1.9,3.6);
+  G('lock_balance',
+    P(1.7,1.0,3.6, CYL(.05,.07,1.7, M(0x2f4152))),
+    P(1.7,1.93,3.6, CYL(.07,.07,.05, M(0x4a7f8c,{metalness:.5}))),
+    refs.beam,
+  );
+  refs.drawer = new THREE.Group();
+  refs.drawer.add(B(.5,.2,.06, M(0x24303e)));
+  refs.drawer.add(P(0,-.01,-.05, B(.16,.03,.03, M(0x8a97a8))));
+  refs.drawer.position.set(.3,.62,3.44);
+  refs.note = new THREE.Mesh(new THREE.PlaneGeometry(.26,.18), new THREE.MeshBasicMaterial({color:0xd8d3c0}));
+  refs.note.rotation.x = -Math.PI/2*.85; refs.note.position.set(.3,.78,3.25); refs.note.visible = false;
+  scene.add(refs.note);
+  G('drawer', refs.drawer);
+  G('valve',
+    P(-2.9,2.0,3.94, new THREE.Mesh(new THREE.TorusGeometry(.12,.03,10,24), M(0x8a3a2a,{metalness:.4}))),
+    P(-2.9,2.3,3.97, CYL(.03,.03,.5, M(0x2f4152))),
+  );
+
+  // ─ 서쪽: 릴 수신기(수열, 방수포 덮임) + 관측 일지 더미 + 망원경(광학) + 주전자
+  refs.dialRingMat = new THREE.MeshStandardMaterial({color:0x7fc4d4, emissive:0x1d4552, metalness:.3});
+  refs.dial = new THREE.Group();
+  const dr2 = new THREE.Mesh(new THREE.TorusGeometry(.12,.025,10,24), refs.dialRingMat);
+  dr2.rotation.y = Math.PI/2; refs.dial.add(dr2);
+  refs.dial.position.set(-3.5,1.35,-.7); refs.dial.visible = false;
+  refs.cloth = [ P(-3.6,1.15,-.7, B(.75,1.1,1.3, M(0x3a4656,{roughness:1}))) ];
+  refs.cloth[0].rotation.z = .04;
+  G('lock_cipher',
+    P(-3.7,.95,-.7, B(.5,1.3,1.2, M(0x1c2732))),
+    P(-3.55,1.35,-.95, CYL(.14,.14,.06, M(0x2f4152))),
+    P(-3.55,1.35,-.45, CYL(.14,.14,.06, M(0x2f4152))),
+    refs.dial, ...refs.cloth,
+  );
+  const logs = [P(-3.85,1.05,-2.5, B(.3,2.1,1.0, M(0x141d28)))];
+  for(let s=0;s<3;s++) for(let i=0;i<3;i++)
+    logs.push(P(-3.68,.55+s*.6,-2.8+i*.3, B(.03,.28,.2, M([0x2f4152,0x3a4656,0x4a5a6c][(s+i)%3]))));
+  G('books', ...logs);
+  refs.mirrorLampMat = new THREE.MeshStandardMaterial({color:0x1a2530, emissive:0x000000});
+  const tube = CYL(.11,.14,1.2, M(0x2a3644,{metalness:.4}));
+  tube.rotation.z = .5; tube.rotation.x = -.35; tube.position.set(-3.35,1.7,1.6);
+  G('lock_mirror',
+    tube,
+    P(-3.5,.9,1.6, CYL(.04,.06,.9, M(0x2f4152))),
+    P(-3.5,.42,1.6, CYL(.24,.28,.06, M(0x2f4152))),
+    P(-3.2,1.25,1.75, new THREE.Mesh(new THREE.SphereGeometry(.05,12,12), refs.mirrorLampMat)),
+  );
+  const kettle = new THREE.Mesh(new THREE.SphereGeometry(.14,14,12), M(0x8a97a8,{metalness:.6}));
+  kettle.scale.set(1,.85,1); kettle.position.set(-3.5,.6,2.7);
+  G('bucket', kettle, P(-3.5,.5,2.7, B(.4,.06,.4, M(0x24303e))));
+
+  return {scene, pickables, refs};
+}
+
+// 화성 기지 씬 — "붉은 행성 기지"
+function buildMarsScene(){
+  const scene = new THREE.Scene();
+  scene.background = new THREE.Color(0x120806);
+  const pickables = [], refs = {};
+  const M = (c,o)=>new THREE.MeshStandardMaterial(Object.assign({color:c, roughness:.9, metalness:.06}, o||{}));
+  const B = (w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d), m);
+  const CYL = (rt,rb,h,m)=>new THREE.Mesh(new THREE.CylinderGeometry(rt,rb,h,20), m);
+  const P = (x,y,z,mesh)=>{ mesh.position.set(x,y,z); return mesh; };
+  const G = (objId, ...meshes)=>{
+    const g = new THREE.Group(); meshes.forEach(m=>g.add(m));
+    if(objId){ g.userData.obj = objId; pickables.push(g); }
+    scene.add(g); return g;
+  };
+
+  const shell = B(8,3,8, new THREE.MeshStandardMaterial({color:0x4a3226, roughness:.95, side:THREE.BackSide}));
+  shell.position.y = 1.5; scene.add(shell);
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(8,8), M(0x33221a));
+  floor.rotation.x = -Math.PI/2; floor.position.y = .005; scene.add(floor);
+  // 모듈 리브(세로 골조)
+  [-2.6,0,2.6].forEach(z=>{
+    scene.add(P(-3.98,1.5,z, B(.06,3,.14, M(0x5a4232))), P(3.98,1.5,z, B(.06,3,.14, M(0x5a4232))));
+  });
+
+  scene.add(new THREE.AmbientLight(0x6a4a3a, .85));
+  refs.lamp = new THREE.PointLight(0xffe8d0, 1.0, 14);
+  refs.lamp.position.set(0, 2.7, 0); scene.add(refs.lamp);
+  const warm = new THREE.PointLight(0xe8833a, .4, 9);
+  warm.position.set(-2.5, 1.8, 2.5); scene.add(warm);
+
+  // ─ 북쪽: 에어록(원형 문) + 산도표 + 미션 타이머 + 헬멧 + 발사 윈도우 판
+  refs.keypadMat = new THREE.MeshStandardMaterial({color:0x1a0e08, emissive:0x4a2a1a, emissiveIntensity:.6});
+  const hatch = new THREE.Mesh(new THREE.CircleGeometry(.95,36), M(0x6a4a38,{metalness:.4}));
+  hatch.position.set(0,1.35,-3.96);
+  const hatchRim = new THREE.Mesh(new THREE.TorusGeometry(.98,.07,12,40), M(0x8a5a42,{metalness:.5}));
+  hatchRim.position.set(0,1.35,-3.95);
+  const wheel = new THREE.Mesh(new THREE.TorusGeometry(.28,.035,10,26), M(0xc9a55a,{metalness:.6}));
+  wheel.position.set(0,1.35,-3.86);
+  const spokes = [0,1,2].map(i=>{ const sp=B(.5,.035,.035, M(0xc9a55a,{metalness:.6})); sp.position.set(0,1.35,-3.86); sp.rotation.z=i*Math.PI/3; return sp; });
+  G('door', hatch, hatchRim, wheel, ...spokes, P(1.3,1.35,-3.93, B(.17,.26,.06, refs.keypadMat)));
+  const posterPh3 = new THREE.Mesh(new THREE.PlaneGeometry(.85,.65),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,196,g=>{
+      g.fillStyle='#241410'; g.fillRect(0,0,256,196);
+      g.strokeStyle='#6a4a38'; g.lineWidth=8; g.strokeRect(4,4,248,188);
+      ['#d63a3a','#e8833a','#e06a9f','#8a5fd3','#4a7fd6','#3fae6a','#d6c23a']
+        .forEach((c,i)=>{ g.fillStyle=c; g.fillRect(28,20+i*24,110,15); });
+      g.fillStyle='#ffb066'; g.font='700 20px sans-serif'; g.fillText('수질 산도표',150,100);
+    })}));
+  posterPh3.position.set(-2.4,1.7,-3.97);
+  G('poster_ph', posterPh3);
+  G('clock',
+    P(2.4,2.2,-3.94, B(.66,.32,.1, M(0x1a0e08))),
+    P(2.4,2.2,-3.88, new THREE.Mesh(new THREE.PlaneGeometry(.54,.2),
+      new THREE.MeshBasicMaterial({map: texCanvas(220,80,g=>{
+        g.fillStyle='#120806'; g.fillRect(0,0,220,80);
+        g.fillStyle='#ff6b6b'; g.font='700 44px monospace'; g.textAlign='center'; g.textBaseline='middle';
+        g.fillText('T-00:00',110,42);
+      })}))),
+  );
+  const helmet = new THREE.Mesh(new THREE.SphereGeometry(.18,18,14), M(0xd8d3c8,{roughness:.4}));
+  helmet.position.set(2.8,.62,-3.5);
+  const visor = new THREE.Mesh(new THREE.SphereGeometry(.15,14,12), M(0x3a2a1a,{metalness:.6, roughness:.2}));
+  visor.position.set(2.8,.62,-3.42); visor.scale.set(.8,.7,.5);
+  G('ext', helmet, visor, P(2.8,.42,-3.5, CYL(.16,.18,.1, M(0x5a4232))));
+  refs.moonRingMat = new THREE.MeshStandardMaterial({color:0xe8833a, emissive:0x542807, metalness:.3});
+  const mRing = new THREE.Mesh(new THREE.TorusGeometry(.38,.03,10,32), refs.moonRingMat);
+  mRing.position.set(-1.3,1.5,-3.95);
+  const mDisc = new THREE.Mesh(new THREE.CircleGeometry(.36,32),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,256,g=>{
+      g.fillStyle='#1c100a'; g.beginPath(); g.arc(128,128,126,0,7); g.fill();
+      for(let i=0;i<6;i++){
+        const a = -Math.PI/2 + i*Math.PI/3;
+        const cx = 128+Math.cos(a)*82, cy = 128+Math.sin(a)*82;
+        g.fillStyle='#e8e2c8'; g.beginPath(); g.arc(cx,cy,20,0,7); g.fill();
+        g.fillStyle='#241410';
+        if(i===0){ g.beginPath(); g.arc(cx,cy,20,0,7); g.fill(); }
+        else if(i<3){ g.beginPath(); g.arc(cx-(3-i)*13,cy,20,0,7); g.fill(); }
+        else if(i>3){ g.beginPath(); g.arc(cx+(i-3)*13,cy,20,0,7); g.fill(); }
+      }
+      g.fillStyle='#ffb066'; g.beginPath(); g.arc(128,128,8,0,7); g.fill();
+    })}));
+  mDisc.position.set(-1.3,1.5,-3.94);
+  G('lock_moon', mRing, mDisc);
+
+  // ─ 동쪽: 전력 케이블 + 스위치보드(회로) + 배선도 + 지구 관측 스크린(보름달)
+  const trunk = B(.14,.08,5.0, M(0x5a4232)); trunk.position.set(3.9,2.75,0);
+  G('cables', trunk, P(3.9,2.3,1.1, CYL(.025,.025,.8, M(0x6a4a38))));
+  refs.panelFrame = M(0x5a4232,{metalness:.3});
+  refs.lampsCircuit = [0,1,2].map(i=>{
+    const s = new THREE.Mesh(new THREE.SphereGeometry(.045,12,12),
+      new THREE.MeshStandardMaterial({color:0x2a1a10, emissive:0x000000}));
+    s.position.set(3.8, 1.02, .75+i*.22);
+    return s;
+  });
+  const panelFace3 = new THREE.Mesh(new THREE.PlaneGeometry(1.0,1.3),
+    new THREE.MeshBasicMaterial({map: texCanvas(200,256,g=>{
+      g.fillStyle='#241410'; g.fillRect(0,0,200,256);
+      g.strokeStyle='#6a4a38'; g.lineWidth=10; g.strokeRect(5,5,190,246);
+      g.fillStyle='#ffb066'; g.font='110px sans-serif'; g.textAlign='center'; g.textBaseline='middle';
+      g.fillText('⚡',100,118);
+    })}));
+  panelFace3.rotation.y = -Math.PI/2; panelFace3.position.set(3.86,1.55,1.05);
+  G('lock_circuit',
+    P(3.94,1.55,1.05, B(.14,1.45,1.1, refs.panelFrame)),
+    panelFace3,
+    P(3.84,1.55,1.57, B(.06,.28,.05, M(0xc9a55a,{metalness:.5}))),
+    ...refs.lampsCircuit,
+  );
+  const posterS3 = new THREE.Mesh(new THREE.PlaneGeometry(.8,.55),
+    new THREE.MeshBasicMaterial({map: texCanvas(256,176,g=>{
+      g.fillStyle='#241410'; g.fillRect(0,0,256,176);
+      g.strokeStyle='#8a5a42'; g.lineWidth=8; g.strokeRect(4,4,248,168);
+      g.fillStyle='#ffb066'; g.font='700 30px sans-serif'; g.textAlign='center';
+      g.fillText('전력 배선도',128,66);
+      g.strokeStyle='#c9a55a'; g.lineWidth=3;
+      g.beginPath(); g.moveTo(40,120); g.lineTo(110,120); g.lineTo(140,146); g.lineTo(216,146); g.stroke();
+    })}));
+  posterS3.rotation.y = -Math.PI/2; posterS3.position.set(3.96,1.6,2.6);
+  G('poster_short', posterS3);
+  const screen = new THREE.Mesh(new THREE.PlaneGeometry(1.7,1.2),
+    new THREE.MeshBasicMaterial({map: texCanvas(340,240,g=>{
+      g.fillStyle='#04070d'; g.fillRect(0,0,340,240);
+      g.strokeStyle='#2f4152'; g.lineWidth=6; g.strokeRect(3,3,334,234);
+      g.fillStyle='#e8e2c8'; g.beginPath(); g.arc(170,110,52,0,7); g.fill();
+      g.fillStyle='#7fc4d4'; g.font='22px sans-serif'; g.textAlign='center';
+      g.fillText('지구 · 달 실시간 관측',170,210);
+    })}));
+  screen.rotation.y = -Math.PI/2; screen.position.set(3.94,1.75,-1.7);
+  G('window', P(3.97,1.75,-1.7, B(.05,1.4,1.9, M(0x5a4232))), screen);
+
+  // ─ 남쪽: 물 재생기(pH) + 화물 크레인(저울) + 공구 서랍 + 산소 밸브
+  refs.beakerMidMat = new THREE.MeshStandardMaterial({color:0x4a7fd6, emissive:0x0a1a3a, transparent:true, opacity:.92});
+  G('lock_ph',
+    P(-2.2,1.0,3.6, CYL(.34,.38,1.9, M(0x6a5a4a,{metalness:.3}))),
+    P(-2.2,1.0,3.24, B(.26,.7,.06, refs.beakerMidMat)),
+    P(-2.2,2.05,3.6, CYL(.08,.08,.3, M(0x5a4232))),
+    P(-1.75,.6,3.5, CYL(.05,.05,.9, M(0x5a4232))),
+  );
+  refs.beam = new THREE.Group();
+  refs.beam.add(B(1.1,.05,.06, M(0xc9a55a,{metalness:.5})));
+  [-.5,.5].forEach(x=>{
+    refs.beam.add(P(x,-.16,0, B(.016,.32,.016, M(0x8a7a5a))));
+    refs.beam.add(P(x,-.4,0, B(.3,.22,.24, M(x<0?0x8a5a42:0x5a4232))));
+  });
+  refs.beam.position.set(1.5,2.15,3.5);
+  G('lock_balance',
+    P(1.5,1.1,3.8, B(.12,2.1,.12, M(0x5a4232,{metalness:.3}))),
+    P(1.5,2.2,3.65, B(.1,.1,.5, M(0x5a4232))),
+    refs.beam,
+  );
+  refs.drawer = new THREE.Group();
+  refs.drawer.add(B(.5,.22,.06, M(0x4a3226)));
+  refs.drawer.add(P(0,-.01,-.05, B(.16,.03,.03, M(0xc9a55a))));
+  refs.drawer.position.set(-.2,.5,3.7);
+  scene.add(P(-.2,.3,3.75, B(.7,.6,.5, M(0x3a2a1e))));
+  refs.note = new THREE.Mesh(new THREE.PlaneGeometry(.26,.18), new THREE.MeshBasicMaterial({color:0xd8d3c0}));
+  refs.note.rotation.x = -Math.PI/2*.85; refs.note.position.set(-.2,.64,3.5); refs.note.visible = false;
+  scene.add(refs.note);
+  G('drawer', refs.drawer);
+  G('valve',
+    P(2.7,2.0,3.94, new THREE.Mesh(new THREE.TorusGeometry(.12,.03,10,24), M(0x3fae6a,{metalness:.4}))),
+    P(2.7,2.3,3.97, CYL(.03,.03,.5, M(0x5a4232))),
+  );
+
+  // ─ 서쪽: 항법 콘솔(수열, 덮개) + 절차서 바인더 + 접시 안테나(광학) + 감자 화분
+  refs.dialRingMat = new THREE.MeshStandardMaterial({color:0xffb066, emissive:0x6a3a10, metalness:.3});
+  refs.dial = new THREE.Group();
+  const dr3 = new THREE.Mesh(new THREE.TorusGeometry(.11,.025,10,24), refs.dialRingMat);
+  dr3.rotation.y = Math.PI/2; refs.dial.add(dr3);
+  refs.dial.position.set(-3.5,1.25,-.6); refs.dial.visible = false;
+  refs.cloth = [ P(-3.55,1.3,-.6, B(.6,.9,1.15, M(0x8a7a6a,{roughness:1}))) ];
+  refs.cloth[0].rotation.z = .05;
+  G('lock_cipher',
+    P(-3.65,.9,-.6, B(.55,1.1,1.1, M(0x3a2a1e))),
+    P(-3.45,1.42,-.6, (()=>{ const sc=B(.04,.5,.8, M(0x0a121c)); sc.rotation.z=.3; return sc; })()),
+    refs.dial, ...refs.cloth,
+  );
+  const binders = [P(-3.85,1.05,-2.5, B(.3,2.1,1.0, M(0x241410)))];
+  for(let s=0;s<3;s++) for(let i=0;i<4;i++)
+    binders.push(P(-3.68,.55+s*.6,-2.85+i*.24, B(.03,.3,.2, M([0xe8833a,0x8a5a42,0xc9a55a,0x6a4a38][(s+i)%4]))));
+  G('books', ...binders);
+  refs.mirrorLampMat = new THREE.MeshStandardMaterial({color:0x2a1a10, emissive:0x000000});
+  const dish = new THREE.Mesh(new THREE.CylinderGeometry(.45,.1,.16,26), M(0xd8d3c8,{metalness:.4, roughness:.5}));
+  dish.rotation.z = 1.0; dish.rotation.x = -.3; dish.position.set(-3.45,1.85,1.6);
+  G('lock_mirror',
+    dish,
+    P(-3.6,1.0,1.6, CYL(.05,.07,1.2, M(0x5a4232))),
+    P(-3.6,.42,1.6, CYL(.22,.26,.06, M(0x5a4232))),
+    P(-3.25,1.4,1.85, new THREE.Mesh(new THREE.SphereGeometry(.05,12,12), refs.mirrorLampMat)),
+  );
+  const pot = CYL(.16,.12,.24, M(0x8a5a42));
+  pot.position.set(-3.4,.42,2.8);
+  const sprouts = [0,1,2].map(i=>{ const c=new THREE.Mesh(new THREE.ConeGeometry(.05,.18,8), M(0x3fae6a)); c.position.set(-3.46+i*.07,.62,2.76+((i%2)*.08)); return c; });
+  G('bucket', pot, ...sprouts, P(-3.4,.28,2.8, B(.5,.05,.5, M(0x3a2a1e))));
+
+  return {scene, pickables, refs};
+}
+
+function init3D(){
+  if(R3){ sizeRenderer(); return; }
+  const container = $('#scene3d');
+  const built = buildRoomScene();
+  const renderer = new THREE.WebGLRenderer({antialias:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+  container.appendChild(renderer.domElement);
+  const camera = new THREE.PerspectiveCamera(72, 16/9, .05, 40);
+  camera.position.set(0, 1.5, 0);
+  R3 = Object.assign({renderer, camera, raycaster:new THREE.Raycaster(), container}, built);
+  sizeRenderer();
+  window.addEventListener('resize', sizeRenderer);
+
+  const cv = renderer.domElement;
+  let dragging = false, lastX = 0, lastY = 0, moved = 0;
+  cv.addEventListener('pointerdown', e=>{
+    dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
+    cv.setPointerCapture(e.pointerId);
+  });
+  cv.addEventListener('pointermove', e=>{
+    if(dragging){
+      const dx = e.clientX-lastX, dy = e.clientY-lastY;
+      lastX = e.clientX; lastY = e.clientY; moved += Math.abs(dx)+Math.abs(dy);
+      camYaw += dx*.0042;
+      camPitch = Math.max(-.55, Math.min(.6, camPitch + dy*.003));
+      targetYaw = null;
+    } else {
+      const id = pickAt(e.clientX, e.clientY);
+      cv.style.cursor = id ? 'pointer' : 'grab';
+      $('#hover-label').textContent = id ? objLabel(id) : '';
+    }
+  });
+  cv.addEventListener('pointerup', e=>{
+    dragging = false;
+    if(moved < 8){ const id = pickAt(e.clientX, e.clientY); if(id) handleObj(id); }
+  });
+  requestAnimationFrame(tick3D);
+}
+
+function sizeRenderer(){
+  if(!R3) return;
+  const w = R3.container.clientWidth || 800;
+  const h = Math.max(300, Math.round(w*9/16));
+  R3.renderer.setSize(w, h);
+  R3.camera.aspect = w/h;
+  R3.camera.updateProjectionMatrix();
+}
+
+function pickAt(cx, cy){
+  const rect = R3.renderer.domElement.getBoundingClientRect();
+  const v = new THREE.Vector2((cx-rect.left)/rect.width*2-1, -((cy-rect.top)/rect.height)*2+1);
+  R3.raycaster.setFromCamera(v, R3.camera);
+  const hits = R3.raycaster.intersectObjects(R3.pickables, true);
+  for(const hit of hits){
+    let o = hit.object;
+    while(o){ if(o.userData && o.userData.obj) return o.userData.obj; o = o.parent; }
+  }
+  return null;
+}
+
+function objLabel(id){
+  const o = objMeta(id);
+  if(o.type==='door') return THEME.doorName + ' · 키패드';
+  if(o.type==='decor') return o.name;
+  if(!ROOM.locks.find(l=>l.id===o.lockId)) return '죽어 있는 장치';
+  if(o.lockId==='cipher' && !state.disc.cipher) return THEME.cipherHiddenLabel;
+  return lockMeta(o.lockId).name + (state.solved[o.lockId] ? ' · 해제됨' : '');
+}
+
+function rotateStep(dir){
+  const cur = targetYaw!==null ? targetYaw : camYaw;
+  targetYaw = Math.round(cur/(Math.PI/2))*(Math.PI/2) + dir*Math.PI/2;
+  $('#note-pop').classList.remove('on');
+}
+
+function tick3D(t){
+  requestAnimationFrame(tick3D);
+  if(!R3 || !$('#screen-room').classList.contains('on')) return;
+  if(targetYaw!==null){
+    camYaw += (targetYaw-camYaw)*.14;
+    if(Math.abs(targetYaw-camYaw)<.005){ camYaw = targetYaw; targetYaw = null; }
+  }
+  R3.refs.lamp.intensity = 1.02 + Math.sin(t*.012)*.05 + (Math.random()<.015 ? -.4 : 0);
+  const d = new THREE.Vector3(
+    Math.sin(camYaw)*Math.cos(camPitch),
+    Math.sin(camPitch),
+    -Math.cos(camYaw)*Math.cos(camPitch)
+  );
+  R3.camera.lookAt(d.add(R3.camera.position));
+  R3.renderer.render(R3.scene, R3.camera);
+}
+
+// 방 상태(발견·해제)를 3D 씬에 반영
+function update3D(){
+  if(!R3) return;
+  const r = R3.refs;
+  const allSolved = ROOM.locks.length>0 && ROOM.locks.every(l=>state.solved[l.id]);
+  const cOn = !!state.solved.circuit;
+  r.lampsCircuit.forEach(s=>{
+    s.material.emissive.setHex(cOn ? 0x2fae6a : 0x000000);
+    s.material.color.setHex(cOn ? 0x5fd39a : 0x232c4e);
+  });
+  r.panelFrame.emissive.setHex(cOn ? 0x123a26 : 0x000000);
+  r.beakerMidMat.color.setHex(state.solved.ph ? 0x8a5fd3 : 0x4a7fd6);
+  r.beakerMidMat.emissive.setHex(state.solved.ph ? 0x3a2266 : 0x0a1a3a);
+  r.beam.rotation.z = state.solved.balance ? 0 : .13;
+  const disc = !!state.disc.cipher;
+  r.cloth.forEach(m=>m.visible = !disc);
+  r.dial.visible = disc;
+  r.dialRingMat.color.setHex(state.solved.cipher ? 0x5fd39a : 0xffd76a);
+  r.dialRingMat.emissive.setHex(state.solved.cipher ? 0x1d4d2e : 0x8a6a20);
+  r.keypadMat.emissive.setHex(allSolved ? 0xffd76a : 0x232c4e);
+  r.keypadMat.emissiveIntensity = allSolved ? 1.6 : .6;
+  r.drawer.position.z = state.found.drawer ? 2.86 : 3.12;
+  r.note.visible = !!state.found.drawer;
+  r.mirrorLampMat.emissive.setHex(state.solved.mirror ? 0x2fae6a : 0x000000);
+  r.mirrorLampMat.color.setHex(state.solved.mirror ? 0x5fd39a : 0x232c4e);
+  r.moonRingMat.color.setHex(state.solved.moon ? 0x5fd39a : 0xffd76a);
+  r.moonRingMat.emissive.setHex(state.solved.moon ? 0x1d4d2e : 0x6a5218);
+}
+
+
+function renderChips(){
+  $('#digit-chips').innerHTML = `<span class="chips-label">${THEME.chipsLabel}</span>` +
+    ROOM.locks.map(l=>`<span class="digit-chip ${state.solved[l.id]?'got':''}">${state.solved[l.id]? l.digit : '?'}</span>`).join('');
+  const got = ROOM.locks.filter(l=>state.solved[l.id]).length;
+  $('#pieces-btn').innerHTML = `${THEME.pieceIcon} 조각 ${got}/${ROOM.locks.length}`;
+  $('#pieces-btn').style.display = ROOM.custom ? 'none' : '';
+}
+function refresh3D(){ update3D(); renderChips(); }
+
+function showNote(nm, text){
+  const np = $('#note-pop');
+  np.innerHTML = `<div class="nm">${nm}</div>${text}`;
+  np.classList.add('on');
+}
+
+function handleObj(id){
+  const o = objMeta(id);
+  if(!o) return;
+  $('#note-pop').classList.remove('on');
+  if(o.type==='door') return openDoor();
+  if(o.type==='decor'){
+    if(id==='drawer' && !state.found.drawer){ state.found.drawer = true; update3D(); }
+    showNote(o.name, o.text);
+    return;
+  }
+  // lock
+  const lm = lockMeta(o.lockId);
+  const lock = ROOM.locks.find(l=>l.id===o.lockId);
+  if(!lock){ showNote('죽어 있는 장치','장치가 먼지를 뒤집어쓴 채 꺼져 있다. 이 방에서는 쓰지 않는 모양이다.'); return; }
+  if(state.solved[o.lockId]){
+    showNote(lm.name, `이미 해제됐다 — ${lm.reward}: ${lock.digit}`);
+    return;
+  }
+  if(!state.disc[o.lockId]){
+    state.disc[o.lockId] = true;
+    update3D();
+    showNote(lm.name + ' 발견!', (lm.discover || o.discover) + ' (다시 누르면 조사한다)');
+    return;
+  }
+  openPuzzle(o.lockId);
+}
+
+$('#note-pop').addEventListener('click', ()=>$('#note-pop').classList.remove('on'));
+$('#pieces-btn').addEventListener('click', openPieces);
+$('#nav-l').addEventListener('click', ()=>rotateStep(-1));
+$('#nav-r').addEventListener('click', ()=>rotateStep(1));
+document.addEventListener('keydown', e=>{
+  if(!$('#screen-room').classList.contains('on') || $('#overlay').classList.contains('on')) return;
+  if(e.key==='ArrowLeft') rotateStep(-1);
+  if(e.key==='ArrowRight') rotateStep(1);
+});
+
+function openPuzzle(id){
+  const p = lockMeta(id);
+  const lock = ROOM.locks.find(l=>l.id===id);
+  const cfg = p.config((lock && lock.diff) || state.diff);
+  cfg.__success = p.success || null;
+  const modal = $('#modal');
+  let hintIdx = 0;
+  const diffNm = DIFF_LABEL[(lock && lock.diff) || state.diff] || '';
+  modal.innerHTML = `
+    <div class="modal-head"><h3>${p.icon} ${p.name}${diffNm?` <span style="font-size:11px;color:var(--amber);font-weight:500">${diffNm}</span>`:''}</h3>
+      <button class="x-btn" id="m-close">✕</button></div>
+    <p class="modal-desc">${cfg.desc}</p>
+    ${cfg.curri ? `<div class="curri-badge">📚 ${cfg.curri}</div>` : ''}
+    <div id="puzzle-body"></div>
+    <div id="hint-area"></div>
+    <div class="modal-foot">
+      <button class="btn" id="m-hint">💡 힌트 보기 (${cfg.hints.length}개)</button>
+    </div>`;
+  $('#overlay').classList.add('on');
+  $('#m-close').onclick = closeModal;
+  $('#m-hint').onclick = ()=>{
+    if(hintIdx >= cfg.hints.length) return;
+    state.hintsUsed++; $('#hint-count').textContent = state.hintsUsed;
+    const d = document.createElement('div');
+    d.className='hint-box'; d.textContent = cfg.hints[hintIdx++];
+    $('#hint-area').appendChild(d);
+    $('#m-hint').textContent = hintIdx>=cfg.hints.length ? '💡 힌트 끝' : `💡 힌트 보기 (${cfg.hints.length-hintIdx}개 남음)`;
+  };
+  p.mount($('#puzzle-body'), cfg, {
+    solve(){
+      state.solved[id] = true;
+      refresh3D();
+      setTimeout(()=>{ closeModal(); showPiece(id); }, 700);
+    }
+  });
+}
+
+// 이야기 조각 획득 연출
+function showPiece(lockId){
+  if(ROOM.custom || !pieceOf(lockId)) return;
+  const pc = pieceOf(lockId);
+  const lock = ROOM.locks.find(l=>l.id===lockId);
+  const modal = $('#modal');
+  modal.innerHTML = `
+    <div class="modal-head"><h3>${THEME.pieceIcon} ${THEME.pieceFoundTitle}</h3>
+      <button class="x-btn" id="m-close">✕</button></div>
+    <div class="piece-card">
+      <div>${THEME.glyph(pc.ord, 64)}</div>
+      <div class="piece-meta">${pc.phase} · ${pc.form}</div>
+      <p class="piece-text">${pc.text}</p>
+      <div class="piece-digit">${THEME.digitLine} <b>${lock.digit}</b></div>
+    </div>
+    <div class="modal-foot" style="justify-content:center">
+      <button class="btn primary" id="p-ok">간직하기</button>
+    </div>`;
+  $('#overlay').classList.add('on');
+  $('#m-close').onclick = closeModal;
+  $('#p-ok').onclick = closeModal;
+}
+
+// 모은 조각 보기
+function openPieces(){
+  const modal = $('#modal');
+  const got = ROOM.locks.filter(l=>state.solved[l.id]);
+  modal.innerHTML = `
+    <div class="modal-head"><h3>${THEME.pieceIcon} 모은 ${THEME.pieceWord} (${got.length}/${ROOM.locks.length})</h3>
+      <button class="x-btn" id="m-close">✕</button></div>` +
+    (got.length
+      ? got.map(l=>{ const pc = pieceOf(l.id); return `
+        <div class="piece-row">
+          <div>${THEME.glyph(pc.ord, 40)}</div>
+          <div class="pr-body">
+            <div class="pr-meta">${pc.phase} · ${pc.form} · 숫자 ${l.digit}</div>
+            <div class="pr-text">${pc.text}</div>
+          </div>
+        </div>`; }).join('')
+      : `<p class="modal-desc">아직 모은 조각이 없다. 장치를 풀면 조각이 나온다.</p>`) +
+    `<p class="modal-desc" style="margin-top:12px">${THEME.collectNudge}</p>`;
+  $('#overlay').classList.add('on');
+  $('#m-close').onclick = closeModal;
+}
+
+function openDoor(){
+  const modal = $('#modal');
+  const allSolved = ROOM.locks.every(l=>state.solved[l.id]);
+  const got = ROOM.locks.filter(l=>state.solved[l.id]);
+  const strip = (!ROOM.custom && got.length)
+    ? `<div class="door-strip">${got.map(l=>`<span class="ds-item">${THEME.glyph(pieceOf(l.id).ord, 26)}${l.digit}</span>`).join('')}</div>`
+    : '';
+  let entered = '';
+  modal.innerHTML = `
+    <div class="modal-head"><h3>🚪 ${THEME.doorName}</h3>
+      <button class="x-btn" id="m-close">✕</button></div>
+    <p class="modal-desc">${allSolved
+      ? (ROOM.custom ? '키패드가 켜져 있다. 장치에서 얻은 숫자를 순서대로.' : THEME.doorHint)
+      : '키패드는 켜져 있지만, 아직 모든 숫자를 찾지 못했다. 그래도 시도해 볼 수는 있다.'}</p>
+    ${strip}
+    <div class="kp-display" id="kp-display">&nbsp;</div>
+    <div class="kp-grid" id="kp-grid">
+      ${[1,2,3,4,5,6,7,8,9].map(n=>`<button class="btn" data-k="${n}">${n}</button>`).join('')}
+      <button class="btn" data-k="C">지움</button>
+      <button class="btn" data-k="0">0</button>
+      <button class="btn primary" data-k="E">열기</button>
+    </div>`;
+  $('#overlay').classList.add('on');
+  $('#m-close').onclick = closeModal;
+  const disp = $('#kp-display');
+  const draw = ()=>{ disp.innerHTML = entered ? entered : '&nbsp;'; };
+  $('#kp-grid').onclick = ev=>{
+    const b = ev.target.closest('[data-k]'); if(!b) return;
+    const k = b.dataset.k;
+    if(k==='C'){ entered=''; draw(); return; }
+    if(k==='E'){
+      if(entered===doorEntryCode()){ escapeRoom(); }
+      else { disp.classList.remove('shake'); void disp.offsetWidth; disp.classList.add('shake'); entered=''; setTimeout(draw,350); }
+      return;
+    }
+    if(entered.length < DOOR_CODE.length){ entered += k; draw(); }
+  };
+  draw();
+}
+
+function escapeRoom(){
+  const t = Math.floor((Date.now()-state.start)/1000);
+  const mm = String(Math.floor(t/60)).padStart(2,'0'), ss = String(t%60).padStart(2,'0');
+  $('#win-stats').innerHTML =
+    `난이도 <b>${DIFF_LABEL[state.diff]||'맞춤 방'}</b> · 탈출 시간 <b>${mm}:${ss}</b> · 힌트 <b>${state.hintsUsed}회</b>`;
+  if(!ROOM.custom){
+    const ordered = ROOM.locks.slice().sort((a,b)=>pieceOf(a.id).ord - pieceOf(b.id).ord);
+    $('#win-story').innerHTML =
+      `<div class="ending-lines">${THEME.ending.join('<br>')}</div>
+      <div class="win-pieces">${ordered.map(l=>{ const pc = pieceOf(l.id); return `
+        <div class="piece-row">
+          <div>${THEME.glyph(pc.ord, 36)}</div>
+          <div class="pr-body">
+            <div class="pr-meta">${pc.phase} · ${pc.form}</div>
+            <div class="pr-text">${pc.text}</div>
+          </div>
+        </div>`; }).join('')}</div>`;
+  } else {
+    $('#win-story').innerHTML = '';
+  }
+  closeModal();
+  const fl = $('#flash');
+  fl.classList.add('on');
+  setTimeout(()=>{ show('screen-win'); }, 300);
+  setTimeout(()=>fl.classList.remove('on'), 1200);
+}
+
+function closeModal(){
+  $('#overlay').classList.remove('on');
+  $('#modal').innerHTML='';
+}
+$('#overlay').addEventListener('click', ev=>{ if(ev.target===$('#overlay')) closeModal(); });
+
+document.querySelectorAll('.diff-card[data-diff]').forEach(b=>{
+  b.addEventListener('click', ()=>startRoom(b.dataset.diff));
+});
+// 방(테마) 선택 → 오프닝 내레이션 + 난이도 선택 노출
+document.querySelectorAll('#room-grid .diff-card').forEach(b=>{
+  b.addEventListener('click', ()=>{
+    THEME = THEMES[b.dataset.room] || THEMES.lab;
+    ROOM = defaultRoom();
+    DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+    $('#opening-lines').innerHTML = THEME.opening.join('<br>');
+    $('#diff-section').style.display = '';
+    document.querySelectorAll('#room-grid .diff-card').forEach(c=>{
+      c.style.borderColor = (c===b) ? 'var(--amber2)' : '';
+    });
+    $('#diff-section').scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
+/* ======================= 맞춤 방 설정(조립기 연동) ======================= */
+// 포맷: #cfg=<base64(UTF-8 JSON)> — {t:제목, s:도입문구, l:[{p:퍼즐id, d:난이도, g:숫자}]}
+// builder.html이 같은 포맷으로 인코딩한다.
+
+function encodeCfg(obj){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return encodeURIComponent(btoa(bin));
+}
+function decodeCfg(str){
+  const bin = atob(decodeURIComponent(str));
+  const bytes = Uint8Array.from(bin, c=>c.charCodeAt(0));
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+function applyCustomCfg(c){
+  THEME = THEMES.lab; // 조립기 맞춤 방은 실험실 테마 기준
+  const locks = (c.l||[])
+    .filter(x=>PUZZLES[x.p])
+    .map(x=>({ id:x.p, diff:DIFF_LABEL[x.d]?x.d:'mid', digit:/^[0-9]$/.test(String(x.g))?String(x.g):PUZZLES[x.p].digit }));
+  if(!locks.length) return false;
+  ROOM = { title:String(c.t||'맞춤 방').slice(0,40), story:String(c.s||'장치를 풀어 비밀번호를 모으자.').slice(0,200), custom:true, locks };
+  DOOR_CODE = locks.map(l=>l.digit).join('');
+  return true;
+}
+
+/* ======================= 셀프테스트 & 개발용 점프 ======================= */
+
+function runSelftest(){
+  const results = [];
+  const T = (name, ok)=>results.push([name, !!ok]);
+
+  ['easy','mid','hard'].forEach(diff=>{
+    // 초기 상태는 미해결이어야 한다
+    const c0 = circuitConfig(diff);
+    T(`circuit ${diff}: 시작 상태 미해결`, !circuitGoalMet(c0));
+    // 정답 배선은 해결이어야 한다
+    const c1 = circuitConfig(diff);
+    c1.edges.forEach(e=>{ if(e.type==='wire' && !e.fixed) e.on = c1.solution.includes(e.id); });
+    T(`circuit ${diff}: 정답 배선 해결`, circuitGoalMet(c1));
+    // 함정(모든 토글 on)은 미해결이어야 한다
+    const c2 = circuitConfig(diff);
+    c2.edges.forEach(e=>{ if(e.type==='wire') e.on = true; });
+    T(`circuit ${diff}: 전부 켜면 미해결(합선/단락)`, !circuitGoalMet(c2));
+
+    const b = balanceConfig(diff);
+    T(`balance ${diff}: 정답 배치 수평`, balanceSolved(b, b.solution));
+    T(`balance ${diff}: 정답 추 개수 제한 통과`, b.solution.length <= b.maxCount);
+    T(`balance ${diff}: 정답이 보관함 추만 사용`, (()=>{
+      const pool = b.inv.slice();
+      return b.solution.every(w=>{ const i=pool.indexOf(w.m); if(i<0) return false; pool.splice(i,1); return true; });
+    })());
+    T(`balance ${diff}: 빈 배치 미해결`, !balanceSolved(b, []));
+    T(`balance ${diff}: 오답 배치 미해결`, !balanceSolved(b, [{m:5,d:1}]));
+
+    const cc = cipherConfig(diff);
+    T(`cipher ${diff}: 정답 다이얼 해제`, cipherSolved(cc, cc.seqs.map(s=>s.ans)));
+    T(`cipher ${diff}: 오답 다이얼 잠김`, !cipherSolved(cc, cc.seqs.map(s=>(s.ans+1)%10)));
+    T(`cipher ${diff}: 정답이 모두 한 자리 수`, cc.seqs.every(s=>s.ans>=0 && s.ans<=9));
+
+    const pc = phConfig(diff);
+    T(`ph ${diff}: 시작 상태 목표색 아님`, phBand(pc.start).name !== pc.targetBand);
+    T(`ph ${diff}: 정답 방울로 목표색 도달`, phSolvedCheck(pc, pc.solution));
+    T(`ph ${diff}: 정답이 방울 제한 통과`, pc.solution.length <= pc.limit);
+    T(`ph ${diff}: 정답 시약이 실제 존재`, pc.solution.every(e=>pc.reagents.some(r=>r.eff===e)));
+    T(`ph ${diff}: 빈 비커 미해결`, !phSolvedCheck(pc, []));
+
+    const mc = mirrorConfig(diff);
+    T(`mirror ${diff}: 빈 격자 미해결`, !mirrorSolved(mc, {}));
+    T(`mirror ${diff}: 정답 거울 배치 해결`, mirrorSolved(mc, mc.solution));
+    T(`mirror ${diff}: 정답이 거울 개수 제한 통과`, Object.keys(mc.solution).length <= mc.limit);
+    T(`mirror ${diff}: 정답 거울이 빈 칸 위`, Object.keys(mc.solution).every(k=>{
+      const [x,y] = k.split(',').map(Number); return mc.rows[y][x]==='.';
+    }));
+
+    const oc = moonConfig(diff);
+    T(`moon ${diff}: 정답 위상 해결`, moonSolved(oc, oc.rowsQ.map(r=>r.ans)));
+    T(`moon ${diff}: 오답 위상 잠김`, !moonSolved(oc, oc.rowsQ.map(r=>(r.ans+1)%6)));
+    T(`moon ${diff}: 정답 인덱스 유효(0~5)`, oc.rowsQ.every(r=>r.ans>=0 && r.ans<=5));
+
+    T(`교육과정 ${diff}: 전 퍼즐 curri 메타 보유`,
+      Object.keys(PUZZLES).every(id=>typeof PUZZLES[id].config(diff).curri === 'string'));
+  });
+
+  // 맞춤 방 설정 왕복 + 적용
+  {
+    const cfgObj = {t:'테스트 방', s:'스토리 문구', l:[{p:'circuit',d:'easy',g:'1'},{p:'ph',d:'hard',g:'2'}]};
+    T('맞춤 방: 인코딩 왕복 일치', JSON.stringify(decodeCfg(encodeCfg(cfgObj)))===JSON.stringify(cfgObj));
+    const ok = applyCustomCfg(cfgObj);
+    T('맞춤 방: 적용 성공', ok && ROOM.title==='테스트 방' && ROOM.locks.length===2 && DOOR_CODE==='12');
+    T('맞춤 방: 난이도 잠금별 반영', ROOM.locks[0].diff==='easy' && ROOM.locks[1].diff==='hard');
+    T('맞춤 방: 엉터리 설정 거부', !applyCustomCfg({l:[{p:'없는퍼즐'}]}));
+    ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+    T('기본 방: 문 코드 6자리(잠금 6종)', DOOR_CODE.length===6);
+  }
+
+  // 이야기 조각 메커니즘 + 테마별 씬 (실험실/저택)
+  const EXPECT_ENTRY = {lab:'954721', mansion:'836072', frequency:'986314', mars:'273509'};
+  const REQ_REFS = ['lamp','lampsCircuit','panelFrame','beakerMidMat','beam','cloth','dial','dialRingMat','keypadMat','drawer','note','mirrorLampMat','moonRingMat'];
+  Object.keys(THEMES).forEach(tid=>{
+    THEME = THEMES[tid];
+    const r = defaultRoom();
+    const ords = r.locks.map(l=>pieceOf(l.id) && pieceOf(l.id).ord).sort();
+    T(`${tid}: 모든 잠금에 조각 배정 + 순서 중복 없음`, JSON.stringify(ords)==='[0,1,2,3,4,5]');
+    ROOM = r; DOOR_CODE = r.locks.map(l=>l.digit).join('');
+    T(`${tid}: 키패드 입력 코드 = 조각 순서(${EXPECT_ENTRY[tid]})`, doorEntryCode()===EXPECT_ENTRY[tid]);
+    T(`${tid}: 입력 코드 ≠ 수집 순서(재구성 퍼즐 성립)`, doorEntryCode()!==DOOR_CODE);
+    T(`${tid}: 3D 씬 전 오브젝트 배치 + refs 계약`, (()=>{
+      try{
+        const b = buildRoomScene();
+        const ids = new Set(b.pickables.map(p=>p.userData.obj));
+        return Object.keys(SCENE_OBJECTS).every(id=>ids.has(id))
+          && REQ_REFS.every(k=>b.refs[k]!==undefined)
+          && b.refs.dial.visible===false
+          && b.refs.cloth.every(m=>m.visible!==false);
+      }catch(e){ return false; }
+    })());
+  });
+  THEME = THEMES.lab;
+  {
+    ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+    ROOM.custom = true;
+    T('맞춤 방: 수집 순서 입력(레거시)', doorEntryCode()===DOOR_CODE);
+    ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+    T('스토리: 달 퍼즐에 실물 확인 문항(정답 보름)',
+      ['easy','mid','hard'].every(d=>moonConfig(d).rowsQ.some(r2=>r2.q.includes('동쪽') && r2.ans===3)));
+  }
+
+  // 탐색 씬
+  T('탐색: 모든 퍼즐이 벽면에 배치됨',
+    Object.keys(PUZZLES).every(id=>Object.values(SCENE_OBJECTS).some(o=>o.lockId===id)));
+  T('3D: THREE 로드됨', typeof THREE !== 'undefined');
+  T('탐색: 씬 오브젝트가 전부 유형 보유',
+    Object.values(SCENE_OBJECTS).every(o=>['door','decor','lock'].includes(o.type)));
+
+  const allPass = results.every(r=>r[1]);
+  document.title = 'SELFTEST ' + (allPass?'PASS':'FAIL');
+  document.body.innerHTML = `<div class="st-list"><div>SELFTEST ${allPass?'PASS':'FAIL'} (${results.filter(r=>r[1]).length}/${results.length})</div>` +
+    results.map(r=>`<div class="${r[1]?'pass':'fail'}">${r[1]?'✓':'✗'} ${r[0]}</div>`).join('') + `</div>`;
+}
+
+(function boot(){
+  const q = new URLSearchParams(location.search);
+  if(q.get('selftest')) return runSelftest();
+  // 조립기가 만든 맞춤 방: #cfg=...
+  const h = location.hash.match(/cfg=([^&]+)/);
+  if(h){
+    try{ if(applyCustomCfg(decodeCfg(h[1]))) return startRoom('custom'); }
+    catch(e){ /* 잘못된 링크면 기본 인트로로 */ }
+  }
+  // 개발용: ?theme=mansion&screen=room&diff=mid&open=circuit&wall=1&disc=cipher&solved=circuit,ph
+  if(q.get('screen')==='room'){
+    if(q.get('theme') && THEMES[q.get('theme')]){
+      THEME = THEMES[q.get('theme')];
+      ROOM = defaultRoom();
+      DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+    }
+    startRoom(q.get('diff')||'mid');
+    if(q.get('wall')) camYaw = ((+q.get('wall'))%4) * Math.PI/2;
+    if(q.get('disc')) q.get('disc').split(',').forEach(id=>state.disc[id]=true);
+    if(q.get('solved')) q.get('solved').split(',').forEach(id=>state.solved[id]=true);
+    refresh3D();
+    const op = q.get('open');
+    if(op==='door') openDoor();
+    else if(op==='pieces') openPieces();
+    else if(op==='piece') showPiece(q.get('lock')||'circuit');
+    else if(op) openPuzzle(op);
+  }
+})();
+</script>
+</body>
+</html>
