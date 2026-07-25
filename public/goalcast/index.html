@@ -79,9 +79,21 @@
   .cell{min-height:0; overflow:hidden; border-left:1px solid var(--line); padding:5px 7px; position:relative; display:flex; flex-direction:column; gap:3px}
   .cell.out{opacity:.4}
   .cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
-  .cell .dnum{font-size:12px; font-weight:600; color:var(--ink-dim)}
+  .cell .dnum{font-size:12px; font-weight:600; color:var(--ink-dim); cursor:pointer}
   .cell.wknd .dnum{color:var(--weekend)}
   .cell.sun .dnum{color:var(--weekend)}
+  /* 디데이 — 날짜 숫자 클릭으로 그 칸에 남은 날짜 표시 */
+  .dd-badge{font-size:11px; font-weight:800; color:var(--warn); font-variant-numeric:tabular-nums;
+    margin-left:5px; padding:0 5px; border-radius:5px; background:rgba(255,207,107,.16)}
+  .dd-badge.soon{color:var(--weekend); background:rgba(255,157,157,.18)}
+  .dd-badge.past{color:var(--ink-dim); background:rgba(255,255,255,.1)}
+  /* 찍어둔 디데이까지 가는 날들 — 오늘부터 며칠째인지 흐리게 이어 표시 */
+  .dd-badge.lead{font-weight:600; color:var(--ink-dim); background:transparent; padding:0; opacity:.5}
+  .cell:hover .dd-badge.lead{opacity:.9}
+  /* 클릭하면 디데이가 된다는 신호 — 칸에 올렸을 때만 */
+  .dd-hint{font-size:11px; font-weight:700; color:var(--ink-dim); margin-left:5px; padding:0 4px;
+    border-radius:5px; border:1px dashed var(--line); opacity:0}
+  .cell:hover .dd-hint{opacity:.6}
   .tasks{display:flex; flex-direction:column; gap:2px; margin-top:1px; overflow:hidden; min-height:0}
   .task{
     font-size:12px; line-height:1.3; cursor:pointer; padding:2px 5px; border-radius:6px;
@@ -197,7 +209,7 @@
   <div class="grid" id="grid"></div>
 
   <div class="hint">
-    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 선택 · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
+    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 선택 · <b>날짜 숫자 클릭=디데이</b> 지정/해제 · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
   </div>
 
 <script>
@@ -239,6 +251,8 @@ function load(){
 // 옛 데이터(문자열 목표/주목표)를 새 객체 구조로 정규화
 function migrate(S){
   S.hideDone=!!S.hideDone; S.monthGoals=S.monthGoals||{}; S.weekGoals=S.weekGoals||{}; S.tasks=S.tasks||{}; S.retros=S.retros||{};
+  // 디데이로 찍어둔 날짜들(ISO 문자열 배열) — 날짜 숫자 클릭으로 토글
+  S.ddayMarks = Array.isArray(S.ddayMarks) ? S.ddayMarks.filter(k=>typeof k==='string') : [];
   for(const k in S.monthGoals){
     S.monthGoals[k]=S.monthGoals[k].map((g,i)=> typeof g==='string'
       ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length],done:g.done});
@@ -252,6 +266,47 @@ function migrate(S){
   }
 }
 function save(){ localStorage.setItem(KEY,JSON.stringify(S)); }
+// 새 달을 처음 열면 직전 달의 못 끝낸 목표를 그대로 가져온다.
+// 한 번이라도 만진 달(비워둔 달 포함)과 지난 달엔 손대지 않는다.
+function carryOverGoals(y,m){
+  const key=`${y}-${m}`;
+  if(S.monthGoals[key]) return;                                   // 이미 만진 달
+  if(y*12+m < today.getFullYear()*12+today.getMonth()+1) return;   // 지난 달은 비워둔 채로
+  let src=null;
+  for(let back=1; back<=12 && !src; back++){                       // 건너뛴 달이 있어도 최근 달에서 이어받게
+    let py=y, pm=m-back;
+    while(pm<=0){ pm+=12; py--; }
+    const arr=S.monthGoals[`${py}-${pm}`];
+    if(arr && arr.length) src=arr;
+  }
+  if(!src) return;
+  const carried=src.filter(g=>!g.done && g.t.trim()).map(g=>({t:g.t,color:g.color,done:false}));
+  if(!carried.length) return;
+  S.monthGoals[key]=carried; save();
+}
+// 디데이 — 오늘 자정 기준 날짜 차이(당일 D-DAY, 하루 전 D-1, 지난 건 D+n)
+function ddayDiff(dstr){
+  const [y,m,d]=String(dstr).split('-').map(Number);
+  return Math.round((Date.UTC(y,m-1,d)-Date.UTC(today.getFullYear(),today.getMonth(),today.getDate()))/864e5);
+}
+function ddayLabel(n){ return n===0?'D-DAY':(n>0?'D-'+n:'D+'+(-n)); }
+// 앞으로 남은 디데이 중 가장 먼 것까지 며칠 — 사다리를 어디까지 그릴지
+function ddayReach(){ return S.ddayMarks.reduce((mx,k)=>Math.max(mx,ddayDiff(k)),0); }
+// 셀 날짜 옆에 붙일 배지 HTML — 찍은 날은 진하게, 가는 길은 흐리게
+function ddayBadge(k){
+  const n=ddayDiff(k);
+  if(S.ddayMarks.includes(k)){
+    const kind = n<0 ? ' past' : (n<=7 ? ' soon' : '');
+    return ` <span class="dd-badge${kind}">${ddayLabel(n)}</span>`;
+  }
+  if(n>0 && n<=ddayReach()) return ` <span class="dd-badge lead">${ddayLabel(n)}</span>`;
+  return '';
+}
+function toggleDday(k){
+  const i=S.ddayMarks.indexOf(k);
+  if(i>=0) S.ddayMarks.splice(i,1); else S.ddayMarks.push(k);
+  save(); render();
+}
 function goalColor(mg,i){ return (mg[i]&&mg[i].color) || GCOLORS[i%GCOLORS.length]; }
 
 const WD=['일요일','월요일','화요일','수요일','목요일','금요일','토요일'];
@@ -332,6 +387,7 @@ function render(){
   document.getElementById('mTitle').textContent=`${view.y}년 ${view.m}월`;
   // 월 목표
   const mgKey=`${view.y}-${view.m}`;
+  carryOverGoals(view.y,view.m);
   const mg=S.monthGoals[mgKey]||[];
   const box=document.getElementById('monthGoals'); box.innerHTML='';
   if(focusGoal!=null && focusGoal>=mg.length) focusGoal=null;
@@ -463,8 +519,10 @@ function render(){
       const cell=document.createElement('div');
       cell.className='cell'+(out?' out':'')+(k===todayISO?' today':'')+(dt.getDay()===0?' sun':'')+(dt.getDay()===6?' wknd':'');
       const tasks=S.tasks[k]||[];
-      cell.innerHTML=`<div class="dnum">${d}${d===1?` <span style="color:var(--accent)">${m}월</span>`:''}</div>
+      const ddb=ddayBadge(k);
+      cell.innerHTML=`<div class="dnum" title="클릭=디데이 지정/해제">${d}${d===1?` <span style="color:var(--accent)">${m}월</span>`:''}${ddb||' <span class="dd-hint">+D</span>'}</div>
         <div class="tasks"></div><div class="add">+ 할일</div>`;
+      cell.querySelector('.dnum').onclick=()=>toggleDday(k);
       const tl=cell.querySelector('.tasks');
       cell.addEventListener('dragover',(e)=>{ if(!dragSrc) return; e.preventDefault(); e.dataTransfer.dropEffect='move';
         if(dragSrc.k!==k && !cell.classList.contains('drop-hot')){ document.querySelectorAll('.cell.drop-hot').forEach(c=>c.classList.remove('drop-hot')); cell.classList.add('drop-hot'); } });
