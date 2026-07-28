@@ -37,7 +37,7 @@
   .month-nav{
     display:flex; flex-direction:column; justify-content:center; gap:6px;
     background:var(--panel-strong); border:1px solid var(--line); border-radius:14px;
-    padding:12px 16px; min-width:190px; backdrop-filter:blur(14px);
+    padding:12px 16px; min-width:210px; backdrop-filter:blur(14px);
   }
   .month-nav .title{font-size:20px; font-weight:700; letter-spacing:-.3px}
   .month-nav .sub{font-size:12px; color:var(--ink-dim)}
@@ -79,7 +79,8 @@
   .cell{min-height:0; overflow:hidden; border-left:1px solid var(--line); padding:5px 7px; position:relative; display:flex; flex-direction:column; gap:3px}
   .cell.out{opacity:.4}
   .cell.today{box-shadow:inset 0 0 0 2px var(--accent)}
-  .cell .dnum{font-size:12px; font-weight:600; color:var(--ink-dim); cursor:pointer}
+  .cell .dnum{font-size:12px; font-weight:600; color:var(--ink-dim); cursor:pointer;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
   .cell.wknd .dnum{color:var(--weekend)}
   .cell.sun .dnum{color:var(--weekend)}
   /* 디데이 — 날짜 숫자 클릭으로 그 칸에 남은 날짜 표시 */
@@ -90,10 +91,29 @@
   /* 찍어둔 디데이까지 가는 날들 — 오늘부터 며칠째인지 흐리게 이어 표시 */
   .dd-badge.lead{font-weight:600; color:var(--ink-dim); background:transparent; padding:0; opacity:.5}
   .cell:hover .dd-badge.lead{opacity:.9}
+  /* 디데이 이름 — 배지 옆에 한 줄, 칸을 넘치면 잘림(전문은 목록·툴팁에서) */
+  .dd-name{font-size:11px; font-weight:600; color:var(--warn); opacity:.9}
+  .dd-name.soon{color:var(--weekend)}
+  .dd-name.past{color:var(--ink-dim)}
   /* 클릭하면 디데이가 된다는 신호 — 칸에 올렸을 때만 */
   .dd-hint{font-size:11px; font-weight:700; color:var(--ink-dim); margin-left:5px; padding:0 4px;
     border-radius:5px; border:1px dashed var(--line); opacity:0}
   .cell:hover .dd-hint{opacity:.6}
+  /* 찍어둔 디데이 목록 — 창 밖(지난·먼 미래)의 디데이도 여기서만 보이고 해제 가능 */
+  .dday-box{display:flex; flex-direction:column; gap:3px; margin-top:6px;
+    overflow-y:auto; max-height:104px}
+  .dday-box::-webkit-scrollbar{width:6px}
+  .dday-box::-webkit-scrollbar-thumb{background:rgba(255,255,255,.2); border-radius:99px}
+  .dday-box:empty{display:none}
+  .dd-row{display:flex; align-items:center; gap:6px; font-size:12px; line-height:1.3}
+  .dd-row .dd-when{color:var(--ink-dim); flex:0 0 auto; font-variant-numeric:tabular-nums}
+  .dd-row .dd-what{flex:1; min-width:30px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+    outline:none; padding:1px 3px; border-radius:5px}
+  .dd-row .dd-what:focus{background:rgba(255,255,255,.12); white-space:normal; overflow:visible}
+  .dd-row .dd-what:empty::before{content:"디데이 이름…"; color:var(--ink-dim); opacity:.55}
+  .dd-row.past{opacity:.5}
+  .dd-row .dd-del{opacity:0; cursor:pointer; color:var(--weekend); padding:0 3px; flex:0 0 auto}
+  .dd-row:hover .dd-del{opacity:.7}
   .tasks{display:flex; flex-direction:column; gap:2px; margin-top:1px; overflow:hidden; min-height:0}
   .task{
     font-size:12px; line-height:1.3; cursor:pointer; padding:2px 5px; border-radius:6px;
@@ -193,6 +213,7 @@
         <button id="prev">‹ 이전</button>
         <button id="next">다음 ›</button>
       </div>
+      <div class="dday-box" id="ddayBox"></div>
     </div>
     <div class="goal-banner">
       <div class="lbl">이 달의 목표</div>
@@ -209,7 +230,7 @@
   <div class="grid" id="grid"></div>
 
   <div class="hint">
-    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 선택 · <b>날짜 숫자 클릭=디데이</b> 지정/해제 · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
+    <b>월→주→일</b> 목표 캐스케이드 · 목표 번호 클릭=그 목표만 강조, 우클릭=색 변경 · 색칩 클릭=목표 연결 선택 · <b>날짜 숫자 클릭=디데이</b> 지정/해제(이름은 왼쪽 목록에서 수정) · 목표 달성 시 🎉 · 데이터는 이 브라우저에 저장돼요
   </div>
 
 <script>
@@ -226,6 +247,7 @@ let view={y:today.getFullYear(),m:today.getMonth()+1}; // 현재 달부터
 let focusGoal=null;  // 포커스된 월 목표 인덱스 → 그 목표에 연결된 할일만 강조
 let dragSrc=null;    // 드래그 중인 할일 {k, i}
 let wgDrag=null;     // 드래그 중인 주 목표 {wkKey, gi} — 같은 주 레일 내 순서 변경
+let ddayFocus=null;  // 방금 찍은 디데이 — 목록 렌더 후 이름 칸에 커서를 놓을 날짜키
 let mgDrag=null;     // 드래그 중인 월 목표 {mgKey, gi} — 이달의 목표 순서 변경
 
 function load(){
@@ -251,8 +273,12 @@ function load(){
 // 옛 데이터(문자열 목표/주목표)를 새 객체 구조로 정규화
 function migrate(S){
   S.hideDone=!!S.hideDone; S.monthGoals=S.monthGoals||{}; S.weekGoals=S.weekGoals||{}; S.tasks=S.tasks||{}; S.retros=S.retros||{};
-  // 디데이로 찍어둔 날짜들(ISO 문자열 배열) — 날짜 숫자 클릭으로 토글
-  S.ddayMarks = Array.isArray(S.ddayMarks) ? S.ddayMarks.filter(k=>typeof k==='string') : [];
+  // 디데이 = {k:'YYYY-MM-DD', t:'이름'} — 날짜 숫자 클릭으로 토글, 이름은 목록에서 수정
+  // 옛 데이터(ISO 문자열 배열)는 그날 첫 할일을 이름으로 삼아 이관
+  S.ddayMarks = (Array.isArray(S.ddayMarks)?S.ddayMarks:[]).map(m=>{
+    if(typeof m==='string') return {k:m, t:((S.tasks[m]||[])[0]||{}).t||''};
+    return (m&&typeof m.k==='string') ? {k:m.k, t:m.t||''} : null;
+  }).filter(Boolean);
   for(const k in S.monthGoals){
     S.monthGoals[k]=S.monthGoals[k].map((g,i)=> typeof g==='string'
       ? {t:g,color:GCOLORS[i%GCOLORS.length]} : {t:g.t||'',color:g.color||GCOLORS[i%GCOLORS.length],done:g.done});
@@ -291,21 +317,74 @@ function ddayDiff(dstr){
 }
 function ddayLabel(n){ return n===0?'D-DAY':(n>0?'D-'+n:'D+'+(-n)); }
 // 앞으로 남은 디데이 중 가장 먼 것까지 며칠 — 사다리를 어디까지 그릴지
-function ddayReach(){ return S.ddayMarks.reduce((mx,k)=>Math.max(mx,ddayDiff(k)),0); }
-// 셀 날짜 옆에 붙일 배지 HTML — 찍은 날은 진하게, 가는 길은 흐리게
+function ddayReach(){ return S.ddayMarks.reduce((mx,m)=>Math.max(mx,ddayDiff(m.k)),0); }
+// 셀 날짜 옆에 붙일 배지 HTML — 찍은 날은 진하게(이름까지), 가는 길은 흐리게
 function ddayBadge(k){
   const n=ddayDiff(k);
-  if(S.ddayMarks.includes(k)){
+  const mk=S.ddayMarks.find(m=>m.k===k);
+  if(mk){
     const kind = n<0 ? ' past' : (n<=7 ? ' soon' : '');
-    return ` <span class="dd-badge${kind}">${ddayLabel(n)}</span>`;
+    const name = mk.t ? ` <span class="dd-name${kind}">${esc(mk.t)}</span>` : '';
+    return ` <span class="dd-badge${kind}">${ddayLabel(n)}</span>${name}`;
   }
   if(n>0 && n<=ddayReach()) return ` <span class="dd-badge lead">${ddayLabel(n)}</span>`;
   return '';
 }
 function toggleDday(k){
-  const i=S.ddayMarks.indexOf(k);
-  if(i>=0) S.ddayMarks.splice(i,1); else S.ddayMarks.push(k);
+  const i=S.ddayMarks.findIndex(m=>m.k===k);
+  if(i>=0) S.ddayMarks.splice(i,1);
+  else {
+    // 이름 기본값 = 그날 첫 할일. 없으면 빈칸 → 목록에서 바로 입력하도록 커서를 보냄
+    S.ddayMarks.push({k, t:((S.tasks[k]||[])[0]||{}).t||''});
+    ddayFocus=k;
+  }
   save(); render();
+}
+// 이름만 바뀌면 그 칸 배지만 갱신 — 여기서 render() 하면 목록이 통째로 다시 그려져
+// blur 직후의 다음 클릭(다른 줄 ✕ 등)이 사라진 노드로 가서 씹힌다
+function syncDdayName(k,t){
+  const dn=document.querySelector(`.cell[data-k="${k}"] .dnum`);
+  if(!dn) return;                       // 보이는 달 밖의 날짜면 다음 render 때 반영됨
+  const badge=dn.querySelector('.dd-badge'); if(!badge) return;
+  const nm=dn.querySelector('.dd-name');
+  if(!t){ if(nm) nm.remove(); }
+  else if(nm) nm.textContent=t;
+  else{
+    const kind = badge.classList.contains('soon')?' soon':(badge.classList.contains('past')?' past':'');
+    badge.insertAdjacentHTML('afterend',` <span class="dd-name${kind}">${esc(t)}</span>`);
+  }
+  dn.title = t || '클릭=디데이 지정/해제';
+}
+// 찍어둔 디데이 목록 — 남은 날 가까운 순, 지난 건 최근 순으로 뒤에. 이름은 여기서 수정
+function renderDdayList(){
+  const box=document.getElementById('ddayBox'); if(!box) return;
+  box.innerHTML='';
+  const marks=S.ddayMarks.slice().sort((a,b)=>{
+    const na=ddayDiff(a.k), nb=ddayDiff(b.k);
+    if(na>=0 && nb>=0) return na-nb;      // 남은 것: 가까운 순
+    if(na<0 && nb<0) return nb-na;        // 지난 것: 최근 순
+    return na<0 ? 1 : -1;                 // 지난 건 항상 뒤로
+  });
+  marks.forEach(mk=>{
+    const k=mk.k, n=ddayDiff(k);
+    const [,m,d]=k.split('-').map(Number);
+    const row=document.createElement('div');
+    row.className='dd-row'+(n<0?' past':'');
+    row.innerHTML=`<span class="dd-badge${n<0?' past':(n<=7?' soon':'')}" style="margin-left:0">${ddayLabel(n)}</span>`+
+      `<span class="dd-when">${m}/${d}</span>`+
+      `<span class="dd-what" contenteditable>${esc(mk.t)}</span>`+
+      `<span class="dd-del" title="디데이 해제">✕</span>`;
+    const txt=row.querySelector('.dd-what');
+    txt.title=mk.t;                       // 이름이 잘렸을 때 툴팁으로 전문 (따옴표 안전하게 속성 대신 프로퍼티로)
+    txt.addEventListener('blur',()=>{
+      const v=txt.textContent.trim(); if(v===mk.t) return;
+      mk.t=v; txt.title=v; save(); syncDdayName(k,v);
+    });
+    txt.addEventListener('keydown',e=>{ if(e.key==='Enter'){ e.preventDefault(); txt.blur(); } });
+    row.querySelector('.dd-del').onclick=()=>toggleDday(k);
+    box.appendChild(row);
+    if(ddayFocus===k){ ddayFocus=null; setTimeout(()=>txt.focus(),0); }
+  });
 }
 function goalColor(mg,i){ return (mg[i]&&mg[i].color) || GCOLORS[i%GCOLORS.length]; }
 
@@ -384,6 +463,7 @@ function moveGoal(mgKey,from,to){
 }
 
 function render(){
+  renderDdayList();
   document.getElementById('mTitle').textContent=`${view.y}년 ${view.m}월`;
   // 월 목표
   const mgKey=`${view.y}-${view.m}`;
@@ -522,7 +602,11 @@ function render(){
       const ddb=ddayBadge(k);
       cell.innerHTML=`<div class="dnum" title="클릭=디데이 지정/해제">${d}${d===1?` <span style="color:var(--accent)">${m}월</span>`:''}${ddb||' <span class="dd-hint">+D</span>'}</div>
         <div class="tasks"></div><div class="add">+ 할일</div>`;
-      cell.querySelector('.dnum').onclick=()=>toggleDday(k);
+      cell.dataset.k=k;                   // 디데이 이름 편집 시 이 칸만 찾아 갱신
+      const dnum=cell.querySelector('.dnum');
+      dnum.onclick=()=>toggleDday(k);
+      const mkk=S.ddayMarks.find(x=>x.k===k);
+      if(mkk&&mkk.t) dnum.title=mkk.t;      // 이름이 잘렸을 때 전문 (속성 대신 프로퍼티=따옴표 안전)
       const tl=cell.querySelector('.tasks');
       cell.addEventListener('dragover',(e)=>{ if(!dragSrc) return; e.preventDefault(); e.dataTransfer.dropEffect='move';
         if(dragSrc.k!==k && !cell.classList.contains('drop-hot')){ document.querySelectorAll('.cell.drop-hot').forEach(c=>c.classList.remove('drop-hot')); cell.classList.add('drop-hot'); } });
