@@ -37,6 +37,7 @@ const BLUE = '#2f63f4';
 
 const platform = (p) => {
   if (p.type === 'web') return '웹 · 설치 없이';
+  if (p.type === 'mac') return 'macOS · 무료';
   const both = p.ios && p.play;
   if (both) return 'iOS · Android';
   if (p.ios) return 'iOS';

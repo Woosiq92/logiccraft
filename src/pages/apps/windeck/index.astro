@@ -1,0 +1,162 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const DOWNLOAD = 'https://github.com/Woosiq92/windeck/releases/latest/download/WinDeck.dmg';
+const VERSION = '0.1.0';
+---
+
+<Layout
+  title="WinDeck — 맥에서 창을 4개 넘게 다루는 창 덱 · 로직크래프트"
+  description="WinDeck은 macOS 기본 창 정렬의 4분할 한계를 넘는 맥용 창 관리 앱입니다. 실제 창을 최대 9분할로 타일링하고, 덱에 없는 창은 오른쪽 스트립에 라이브 미러로 띄워 클릭 한 번에 불러옵니다. macOS 11 이상, 무료."
+  image="/og/windeck.png"
+>
+  <section class="edu-hero">
+    <div class="wrap wd-hero">
+      <p class="edu-eyebrow">PRODUCT · WinDeck</p>
+      <h1>창 4개로는<br />모자랄 때.</h1>
+      <p class="lede">
+        macOS 기본 창 정렬은 최대 4분할이고, 배치를 바꾸려면 매번 드래그해야 합니다.
+        WinDeck은 화면을 덱과 스트립으로 나눕니다. 왼쪽 덱에는 실제 창을 최대 9분할로
+        타일링하고, 오른쪽 스트립에는 덱에 없는 창까지 전부 라이브 미러로 띄웁니다.
+        미러를 클릭하면 그 창이 원하는 칸으로 들어옵니다.
+      </p>
+      <div class="cta-row">
+        <a class="cta" href={DOWNLOAD}>
+          <span class="cta-sub">macOS 11 이상 · 무료</span>
+          <span class="cta-main">WinDeck {VERSION} 다운로드</span>
+        </a>
+      </div>
+      <p class="note">
+        Apple Silicon과 Intel 맥 모두에서 실행됩니다. Developer ID 서명과 애플 공증을
+        마친 빌드라 받아서 바로 열 수 있습니다.
+      </p>
+    </div>
+  </section>
+
+  <section class="wrap block">
+    <h2>쓰는 창과 보는 창을 나눕니다</h2>
+    <p class="block-lede">
+      1728×1117 화면을 9분할하면 칸당 576×372입니다. 브라우저나 에디터를 그 크기로
+      쓰기는 어렵습니다. 그래서 WinDeck은 전부 타일링하는 대신, 손대는 창 두어 개만
+      덱에 두고 나머지는 미러로 지켜보는 구조를 택했습니다.
+    </p>
+    <div class="cards">
+      <article class="wd-card">
+        <h3>덱</h3>
+        <p>
+          2×2, 3×2, 4×2, 3×3 중에 고르면 실제 창이 그 그리드에 배치됩니다.
+          Accessibility API로 진짜 창을 옮기는 것이라 클릭도 타이핑도 그대로 됩니다.
+        </p>
+      </article>
+      <article class="wd-card">
+        <h3>스트립</h3>
+        <p>
+          화면 오른쪽 268pt에 덱 밖의 창들이 라이브 미러로 뜹니다. 지금 무슨 일이
+          벌어지는지 보면서, 필요해지면 클릭 한 번으로 덱에 넣습니다.
+        </p>
+      </article>
+      <article class="wd-card">
+        <h3>채우기</h3>
+        <p>
+          한 앱의 창을 한꺼번에 깔 때 씁니다. macOS의 "채우기 및 정렬"과 같은 동작인데
+          4개 제한이 없습니다. 터미널 창 8개면 4×2로 한 번에 깔립니다.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="wrap block">
+    <h2>권한 두 개가 필요합니다</h2>
+    <p class="block-lede">
+      첫 실행에서 시스템 설정 &gt; 개인정보 보호 및 보안에 두 항목을 허용해야 합니다.
+      둘 다 없으면 목록만 뜨고 창은 움직이지 않습니다.
+    </p>
+    <ul class="perms">
+      <li>
+        <b>손쉬운 사용</b>
+        다른 앱의 창을 옮기고 크기를 바꾸는 데 씁니다. 이 권한이 없으면 macOS가
+        외부 앱의 창 제어를 아예 막습니다.
+      </li>
+      <li>
+        <b>화면 기록</b>
+        스트립의 라이브 미러를 그리는 데 씁니다. 캡처한 화면은 앱 안에서 그려질 뿐
+        저장되지 않고, 기기 밖으로 나가지 않습니다. WinDeck은 네트워크 통신을 하지
+        않고 계정도 없습니다.
+      </li>
+    </ul>
+  </section>
+
+  <section class="wrap block">
+    <h2>알아둘 것</h2>
+    <ul class="limits">
+      <li>앱마다 최소 창 크기가 있습니다. Finder는 폭 510pt 아래로 줄지 않아 3×3에서는 칸 밖으로 조금 넘칩니다. macOS와 각 앱의 제약이라 WinDeck이 어쩌지 못하는 부분입니다.</li>
+      <li>미러는 2fps로 캡처합니다. 창이 많으면 프레임을 올릴 수 있지만 CPU를 더 씁니다.</li>
+      <li>슬롯 배정은 메모리에만 있습니다. 앱을 껐다 켜면 초기화됩니다.</li>
+      <li>주 디스플레이 한 대 기준입니다. 외부 모니터에는 덱을 만들지 않습니다.</li>
+      <li>터미널 새 탭(⌘T)은 창이 아니라 탭이라 별도 항목으로 잡히지 않습니다. 새 창은 ⌘N이어야 합니다.</li>
+    </ul>
+    <p class="beta-note">
+      0.1 버전입니다. 위 항목들을 아는 상태로 쓰기를 권합니다.
+    </p>
+  </section>
+
+  <section class="wrap closing">
+    <ul class="edu-notes">
+      <li>완전 무료입니다. 광고도 인앱 결제도 없습니다.</li>
+      <li>계정이 없고 네트워크 통신을 하지 않습니다. 수집하는 정보가 없습니다.</li>
+      <li>앱스토어가 아니라 직접 배포합니다. 창 제어와 화면 캡처를 하는 앱은 앱스토어 규정상 올릴 수 없습니다.</li>
+    </ul>
+    <nav class="edu-links">
+      <span class="edu-doclinks">
+        <a href={DOWNLOAD}>다운로드</a>
+        <a href="https://github.com/Woosiq92/windeck">GitHub</a>
+        <a href="mailto:logiccraftmarketing@gmail.com">고객 지원</a>
+      </span>
+      <a class="edu-back" href="/apps">← 제품 목록</a>
+    </nav>
+  </section>
+</Layout>
+
+<style>
+  .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
+  .wd-hero { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
+  .wd-hero h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 56ch; }
+  .cta-row { margin-top: 1.8rem; }
+  .cta { display: inline-flex; flex-direction: column; gap: 2px; min-height: 62px; justify-content: center; padding: 10px 30px; border-radius: 14px; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
+  .cta-sub { font-size: 0.78rem; opacity: 0.82; letter-spacing: 0.02em; }
+  .cta-main { font-size: 1.06rem; font-weight: 700; white-space: nowrap; }
+  .note { color: #aab4dc; margin: 1.3rem 0 0; line-height: 1.75; font-size: 0.93rem; max-width: 52ch; }
+
+  .block { padding-block: clamp(2.4rem, 5vw, 3.6rem); }
+  .block h2 { font-size: clamp(1.35rem, 2.6vw, 1.7rem); margin: 0; letter-spacing: -0.01em; }
+  .block-lede { color: var(--sub); line-height: 1.8; margin: 0.8rem 0 0; max-width: 60ch; }
+
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 1.6rem; }
+  .wd-card { border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; background: #fff; }
+  .wd-card h3 { margin: 0 0 8px; font-size: 1.02rem; }
+  .wd-card p { margin: 0; color: var(--sub); line-height: 1.75; font-size: 0.93rem; }
+
+  .perms { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; gap: 14px; max-width: 64ch; }
+  .perms li { border-left: 3px solid var(--accent); padding: 4px 0 4px 16px; color: var(--sub); line-height: 1.8; }
+  .perms b { display: block; color: var(--ink, #11183a); font-weight: 700; margin-bottom: 3px; }
+
+  .limits { margin: 1.4rem 0 0; padding-left: 1.1rem; color: var(--sub); line-height: 1.85; max-width: 64ch; }
+  .limits li { margin-bottom: 6px; }
+  .beta-note { margin: 1.3rem 0 0; color: var(--sub); font-size: 0.93rem; }
+
+  .closing { padding-block: 0 4rem; }
+  .edu-notes { list-style: none; padding: 0; margin: 0 0 1.6rem; display: grid; gap: 8px; color: var(--sub); font-size: 0.93rem; line-height: 1.7; }
+  .edu-notes li { padding-left: 14px; position: relative; }
+  .edu-notes li::before { content: ''; position: absolute; left: 0; top: 0.62em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .edu-links { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; border-top: 1px solid var(--border); padding-top: 1rem; font-size: 0.92rem; }
+  .edu-doclinks a { border-right: 1px solid var(--border); padding: 0 12px 0 0; margin-right: 12px; }
+  .edu-doclinks a:last-child { border-right: 0; padding-right: 0; margin-right: 0; }
+  .edu-back { margin-left: auto; }
+
+  @media (max-width: 860px) {
+    .cards { grid-template-columns: 1fr; }
+  }
+</style>

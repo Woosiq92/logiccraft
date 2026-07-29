@@ -9,7 +9,12 @@ const { p } = Astro.props;
   </div>
   <p class="desc">{p.desc}</p>
   <div class="links">
-    {p.type === 'web' ? (
+    {p.type === 'mac' ? (
+      <>
+        <a href={p.download}>다운로드 (macOS) →</a>
+        {p.slug && <div class="legal"><a class="muted" href={`/apps/${p.slug}/`}>소개</a></div>}
+      </>
+    ) : p.type === 'web' ? (
       <>
         <a href={p.web}>바로가기 →</a>
         {p.slug && <div class="legal"><a class="muted" href={`/apps/${p.slug}/`}>소개</a></div>}
