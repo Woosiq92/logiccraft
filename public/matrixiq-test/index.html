@@ -24,6 +24,10 @@
   .wm { display:flex; align-items:center; gap:9px; margin-bottom:2px; }
   .wm-name { font-size:16px; font-weight:700; letter-spacing:-.01em; }
   .wm-tag { font-family:var(--mono); font-size:9.5px; color:var(--muted2); letter-spacing:.08em; margin-left:auto; }
+  .ch-grid { display:flex; flex-direction:column; gap:1px; margin:10px 0 2px; }
+  .ch-grow { font-size:19px; letter-spacing:.06em; line-height:1.2; }
+  .qmeta { display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--muted3); margin:8px 0 4px; }
+  .qmeta span:last-child { font-size:13px; letter-spacing:.04em; }
   .lang { display:flex; gap:6px; margin:14px 0 0; }
   .lang button { flex:none; border:1px solid var(--line); background:var(--card); color:var(--muted3); border-radius:8px; padding:5px 11px; font-size:12px; font-family:var(--sans); cursor:pointer; }
   .lang button.on { border-color:var(--indigo); color:var(--indigo); font-weight:600; }
@@ -136,6 +140,29 @@
   var PLAY = 'https://play.google.com/store/apps/details?id=kr.logiccraft.matrixiq';
   var LANDING = 'https://logiccraft.co.kr/apps/matrixiq/';
 
+  // ── 오늘의 도전 (?ch=N) ──
+  // ★앱(app.js chNo/chBuild)과 문항이 정확히 같아야 공유 링크가 성립한다. 상수·순서를 임의로 바꾸지 말 것.
+  //   앱을 고치면 여기도 같이 고치고, engine.js 는 deploy.sh 가 정본에서 복사한다.
+  var CH_EPOCH = [2026, 6, 28], CH_N = 10, CH_DIFF = [2, 2, 3, 3, 3, 4, 4, 4, 5, 5];
+  var SEC_BASE = { diagram: 12, coding: 12, calc: 12, sequence: 15, odd: 15, figural: 15,
+                   matrix: 22, spatial: 22, verbal: 22, analytic: 22 };
+  function targetSec(type, d) { var b = SEC_BASE[type] || 16; return b + (Math.max(1, d) - 1) * b * 0.35; }
+  function chNo() {
+    var e = new Date(CH_EPOCH[0], CH_EPOCH[1], CH_EPOCH[2]), n = new Date();
+    e.setHours(0, 0, 0, 0); n.setHours(0, 0, 0, 0);
+    return Math.max(1, Math.floor((n - e) / 86400000) + 1);
+  }
+  function chBuild(no) {
+    ENGINE.setSeed('ch-' + no);
+    var pool = ENGINE.types.slice();
+    for (var i = pool.length - 1; i > 0; i--) { var j = ENGINE.ri(i + 1); var x = pool[i]; pool[i] = pool[j]; pool[j] = x; }
+    var qs = [];
+    for (var k = 0; k < CH_N; k++) qs.push(ENGINE.generate(pool[k % pool.length], CH_DIFF[k]));
+    ENGINE.setSeed(null);
+    return qs;
+  }
+  function chEmoji(m) { return m === 'g' ? '🟩' : m === 'y' ? '🟨' : '🟥'; }
+
   var TOTAL = 6;
   // 유형 순서: 쉬운·직관적인 것부터(이탈 방지). 도형·수열 중심 = 언어무관 훅.
   var PLAN = ['sequence', 'matrix', 'odd', 'figural', 'spatial', 'calc'];
@@ -184,6 +211,7 @@
   function setLang(l) { if (l === LANG) return; var u = new URL(location); u.searchParams.set('lang', l); location = u; }
 
   function startTest() {
+    ch = null;
     s = { idx: 0, rating: 1000, correct: 0, per: {} };
     nextQ();
   }
@@ -241,7 +269,7 @@
   }
   function bindOpts() {
     document.querySelectorAll('#opts [data-i]').forEach(function (b) {
-      b.addEventListener('click', function () { answer(parseInt(b.getAttribute('data-i'), 10)); });
+      b.addEventListener('click', function () { var i = parseInt(b.getAttribute('data-i'), 10); if (ch) chAnswer(i); else answer(i); });
     });
   }
   function answer(i) {
@@ -283,6 +311,90 @@
     document.getElementById('dl').onclick = gotoStore;
     document.getElementById('retry').onclick = startTest;
   }
+  // ── 도전 화면 3종: 안내 → 풀이 → 결과 ──
+  var ch = null;
+  function chIntro(no) {
+    var today = chNo(), old = no !== today;
+    el(header() +
+      '<div class="intro">' +
+        '<span class="intro-badge">' + t('오늘의 도전 #', "Today's Challenge #") + no + '</span>' +
+        '<h1 class="intro-h">' + t('전 세계가 <b>같은 문제</b>를 풀어요', 'Everyone solves <b>the same questions</b>') + '</h1>' +
+        '<p class="intro-d">' + (old
+          ? t('#' + today + '이 오늘 문제예요. 지금 여는 건 #' + no + ' 입니다.', 'Today is #' + today + '. You are opening #' + no + '.')
+          : t(CH_N + '문항. 설치도 로그인도 필요 없어요.', CH_N + ' questions. No install, no login.')) + '</p>' +
+        '<button class="primary" id="start">' + t('풀어보기', 'Play') + ' <span>→</span></button>' +
+        '<button class="ghost" id="quick">' + t('그냥 퀵테스트 할래요', 'Just take the quick test') + '</button>' +
+      '</div>');
+    document.getElementById('start').onclick = function () { chStart(no); };
+    document.getElementById('quick').onclick = viewIntro;
+  }
+  function chStart(no) {
+    ch = { no: no, idx: 0, qs: chBuild(no), marks: [], correct: 0, answered: false, t0: Date.now() };
+    chRender();
+  }
+  function chRender() {
+    var q = ch.qs[ch.idx], pctv = Math.round(ch.idx / CH_N * 100);
+    ch.t0 = Date.now();
+    el(header() +
+      '<div class="bar"><div class="bar-f" style="width:' + pctv + '%"></div></div>' +
+      '<div class="qmeta"><span>' + t('오늘의 도전 #', "Challenge #") + ch.no + ' · ' + (ch.idx + 1) + ' / ' + CH_N + '</span>' +
+        '<span>' + (ch.marks.map(chEmoji).join('') || '') + '</span></div>' +
+      '<p class="qprompt">' + promptFor(q.type) + '</p>' +
+      '<div class="stem">' + q.stemHTML + '</div>' +
+      '<div id="opts">' + optsHtml(q, false) + '</div><div id="fb"></div>');
+    bindOpts();
+  }
+  function chAnswer(i) {
+    if (ch.answered) return;
+    ch.answered = true;
+    var q = ch.qs[ch.idx], ok = (i === q.answer), dt = Date.now() - ch.t0;
+    ch.marks.push(ok ? (dt <= targetSec(q.type, q.difficulty) * 1000 ? 'g' : 'y') : 'r');
+    if (ok) ch.correct++;
+    document.getElementById('opts').innerHTML = optsHtml(q, true, i);
+    document.getElementById('fb').innerHTML =
+      '<div class="fb ' + (ok ? 'ok' : 'no') + '">' + (ok ? t('정답', 'Correct') : t('오답', 'Not quite')) +
+      ' · ' + (q.explain || '') + '</div>' +
+      '<button class="primary" id="next">' + (ch.idx + 1 >= CH_N ? t('결과 보기', 'See result') : t('다음', 'Next')) + ' <span>→</span></button>';
+    document.getElementById('next').onclick = function () {
+      ch.idx++; ch.answered = false;
+      if (ch.idx >= CH_N) chResult(); else chRender();
+    };
+  }
+  function chGrid(marks) {
+    var r = '';
+    for (var i = 0; i < marks.length; i += 5) r += '<div class="ch-grow">' + marks.slice(i, i + 5).map(chEmoji).join('') + '</div>';
+    return '<div class="ch-grid">' + r + '</div>';
+  }
+  function chResult() {
+    var rows = [];
+    for (var i = 0; i < ch.marks.length; i += 5) rows.push(ch.marks.slice(i, i + 5).map(chEmoji).join(''));
+    var share = t('매트릭스 도전 #', 'Matrix Challenge #') + ch.no + '  ' + ch.correct + '/' + CH_N + '\n' + rows.join('\n');
+    el(header() +
+      '<div class="score-card">' +
+        '<div class="sc-kick">' + t('오늘의 도전 #', "CHALLENGE #") + ch.no + '</div>' +
+        '<div class="sc-rate">' + ch.correct + ' / ' + CH_N + '</div>' +
+        chGrid(ch.marks) +
+        '<div class="sc-foot">logiccraft.co.kr/apps/matrixiq</div>' +
+      '</div>' +
+      '<h2 class="res-h">' + t('내일 또 새 문제가 나와요', 'A new set drops tomorrow') + '</h2>' +
+      '<p class="res-sub">' + t('앱에서는 매일 도전에 서바이벌·맞춤 훈련까지, 12유형을 무제한으로 풀어요.',
+        'In the app you get the daily challenge plus Survival and tailored drills across twelve types.') + '</p>' +
+      '<button class="primary" id="dl">' + t('앱에서 계속하기', 'Continue in the app') + ' <span>→</span></button>' +
+      '<button class="ghost" id="sh">' + t('내 결과 공유', 'Share my grid') + '</button>' +
+      '<p class="honest">' + t('점수는 이 앱의 자체 채점이며 IQ나 합격을 보장하지 않습니다.',
+        'The score is this app’s own and guarantees no IQ or exam result.') + '</p>');
+    document.getElementById('dl').onclick = gotoStore;
+    document.getElementById('sh').onclick = function () {
+      var u = location.origin + location.pathname + '?ch=' + ch.no + '&lang=' + LANG;
+      var payload = share + '\n' + u;
+      try { if (navigator.share) { navigator.share({ text: payload }).catch(function () {}); return; } } catch (e) {}
+      try { if (navigator.clipboard) navigator.clipboard.writeText(payload); } catch (e) {}
+      var el2 = document.getElementById('sh');
+      el2.textContent = t('복사했어요 ✓', 'Copied ✓');
+      setTimeout(function () { el2.textContent = t('내 결과 공유', 'Share my grid'); }, 1800);
+    };
+  }
+
   function gotoStore() {
     var ua = navigator.userAgent || '';
     if (/android/i.test(ua)) location = PLAY;
@@ -291,7 +403,8 @@
   }
 
   document.documentElement.lang = LANG;
-  viewIntro();
+  var chParam = parseInt(qp.get('ch'), 10);
+  if (chParam > 0) chIntro(chParam); else viewIntro();
 })();
 </script>
 </body>
