@@ -12,6 +12,7 @@ const VERSION = '0.1.0';
 >
   <section class="edu-hero">
     <div class="wrap wd-hero">
+      <div class="wd-copy">
       <p class="edu-eyebrow">PRODUCT · WinDeck</p>
       <h1>창 4개로는<br />모자랄 때.</h1>
       <p class="lede">
@@ -30,6 +31,11 @@ const VERSION = '0.1.0';
         Apple Silicon과 Intel 맥 모두에서 실행됩니다. Developer ID 서명과 애플 공증을
         마친 빌드라 받아서 바로 열 수 있습니다.
       </p>
+      </div>
+      <div class="wd-shot">
+        <img src="/screens/windeck/hero.png" width="2240" height="1308" loading="eager"
+             alt="WinDeck 화면 — 왼쪽에 미리보기·사전·Finder·서체 관리자 창이 2×2로 타일링돼 있고, 오른쪽 스트립에 슬롯맵 4칸과 각 창의 라이브 미러가 세로로 늘어서 있다" />
+      </div>
     </div>
   </section>
 
@@ -119,7 +125,9 @@ const VERSION = '0.1.0';
 
 <style>
   .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
-  .wd-hero { padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .wd-hero { padding-block: clamp(2.5rem, 6vw, 4.5rem); display: grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; }
+  .wd-shot { display: flex; justify-content: center; }
+  .wd-shot img { width: 100%; max-width: 640px; height: auto; display: block; border-radius: 12px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
   .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
   .wd-hero h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
   .lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 56ch; }
@@ -158,5 +166,7 @@ const VERSION = '0.1.0';
 
   @media (max-width: 860px) {
     .cards { grid-template-columns: 1fr; }
+    .wd-hero { grid-template-columns: 1fr; }
+    .wd-shot { order: -1; }
   }
 </style>
