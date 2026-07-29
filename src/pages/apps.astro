@@ -8,7 +8,7 @@ const webCount = products.filter((p) => p.type === 'web').length;
 const cats = [
   { label: '교육', cls: '', items: products.filter((p) => p.section === 'edu' && !p.lab) },
   { label: '일상', cls: ' daily', items: products.filter((p) => p.section === 'daily' && !p.lab) },
-  { label: '베타 실험실', cls: ' lab', items: products.filter((p) => p.lab), lead: '가볍게 실험 중인 도구들.' },
+  { label: '베타 실험실', cls: ' lab', items: products.filter((p) => p.lab), lead: '가볍게 실험 중인 웹 도구들.' },
 ];
 ---
 
