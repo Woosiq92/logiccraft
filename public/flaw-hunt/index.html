@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>데이터 결함 사냥</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#dfe3e8; --ink:#1b1f24; --dim:#5b6572;
+    --accent:#1f5fd0; --good:#0f7b46; --bad:#b3261e; --warn:#8a5a00;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);
+       font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+       font-size:15px;line-height:1.6}
+  header{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line)}
+  .hwrap{max-width:1120px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+  .brand{font-weight:700;letter-spacing:-.02em}
+  .steps{display:flex;gap:6px;flex:1;flex-wrap:wrap}
+  .st{font-size:12px;padding:3px 9px;border-radius:99px;background:#eef1f5;color:var(--dim)}
+  .st.on{background:var(--accent);color:#fff}
+  .st.done{background:#dbe7fb;color:var(--accent)}
+  .clock{font-variant-numeric:tabular-nums;font-size:13px;color:var(--dim)}
+  main{max-width:1120px;margin:0 auto;padding:20px 16px 60px}
+  h1{font-size:24px;margin:0 0 6px;letter-spacing:-.02em}
+  h2{font-size:19px;margin:0 0 4px;letter-spacing:-.02em}
+  h3{font-size:15px;margin:0 0 8px}
+  p{margin:0 0 10px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px;margin-bottom:14px}
+  .muted{color:var(--dim);font-size:13px}
+  .row{display:flex;gap:14px;flex-wrap:wrap}
+  .col{flex:1;min-width:300px}
+  .col.stat{min-width:150px}
+  button{font:inherit;cursor:pointer;border-radius:8px;border:1px solid var(--line);background:#fff;padding:8px 14px}
+  button:hover{background:#f0f3f7}
+  button.primary{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  button.primary:hover{filter:brightness(1.08)}
+  button.primary:disabled{background:#b9c3d2;border-color:#b9c3d2;cursor:not-allowed;filter:none}
+  button.tab{border-radius:99px;padding:5px 12px;font-size:13px}
+  button.tab.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+  button.pickcard{display:block;width:100%;text-align:left;padding:12px 14px;border-radius:10px;margin-bottom:8px}
+  button.pickcard.on{border-color:var(--accent);background:#f2f6ff;box-shadow:inset 0 0 0 1px var(--accent)}
+  button.pickcard b{display:block;margin-bottom:2px}
+  button.pickcard span{font-size:13px;color:var(--dim)}
+  input,select,textarea{font:inherit;border:1px solid var(--line);border-radius:8px;padding:7px 9px;background:#fff;max-width:100%}
+  textarea{width:100%;resize:vertical}
+  label{font-size:13px;color:var(--dim);display:block;margin-bottom:3px}
+  .tablewrap{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:10px;background:#fff}
+  table{border-collapse:collapse;width:100%;font-size:12.5px}
+  th,td{border-bottom:1px solid #eef1f5;padding:5px 6px;white-space:nowrap;text-align:right}
+  th{position:sticky;top:0;background:#f3f5f8;cursor:pointer;user-select:none;text-align:right;font-weight:600}
+  th:hover{background:#e8ecf2}
+  td.cat,th.cat{text-align:left}
+  tbody tr:hover{background:#fafbfd}
+  .hl{background:#fff4d6}
+  .pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:99px;background:#eef1f5;color:var(--dim);margin-right:5px}
+  .ok{color:var(--good)} .no{color:var(--bad)} .wn{color:var(--warn)}
+  .rep{border:1px solid var(--line);border-radius:10px;padding:10px;margin-bottom:8px;background:#fbfcfd}
+  .rep .line{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:6px}
+  .dict dt{font-weight:600;margin-top:12px}
+  .dict dd{margin:0;color:var(--dim);font-size:13px}
+  .how{display:block;margin-top:4px;color:var(--accent);font-size:12.5px}
+  .tip{background:#f8f9fb;border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 8px 8px 0;font-size:13px;color:var(--dim);margin:10px 0}
+  .exp{border:1px solid var(--line);border-radius:10px;padding:12px 14px;margin-bottom:10px;background:#fbfcfd}
+  .exp h4{margin:0 0 6px;font-size:15px}
+  .exp .q{display:block;font-size:12px;color:var(--accent);font-weight:600;margin-top:8px}
+  .exp .a{font-size:13.5px;color:var(--ink)}
+  .kv{display:flex;justify-content:space-between;gap:12px;border-bottom:1px dashed #e6eaef;padding:3px 0;font-size:13px}
+  .big{font-size:30px;font-weight:700;letter-spacing:-.02em}
+  .note{background:#f2f6ff;border:1px solid #d6e3fb;border-radius:10px;padding:10px 12px;font-size:13px;margin-bottom:12px}
+  .err{color:var(--bad);font-size:13px;min-height:19px}
+  .actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}
+  pre.report{white-space:pre-wrap;font-size:12.5px;background:#fbfcfd;border:1px solid var(--line);border-radius:10px;padding:12px;max-height:340px;overflow:auto}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="hwrap">
+    <div class="brand">데이터 결함 사냥</div>
+    <div class="steps" id="steps"></div>
+    <div class="clock" id="clock"></div>
+  </div>
+</header>
+
+<main id="stage"></main>
+
+<script>
+/* ================= 난수 ================= */
+function hashSeed(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619)}return h>>>0}
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function pickN(rng,n,max){const s=new Set();while(s.size<n&&s.size<max)s.add(Math.floor(rng()*max));return[...s]}
+function shuffle(rng,arr){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function one(rng,arr){return arr[Math.floor(rng()*arr.length)]}
+function ri(rng,a,b){return a+Math.floor(rng()*(b-a+1))}
+function rf(rng,a,b,d){return +(a+rng()*(b-a)).toFixed(d)}
+function addDays(base,n){const d=new Date(base.getTime()+n*86400000);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function dayDiff(a,b){return Math.round((new Date(b)-new Date(a))/86400000)}
+
+/* ================= 시나리오 =================
+   컬럼 메타에 붙는 결함 재료
+     missingVal   무응답을 채운 가짜 숫자
+     impossibleVal 물리적으로 불가능한 값
+     unitAlt      {f:배율, label:'바뀐 단위'}
+     scaleDiv     자릿수가 밀린 배수
+     outlierVal   가능하지만 극단적인 값
+     variants     {원래값:[다른 표기...]}
+     ws           앞뒤 공백을 섞어도 되는 범주 컬럼
+   ============================================ */
+
+const SCENARIOS=[
+{
+ id:'survey', title:'학교생활 만족도 설문', n:40, target:'만족도',
+ blurb:'2학년 전체를 대상으로 걷은 생활 습관 설문이에요. 만족도를 예측하는 모델에 쓰려고 합니다.',
+ goal:'학교생활 만족도(1에서 5점)를 예측하는 모델',
+ leakCol:'상담_만족여부', biasCol:'동아리', biasVal:'없음',
+ briefNormal:'2학년 전체 학급을 대상으로 조회 시간에 설문지를 배포하고 그 자리에서 회수했어요. 담임 선생님이 미제출자를 확인해 다시 받았습니다.',
+ briefBias:'2학년 동아리 활동 시간에 각 동아리실을 돌며 설문지를 배포하고 그 자리에서 회수했어요. 회수율은 100퍼센트였습니다.',
+ cols:[
+  {k:'번호',t:'num',desc:'응답자 일련번호',spec:'1번부터 차례로, 같은 번호는 한 번만 나와요'},
+  {k:'학급',t:'cat',desc:'응답자가 속한 학급',spec:'2-1, 2-2, 2-3, 2-4 네 가지',ws:true},
+  {k:'성별',t:'cat',desc:'응답자 성별',spec:'남, 여 두 가지',variants:{'남':['남자','M'],'여':['여자','F']}},
+  {k:'공부시간',t:'num',u:'시간',desc:'하루 평균 공부 시간',spec:'보통 0.5에서 5 사이',unitAlt:{f:60,label:'분'}},
+  {k:'수면시간',t:'num',u:'시간',desc:'하루 평균 수면 시간',spec:'보통 5에서 9 사이. 24를 넘을 수 없어요',impossibleVal:26},
+  {k:'폰사용',t:'num',u:'분',desc:'하루 스마트폰 사용 시간',spec:'보통 40에서 360 사이',missingVal:999,outlierVal:1180},
+  {k:'통학시간',t:'num',u:'분',desc:'집에서 학교까지 걸리는 시간',spec:'보통 5에서 65 사이',missingVal:999},
+  {k:'월용돈',t:'num',u:'원',desc:'한 달에 받는 용돈',spec:'보통 50,000에서 155,000 사이',scaleDiv:1000},
+  {k:'동아리',t:'cat',desc:'소속 동아리',spec:'코딩, 밴드, 축구, 독서, 없음 다섯 가지',ws:true},
+  {k:'상담_만족여부',t:'cat',desc:'담임 상담 기록에 적힌 만족 여부',spec:'만족, 보통, 불만 세 가지'},
+  {k:'만족도',t:'num',u:'점',desc:'학교생활 만족도. 오늘 맞히려는 목표예요',spec:'1에서 5까지의 정수',impossibleVal:9},
+ ],
+ gen(rng){
+  const CLUB=['코딩','밴드','축구','독서','없음'];
+  const rows=[];
+  for(let i=1;i<=40;i++){
+    const sleep=rf(rng,5,8.4,1), club=one(rng,CLUB);
+    let sat=Math.round(2.3+(sleep-6.5)*0.35+(club!=='없음'?0.7:0)+rng()*1.5);
+    sat=Math.max(1,Math.min(5,sat));
+    rows.push({번호:i,학급:'2-'+ri(rng,1,4),성별:rng()<0.5?'남':'여',
+      공부시간:rf(rng,0.5,4.5,1),수면시간:sleep,폰사용:ri(rng,40,360),
+      통학시간:ri(rng,5,65),월용돈:ri(rng,10,31)*5000,동아리:club,
+      상담_만족여부:'',만족도:sat});
+  }
+  return rows;
+ },
+ leakFrom:r=>r.만족도>=4?'만족':(r.만족도===3?'보통':'불만'),
+ leakNoise:['만족','보통','불만'],
+},
+{
+ id:'library', title:'학급 도서 대출 기록', n:45, target:'반납지연',
+ blurb:'학급문고 대출 기록이에요. 어떤 대출이 반납 지연으로 이어지는지 예측하려고 합니다.',
+ goal:'반납이 지연될지(지연/정상) 미리 알아내는 모델',
+ leakCol:'독촉문자', biasCol:'학년', biasVal:'1학년',
+ briefNormal:'1학년부터 3학년까지 모든 교실 앞에 학급문고를 두고, 대출대장에 적힌 기록을 학기말에 그대로 옮겼어요.',
+ briefBias:'2학년과 3학년 교실에만 학급문고 안내문을 붙였고, 대출대장에 적힌 기록을 학기말에 그대로 옮겼어요.',
+ datePair:{from:'대출일',to:'반납일',derived:'대출기간'},
+ cols:[
+  {k:'대출번호',t:'num',desc:'대출 건 일련번호',spec:'1번부터 차례로, 같은 번호는 한 번만 나와요'},
+  {k:'학년',t:'cat',desc:'빌린 학생의 학년',spec:'1학년, 2학년, 3학년 세 가지',variants:{'1학년':['1','일학년'],'2학년':['2','이학년']}},
+  {k:'장르',t:'cat',desc:'책의 분류',spec:'소설, 과학, 역사, 만화, 시집 다섯 가지',ws:true,variants:{'만화':['만화책','코믹'],'시집':['시','시집(운문)']}},
+  {k:'대출일',t:'cat',date:true,desc:'책을 빌려 간 날',spec:'2026-03-02 이후'},
+  {k:'반납일',t:'cat',date:true,desc:'책을 돌려준 날',spec:'항상 대출일보다 나중이에요'},
+  {k:'대출기간',t:'num',u:'일',desc:'반납일에서 대출일을 뺀 값',spec:'1에서 30 사이. 음수가 될 수 없어요',unitAlt:{f:24,label:'시간'}},
+  {k:'대출권수',t:'num',u:'권',desc:'한 번에 빌린 권수',spec:'1에서 5 사이. 0권은 있을 수 없어요',impossibleVal:0},
+  {k:'페이지수',t:'num',u:'쪽',desc:'빌린 책의 쪽수 합계',spec:'보통 80에서 800 사이',missingVal:9999,outlierVal:3400},
+  {k:'누적대출횟수',t:'num',u:'회',desc:'그 학생이 지금까지 빌린 횟수',spec:'보통 1에서 25 사이',missingVal:99},
+  {k:'독촉문자',t:'cat',desc:'사서 도우미가 독촉 문자를 보냈는지',spec:'발송, 미발송 두 가지'},
+  {k:'반납지연',t:'cat',desc:'반납이 늦었는지 여부. 오늘 맞히려는 목표예요',spec:'지연, 정상 두 가지'},
+ ],
+ gen(rng){
+  const GEN=['소설','과학','역사','만화','시집'];
+  const base=new Date(2026,2,2), rows=[];
+  for(let i=1;i<=45;i++){
+    const start=ri(rng,0,110), span=ri(rng,1,30);
+    const late=rng()<0.38?'지연':'정상';
+    rows.push({대출번호:i,학년:one(rng,['1학년','2학년','3학년']),장르:one(rng,GEN),
+      대출일:addDays(base,start),반납일:addDays(base,start+span),대출기간:span,
+      대출권수:ri(rng,1,5),페이지수:ri(rng,80,800),누적대출횟수:ri(rng,1,25),
+      독촉문자:'',반납지연:late});
+  }
+  return rows;
+ },
+ leakFrom:r=>r.반납지연==='지연'?'발송':'미발송',
+ leakNoise:['발송','미발송'],
+},
+{
+ id:'fitness', title:'학생 체력검사 기록', n:42, target:'종합등급',
+ blurb:'2학년 체력검사 측정 기록이에요. 종합등급을 예측하는 모델에 쓰려고 합니다.',
+ goal:'체력 종합등급(1에서 5등급)을 예측하는 모델',
+ leakCol:'교사_판정', biasCol:'측정구분', biasVal:'추후측정',
+ briefNormal:'정규 체육 수업 시간에 2학년 전원을 측정했고, 그날 결석한 학생은 나중에 따로 측정해서 함께 넣었어요.',
+ briefBias:'정규 체육 수업 시간에 2학년을 측정했어요. 그날 결석한 학생도 나중에 따로 측정했지만, 기록을 옮길 때는 수업 시간 측정분만 가져왔습니다.',
+ datePair:{from:'측정일',to:'입력일',derived:'입력지연'},
+ cols:[
+  {k:'번호',t:'num',desc:'학생 일련번호',spec:'1번부터 차례로, 같은 번호는 한 번만 나와요'},
+  {k:'성별',t:'cat',desc:'학생 성별',spec:'남, 여 두 가지',variants:{'남':['남자','M'],'여':['여자','F']}},
+  {k:'측정구분',t:'cat',desc:'언제 측정했는지',spec:'당일측정, 추후측정 두 가지',ws:true},
+  {k:'측정일',t:'cat',date:true,desc:'체력검사를 실시한 날',spec:'2026-04-06 이후'},
+  {k:'입력일',t:'cat',date:true,desc:'기록을 전산에 입력한 날',spec:'항상 측정일과 같거나 나중이에요'},
+  {k:'입력지연',t:'num',u:'일',desc:'입력일에서 측정일을 뺀 값',spec:'0에서 14 사이. 음수가 될 수 없어요'},
+  {k:'키',t:'num',u:'cm',desc:'측정한 키',spec:'보통 150에서 185 사이',scaleDiv:100,impossibleVal:250},
+  {k:'몸무게',t:'num',u:'kg',desc:'측정한 몸무게',spec:'보통 42에서 88 사이',missingVal:999,outlierVal:171},
+  {k:'윗몸일으키기',t:'num',u:'회',desc:'1분간 실시한 횟수',spec:'보통 10에서 60 사이',missingVal:999},
+  {k:'오래달리기',t:'num',u:'초',desc:'오래달리기 기록',spec:'보통 240에서 600 사이',unitAlt:{f:1/60,label:'분'}},
+  {k:'교사_판정',t:'cat',desc:'담당 교사가 적어 둔 총평',spec:'양호, 보통, 미흡 세 가지',ws:true},
+  {k:'종합등급',t:'num',u:'등급',desc:'체력 종합등급. 오늘 맞히려는 목표예요',spec:'1에서 5까지의 정수',impossibleVal:9},
+ ],
+ gen(rng){
+  const base=new Date(2026,3,6), rows=[];
+  for(let i=1;i<=42;i++){
+    const run=ri(rng,240,600), sit=ri(rng,10,60);
+    let grade=Math.round(1+(run-240)/90-(sit-35)/25+rng()*1.2);
+    grade=Math.max(1,Math.min(5,grade));
+    const m=ri(rng,0,20), lag=ri(rng,0,14);
+    rows.push({번호:i,성별:rng()<0.5?'남':'여',측정구분:rng()<0.75?'당일측정':'추후측정',
+      측정일:addDays(base,m),입력일:addDays(base,m+lag),입력지연:lag,
+      키:ri(rng,150,185),몸무게:ri(rng,42,88),윗몸일으키기:sit,오래달리기:run,
+      교사_판정:'',종합등급:grade});
+  }
+  return rows;
+ },
+ leakFrom:r=>r.종합등급<=2?'양호':(r.종합등급===3?'보통':'미흡'),
+ leakNoise:['양호','보통','미흡'],
+},
+];
+
+/* ================= 결함 유형 12종 ================= */
+const FLAWS=[
+{id:'missing',name:'결측 위장',
+ what:'응답하지 않은 칸을 빈칸으로 두는 대신 999 같은 숫자로 채워 넣은 경우예요.',
+ how:'컬럼 요약에서 최댓값과 자주 나온 값을 보세요. 똑같이 튀는 숫자가 여러 번 반복돼요.',
+ impact:'평균이 크게 부풀어요. 그 컬럼을 쓴 모델은 응답하지 않은 학생을 극단값으로 취급하게 됩니다.',
+ fix:'그 숫자를 결측으로 되돌린 뒤, 해당 행을 빼거나 중앙값 같은 대푯값으로 채워요.',
+ pick:(ds)=>ds.cols.filter(c=>c.missingVal!=null).map(c=>c.k),
+ apply(rows,rng,ds,col){const m=ds.cols.find(c=>c.k===col).missingVal;
+   const idx=pickN(rng,Math.max(5,Math.round(rows.length*0.16)),rows.length);
+   idx.forEach(i=>rows[i][col]=m);
+   return{idx,why:col+' 컬럼에 '+m+'이 '+idx.length+'개 들어 있어요. 사전 기준으로는 나올 수 없는 값이고, 응답하지 않은 칸을 채운 흔적이에요.'}}},
+
+{id:'unit',name:'단위 혼재',
+ what:'한 컬럼에 서로 다른 단위가 섞여 들어간 경우예요. 2.5시간과 150분이 한 칸에 같이 있는 상태입니다.',
+ how:'컬럼 요약에서 최솟값과 최댓값 차이가 지나치게 큰지 보세요. 사전에 적힌 단위와 실제 값의 크기를 견주면 드러나요.',
+ impact:'같은 뜻의 값이 60배 차이로 들어가서, 모델은 단위가 다른 학생을 완전히 다른 사람으로 봅니다.',
+ fix:'어느 쪽 단위인지 판별하는 기준을 정하고 한 단위로 환산해요. 애매하면 원본 응답지를 다시 확인합니다.',
+ pick:(ds)=>ds.cols.filter(c=>c.unitAlt).map(c=>c.k),
+ apply(rows,rng,ds,col){const a=ds.cols.find(c=>c.k===col).unitAlt;
+   const idx=pickN(rng,Math.max(6,Math.round(rows.length*0.2)),rows.length);
+   idx.forEach(i=>rows[i][col]=+(rows[i][col]*a.f).toFixed(1));
+   return{idx,why:col+' 컬럼 일부가 '+a.label+' 단위로 입력됐어요. 사전에 적힌 단위와 다른 값이 섞여 있어요.'}}},
+
+{id:'category',name:'범주 표기 불일치',
+ what:'같은 뜻을 여러 표기로 적은 경우예요. 남, 남자, M이 컴퓨터에게는 서로 다른 값으로 세어져요.',
+ how:'컬럼 요약에서 고유값 개수를 보세요. 사전에 적힌 종류보다 많으면 표기가 흩어진 거예요.',
+ impact:'한 집단이 여러 조각으로 쪼개져서 집단별 비교가 어긋나고, 모델은 같은 사람을 다른 부류로 나눕니다.',
+ fix:'표기 대응표를 만들어 하나로 통일해요. 입력 단계에서 선택지를 고르게 바꾸면 다시 생기지 않습니다.',
+ pick:(ds)=>ds.cols.filter(c=>c.variants).map(c=>c.k),
+ apply(rows,rng,ds,col){const v=ds.cols.find(c=>c.k===col).variants;
+   // 다른 표기가 준비된 값을 가진 행 중에서만 고른다. 무작위로 뽑으면 하나도 안 바뀔 수 있다
+   const elig=rows.map((r,i)=>i).filter(i=>v[rows[i][col]]);
+   const idx=shuffle(rng,elig).slice(0,Math.max(6,Math.round(elig.length*0.55)));
+   idx.forEach(i=>rows[i][col]=one(rng,v[rows[i][col]]));
+   return{idx,why:col+' 컬럼의 고유값이 사전보다 많아요. 같은 뜻을 여러 표기로 적어서 하나의 범주가 쪼개졌어요.'}}},
+
+{id:'impossible',name:'불가능한 값',
+ what:'현실에서 나올 수 없는 값이 들어간 경우예요. 하루 26시간 수면이나 0권 대출이 여기 해당해요.',
+ how:'컬럼 요약에서 최솟값과 최댓값만 봐도 걸려요. 사전에 적힌 범위와 견주세요.',
+ impact:'평균과 분포가 통째로 흔들려요. 정규화를 하면 나머지 정상 값이 모두 좁은 구간으로 눌립니다.',
+ fix:'입력 오류로 보고 결측 처리한 뒤, 원본 기록이 남아 있으면 확인해서 되살려요.',
+ pick:(ds)=>ds.cols.filter(c=>c.impossibleVal!=null).map(c=>c.k),
+ apply(rows,rng,ds,col){const v=ds.cols.find(c=>c.k===col).impossibleVal;
+   const idx=pickN(rng,3,rows.length);
+   idx.forEach(i=>rows[i][col]=v);
+   return{idx,why:col+' 컬럼에 '+v+'이 들어 있어요. 사전의 범위를 벗어난 값이고 입력할 때 걸러지지 않았어요.'}}},
+
+{id:'scale',name:'자릿수 오류',
+ what:'같은 항목을 어떤 행은 원래 단위로, 어떤 행은 자릿수를 줄여서 적은 경우예요.',
+ how:'컬럼 요약에서 최솟값을 보세요. 다른 값보다 유난히 작은 값이 모여 있으면 자릿수가 밀린 거예요.',
+ impact:'값의 크기 순서가 뒤집혀요. 용돈이 가장 적은 학생이 가장 많은 학생으로 계산될 수 있습니다.',
+ fix:'작은 무리에 배수를 곱해 되돌려요. 되돌린 뒤 분포가 하나로 이어지는지 다시 확인합니다.',
+ pick:(ds)=>ds.cols.filter(c=>c.scaleDiv).map(c=>c.k),
+ apply(rows,rng,ds,col){const d=ds.cols.find(c=>c.k===col).scaleDiv;
+   const idx=pickN(rng,Math.max(5,Math.round(rows.length*0.15)),rows.length);
+   idx.forEach(i=>rows[i][col]=+(rows[i][col]/d).toFixed(2));
+   return{idx,why:col+' 컬럼 일부가 '+d+'분의 1 크기로 입력됐어요. 자릿수가 밀린 값과 원래 값이 한 컬럼에 섞여 있어요.'}}},
+
+{id:'outlier',name:'극단 이상치',
+ what:'물리적으로 불가능하지는 않지만 나머지와 동떨어진 값이에요. 드물게 실제로 그럴 수도 있는 값입니다.',
+ how:'컬럼 요약에서 최댓값이 사전 범위를 크게 넘는지 보세요. 불가능한 값과 달리 한두 개만 나옵니다.',
+ impact:'평균과 표준편차를 혼자 끌고 가요. 이 값 하나 때문에 회귀선의 기울기가 바뀔 수 있습니다.',
+ fix:'지우기 전에 진짜인지 확인해요. 실제 기록이면 남기고, 대신 이상치에 덜 흔들리는 중앙값을 함께 봅니다.',
+ pick:(ds)=>ds.cols.filter(c=>c.outlierVal!=null).map(c=>c.k),
+ apply(rows,rng,ds,col){const v=ds.cols.find(c=>c.k===col).outlierVal;
+   const idx=pickN(rng,2,rows.length);
+   idx.forEach(i=>rows[i][col]=v);
+   return{idx,why:col+' 컬럼에 '+v+'이 들어 있어요. 불가능하지는 않지만 나머지 값과 크게 동떨어져 있어요.'}}},
+
+{id:'space',name:'숨은 공백',
+ what:'값의 앞이나 뒤에 눈에 보이지 않는 공백이 붙은 경우예요. 표에서는 똑같아 보입니다.',
+ how:'컬럼 요약에서 고유값이 사전보다 많은지 먼저 보세요. 자주 나온 값 목록에 똑같아 보이는 이름이 두 줄로 따로 세어져 있으면 공백이 붙은 거예요.',
+ impact:'같은 값이 둘로 갈라져서 집계가 어긋나요. 표만 봐서는 끝까지 못 찾는 유형이라 더 위험합니다.',
+ fix:'모든 문자열의 앞뒤 공백을 잘라내요. 데이터를 읽어 들이는 첫 단계에서 일괄로 처리합니다.',
+ pick:(ds)=>ds.cols.filter(c=>c.ws).map(c=>c.k),
+ apply(rows,rng,ds,col){
+   const idx=pickN(rng,Math.max(6,Math.round(rows.length*0.22)),rows.length);
+   idx.forEach(i=>rows[i][col]=rng()<0.5?rows[i][col]+' ':' '+rows[i][col]);
+   return{idx,why:col+' 컬럼의 일부 값 앞뒤에 공백이 붙어 있어요. 표에서는 같아 보이지만 컴퓨터는 다른 값으로 셉니다.'}}},
+
+{id:'constant',name:'상수 컬럼',
+ what:'모든 행의 값이 똑같은 컬럼이에요. 채워져 있지만 아무것도 알려주지 않습니다.',
+ how:'컬럼 요약에서 고유값이 1인 컬럼을 찾으세요. 사전에 여러 종류라고 적혀 있는데 하나뿐이면 결함이에요.',
+ impact:'모델 입장에서는 없는 것과 같아요. 학습 시간만 늘고, 표준편차가 0이라 정규화에서 오류가 납니다.',
+ fix:'왜 하나로 채워졌는지 확인해요. 수집 과정의 실수라면 원본에서 다시 가져오고, 아니면 컬럼을 제거합니다.',
+ pick:(ds)=>ds.cols.filter(c=>c.k!==ds.target&&c.t==='cat'&&!c.date).map(c=>c.k),
+ apply(rows,rng,ds,col){const v=rows[0][col];
+   rows.forEach(r=>r[col]=v);
+   return{idx:[0,1,2],why:col+' 컬럼이 전부 '+v+' 하나로 채워져 있어요. 사전에는 여러 종류라고 적혀 있는데 고유값이 1개뿐이에요.'}}},
+
+{id:'dupe',name:'중복 응답',
+ what:'같은 사람의 기록이 두 번 들어간 경우예요.',
+ how:'표에서 첫 번째 번호 컬럼의 머리글을 눌러 정렬해 보세요. 같은 번호가 나란히 두 번 나옵니다. 컬럼 요약에서 개수와 고유값이 다른 것으로도 알 수 있어요.',
+ impact:'그 사람의 특성만 두 배로 반영돼요. 학습과 평가에 같은 행이 나뉘어 들어가면 성능이 실제보다 좋게 나옵니다.',
+ fix:'완전히 같은 행을 하나만 남겨요. 일부만 다른 행이면 어느 쪽이 맞는지 원본으로 확인합니다.',
+ pick:()=>['행 전체'],
+ apply(rows,rng,ds){const idx=pickN(rng,3,rows.length),added=[];
+   idx.forEach(i=>{rows.push(Object.assign({},rows[i]));added.push(rows.length-1)});
+   return{idx:idx.concat(added),why:'번호가 같은 행이 여러 쌍 있어요. 같은 사람의 기록이 두 번 들어갔어요.'}}},
+
+{id:'leak',name:'목표 누수',
+ what:'맞히려는 목표를 사실상 그대로 베낀 컬럼이 섞인 경우예요.',
+ how:'목표와 비교 탭에서 컬럼을 하나씩 바꿔 보세요. 맨 윗줄에 적힌 목표 값마다 세로로 훑어서, 숫자가 한 칸에만 있고 나머지가 0이면 베낀 컬럼이에요.',
+ impact:'연습에서는 정확도가 치솟지만 실제로는 못 씁니다. 예측하려는 시점에는 그 컬럼이 아직 존재하지 않기 때문이에요.',
+ fix:'그 컬럼을 빼고 다시 학습해요. 언제 기록된 값인지 따져서 예측 시점 이후의 정보를 모두 걸러냅니다.',
+ pick:(ds)=>[ds.leakCol],
+ apply(rows,rng,ds){rows.forEach(r=>r[ds.leakCol]=ds.leakFrom(r));
+   return{idx:pickN(rng,6,rows.length),
+     why:ds.leakCol+'는 '+ds.target+'에서 그대로 계산된 값이에요. 교차표를 보면 두 컬럼이 한 칸도 어긋나지 않아요.'}}},
+
+{id:'bias',name:'표본 편향',
+ what:'자료를 모으는 방식 때문에 특정 집단이 통째로 빠진 경우예요. 값 자체는 멀쩡해 보입니다.',
+ how:'조사 개요를 읽고 누가 빠졌을지 떠올린 뒤, 데이터 사전의 원래 종류와 컬럼 요약의 고유값을 견주세요. 신고 대상은 조사 개요로 고릅니다.',
+ impact:'빠진 집단에 대해서는 모델이 아무것도 배우지 못해요. 정확도는 높게 나오는데 정작 필요한 학생에게 틀립니다.',
+ fix:'빠진 집단을 다시 조사해서 채워요. 당장 어렵다면 이 모델이 누구에게는 쓸 수 없는지 문서에 남깁니다.',
+ pick:()=>['조사 개요'],
+ apply(rows,rng,ds){
+   for(let i=rows.length-1;i>=0;i--) if(rows[i][ds.biasCol]===ds.biasVal) rows.splice(i,1);
+   return{idx:[],brief:'bias',
+     why:'자료를 모으는 방식 때문에 '+ds.biasCol+'가 '+ds.biasVal+'인 사람이 한 명도 들어오지 않았어요. 사전에 적힌 종류보다 고유값이 적습니다.'}}},
+
+{id:'dateflip',name:'앞뒤가 뒤바뀐 날짜',
+ what:'나중이어야 할 날짜가 앞선 경우예요. 두 날짜의 차이를 계산한 컬럼이 음수가 됩니다.',
+ how:'두 날짜의 차이를 담은 숫자 컬럼의 최솟값을 보세요. 음수가 있으면 순서가 뒤집힌 행이 있는 거예요.',
+ impact:'기간을 쓰는 계산이 전부 어긋나요. 음수 기간이 평균에 섞이면 실제보다 짧게 나옵니다.',
+ fix:'뒤바뀐 두 날짜를 맞바꾸거나, 원본 기록에서 어느 쪽이 맞는지 확인해 고쳐요.',
+ pick:(ds)=>ds.datePair?[ds.datePair.derived]:[],
+ apply(rows,rng,ds){const p=ds.datePair;
+   const idx=pickN(rng,3,rows.length);
+   idx.forEach(i=>{const gap=ri(rng,2,9);
+     rows[i][p.to]=addDays(new Date(rows[i][p.from]),-gap);
+     rows[i][p.derived]=dayDiff(rows[i][p.from],rows[i][p.to]);});
+   return{idx,why:p.derived+' 컬럼에 음수가 있어요. '+p.to+'이 '+p.from+'보다 앞선 행이 섞여 있어요.'}}},
+];
+const FLAW_BY_ID=Object.fromEntries(FLAWS.map(f=>[f.id,f]));
+const LEVELS=[{id:'easy',name:'입문',n:3,label:'결함 3개'},
+              {id:'base',name:'기본',n:4,label:'결함 4개'},
+              {id:'hard',name:'도전',n:6,label:'결함 6개'}];
+
+/* ================= 데이터 만들기 ================= */
+function buildDataset(code,scenId,levelId){
+  const ds=SCENARIOS.find(s=>s.id===scenId)||SCENARIOS[0];
+  const lv=LEVELS.find(l=>l.id===levelId)||LEVELS[1];
+  const rng=mulberry32(hashSeed(code+'|'+ds.id+'|'+lv.id));
+  const rows=ds.gen(rng);
+  // 누수 후보 컬럼은 평소에는 잡음을 섞어 둔다
+  rows.forEach(r=>{r[ds.leakCol]= rng()<0.3 ? one(rng,ds.leakNoise) : ds.leakFrom(r)});
+
+  // 적용 가능한 (유형, 대상) 짝을 모아 대상이 겹치지 않게 뽑는다
+  // 유형을 먼저 섞고 그 안에서 대상을 고른다. 대상 후보가 많은 유형이 과대 출현하는 것을 막는다.
+  // foot = 실제로 건드리는 컬럼. 표본 편향은 신고 대상이 조사 개요지만 컬럼 하나를 소비한다
+  const order=['bias','constant','space','missing','unit','category','impossible','scale','outlier','dateflip','leak','dupe'];
+  const chosen=[],usedCol=new Set();
+  for(const f of shuffle(rng,FLAWS)){
+    if(chosen.length>=lv.n)break;
+    const opts=shuffle(rng,f.pick(ds)).filter(col=>!usedCol.has(f.id==='bias'?ds.biasCol:col));
+    if(!opts.length)continue;
+    const col=opts[0];
+    usedCol.add(f.id==='bias'?ds.biasCol:col);
+    chosen.push({f,col});
+  }
+  chosen.sort((a,b)=>order.indexOf(a.f.id)-order.indexOf(b.f.id));
+
+  let brief=ds.briefNormal;const key=[];
+  for(const c of chosen){
+    const r=c.f.apply(rows,rng,ds,c.col);
+    if(r.brief==='bias')brief=ds.briefBias;
+    key.push({id:c.f.id,name:c.f.name,target:c.col,idx:r.idx,why:r.why});
+  }
+  return{ds,lv,rows,key,brief};
+}
+
+/* ================= 상태 ================= */
+const S={
+  code:'',scen:'survey',level:'base',step:0,startedAt:0,
+  ds:null,lv:null,rows:[],key:[],brief:'',
+  predCount:null,predCol:'',predWhy:'',
+  reports:[{target:'',type:'',why:''}],
+  result:null,rebuttal:'',blanks:['','',''],
+  tool:'book',sumCol:'',crossCol:'',
+  sortKey:null,sortDir:1,
+  use:{summary:new Set(),cross:0,sort:0},
+};
+const STEP_NAMES=['시작','1 예측','2 조사','3 판정','4 반증','5 백지','결과'];
+const STEP_MIN=['','2분','20분','5분','8분','5분',''];
+const cols=()=>S.ds.cols;
+const meta=k=>S.ds.cols.find(c=>c.k===k);
+const maxReports=()=>S.lv.n+2;
+
+function renderHead(){
+  document.getElementById('steps').innerHTML=STEP_NAMES.map((n,i)=>{
+    if(i===0)return'';
+    const cls=i===S.step?'st on':(i<S.step?'st done':'st');
+    return '<span class="'+cls+'">'+n+(STEP_MIN[i]?' · '+STEP_MIN[i]:'')+'</span>';
+  }).join('');
+  const c=document.getElementById('clock');
+  if(!S.startedAt){c.textContent='';return}
+  const s=Math.floor((Date.now()-S.startedAt)/1000);
+  c.textContent='경과 '+String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')+' / 45:00';
+}
+setInterval(renderHead,1000);
+
+/* ================= 통계 ================= */
+function colStats(k){
+  const m=meta(k), vals=S.rows.map(r=>r[k]);
+  const uniq=new Map();
+  vals.forEach(v=>uniq.set(v,(uniq.get(v)||0)+1));
+  const top=[...uniq.entries()].sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(m.t==='cat')return{type:'cat',n:vals.length,uniq:uniq.size,top};
+  const nums=vals.slice().sort((a,b)=>a-b);
+  const q=p=>nums[Math.min(nums.length-1,Math.floor(p*(nums.length-1)))];
+  const mean=nums.reduce((a,b)=>a+b,0)/nums.length;
+  return{type:'num',n:nums.length,uniq:uniq.size,min:nums[0],q1:q(.25),med:q(.5),q3:q(.75),
+    max:nums[nums.length-1],mean,top};
+}
+function crossTab(k){
+  const m=meta(k), tk=S.ds.target;
+  const tv=[...new Set(S.rows.map(r=>r[tk]))].sort((a,b)=>
+    (typeof a==='number'&&typeof b==='number')?a-b:String(a).localeCompare(String(b),'ko'));
+  if(m.t==='cat'){
+    const cats=[...new Set(S.rows.map(r=>r[k]))];
+    const grid=cats.map(c=>({c,cells:tv.map(v=>S.rows.filter(r=>r[k]===c&&r[tk]===v).length)}));
+    grid.forEach(g=>g.tot=g.cells.reduce((a,b)=>a+b,0));
+    grid.sort((a,b)=>b.tot-a.tot);
+    return{type:'cat',tv,grid:grid.slice(0,12),trimmed:Math.max(0,grid.length-12)};
+  }
+  return{type:'num',grid:tv.map(v=>{const g=S.rows.filter(r=>r[tk]===v);
+    return{c:v,n:g.length,mean:g.reduce((a,b)=>a+b[k],0)/(g.length||1)}})};
+}
+
+/* ================= 표 ================= */
+function tableHTML(rows,hl){
+  const hlSet=new Set(hl||[]);
+  let h='<div class="tablewrap"><table><thead><tr><th class="cat">행</th>';
+  cols().forEach(c=>{
+    const mark=S.sortKey===c.k?(S.sortDir>0?' ▲':' ▼'):'';
+    h+='<th class="'+(c.t==='cat'?'cat':'')+'" data-sort="'+c.k+'">'+c.k+mark+'</th>';
+  });
+  h+='</tr></thead><tbody>';
+  rows.forEach(r=>{
+    h+='<tr class="'+(hlSet.has(r.__i)?'hl':'')+'"><td class="cat">'+(r.__i+1)+'</td>';
+    cols().forEach(c=>{h+='<td class="'+(c.t==='cat'?'cat':'')+'">'+esc(r[c.k])+'</td>'});
+    h+='</tr>';
+  });
+  return h+'</tbody></table></div>';
+}
+function sortedRows(){
+  const rows=S.rows.map((r,i)=>Object.assign({__i:i},r));
+  if(!S.sortKey)return rows;
+  const m=meta(S.sortKey);
+  return rows.sort((a,b)=>{
+    const x=a[S.sortKey],y=b[S.sortKey];
+    if(m.t==='num')return (x-y)*S.sortDir;
+    return String(x).localeCompare(String(y),'ko')*S.sortDir;
+  });
+}
+
+/* ================= 채점 ================= */
+function gradeReports(){
+  const valid=S.reports.filter(r=>r.target&&r.type&&r.why.trim().length>=10);
+  const used=new Set(),taken=new Set(),hits=[],near=[],fps=[];
+  valid.forEach((r,ri)=>{
+    const i=S.key.findIndex((k,j)=>!used.has(j)&&k.target===r.target&&k.id===r.type);
+    if(i>=0){used.add(i);taken.add(ri);hits.push({rep:r,key:S.key[i]})}
+  });
+  valid.forEach((r,ri)=>{
+    if(taken.has(ri))return;
+    const i=S.key.findIndex((k,j)=>!used.has(j)&&k.target===r.target);
+    if(i>=0){used.add(i);near.push({rep:r,key:S.key[i]})}else fps.push(r);
+  });
+  const misses=S.key.filter((k,j)=>!used.has(j));
+  const found=hits.length+near.length, submitted=valid.length;
+  return{hits,near,fps,misses,submitted,found,
+    precision:submitted?found/submitted:0,
+    recall:S.key.length?found/S.key.length:0,
+    score:hits.length*2+near.length-fps.length};
+}
+
+/* 헛짚은 신고에 대한 해설을 실제 수치로 만들어 준다 */
+function whyClean(target){
+  // 같은 자리를 두 번 신고하면 두 번째 건이 오탐으로 떨어진다. 이때 정상이라고 말하면 안 된다
+  if(S.key.some(k=>k.target===target))
+    return '이 자리에는 결함이 있고, 앞선 신고에서 이미 채점됐어요. 같은 곳을 두 번 신고하면 두 번째 건은 오탐으로 처리되니 한 자리에 한 건만 내세요.';
+  if(target==='조사 개요')
+    return '조사 개요를 보면 특정 집단만 빠질 만한 대목이 없어요. 데이터 사전에 적힌 종류가 표에도 모두 들어 있습니다.';
+  if(target==='행 전체'){
+    const first=cols()[0].k, st=colStats(first);
+    return first+' 컬럼의 개수가 '+st.n+'개, 고유값이 '+st.uniq+'개로 같아요. 두 값이 같으면 중복된 행이 없다는 뜻입니다.';
+  }
+  const m=meta(target); if(!m)return '';
+  const st=colStats(target);
+  if(st.type==='num')
+    return target+' 컬럼은 최솟값 '+st.min+', 최댓값 '+st.max+'로 사전 기준('+m.spec+') 안에 들어와요.';
+  return target+' 컬럼은 고유값이 '+st.uniq+'종이고 사전 기준은 '+m.spec+'이에요. 표기가 흩어진 흔적이 없습니다.';
+}
+
+/* ================= 화면 ================= */
+const stage=document.getElementById('stage');
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function go(n){S.step=n;render();window.scrollTo(0,0)}
+function render(){
+  renderHead();
+  stage.innerHTML=[view0,view1,view2,view3,view4,view5,view6][S.step]();
+  bind();
+}
+
+const HOWTO=[
+ ['1 예측','2분','표를 열기 전에 결함이 몇 개일지 먼저 걸어 둬요'],
+ ['2 조사','20분','표를 정렬하고 도구로 컬럼을 살펴본 뒤, 찾은 결함을 근거와 함께 신고해요'],
+ ['3 판정','5분','몇 개를 맞혔고 몇 개를 헛짚었는지 확인해요'],
+ ['4 반증','8분','놓친 결함의 실제 행을 직접 보고 무엇이 이상했는지 적어요'],
+ ['5 백지','5분','오늘 쓴 확인 절차를 표를 덮고 다시 적어요'],
+];
+
+function view0(){
+  return `
+  <div class="card">
+    <h1>데이터 결함 사냥</h1>
+    <p class="muted">데이터 과학 · 데이터 정제 · 45분 1차시</p>
+    <p>표 하나를 받아서, 그대로 모델에 넣어도 될지 판단하는 활동이에요.
+    숨어 있는 결함을 찾아 근거와 함께 신고하면 됩니다.</p>
+    <div class="tip">데이터 분석에서 가장 많은 시간이 들어가는 일이 이 확인 작업이에요.
+    표를 열자마자 분석부터 시작하면, 나중에 나온 결과가 왜 이상한지 알 수 없게 됩니다.</div>
+  </div>
+
+  <div class="card">
+    <h2>결함이 뭔가요</h2>
+    <p class="muted">아래 표에서 3번 학생의 수면시간을 보세요.</p>
+    <div class="row">
+      <div class="col" style="max-width:280px">
+        <div class="tablewrap" style="max-height:none">
+        <table><thead><tr><th class="cat">번호</th><th>수면시간</th></tr></thead><tbody>
+        <tr><td class="cat">1</td><td>6.5</td></tr>
+        <tr><td class="cat">2</td><td>7.0</td></tr>
+        <tr class="hl"><td class="cat">3</td><td>26.0</td></tr>
+        <tr><td class="cat">4</td><td>5.5</td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="col">
+        <p>하루에 26시간을 잘 수는 없어요. 설문을 입력할 때 걸러지지 않은 값이 그대로 남은 거예요.
+        이럴 때 대상은 <b>수면시간</b> 컬럼, 유형은 <b>불가능한 값</b>으로 신고하면 정답 처리됩니다.</p>
+        <p class="muted">오늘 다루는 결함은 모두 ${FLAWS.length}유형이에요. 각각을 어떻게 찾는지는
+        조사 단계의 결함 유형 사전에 적어 뒀고, 유형을 외울 필요는 없어요.
+        사전은 조사하는 동안 계속 열어 볼 수 있습니다.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>어떤 자료로 할까요</h2>
+    ${SCENARIOS.map(s=>'<button class="pickcard '+(S.scen===s.id?'on':'')+'" data-scen="'+s.id+'">'
+      +'<b>'+s.title+'</b><span>'+s.blurb+' 목표는 '+s.goal+'이에요.</span></button>').join('')}
+  </div>
+
+  <div class="card">
+    <h2>난이도</h2>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${LEVELS.map(l=>'<button class="tab '+(S.level===l.id?'on':'')+'" data-lv="'+l.id+'">'+l.name+' · '+l.label+'</button>').join('')}
+    </div>
+    <p class="muted" style="margin-top:8px">처음이라면 입문으로 시작해 보세요. 신고 횟수는 결함 개수보다 두 번 더 주어집니다.</p>
+  </div>
+
+  <div class="card">
+    <h2>진행 순서</h2>
+    ${HOWTO.map(h=>'<div class="kv"><span><b>'+h[0]+'</b> · '+h[2]+'</span><b>'+h[1]+'</b></div>').join('')}
+  </div>
+
+  <div class="card">
+    <h2>규칙</h2>
+    <ul class="muted" style="margin:0 0 12px;padding-left:20px">
+      <li>자리와 유형을 모두 맞히면 2점이에요</li>
+      <li>자리는 맞고 유형만 다르면 1점이고 감점은 없어요</li>
+      <li>결함이 없는 곳을 신고하면 1점 감점이에요</li>
+      <li>신고마다 근거를 10자 이상 적어야 제출돼요</li>
+    </ul>
+    <div class="tip">다 못 찾아도 괜찮아요. 이 활동은 정답 개수보다 어떤 순서로 확인했는지가 남는 활동이에요.
+    놓친 결함은 4단계에서 직접 보게 되고, 마지막에 전부 해설이 나옵니다.</div>
+    <label>수업 코드</label>
+    <input id="code" value="2026A" style="width:160px">
+    <p class="muted" style="margin-top:4px">선생님이 불러 주는 코드가 있으면 그대로 입력하세요.
+    같은 코드에 같은 자료와 난이도를 고르면 반 전체가 똑같은 문제를 풀게 됩니다.</p>
+    <div class="actions"><button class="primary" id="start">1단계 예측 시작하기</button></div>
+  </div>`;
+}
+
+function view1(){
+  const opts=cols().map(c=>'<option '+(S.predCol===c.k?'selected':'')+'>'+c.k+'</option>').join('');
+  return `
+  <div class="card">
+    <h2>1단계 · 예측</h2>
+    <p class="muted">자료는 ${esc(S.ds.title)}, 난이도는 ${S.lv.name}(결함 ${S.lv.n}개)예요.
+    표를 열기 전에 예상을 먼저 걸어 둡니다. 한 번 넘어가면 이 답은 고칠 수 없어요.</p>
+    <div class="tip">맞히려고 애쓰지 않아도 돼요. 3단계에서 예상과 실제를 나란히 보여 주는데,
+    어긋난 지점이 앞으로 무엇을 더 조심해야 하는지 알려 줍니다.</div>
+    <label>조사 개요 (자료를 어떻게 모았는지 적어 둔 기록이에요)</label>
+    <div class="note">${esc(S.brief)}</div>
+    <div class="row">
+      <div class="col">
+        <label>결함이 몇 개나 있을 것 같나요</label>
+        <div>${[1,2,3,4,5,6,7,8].map(n=>'<button class="tab '+(S.predCount===n?'on':'')+'" data-cnt="'+n+'">'+n+'</button>').join(' ')}</div>
+      </div>
+      <div class="col">
+        <label>가장 의심스러운 컬럼은 어디인가요</label>
+        <select id="predcol"><option value="">컬럼 고르기</option>${opts}</select>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <label>그렇게 생각한 이유를 한 줄만 적어 주세요</label>
+      <textarea id="predwhy" rows="2" placeholder="예시: 시간을 묻는 항목은 단위가 헷갈려서 잘못 적는 사람이 많을 것 같아요">${esc(S.predWhy)}</textarea>
+    </div>
+    <div class="err" id="err"></div>
+    <div class="actions"><button class="primary" id="next">예상 잠그고 표 열기</button></div>
+  </div>`;
+}
+
+function view2(){
+  const tabs=[['book','데이터 사전'],['brief','조사 개요'],['sum','컬럼 요약'],['cross',S.ds.target+'와 비교'],['dict','결함 유형 사전']];
+  return `
+  <div class="card">
+    <h2>2단계 · 조사 <span class="pill">${esc(S.ds.title)}</span><span class="pill">${S.lv.name} · 결함 ${S.lv.n}개</span></h2>
+    <p class="muted">아래 순서대로 하면 결함이 보여요. 오른쪽 도구를 하나씩 눌러 보세요.</p>
+    <ol class="muted" style="margin:0;padding-left:20px">
+      <li><b>데이터 사전</b>을 먼저 읽으세요. 각 컬럼의 단위와 원래 들어갈 값이 적혀 있어요. 이게 판단 기준이 됩니다</li>
+      <li><b>결함 유형 사전</b>을 훑어 보세요. 유형마다 찾는 법이 한 줄씩 적혀 있어요</li>
+      <li><b>컬럼 요약</b>에서 컬럼을 하나씩 바꿔 가며 최솟값, 최댓값, 고유값 개수를 데이터 사전과 견주세요</li>
+      <li><b>${esc(S.ds.target)}와 비교</b>를 열어 목표를 그대로 베낀 컬럼이 있는지 보세요</li>
+      <li>표 머리글을 눌러 정렬해 보세요. 같은 번호가 두 번 나오면 중복된 행이에요</li>
+      <li><b>조사 개요</b>를 다시 읽고, 빠진 집단이 있는지 생각해 보세요</li>
+      <li>확신이 서면 아래 신고서에 대상, 유형, 근거를 적어 주세요</li>
+    </ol>
+    <div class="tip">서두르지 않아도 돼요. 컬럼이 ${cols().length}개니까 하나에 1분씩만 봐도 20분 안에 다 볼 수 있어요.</div>
+  </div>
+  <div class="row">
+    <div class="col" style="flex:2.6">
+      ${tableHTML(sortedRows())}
+      <p class="muted" style="margin-top:6px">행 ${S.rows.length}개 · 컬럼 ${cols().length}개 · 맞히려는 목표는 ${esc(S.ds.target)} 컬럼이에요</p>
+    </div>
+    <div class="col">
+      <div class="card">
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px">
+          ${tabs.map(t=>'<button class="tab '+(S.tool===t[0]?'on':'')+'" data-tool="'+t[0]+'">'+esc(t[1])+'</button>').join('')}
+        </div>
+        ${toolHTML()}
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>신고서</h3>
+    <p class="muted">대상, 유형, 근거 세 가지를 채우면 한 건이 완성돼요. 최대 ${maxReports()}건까지 낼 수 있고,
+    자리와 유형을 모두 맞히면 2점, 자리만 맞히면 1점, 결함이 없는 곳을 신고하면 1점 감점이에요.</p>
+    <div id="reps">${S.reports.map((r,i)=>repHTML(r,i)).join('')}</div>
+    <button id="addrep" ${S.reports.length>=maxReports()?'disabled':''}>신고 한 건 더 추가</button>
+    <div class="err" id="err"></div>
+    <div class="actions"><button class="primary" id="next">신고서 제출하기</button>
+      <span class="muted">제출하면 되돌아올 수 없어요</span></div>
+  </div>`;
+}
+
+function repHTML(r,i){
+  const targets=cols().map(c=>c.k).concat(['행 전체','조사 개요']);
+  return `<div class="rep">
+    <div class="line">
+      <span class="pill">${i+1}</span>
+      <select data-rep="${i}" data-f="target"><option value="">어디인가요</option>
+        ${targets.map(t=>'<option '+(r.target===t?'selected':'')+'>'+esc(t)+'</option>').join('')}</select>
+      <select data-rep="${i}" data-f="type"><option value="">어떤 결함인가요</option>
+        ${FLAWS.map(f=>'<option value="'+f.id+'" '+(r.type===f.id?'selected':'')+'>'+f.name+'</option>').join('')}</select>
+      <button data-del="${i}">삭제</button>
+    </div>
+    <textarea data-rep="${i}" data-f="why" rows="2" placeholder="예시: 컬럼 요약에서 최댓값이 999였고 자주 나온 값에도 999가 7번 있었어요">${esc(r.why)}</textarea>
+  </div>`;
+}
+
+function toolHTML(){
+  if(S.tool==='book')return `<h3>데이터 사전</h3>
+    <p class="muted">자료를 만들 때 정해 둔 기준이에요. 표에 있는 값이 이 기준에서 벗어나면 결함을 의심하세요.</p>
+    <dl class="dict">${cols().map(c=>'<dt>'+esc(c.k)+(c.u?' <span class="pill">단위 '+esc(c.u)+'</span>':'')+'</dt>'
+      +'<dd>'+esc(c.desc)+'<span class="how">원래 들어갈 값: '+esc(c.spec)+'</span></dd>').join('')}</dl>`;
+  if(S.tool==='brief')return `<h3>조사 개요</h3><p>${esc(S.brief)}</p>
+    <p class="muted">기록은 ${S.rows.length}건이에요. 목표는 ${esc(S.ds.goal)}입니다.</p>
+    <div class="tip">여기 적힌 방식대로 자료를 모았을 때, 아예 들어오지 못한 사람이 있는지 생각해 보세요.</div>`;
+  if(S.tool==='sum'){
+    const k=S.sumCol||cols()[3].k, m=meta(k), st=colStats(k);
+    let body='';
+    if(st.type==='num'){
+      body=[['개수',st.n],['고유값',st.uniq],['최솟값',st.min],['25%',st.q1],['중앙값',st.med],
+            ['75%',st.q3],['최댓값',st.max],['평균',st.mean.toFixed(2)]]
+        .map(x=>'<div class="kv"><span>'+x[0]+'</span><b>'+x[1]+'</b></div>').join('');
+    }else{
+      body='<div class="kv"><span>개수</span><b>'+st.n+'</b></div><div class="kv"><span>고유값</span><b>'+st.uniq+'</b></div>';
+    }
+    body+='<h3 style="margin-top:12px">자주 나온 값</h3>'
+      +st.top.map(t=>'<div class="kv"><span>'+esc(t[0])+'</span><b>'+t[1]+'회</b></div>').join('');
+    return `<h3>컬럼 요약</h3>
+      <p class="muted">컬럼을 바꿔 가며 최솟값과 최댓값이 말이 되는지, 고유값 개수가 사전과 맞는지 보세요.</p>
+      <select id="sumcol">${cols().map(c=>'<option '+(k===c.k?'selected':'')+'>'+esc(c.k)+'</option>').join('')}</select>
+      <div class="tip" style="margin:10px 0 0">사전 기준 · 단위 ${esc(m.u||'없음')} · 원래 들어갈 값은 ${esc(m.spec)}</div>
+      <div style="margin-top:10px">${body}</div>`;
+  }
+  if(S.tool==='cross'){
+    const k=S.crossCol||cols().find(c=>c.k!==S.ds.target&&!c.date).k, ct=crossTab(k);
+    let body='';
+    if(ct.type==='cat'){
+      body='<table style="width:100%"><thead><tr><th class="cat">'+esc(k)+'</th>'
+        +ct.tv.map(v=>'<th>'+esc(v)+'</th>').join('')+'</tr></thead><tbody>'
+        +ct.grid.map(g=>'<tr><td class="cat">'+esc(g.c)+'</td>'+g.cells.map(n=>'<td>'+n+'</td>').join('')+'</tr>').join('')
+        +'</tbody></table>'
+        +(ct.trimmed?'<p class="muted">값 종류가 많아서 상위 12개만 보여 줘요. 나머지 '+ct.trimmed+'종은 생략했습니다.</p>':'');
+    }else{
+      body='<table style="width:100%"><thead><tr><th class="cat">'+esc(S.ds.target)+'</th><th>인원</th><th>'+esc(k)+' 평균</th></tr></thead><tbody>'
+        +ct.grid.map(g=>'<tr><td class="cat">'+esc(g.c)+'</td><td>'+g.n+'</td><td>'+g.mean.toFixed(1)+'</td></tr>').join('')
+        +'</tbody></table>';
+    }
+    return `<h3>${esc(S.ds.target)}와 비교</h3>
+      <p class="muted">고른 컬럼과 ${esc(S.ds.target)}가 함께 어떻게 움직이는지 보여 줘요.</p>
+      <select id="crosscol">${cols().filter(c=>c.k!==S.ds.target&&!c.date).map(c=>'<option '+(k===c.k?'selected':'')+'>'+esc(c.k)+'</option>').join('')}</select>
+      <div style="margin-top:10px;overflow:auto">${body}</div>
+      <div class="tip">맨 윗줄의 목표 값 하나를 골라 세로로 훑어 보세요. 숫자가 한 칸에만 있고
+      나머지가 전부 0이면, 그 컬럼은 목표를 그대로 베낀 컬럼이에요.
+      가로줄에서는 여러 칸에 숫자가 있어도 괜찮아요. 여러 목표 값이 같은 이름으로 묶일 수 있으니까요.
+      너무 잘 맞는 컬럼은 반가운 것이 아니라 의심할 대상이에요.</div>`;
+  }
+  return '<h3>결함 유형 사전</h3><p class="muted">'+FLAWS.length+'유형 중 '+S.lv.n
+    +'개가 이 표에 숨어 있어요. 찾는 법을 그대로 따라 해 보세요.</p>'
+    +'<dl class="dict">'+FLAWS.map(f=>'<dt>'+f.name+'</dt><dd>'+f.what
+    +'<span class="how">찾는 법: '+f.how+'</span></dd>').join('')+'</dl>';
+}
+
+function explainHTML(k,extra){
+  const f=FLAW_BY_ID[k.id];
+  return `<div class="exp">
+    <h4>${esc(k.target)} · ${f.name}</h4>
+    ${extra||''}
+    <span class="q">무슨 일이 있었나요</span><span class="a">${esc(k.why)}</span>
+    <span class="q">어떻게 찾나요</span><span class="a">${esc(f.how)}</span>
+    <span class="q">그냥 두면 어떻게 되나요</span><span class="a">${esc(f.impact)}</span>
+    <span class="q">어떻게 고치나요</span><span class="a">${esc(f.fix)}</span>
+  </div>`;
+}
+
+function view3(){
+  const g=S.result;
+  const predHit=S.predCount===S.key.length;
+  const predColHit=S.key.some(k=>k.target===S.predCol);
+  return `
+  <div class="card">
+    <h2>3단계 · 판정</h2>
+    <div class="row">
+      <div class="col stat"><label>정탐</label><div class="big ok">${g.hits.length}</div><p class="muted">자리와 유형 모두 적중</p></div>
+      <div class="col stat"><label>부분 정탐</label><div class="big wn">${g.near.length}</div><p class="muted">자리는 맞고 유형만 다름</p></div>
+      <div class="col stat"><label>오탐</label><div class="big no">${g.fps.length}</div><p class="muted">결함이 없는 곳</p></div>
+      <div class="col stat"><label>미탐</label><div class="big wn">${g.misses.length}</div><p class="muted">지나친 결함</p></div>
+      <div class="col stat"><label>정밀도</label><div class="big">${Math.round(g.precision*100)}%</div>
+        <p class="muted">신고한 ${g.submitted}건 중 결함을 짚은 비율</p></div>
+      <div class="col stat"><label>재현율</label><div class="big">${Math.round(g.recall*100)}%</div>
+        <p class="muted">숨은 ${S.key.length}개 중 찾아낸 비율</p></div>
+    </div>
+    <div class="tip">자리를 맞게 짚었으면 유형 이름이 달라도 절반은 인정돼요. 같은 이상값을 두고
+    결측 위장으로 볼지 불가능한 값으로 볼지는 갈릴 수 있으니까요. 두 비율 중 정밀도는 조심해서
+    조금만 신고할 때 오르고, 재현율은 넓게 신고할 때 올라요.</div>
+  </div>
+  <div class="card">
+    <h3>1단계에서 걸었던 예상</h3>
+    <div class="kv"><span>결함 개수</span><b>${S.predCount}개로 예상 → 실제 ${S.key.length}개 ${predHit?'<span class="ok">맞았어요</span>':'<span class="no">어긋났어요</span>'}</b></div>
+    <div class="kv"><span>의심 컬럼</span><b>${esc(S.predCol)} ${predColHit?'<span class="ok">여기 정말 있었어요</span>':'<span class="no">여기엔 없었어요</span>'}</b></div>
+    <p class="muted" style="margin-top:8px">적었던 이유: ${esc(S.predWhy)}</p>
+  </div>
+  <div class="card">
+    <h3>맞힌 신고</h3>
+    ${g.hits.length?g.hits.map(h=>'<div class="rep"><b class="ok">'+esc(h.key.target)+' · '+h.key.name+'</b><div class="muted">'+esc(h.key.why)+'</div></div>').join(''):'<p class="muted">이번엔 없어요. 4단계에서 실제 결함을 직접 보게 됩니다.</p>'}
+    ${g.near.length?'<h3 style="margin-top:14px">자리는 맞힌 신고</h3>'+g.near.map(h=>
+      '<div class="rep"><b class="wn">'+esc(h.key.target)+'</b> · 신고한 유형은 '+FLAW_BY_ID[h.rep.type].name
+      +', 실제 유형은 <b>'+h.key.name+'</b>이었어요<div class="muted">'+esc(h.key.why)+'</div></div>').join(''):''}
+    <h3 style="margin-top:14px">헛짚은 신고</h3>
+    ${g.fps.length?g.fps.map(r=>'<div class="rep"><b class="no">'+esc(r.target)+' · '+FLAW_BY_ID[r.type].name+'</b>'
+      +'<div class="muted">적었던 근거: '+esc(r.why)+'</div>'
+      +'<div class="muted" style="margin-top:4px">여기가 정상인 이유: '+esc(whyClean(r.target))+'</div></div>').join(''):'<p class="muted">없어요. 확신이 선 것만 신고했네요.</p>'}
+    <h3 style="margin-top:14px">놓친 결함</h3>
+    ${g.misses.length?g.misses.map(k=>'<div class="rep"><b class="wn">'+esc(k.target)+'</b><div class="muted">여기에 결함이 하나 있어요. 어떤 유형인지는 4단계를 마치면 알려 드려요.</div></div>').join(''):'<p class="muted">없어요. 모두 찾았습니다.</p>'}
+    <div class="actions"><button class="primary" id="next">4단계로 넘어가기</button></div>
+  </div>`;
+}
+
+function rebuttalCase(){
+  const g=S.result;
+  if(g.misses.length)return{kind:'miss',key:g.misses[0]};
+  if(g.fps.length)return{kind:'fp',rep:g.fps[0]};
+  return{kind:'what',key:S.key[S.key.length-1]};
+}
+
+function view4(){
+  const c=rebuttalCase();
+  let head='',lead='',body='',ask='';
+  if(c.kind==='miss'){
+    const rows=sortedRows().filter(r=>c.key.idx.includes(r.__i)).slice(0,8);
+    head='놓친 곳을 같이 봐요';
+    lead='아래는 신고하지 않고 지나간 '+esc(c.key.target)+' 부분이에요. 정답을 바로 알려 주지 않을게요. 눈으로 먼저 찾아보세요.';
+    body= c.key.target==='조사 개요'
+      ? '<div class="note">'+esc(S.brief)+'</div><p class="muted">값 자체는 멀쩡해요. 이 방식으로 자료를 모았을 때 누가 빠졌을지 생각해 보세요.</p>'
+      : tableHTML(rows,c.key.idx);
+    ask='표시된 곳에서 무엇이 이상해 보이나요. 어느 값이 왜 문제인지 적어 주세요.';
+  }else if(c.kind==='fp'){
+    head='이 신고는 결함이 아니었어요';
+    lead='틀린 신고를 되짚어 보는 것이 이 단계예요.';
+    body='<div class="rep"><b>'+esc(c.rep.target)+' · '+FLAW_BY_ID[c.rep.type].name+'</b>'
+      +'<div class="muted">적었던 근거: '+esc(c.rep.why)+'</div>'
+      +'<div class="muted" style="margin-top:4px">실제로는 이래요: '+esc(whyClean(c.rep.target))+'</div></div>';
+    ask='어떤 확인을 건너뛰어서 이렇게 판단하게 됐을까요. 다음엔 무엇을 더 볼지 적어 주세요.';
+  }else{
+    head='숨은 결함을 모두 찾았어요';
+    lead='잘했어요. 마지막으로 이 결함이 남아 있었다면 어떤 일이 생겼을지 생각해 보세요.';
+    body='<div class="rep"><b>'+esc(c.key.target)+' · '+c.key.name+'</b><div class="muted">'+esc(c.key.why)+'</div></div>';
+    ask='이 결함을 못 보고 모델을 학습시켰다면 어떤 일이 벌어질까요.';
+  }
+  return `
+  <div class="card">
+    <h2>4단계 · 반증</h2>
+    <h3>${head}</h3>
+    <p class="muted">${lead}</p>
+    ${body}
+    <div style="margin-top:12px">
+      <label>${ask}</label>
+      <textarea id="reb" rows="4" placeholder="한두 문장이면 충분해요. 20자 이상 적으면 넘어갈 수 있어요.">${esc(S.rebuttal)}</textarea>
+    </div>
+    <div class="err" id="err"></div>
+    <div class="actions"><button class="primary" id="next">적었어요, 5단계로</button></div>
+  </div>`;
+}
+
+const BLANK_Q=[
+ '표를 처음 열었을 때 가장 먼저 확인할 것',
+ '숫자 컬럼에서 꼭 확인할 것',
+ '범주 컬럼에서 꼭 확인할 것'
+];
+function view5(){
+  return `
+  <div class="card">
+    <h2>5단계 · 백지</h2>
+    <p class="muted">오늘 쓴 확인 절차를 한 줄씩 적어 주세요. 표나 사전을 다시 보지 않고 기억나는 대로 적는 것이 중요해요.</p>
+    <div class="tip">여기서 막히는 것이 정상이에요. 어디가 안 떠오르는지 확인하는 것이 이 단계의 목적이고,
+    적고 나면 전체 해설과 체크리스트를 보여 드려요.</div>
+    ${BLANK_Q.map((q,i)=>'<div style="margin-bottom:10px"><label>'+(i+1)+'. '+q+'</label>'
+      +'<input data-blank="'+i+'" style="width:100%" placeholder="짧게 한 줄이면 돼요" value="'+esc(S.blanks[i])+'"></div>').join('')}
+    <div class="err" id="err"></div>
+    <div class="actions"><button class="primary" id="next">다 적었어요</button></div>
+  </div>`;
+}
+
+function reportText(){
+  const g=S.result;
+  const mins=Math.round((Date.now()-S.startedAt)/60000);
+  const L=[];
+  L.push('데이터 결함 사냥 · 제출 요약');
+  L.push('자료 '+S.ds.title+' · 난이도 '+S.lv.name+'(결함 '+S.lv.n+'개) · 수업 코드 '+S.code+' · 소요 '+mins+'분');
+  L.push('');
+  L.push('[예측] 개수 '+S.predCount+' (실제 '+S.key.length+') / 의심 컬럼 '+S.predCol);
+  L.push('  이유: '+S.predWhy);
+  L.push('');
+  L.push('[결과] 정탐 '+g.hits.length+' 부분정탐 '+g.near.length+' 오탐 '+g.fps.length+' 미탐 '+g.misses.length
+    +' / 정밀도 '+Math.round(g.precision*100)+'% 재현율 '+Math.round(g.recall*100)+'% / 점수 '+g.score);
+  L.push('');
+  L.push('[신고 내역] O 정탐, △ 자리만 적중, X 오탐');
+  S.reports.filter(r=>r.target&&r.type).forEach((r,i)=>{
+    const mark=g.hits.some(h=>h.rep===r)?'O':(g.near.some(h=>h.rep===r)?'△':'X');
+    L.push('  '+(i+1)+'. '+mark+' '+r.target+' · '+FLAW_BY_ID[r.type].name);
+    L.push('     근거: '+r.why);
+  });
+  L.push('');
+  L.push('[숨어 있던 결함] '+S.key.map(k=>k.target+' · '+k.name).join(', '));
+  L.push('[놓친 결함] '+(g.misses.length?g.misses.map(k=>k.target+' · '+k.name).join(', '):'없음'));
+  L.push('');
+  L.push('[반증 서술] '+S.rebuttal);
+  L.push('');
+  L.push('[백지 복원]');
+  BLANK_Q.forEach((q,i)=>L.push('  '+(i+1)+'. '+q+' → '+S.blanks[i]));
+  L.push('');
+  L.push('[도구 사용] 컬럼 요약 '+S.use.summary.size+'개 컬럼 / 목표 비교 '+S.use.cross+'회 / 정렬 '+S.use.sort+'회');
+  return L.join('\n');
+}
+
+function view6(){
+  const g=S.result;
+  const hitIds=new Set(g.hits.map(h=>h.key.id));
+  return `
+  <div class="card">
+    <h2>결과 <span class="pill">${esc(S.ds.title)}</span><span class="pill">${S.lv.name}</span></h2>
+    <div class="row">
+      <div class="col stat"><label>점수</label><div class="big">${g.score}</div><p class="muted">정탐 2점, 부분 1점, 오탐 1점 감점</p></div>
+      <div class="col stat"><label>정밀도</label><div class="big">${Math.round(g.precision*100)}%</div></div>
+      <div class="col stat"><label>재현율</label><div class="big">${Math.round(g.recall*100)}%</div></div>
+      <div class="col stat"><label>도구 사용</label><div class="big">${S.use.summary.size}·${S.use.cross}·${S.use.sort}</div>
+        <p class="muted">요약해 본 컬럼 수 · 비교 · 정렬</p></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>이번 표 해설</h3>
+    <p class="muted">숨어 있던 ${S.key.length}개를 하나씩 풀어서 설명할게요. 찾은 것도 다시 읽어 보면 다음 표에서 훨씬 빨라져요.</p>
+    ${S.key.map(k=>{
+      const found=hitIds.has(k.id)?'<span class="pill" style="background:#dff3e7;color:#0f7b46">찾음</span>'
+        :(g.near.some(h=>h.key===k)?'<span class="pill" style="background:#fff1d6;color:#8a5a00">자리만 찾음</span>'
+        :'<span class="pill" style="background:#fde8e6;color:#b3261e">놓침</span>');
+      return explainHTML(k,found);
+    }).join('')}
+  </div>
+
+  ${g.fps.length?`<div class="card">
+    <h3>헛짚은 곳 해설</h3>
+    ${g.fps.map(r=>'<div class="exp"><h4>'+esc(r.target)+' · '+FLAW_BY_ID[r.type].name+'</h4>'
+      +'<span class="q">적었던 근거</span><span class="a">'+esc(r.why)+'</span>'
+      +'<span class="q">여기가 정상인 이유</span><span class="a">'+esc(whyClean(r.target))+'</span></div>').join('')}
+  </div>`:''}
+
+  <div class="card">
+    <h3>안 나온 유형도 알아 두기</h3>
+    <p class="muted">이번 표에는 없었지만 다른 자료에서는 자주 나오는 유형이에요.</p>
+    <dl class="dict">${FLAWS.filter(f=>!S.key.some(k=>k.id===f.id)).map(f=>
+      '<dt>'+f.name+'</dt><dd>'+f.what+'<span class="how">찾는 법: '+f.how+'</span></dd>').join('')}</dl>
+  </div>
+
+  <div class="card">
+    <h3>확인 절차 체크리스트</h3>
+    <p class="muted">앞으로 어떤 표를 받든 이 순서대로 보면 돼요. 5단계에서 적은 것과 비교해 보세요.</p>
+    <ol class="muted" style="margin:0;padding-left:20px">
+      <li>데이터 사전을 먼저 읽고 각 컬럼의 단위와 정상 범위를 확인해요</li>
+      <li>행 수를 세고 중복된 행이 있는지 정렬해서 확인해요</li>
+      <li>숫자 컬럼마다 최솟값과 최댓값을 봐요. 사전 범위를 벗어난 값이 있는지 확인해요</li>
+      <li>범주 컬럼마다 고유값 목록을 뽑아요. 사전보다 많으면 표기가 흩어진 것이고, 1개뿐이면 상수 컬럼이에요</li>
+      <li>맞히려는 목표와 각 컬럼을 교차해 봐요. 너무 잘 맞는 컬럼은 의심해요</li>
+      <li>자료를 어떻게 모았는지 읽어요. 표에 들어오지 못한 사람이 누구인지 생각해요</li>
+    </ol>
+    <p class="muted" style="margin-top:10px">5단계에 적었던 답: ${S.blanks.map((b,i)=>(i+1)+') '+esc(b)).join(' · ')}</p>
+  </div>
+
+  <div class="card">
+    <h3>제출 요약</h3>
+    <p class="muted">아래 내용을 복사해서 선생님께 제출하면 돼요.</p>
+    <pre class="report" id="rep">${esc(reportText())}</pre>
+    <div class="actions">
+      <button class="primary" id="copy">제출 내용 복사하기</button>
+      <button id="again">다른 자료로 한 번 더</button>
+      <span class="muted" id="copied"></span>
+    </div>
+  </div>`;
+}
+
+/* ================= 이벤트 ================= */
+function bind(){
+  const $=s=>stage.querySelector(s);
+  const err=m=>{const e=$('#err');if(e)e.textContent=m};
+
+  stage.querySelectorAll('[data-scen]').forEach(b=>b.onclick=()=>{S.scen=b.dataset.scen;render()});
+  stage.querySelectorAll('[data-lv]').forEach(b=>b.onclick=()=>{S.level=b.dataset.lv;render()});
+
+  const st=$('#start');
+  if(st)st.onclick=()=>{
+    S.code=($('#code').value||'seed').trim();
+    const d=buildDataset(S.code,S.scen,S.level);
+    S.ds=d.ds;S.lv=d.lv;S.rows=d.rows;S.key=d.key;S.brief=d.brief;
+    S.sumCol=d.ds.cols[3].k;S.crossCol=d.ds.cols.find(c=>c.k!==d.ds.target&&!c.date).k;
+    S.startedAt=Date.now();
+    go(1);
+  };
+
+  stage.querySelectorAll('[data-cnt]').forEach(b=>b.onclick=()=>{S.predCount=+b.dataset.cnt;render()});
+  const pc=$('#predcol');if(pc)pc.onchange=()=>S.predCol=pc.value;
+  const pw=$('#predwhy');if(pw)pw.oninput=()=>S.predWhy=pw.value;
+
+  stage.querySelectorAll('[data-tool]').forEach(b=>b.onclick=()=>{
+    S.tool=b.dataset.tool;
+    if(S.tool==='sum')S.use.summary.add(S.sumCol);
+    if(S.tool==='cross')S.use.cross++;
+    render();
+  });
+  const sc=$('#sumcol');if(sc)sc.onchange=()=>{S.sumCol=sc.value;S.use.summary.add(sc.value);render()};
+  const cc=$('#crosscol');if(cc)cc.onchange=()=>{S.crossCol=cc.value;S.use.cross++;render()};
+  stage.querySelectorAll('th[data-sort]').forEach(th=>th.onclick=()=>{
+    const k=th.dataset.sort;
+    S.sortDir=(S.sortKey===k)?-S.sortDir:1;S.sortKey=k;S.use.sort++;render();
+  });
+
+  stage.querySelectorAll('[data-rep]').forEach(el=>{
+    const i=+el.dataset.rep,f=el.dataset.f;
+    const h=()=>{S.reports[i][f]=el.value};
+    el.tagName==='SELECT'?el.onchange=h:el.oninput=h;
+  });
+  stage.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    S.reports.splice(+b.dataset.del,1);
+    if(!S.reports.length)S.reports.push({target:'',type:'',why:''});
+    render();
+  });
+  const ar=$('#addrep');if(ar)ar.onclick=()=>{
+    if(S.reports.length<maxReports()){S.reports.push({target:'',type:'',why:''});render()}};
+
+  const rb=$('#reb');if(rb)rb.oninput=()=>S.rebuttal=rb.value;
+  stage.querySelectorAll('[data-blank]').forEach(el=>el.oninput=()=>S.blanks[+el.dataset.blank]=el.value);
+
+  const nx=$('#next');
+  if(nx)nx.onclick=()=>{
+    if(S.step===1){
+      if(!S.predCount)return err('결함이 몇 개일지 위에서 숫자 하나를 눌러 주세요.');
+      if(!S.predCol)return err('의심되는 컬럼을 하나 골라 주세요. 틀려도 감점은 없어요.');
+      if(S.predWhy.trim().length<5)return err('이유를 한 줄만 적어 주세요. 짧아도 괜찮아요.');
+      return go(2);
+    }
+    if(S.step===2){
+      const valid=S.reports.filter(r=>r.target&&r.type&&r.why.trim().length>=10);
+      if(!valid.length)return err('아직 완성된 신고가 없어요. 대상, 결함 유형, 근거 세 가지를 모두 채워야 제출돼요. 근거는 10자 이상 적어 주세요.');
+      const partial=S.reports.filter(r=>(r.target||r.type||r.why.trim())&&!(r.target&&r.type&&r.why.trim().length>=10));
+      if(partial.length)return err('쓰다 만 신고가 있어요. 빈 곳을 채우거나 삭제 버튼을 눌러 주세요.');
+      S.result=gradeReports();
+      return go(3);
+    }
+    if(S.step===3)return go(4);
+    if(S.step===4){
+      if(S.rebuttal.trim().length<20)return err('조금만 더 자세히 적어 주세요. 20자 이상이면 넘어갈 수 있어요.');
+      return go(5);
+    }
+    if(S.step===5){
+      if(S.blanks.some(b=>b.trim().length<5))return err('세 칸을 모두 채워 주세요. 한 줄씩이면 충분해요.');
+      return go(6);
+    }
+  };
+
+  const cp=$('#copy');
+  if(cp)cp.onclick=async()=>{
+    const t=reportText();
+    try{await navigator.clipboard.writeText(t)}catch(e){
+      const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);
+      ta.select();document.execCommand('copy');ta.remove();
+    }
+    $('#copied').textContent='복사했어요. 제출할 곳에 붙여 넣으면 됩니다.';
+  };
+  const ag=$('#again');
+  if(ag)ag.onclick=()=>{
+    Object.assign(S,{step:0,startedAt:0,predCount:null,predCol:'',predWhy:'',
+      reports:[{target:'',type:'',why:''}],result:null,rebuttal:'',blanks:['','',''],
+      tool:'book',sortKey:null,sortDir:1,use:{summary:new Set(),cross:0,sort:0}});
+    go(0);
+  };
+}
+
+render();
+</script>
+</body>
+</html>
