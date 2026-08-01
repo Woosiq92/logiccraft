@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="난제도감">
+  <!-- 앱의 signature 화면인 관계 지도를 그대로 마크로 쓴다.
+       채워진 점 = 미해결, 속이 빈 점 = 해결된 문제. 앱 안의 약속과 같다. -->
+  <rect width="512" height="512" rx="112" fill="#1e3a5f"/>
+  <g stroke="#8fa8c4" stroke-width="14" stroke-linecap="round" opacity="0.85">
+    <line x1="256" y1="196" x2="150" y2="316"/>
+    <line x1="256" y1="196" x2="362" y2="316"/>
+    <line x1="256" y1="196" x2="256" y2="100"/>
+    <line x1="150" y1="316" x2="256" y2="392"/>
+    <line x1="362" y1="316" x2="256" y2="392"/>
+  </g>
+  <circle cx="256" cy="196" r="52" fill="#f7f5f0"/>
+  <circle cx="150" cy="316" r="34" fill="#f7f5f0"/>
+  <circle cx="362" cy="316" r="34" fill="#f7f5f0"/>
+  <circle cx="256" cy="392" r="28" fill="#f7f5f0"/>
+  <circle cx="256" cy="100" r="24" fill="none" stroke="#f7f5f0" stroke-width="12"/>
+</svg>

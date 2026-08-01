@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <!-- maximum-scale=1: iOS 입력창 자동확대 방지 (메모리 함정) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>난제도감 — 아직 풀리지 않은 수학 난제</title>
+  <meta name="description" content="아직 아무도 풀지 못한 수학 문제 85편을 한 줄·비유·정식 서술 세 층으로 읽는 도감. 하나가 풀리면 함께 풀리는 문제를 관계 지도로." />
+  <meta name="theme-color" content="#1e3a5f" />
+  <meta property="og:title" content="난제도감" />
+  <meta property="og:description" content="아직 아무도 풀지 못한 수학 문제 85편. 한 줄·비유·정식 서술 세 층으로 읽습니다." />
+  <meta property="og:type" content="website" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- 데스크톱 전용 좌측 내비. 폰에서는 숨고 하단 탭바가 대신한다(같은 TABS 데이터에서 렌더). -->
+  <aside class="sidebar" id="sidebar"></aside>
+
+  <div class="shell">
+    <header class="topbar">
+      <button class="back" id="back" hidden aria-label="뒤로">‹</button>
+      <h1 id="screen-title">난제도감</h1>
+      <span class="topbar-right" id="topbar-right"></span>
+    </header>
+
+    <main id="app"><!-- app.js가 현재 화면을 렌더 --></main>
+  </div>
+
+  <nav class="tabbar" id="tabbar"><!-- app.js가 탭 버튼 렌더 --></nav>
+
+  <script src="data/meta.js"></script>
+  <script src="data/problems.js"></script>
+  <script src="data/index-corpus.js"></script>
+  <script src="graph.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

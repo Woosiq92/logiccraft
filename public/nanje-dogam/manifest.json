@@ -1,0 +1,19 @@
+{
+  "name": "난제도감",
+  "short_name": "난제도감",
+  "description": "아직 풀리지 않은 수학 난제 도감",
+  "start_url": ".",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a5f",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

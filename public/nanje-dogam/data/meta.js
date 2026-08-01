@@ -1,0 +1,71 @@
+/* 난제도감 — 분야 / 컬렉션 / 상태 정의.
+ * problems.js 의 field·tags·status 문자열이 여기 키와 1:1로 맞아야 한다. (tests/data.test.js 가 강제) */
+window.META = {
+  fields: {
+    nt:    { label: '정수론',        icon: '#', color: '#2f6fb0' },
+    alg:   { label: '대수·기하',     icon: '∮', color: '#7a5bb5' },
+    ana:   { label: '해석·미분방정식', icon: '∂', color: '#0f8a7a' },
+    top:   { label: '위상·기하',     icon: '◎', color: '#c2703a' },
+    comb:  { label: '조합·그래프',   icon: '⬡', color: '#b0454f' },
+    logic: { label: '논리·집합',     icon: '∀', color: '#5c6b7a' },
+    cs:    { label: '계산·복잡도',   icon: '⌘', color: '#3f7d3f' },
+  },
+
+  status: {
+    open:        { label: '미해결',   tone: 'open',   desc: '알려진 진전이 거의 없거나 핵심이 그대로 남아 있음' },
+    partial:     { label: '부분 결과', tone: 'part',   desc: '미해결이지만 의미 있는 부분 결과가 있음' },
+    disputed:    { label: '검증 중',   tone: 'disp',   desc: '해결 주장이 나왔으나 학계 검증이 끝나지 않음' },
+    independent: { label: '결정 불가', tone: 'indep',  desc: '현재 공리계로는 참·거짓을 정할 수 없음이 증명됨' },
+    solved:      { label: '해결됨',   tone: 'solved', desc: '증명이 완료되어 학계가 받아들임' },
+  },
+
+  collections: [
+    { id: 'millennium', label: '밀레니엄 7문제', sub: '클레이 수학연구소, 각 100만 달러',
+      note: '2000년에 지정된 일곱 문제. 푸앵카레 추측만 해결되었고 여섯 개가 남았다.' },
+    { id: 'simple',     label: '진술은 쉬운데 아무도 못 푼', sub: '중학생도 문제를 이해할 수 있음',
+      note: '이해에 배경이 거의 필요 없다는 것과 푸는 것이 쉽다는 것은 완전히 다른 얘기다.' },
+    { id: 'hilbert',    label: '힐베르트의 23문제', sub: '1900년 파리, 20세기 수학의 목록',
+      note: '대부분 해결되었지만 몇은 여전히 열려 있고, 하나는 답이 "결정 불가"였다.' },
+    { id: 'landau',     label: '란다우의 네 문제', sub: '소수에 관한 1912년의 네 질문',
+      note: '네 개 모두 진술이 짧고 네 개 모두 아직 열려 있다.' },
+    { id: 'erdos',      label: '에르되시가 남긴 문제', sub: '상금을 직접 걸었던 방랑 수학자',
+      note: '에르되시는 문제마다 난도에 따라 25달러에서 1만 달러까지 상금을 걸었다.' },
+    { id: 'hall',       label: '명예의 전당', sub: '끝내 풀린 문제들',
+      note: '미해결만 모으면 끝이 없다는 느낌만 남는다. 닫힌 문제도 같은 무게로 본다.' },
+    { id: 'oldest',     label: '가장 오래 버틴 문제', sub: '제기된 지 300년 넘은 것들',
+      note: '' },
+  ],
+
+  /* 수업 모드 — 45분 1차시. 교사가 화면을 띄우고 진행한다. */
+  lesson: {
+    title: '난제 한 시간',
+    grade: '중3~고3 · 45분 · 수학 또는 창의적 체험활동',
+    goal: '풀리지 않은 문제를 하나 골라, 남에게 설명할 수 있는 문장으로 바꿔 본다.',
+    steps: [
+      { min: 5,  title: '여는 질문',
+        teacher: '"수학에는 아직 아무도 모르는 게 있을까?"를 묻고 답을 몇 개 받는다.',
+        screen: 'hall',
+        note: '학생 다수는 수학을 이미 완성된 것으로 배운다. 그 전제를 먼저 흔든다.' },
+      { min: 7,  title: '284년 된 문제',
+        teacher: '골드바흐 추측을 함께 확인한다. 짝수를 부르게 하고 소수 두 개로 쪼갠다.',
+        screen: 'problem:goldbach',
+        note: '"우리가 방금 한 게 증명일까?"를 묻는다. 사례 확인과 증명의 차이가 이 수업의 핵심이다.' },
+      { min: 8,  title: '문제 고르기',
+        teacher: '모둠별로 도감에서 문제를 하나 고른다. 겹치지 않게 한다.',
+        screen: 'dex',
+        note: '진입 난이도 1~2 문제만 보이도록 필터를 걸어두면 고르기가 빨라진다.' },
+      { min: 15, title: '비유 층 직접 쓰기',
+        teacher: '고른 문제의 "한 줄"과 "정식 서술"만 보여주고, 가운데 비유 층을 모둠이 직접 쓴다.',
+        screen: 'worksheet',
+        note: '앱의 비유를 먼저 보여주지 않는다. 보고 나면 쓰지 못한다.' },
+      { min: 8,  title: '발표와 대조',
+        teacher: '모둠이 쓴 비유를 읽고, 그다음 앱의 비유를 열어 비교한다.',
+        screen: 'worksheet',
+        note: '어느 쪽이 더 나은지 따지지 않는다. 어디를 버리고 어디를 남겼는지만 본다.' },
+      { min: 2,  title: '닫는 말',
+        teacher: '"이 중 하나는 여기 있는 누군가가 풀 수도 있다"로 닫는다.',
+        screen: 'hall',
+        note: '드 그레이는 노인학 연구자였고, 장이탕은 50대까지 무명이었다.' },
+    ],
+  },
+};
