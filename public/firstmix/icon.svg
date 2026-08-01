@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="첫믹스">
+  <!-- 앱이 가르치는 것 하나를 그대로 그린다: 두 곡의 박이 겹치는 순간.
+       왼쪽 보라(DECK A)와 오른쪽 시안(DECK B)이 가운데서 만나 흰 박이 된다.
+       29px 설정 아이콘에서도 뭉치지 않도록 막대는 굵게, 개수는 적게.
+
+       scripts/make-icons.js 가 #tile 의 rx 와 #art 의 transform 을 바꿔
+       스토어용(모서리 각지고 알파 없는) PNG 를 굽는다. id 를 지우지 말 것. -->
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0.35" y2="1">
+      <stop offset="0" stop-color="#2e2260"/>
+      <stop offset="1" stop-color="#12101f"/>
+    </linearGradient>
+  </defs>
+  <rect id="tile" width="512" height="512" rx="112" fill="url(#bg)"/>
+
+  <g id="art">
+    <!-- 아직 어긋나 있는 박 -->
+    <rect x="72"  y="196" width="34" height="120" rx="17" fill="#7c3aed" opacity="0.45"/>
+    <rect x="140" y="166" width="34" height="180" rx="17" fill="#7c3aed" opacity="0.9"/>
+    <rect x="406" y="196" width="34" height="120" rx="17" fill="#06b6d4" opacity="0.45"/>
+    <rect x="338" y="166" width="34" height="180" rx="17" fill="#06b6d4" opacity="0.9"/>
+
+    <!-- 겹친 박 -->
+    <rect x="222" y="118" width="68" height="276" rx="34" fill="#ffffff"/>
+  </g>
+</svg>

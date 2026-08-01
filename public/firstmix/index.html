@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <!-- maximum-scale=1: iOS 입력창 자동확대 방지 (메모리 함정) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <title>첫믹스</title>
+  <meta name="theme-color" content="#07070c" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icon.svg" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1 id="screen-title">첫믹스</h1>
+    <span id="latency" class="latency" hidden></span>
+    <span id="topbar-mode"></span>
+    <span id="topbar-rec"></span>
+  </header>
+
+  <main id="app"><!-- app.js가 현재 탭을 렌더 --></main>
+
+  <nav class="tabbar" id="tabbar"><!-- app.js가 탭 버튼 렌더 --></nav>
+
+  <!-- 오디오는 사용자가 화면을 한 번 만져야 살아난다 (iOS·모바일 크롬 공통) -->
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <!-- 아이콘과 같은 모티프: 어긋난 박 두 쌍이 가운데서 만나 흰 박이 된다 -->
+      <div class="gate-mark" aria-hidden="true">
+        <span class="gm gm-a1"></span><span class="gm gm-a2"></span>
+        <span class="gm gm-mid"></span>
+        <span class="gm gm-b2"></span><span class="gm gm-b1"></span>
+      </div>
+      <div class="gate-logo">첫믹스</div>
+      <p class="gate-lead">폰 하나로 시작하는 디제잉</p>
+      <button id="gate-btn" class="btn btn-primary">소리 켜고 시작</button>
+      <p class="gate-note">이어폰은 <b>유선</b>을 권합니다.<br />블루투스는 소리가 늦게 도착해서 박자 감각이 어긋납니다.</p>
+    </div>
+  </div>
+
+  <!-- i18n 이 가장 먼저: 상수 배열이 읽힐 때 L() 이 있어야 한다 -->
+  <script src="i18n.js"></script>
+  <script src="audio/engine.js"></script>
+  <script src="audio/tracks.js"></script>
+  <script src="audio/bpm.js"></script>
+  <script src="audio/library.js"></script>
+  <script src="audio/daily.js"></script>
+  <script src="ui/deck.js"></script>
+  <script src="ui/train.js"></script>
+  <script src="ui/daily.js"></script>
+  <script src="ui/guide.js"></script>
+  <script src="ui/learn.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,80 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="첫믹스 — 컨트롤러 없이 시작하는 디제잉 훈련 · 로직크래프트"
+  description="첫믹스는 두 곡의 빠르기를 맞추고 박을 겹치는 감각을 브라우저에서 훈련하는 디제잉 온램프입니다. 일곱 단계 채점 훈련과 연습 트랙 스무 곡, 실제 기기와 같은 믹서 구성. 가입·설치 없이 무료."
+  image="/og/firstmix.png"
+>
+  <section class="edu-hero">
+    <div class="wrap web-hero-inner">
+      <div class="web-hero-copy">
+        <p class="edu-eyebrow">PRODUCT · 첫믹스</p>
+        <h1>기기를 사기 전에,<br />귀부터.</h1>
+        <p class="web-lede">
+          DJ 컨트롤러는 수십만 원부터 시작합니다. 그런데 처음 배워야 하는 건 장비 조작이 아니라
+          두 곡의 빠르기를 같게 만들고 박을 겹치는 감각입니다. 그건 브라우저에서도 기를 수 있습니다.
+        </p>
+        <div class="web-cta"><a class="cta" href="https://logiccraft.co.kr/firstmix/">바로 시작하기 →</a></div>
+        <p class="web-note">
+          박 느끼기에서 필터 전환까지 일곱 단계를 채점으로 지나갑니다. 맞춘 상태를 4초 동안
+          유지해야 통과이고, 스쳐 지나간 정렬로는 넘어가지 않습니다.
+        </p>
+      </div>
+      <div class="web-hero-shot">
+        <img src="/screens/firstmix/hero.png" alt="첫믹스 자유 믹스 화면 — 좌우 덱과 조그휠, 가운데 믹서의 트림·EQ·필터·에코와 레벨 미터, 초록으로 물린 위상 바늘" width="1120" height="752" loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap web-body">
+    <ul class="edu-notes">
+      <li>연습 트랙 스무 곡(110~140 BPM)을 음원 파일 없이 코드로 합성합니다. 박자의 정답을 앱이 알고 있어서, 몇 밀리초 어긋났는지까지 재서 알려줍니다.</li>
+      <li>믹스 화면은 간단과 전체 두 가지로 열립니다. 간단은 레슨에서 쓰던 손잡이만 남기고, 전체는 트림·3밴드 EQ·필터·에코·핫큐·루프·레벨 미터까지 실제 기기와 같은 구성을 엽니다.</li>
+      <li>SYNC 버튼은 넣지 않았습니다. 맞추는 일을 기계가 대신하면 그 감각이 늘지 않습니다.</li>
+      <li>기기에 있는 음악 파일을 불러오면 BPM과 첫 박을 찾아 줍니다. 불러온 파일은 기기 안에만 남고 어디로도 전송되지 않습니다.</li>
+      <li>박자를 다루는 연습에는 유선 이어폰을 권합니다. 블루투스는 소리가 0.2초쯤 늦게 도착합니다.</li>
+      <li>결제 요소와 광고가 없습니다. 계정도 서버도 없어서 어떤 정보도 수집하지 않습니다.</li>
+    </ul>
+    <p class="web-note dim">아직 다듬는 중인 베타입니다. 앱 스토어와 구글 플레이 출시를 준비하고 있습니다.</p>
+  </section>
+
+  <section class="wrap web-links">
+    <p class="links">
+      <a href="/apps/firstmix/support">고객 지원</a> ·
+      <a href="/apps/firstmix/privacy">개인정보 처리방침</a> ·
+      <a href="/apps">← 제품 목록</a>
+    </p>
+  </section>
+</Layout>
+
+<style>
+  .edu-hero { background: radial-gradient(120% 120% at 78% 8%, #24356e 0%, #182a5c 38%, #11183a 78%); color: #fff; overflow: hidden; }
+  .web-hero-inner { display: grid; grid-template-columns: 0.92fr 1.08fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .edu-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #8fb0ff; margin: 0; }
+  .web-hero-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; }
+  .web-lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
+  .web-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
+  .web-note { color: #aab4dc; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
+  .web-hero-shot { display: flex; justify-content: center; }
+  .web-hero-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+
+  .web-body { padding-block: clamp(2.2rem, 5vw, 3.4rem) 0; }
+  .edu-notes { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.85rem; max-width: 62ch; }
+  .edu-notes li { position: relative; padding-left: 1.1rem; line-height: 1.8; color: var(--text-soft, #4a5270); }
+  .edu-notes li::before { content: ''; position: absolute; left: 0; top: 0.72em; width: 5px; height: 5px; border-radius: 50%; background: var(--accent); }
+  .web-body .web-note.dim { color: #6b7490; max-width: 62ch; }
+
+  .web-links { padding-block: 2rem 4rem; }
+  .links { font-size: 0.95rem; }
+  @media (max-width: 860px) {
+    .web-hero-inner { grid-template-columns: 1fr; }
+    .web-hero-shot { order: -1; }
+    .web-hero-copy { text-align: center; }
+    .web-lede, .web-note { margin-inline: auto; }
+    .web-cta { display: flex; justify-content: center; }
+  }
+</style>
