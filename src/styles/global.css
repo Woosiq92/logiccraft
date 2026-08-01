@@ -243,6 +243,8 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .btn-ghost:hover { background: rgba(255,255,255,.12); border-color: rgba(255,255,255,.4); }
 .btn-dark { background: var(--ink); color: #fff; }
 .btn-dark:hover { background: var(--blue); }
+.btn-disabled { background: rgba(255,255,255,.08); color: #9aa3bd; border-color: rgba(255,255,255,.16); cursor: default; }
+.btn-disabled:hover { transform: none; }
 .btn .arr { transition: transform .2s var(--ease); }
 .btn:hover .arr { transform: translateX(3px); }
 
