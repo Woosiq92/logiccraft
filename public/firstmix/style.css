@@ -29,11 +29,17 @@
   --r-sm: 9px;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-html, body { margin: 0; padding: 0; height: 100%; }
+html, body { margin: 0; padding: 0; }
+html { height: 100%; }
 body {
   background: var(--bg); color: var(--fg);
   font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Pretendard", sans-serif;
   -webkit-font-smoothing: antialiased;
+  /* 고정 탭바가 덮는 만큼 아래를 비운다.
+   * ★ body 에 height:100% 를 같이 주면 안 된다. box-sizing:border-box 라 박스가 뷰포트 높이에
+   *   고정되고, 이 여백은 첫 화면 안쪽에 그려진다. 넘쳐 흐른 내용은 그 여백 바깥으로 나가서
+   *   끝까지 내려도 마지막 카드가 탭바에 정확히 탭바 높이만큼 가린다. */
+  min-height: 100%;
   padding-bottom: calc(64px + env(safe-area-inset-bottom));
   overscroll-behavior: none;
 }

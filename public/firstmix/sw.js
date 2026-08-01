@@ -3,7 +3,7 @@
  * 이 주석에 버전 문자열을 예시로 적지 말 것. 문자열 치환으로 버전을 올리다 보면
  * 주석 쪽이 먼저 걸려서 상수는 그대로 남는다(실제로 v2 에 멈춰 있었다).
  * tests/smoke.js 가 파일 안에 버전 문자열이 하나뿐인지 확인한다. */
-const CACHE = 'firstmix-v15';
+const CACHE = 'firstmix-v16';
 // addAll 은 하나만 404 여도 통째로 거부한다 = 서비스워커 설치 실패. 목록을 실제 파일과 맞출 것.
 const ASSETS = [
   './', './index.html', './i18n.js', './app.js', './style.css',
