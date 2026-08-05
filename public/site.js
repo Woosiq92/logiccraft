@@ -40,6 +40,19 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(hover: hover) and (pointer: fine)').matches;
 
+  /* ---- Campus flyover: fetch + play only while in view ---- */
+  (function campusVideo() {
+    const v = document.querySelector('.campus-map video');
+    if (!v) return;
+    if (reduceMotion) { v.removeAttribute('autoplay'); v.pause(); return; }
+    new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) { v.preload = 'auto'; v.play().catch(() => {}); }
+        else v.pause();
+      });
+    }, { threshold: 0.2 }).observe(v);
+  })();
+
   /* ---- Hero: pointer-parallax 3D tilt (subtle) ---- */
   (function heroTilt() {
     if (reduceMotion || !finePointer) return;

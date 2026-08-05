@@ -376,8 +376,10 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
   position: relative; display: block; border-radius: var(--radius); overflow: hidden;
   box-shadow: 0 22px 44px -24px rgba(17,24,58,.5);
 }
-.campus-map img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s var(--ease); }
-.campus-map:hover img { transform: scale(1.03); }
+.campus-map img,
+.campus-map video { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s var(--ease); }
+.campus-map:hover img,
+.campus-map:hover video { transform: scale(1.03); }
 .campus-badge {
   position: absolute; top: 14px; left: 14px;
   font-family: "IBM Plex Mono", monospace; font-size: 11.5px; font-weight: 600; letter-spacing: .02em;
