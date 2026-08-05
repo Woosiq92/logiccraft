@@ -27,6 +27,14 @@
   textarea{resize:vertical;min-height:64px;line-height:1.6}
   input:focus,textarea:focus,select:focus{outline:none;border-color:var(--amber2)}
 
+  .theme-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:8px}
+  .theme-card{display:flex;flex-direction:column;gap:2px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;cursor:pointer;color:var(--text);font-family:inherit;text-align:left}
+  .theme-card:hover{border-color:var(--amber2)}
+  .theme-card.sel{border-color:var(--amber);background:#1f294a}
+  .theme-card .ti{font-size:22px}
+  .theme-card .tn{font-size:15px;font-weight:700}
+  .theme-card .td{font-size:12px;color:var(--dim)}
+  @media(max-width:520px){.theme-grid{grid-template-columns:1fr}}
   .p-row{
     display:flex;align-items:center;gap:12px;background:var(--panel);
     border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;flex-wrap:wrap;
@@ -72,11 +80,14 @@
   <div class="badge">TEACHER TOOLS</div>
   <h1>🧩 방탈출 조립기</h1>
   <p class="sub">
-    수업 단원에 맞춰 잠금장치를 고르면 방탈출 링크가 만들어진다.<br>
+    방을 고르고 수업 단원에 맞춰 잠금장치를 담으면 방탈출 링크가 만들어진다.<br>
     서버·계정 없이 링크 하나로 동작 — 학급 채팅방에 붙여넣거나 프로젝터로 띄우면 끝.
   </p>
 
-  <h2>1. 방 소개</h2>
+  <h2>1. 방 고르기</h2>
+  <div id="theme-grid" class="theme-grid"></div>
+
+  <h2>2. 방 소개</h2>
   <label class="field">방 제목
     <input type="text" id="f-title" maxlength="40" value="우리 반 탈출 미션">
   </label>
@@ -84,10 +95,10 @@
     <textarea id="f-story" maxlength="200">수업 준비실 문이 잠겨 버렸다! 장치를 풀어 비밀번호 숫자를 모으자.</textarea>
   </label>
 
-  <h2>2. 잠금장치 고르기</h2>
+  <h2>3. 잠금장치 고르기</h2>
   <div id="p-list"></div>
 
-  <h2>3. 링크 만들기</h2>
+  <h2>4. 링크 만들기</h2>
   <div class="out">
     <div class="code-line">문 비밀번호 (교사만 알기): <b id="code-preview"></b></div>
     <div class="url-box" id="url-out"></div>
@@ -123,8 +134,74 @@ const PUZZLE_META = [
     diffs:{easy:'과학 4-2 그림자와 거울', mid:'중1 빛과 파동 · 반사 법칙', hard:'심화 · 광학 경로 설계'} },
   { id:'moon', icon:'🌓', name:'달 관측판 (달의 위상)', digit:'1',
     diffs:{easy:'과학 6-1 지구와 달의 운동', mid:'중3 태양계 · 위상과 음력', hard:'심화 · 위상과 관측 시각'} },
+  { id:'fraction', icon:'🥧', name:'분수 원판 (분수·비율)', digit:'6',
+    diffs:{easy:'수학 5 분수의 덧셈(같은 분모)', mid:'수학 5-6 통분·다른 분모', hard:'수학 심화 · 분수와 1'} },
+  { id:'equation', icon:'⚖️', name:'천칭 방정식 (일차방정식)', digit:'8',
+    diffs:{easy:'수학 6 · □ 구하기', mid:'중1 · 일차방정식', hard:'중1 심화 · 양변 미지수'} },
+  { id:'symmetry', icon:'◐', name:'대칭 무늬판 (도형)', digit:'4',
+    diffs:{easy:'수학 4 · 선대칭', mid:'수학 5 · 선대칭의 성질', hard:'수학 5 · 점대칭'} },
+  { id:'strata', icon:'🪨', name:'지층 코어 (지구과학)', digit:'0',
+    diffs:{easy:'과학 4 · 지층과 퇴적암', mid:'표준화석과 지질 시대', hard:'심화 · 관입·부정합'} },
+  { id:'counting', icon:'🎲', name:'경우의 수 자물쇠 (경우의 수·순열·조합)', digit:'3', diffs:{easy:'수학 심화 · 곱의 법칙', mid:'중2 수학 · 순열', hard:'중2 수학 · 조합'} },
+  { id:'probability', icon:'🎯', name:'확률 자물쇠 (확률)', digit:'7', diffs:{easy:'중2 수학 · 확률의 뜻', mid:'중2 수학 · 확률의 계산', hard:'중2 수학 · 두 사건의 확률'} },
+  { id:'proportion', icon:'📊', name:'비례표 자물쇠 (정비례·반비례)', digit:'4', diffs:{easy:'중1 수학 · 정비례', mid:'중1 수학 · 반비례', hard:'중1 수학 · 반비례 활용'} },
+  { id:'heat', icon:'🌡️', name:'열평형 자물쇠 (열평형·비열)', digit:'2', diffs:{easy:'중2 과학 · 열평형', mid:'중2 과학 · 열량과 비열', hard:'중2 과학 · 열량 계산'} },
+  { id:'gaslaw', icon:'🎈', name:'기체법칙 자물쇠 (보일·샤를)', digit:'9', diffs:{easy:'중2 과학 · 보일 법칙', mid:'중2 과학 · 보일 법칙', hard:'중2 과학 · 샤를 법칙'} },
+  { id:'speed', icon:'🏃', name:'속력 계기판 (속력=거리÷시간)', digit:'5', diffs:{easy:'중2 과학 · 속력', mid:'중2 과학 · 속력', hard:'중2 과학 · 속력의 단위 환산'} },
+  { id:'ohm', icon:'⚡', name:'옴의 법칙 회로 (V=IR)', digit:'3', diffs:{easy:'중2 과학 · 옴의 법칙', mid:'중2 과학 · 옴의 법칙', hard:'중2 과학 · 옴의 법칙'} },
+  { id:'magnet', icon:'🧲', name:'자석 극 정렬 (인력·척력)', digit:'4', diffs:{easy:'초3 과학 · 자석의 성질', mid:'중2 과학 · 자기장', hard:'중2 과학 · 자기장'} },
+  { id:'sound', icon:'🔊', name:'파형 조율기 (진동수·진폭·파장)', digit:'6', diffs:{easy:'초3 과학 · 소리의 성질', mid:'중1 과학 · 파동', hard:'중1 과학 · 파장과 진동수'} },
+  { id:'ratio', icon:'⚖️', name:'비례식 자물쇠 (비와 비율·비례식)', digit:'6', diffs:{easy:'초6 수학 · 비와 비율', mid:'초6 수학 · 비례식', hard:'중2 수학 · 닮음비 응용'} },
+  { id:'graph', icon:'📈', name:'좌표 패널 (좌표평면·일차함수)', digit:'2', diffs:{easy:'중1 수학 · 좌표평면', mid:'중2 수학 · 일차함수', hard:'중2 수학 · 일차함수 그래프'} },
+  { id:'lcm', icon:'⚙️', name:'톱니바퀴 자물쇠 (최소공배수·최대공약수)', digit:'4', diffs:{easy:'초5 수학 · 최대공약수', mid:'초5 수학 · 최소공배수', hard:'초5 수학 · 최소공배수 활용'} },
+  { id:'factorize', icon:'🌳', name:'소인수 자물쇠 (소인수분해)', digit:'8', diffs:{easy:'중1 수학 · 소인수분해', mid:'중1 수학 · 소인수분해', hard:'중1 수학 · 소인수분해'} },
+  { id:'separate', icon:'⚗️', name:'혼합물의 분리 (성질 차이로 분리)', digit:'2', diffs:{easy:'초4 과학 · 혼합물의 분리', mid:'초4~중1 과학 · 혼합물의 분리', hard:'중1 과학 · 혼합물의 분리'} },
+  { id:'solubility', icon:'📈', name:'용해도 곡선 (온도별 용해량·석출량)', digit:'7', diffs:{easy:'중1~2 과학 · 용해도 곡선 읽기', mid:'중2 과학 · 석출량', hard:'중2 과학 · 용해도와 냉각'} },
+  { id:'density', icon:'⚖️', name:'밀도 저울 (질량÷부피·뜸/가라앉음)', digit:'4', diffs:{easy:'중2 과학 · 물질의 특성(밀도)', mid:'중2 과학 · 밀도와 부력', hard:'중2 과학 · 밀도 비교'} },
+  { id:'massbalance', icon:'🧪', name:'반응 저울 (질량보존·화학반응식 계수)', digit:'6', diffs:{easy:'중3 과학 · 질량보존', mid:'중3 과학 · 화학반응식', hard:'중3 과학 · 화학반응식 계수'} },
+  { id:'pythagoras', icon:'📐', name:'피타고라스 자물쇠 (피타고라스 정리)', digit:'5', diffs:{easy:'중2 수학 · 피타고라스 정리(빗변)', mid:'중2 수학 · 피타고라스 정리(3:4:5 배수)', hard:'중2 수학 · 피타고라스 정리(한 변 구하기)'} },
+  { id:'area', icon:'📦', name:'넓이·부피 자물쇠 (넓이·부피 측정)', digit:'4', diffs:{easy:'초5 수학 · 직사각형의 넓이', mid:'초5 수학 · 삼각형의 넓이', hard:'초6 수학 · 직육면체의 부피'} },
+  { id:'average', icon:'📊', name:'평균 저울 자물쇠 (평균·대푯값)', digit:'3', diffs:{easy:'초5 수학 · 평균', mid:'초6 수학 · 평균', hard:'중1 수학 · 평균과 대푯값'} },
+  { id:'netfold', icon:'🧊', name:'전개도 자물쇠 (전개도·마주보는 면)', digit:'6', diffs:{easy:'초5 수학 · 정육면체의 전개도', mid:'초5 수학 · 전개도의 마주보는 면', hard:'초5 수학 · 전개도 겨냥(심화)'} },
+  { id:'foodchain', icon:'🌾', name:'먹이사슬 자물쇠 (먹이사슬·에너지 흐름)', digit:'4', diffs:{easy:'초6 과학 · 생물과 환경(먹이사슬)', mid:'초6 과학 · 생물과 환경(먹이 관계)', hard:'고1 통합과학 · 생태계와 에너지 흐름'} },
+  { id:'genetics', icon:'🧬', name:'유전 격자 자물쇠 (멘델 유전·퍼넷 사각형)', digit:'3', diffs:{easy:'중3 과학 · 멘델 유전(단성 잡종교배)', mid:'중3 과학 · 우열의 원리', hard:'중3 과학 · 검정교배'} },
+  { id:'orbit', icon:'🪐', name:'행성 궤도 자물쇠 (태양계 거리·공전 주기)', digit:'8', diffs:{easy:'초5 과학 · 태양계 행성(거리)', mid:'중2 과학 · 태양계(행성의 공전)', hard:'중2 과학 · 태양계의 구성'} },
+  { id:'moonorbit', icon:'🌙', name:'달의 위상 자물쇠 (태양·지구·달 위치와 위상)', digit:'2', diffs:{easy:'초6 과학 · 달의 위상 변화(보름달)', mid:'중2 과학 · 달의 위상과 위치(상현달)', hard:'중2 과학 · 달의 위상과 위치(하현달)'} },
 ];
 const DIFF_LABEL = {easy:'초등', mid:'중등', hard:'심화'};
+
+// 방(테마) 팩 — index.html THEMES와 짝을 맞춘 장치 이름·기본 숫자
+const THEME_PACKS = {
+  lab:{ title:'블랙아웃 실험실', icon:'🔦', desc:'정전된 과학실',
+    dev:{ circuit:['배전반','⚡','4'], balance:['카운터웨이트 저울','⚖️','7'], cipher:['시약장 다이얼','🔢','2'],
+          ph:['지시약 혼합대','🧪','9'], mirror:['광학 장치','🔦','5'], moon:['달 관측판','🌓','1'] } },
+  mansion:{ title:'사라진 마술사의 저택', icon:'🎩', desc:'유령 소문의 저택',
+    dev:{ circuit:['저절로 켜지는 촛대','🕯️','8'], balance:['혼자 열리는 비밀문','🚪','3'], cipher:['예언 노트','🔮','6'],
+          ph:['유령 물약','🧪','0'], mirror:['허공의 유령','👻','7'], moon:['보름밤의 최종 쇼','🌕','2'] } },
+  frequency:{ title:'오래된 주파수', icon:'📡', desc:'폐쇄된 관측소',
+    dev:{ circuit:['수신기 전원반','⚡','6'], balance:['망원경 카운터웨이트','🔭','1'], cipher:['기록 보관함 다이얼','🗄️','9'],
+          ph:['건판 현상대','🧪','3'], mirror:['광학 시준 장치','🪞','8'], moon:['관측 달력판','🌓','4'] } },
+  mars:{ title:'붉은 행성 기지', icon:'🚀', desc:'화성 생존 카운트다운',
+    dev:{ circuit:['메인 배전반','⚡','2'], balance:['화물 적재 저울','📦','0'], cipher:['항법 컴퓨터','🖥️','5'],
+          ph:['물 재생기','💧','7'], mirror:['통신 안테나 정렬기','📡','3'], moon:['발사 관제판','🌕','9'] } },
+};
+let curTheme = 'lab';
+
+// 방 선택 카드
+const tGrid = document.getElementById('theme-grid');
+tGrid.innerHTML = Object.entries(THEME_PACKS).map(([id,t])=>`
+  <button class="theme-card ${id===curTheme?'sel':''}" data-theme="${id}">
+    <span class="ti">${t.icon}</span>
+    <span class="tn">${t.title}</span>
+    <span class="td">${t.desc}</span>
+  </button>`).join('');
+tGrid.addEventListener('click', e=>{
+  const b = e.target.closest('[data-theme]'); if(!b) return;
+  curTheme = b.dataset.theme;
+  document.querySelectorAll('.theme-card').forEach(c=>c.classList.toggle('sel', c===b));
+  renderPuzzleRows();
+  update();
+});
 
 function encodeCfg(obj){
   const bytes = new TextEncoder().encode(JSON.stringify(obj));
@@ -132,27 +209,39 @@ function encodeCfg(obj){
   return encodeURIComponent(btoa(bin));
 }
 
-// 퍼즐 행 렌더
+// 퍼즐 행 렌더 (현재 방 테마의 장치 이름·기본 숫자 반영, 선택/난이도는 유지)
 const pList = document.getElementById('p-list');
-pList.innerHTML = PUZZLE_META.map(p=>`
-  <div class="p-row" data-p="${p.id}">
-    <input type="checkbox" class="f-use" checked>
-    <span class="icon">${p.icon}</span>
-    <div class="p-info">
-      <div class="nm">${p.name}</div>
-      <div class="dd" data-dd></div>
-    </div>
-    <div class="p-ctrl">
-      <label>난이도</label>
-      <select class="f-diff">
-        ${Object.keys(DIFF_LABEL).map(d=>`<option value="${d}" ${d==='mid'?'selected':''}>${DIFF_LABEL[d]}</option>`).join('')}
-      </select>
-      <label>숫자</label>
-      <select class="f-digit">
-        ${'0123456789'.split('').map(n=>`<option ${n===p.digit?'selected':''}>${n}</option>`).join('')}
-      </select>
-    </div>
-  </div>`).join('');
+function renderPuzzleRows(){
+  const prev = {};
+  document.querySelectorAll('.p-row').forEach(row=>{
+    prev[row.dataset.p] = { use:row.querySelector('.f-use').checked, d:row.querySelector('.f-diff').value };
+  });
+  const pack = THEME_PACKS[curTheme].dev;
+  pList.innerHTML = PUZZLE_META.map(p=>{
+    const [nm, icon, digit] = pack[p.id] || [p.name, p.icon, p.digit]; // 테마 무관 장치(분수)는 기본값
+    const st = prev[p.id] || {use:true, d:'mid'};
+    return `
+    <div class="p-row" data-p="${p.id}">
+      <input type="checkbox" class="f-use" ${st.use?'checked':''}>
+      <span class="icon">${icon}</span>
+      <div class="p-info">
+        <div class="nm">${nm}</div>
+        <div class="dd" data-dd></div>
+      </div>
+      <div class="p-ctrl">
+        <label>난이도</label>
+        <select class="f-diff">
+          ${Object.keys(DIFF_LABEL).map(d=>`<option value="${d}" ${d===st.d?'selected':''}>${DIFF_LABEL[d]}</option>`).join('')}
+        </select>
+        <label>숫자</label>
+        <select class="f-digit">
+          ${'0123456789'.split('').map(n=>`<option ${n===digit?'selected':''}>${n}</option>`).join('')}
+        </select>
+      </div>
+    </div>`;
+  }).join('');
+}
+renderPuzzleRows();
 
 function readForm(){
   const locks = [];
@@ -165,6 +254,7 @@ function readForm(){
     if(use) locks.push({ p:row.dataset.p, d:diff, g:row.querySelector('.f-digit').value });
   });
   return {
+    th: curTheme,
     t: document.getElementById('f-title').value.trim() || '우리 반 탈출 미션',
     s: document.getElementById('f-story').value.trim(),
     l: locks,
