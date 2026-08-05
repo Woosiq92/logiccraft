@@ -32,6 +32,15 @@
   .diff-card .dt{font-size:17px;font-weight:700;margin-bottom:4px}
   .diff-card .dd{font-size:13px;color:var(--dim);line-height:1.5}
   .diff-card .tag{font-size:11px;color:var(--amber);margin-left:8px;font-weight:500}
+  #resume-banner{display:flex;gap:10px;align-items:center;margin-bottom:16px}
+  .resume-card{flex:1;display:flex;align-items:center;gap:14px;background:#1a2340;border:1px solid var(--amber);border-radius:14px;padding:14px 18px;cursor:pointer;color:var(--text);font-family:inherit;text-align:left}
+  .resume-card:hover{background:#1f294a}
+  .resume-icon{font-size:22px;color:var(--amber)}
+  .resume-body{display:flex;flex-direction:column;gap:2px}
+  .resume-body b{font-size:15px}
+  .resume-body span{font-size:12.5px;color:var(--dim)}
+  .resume-clear{background:none;border:none;color:var(--dim);font-size:12.5px;cursor:pointer;font-family:inherit;padding:8px}
+  .resume-clear:hover{color:var(--text)}
 
   /* ---------- room ---------- */
   .room-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin:8px 0 4px;flex-wrap:wrap}
@@ -148,6 +157,25 @@
     display:inline-block;font-size:11.5px;color:#7ea0d8;background:#12203a;
     border:1px solid #23406a;border-radius:999px;padding:3px 11px;margin-bottom:12px;
   }
+  /* 분수 원판 */
+  .frac-target{text-align:center;font-size:15px;color:var(--text);padding:14px 0 6px}
+  .frac-target b{color:var(--amber);font-size:22px;margin:0 4px}
+  .frac-row{display:flex;align-items:center;justify-content:center;gap:10px;flex-wrap:wrap;padding:8px 6px 18px}
+  .frac-plus{font-size:26px;color:var(--dim);font-weight:700}
+  .frac-sum{font-size:26px;font-weight:800;color:var(--green);min-width:70px;text-align:center}
+  .frac-dial{display:flex;flex-direction:column;align-items:center;gap:6px}
+  .frac-btns{display:flex;gap:8px}
+  .frac-btns .btn{padding:6px 16px;font-size:18px}
+  /* 천칭 방정식 */
+  .eq-ctrl{display:flex;gap:8px;justify-content:center;padding:8px 0 14px}
+  /* 지층 순서 */
+  .strata-clue{font-size:12.5px;color:#c9a97a;background:#1a140c;border:1px solid #3a2a18;border-radius:10px;padding:10px 14px;margin:12px}
+  .strata-stack{display:flex;flex-direction:column;gap:3px;padding:0 14px}
+  .strata-layer{display:flex;align-items:center;justify-content:space-between;border-radius:6px;padding:12px 14px;color:#1a1206}
+  .strata-layer .sl-name{font-weight:800;font-size:14.5px}
+  .strata-layer .sl-btns{display:flex;gap:5px}
+  .strata-layer .sl-btns .btn{padding:3px 9px;font-size:12px}
+  .strata-axis{display:flex;justify-content:space-between;padding:6px 16px 4px;font-size:11.5px;color:var(--dim)}
 
   /* 이야기 조각 */
   .pieces-btn{
@@ -220,6 +248,13 @@
   <div class="intro-badge">MATH · SCIENCE ESCAPE</div>
   <h1>수학·과학 방탈출</h1>
   <p class="intro-story" id="room-pick-lead">방을 고르면 이야기가 시작된다. 어느 방이든 원리를 이해해야만 열린다.</p>
+  <div id="resume-banner" style="display:none">
+    <button class="resume-card" id="resume-btn">
+      <span class="resume-icon">↩</span>
+      <span class="resume-body"><b id="resume-title"></b><span id="resume-sub"></span></span>
+    </button>
+    <button class="resume-clear" id="resume-clear">처음부터 →</button>
+  </div>
   <div class="diff-grid" id="room-grid">
     <button class="diff-card" data-room="lab">
       <div class="dt">🔦 블랙아웃 실험실 <span class="tag">과학실 미스터리</span></div>
@@ -265,6 +300,7 @@
       <span id="diff-label"></span>
       <button class="pieces-btn" id="pieces-btn">📖 조각 <span id="piece-count">0</span>/<span id="pieces-total">6</span></button>
       <span>💡 힌트 <span id="hint-count">0</span></span>
+      <button class="pieces-btn" id="mute-btn" title="소리 켜기/끄기">🔊</button>
       <span class="timer" id="timer">00:00</span>
     </div>
   </div>
@@ -313,7 +349,66 @@
    ========================================================================= */
 
 const $ = s => document.querySelector(s);
+
+/* ---------- 절차적 효과음 (WebAudio, 에셋 0) ----------
+   방탈출의 손맛은 소리. 해제/오답/발견/문열림에 짧은 톤을 얹는다. 음소거 토글 지원. */
+const SFX = (function(){
+  let ctx = null, muted = false;
+  try{ muted = localStorage.getItem('escapelab:muted')==='1'; }catch(e){}
+  function ac(){ if(!ctx){ try{ ctx = new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ ctx=null; } } return ctx; }
+  // note: [주파수Hz, 시작초, 길이초, 파형, 볼륨]
+  function play(notes){
+    if(muted) return; const c = ac(); if(!c) return;
+    if(c.state==='suspended') c.resume();
+    const t0 = c.currentTime;
+    notes.forEach(([f,st,d,wave,vol])=>{
+      const o = c.createOscillator(), g = c.createGain();
+      o.type = wave||'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(0, t0+st);
+      g.gain.linearRampToValueAtTime((vol||.18), t0+st+0.008);
+      g.gain.exponentialRampToValueAtTime(0.0008, t0+st+d);
+      o.connect(g); g.connect(c.destination);
+      o.start(t0+st); o.stop(t0+st+d+0.02);
+    });
+  }
+  return {
+    solve(){ play([[660,0,.12,'triangle',.16],[880,.09,.16,'triangle',.16],[1174,.2,.28,'triangle',.14]]); }, // 상승 3음
+    error(){ play([[220,0,.12,'sawtooth',.13],[180,.1,.18,'sawtooth',.13]]); },                               // 낮은 버저
+    discover(){ play([[520,0,.09,'sine',.12],[720,.07,.14,'sine',.12]]); },                                   // 딩
+    click(){ play([[420,0,.05,'square',.06]]); },                                                             // 톡
+    door(){ play([[330,0,.18,'triangle',.16],[440,.14,.22,'triangle',.16],[660,.32,.5,'triangle',.16],[990,.5,.7,'sine',.12]]); }, // 팡파르
+    toggle(){ muted = !muted; try{ localStorage.setItem('escapelab:muted', muted?'1':'0'); }catch(e){} return muted; },
+    isMuted(){ return muted; },
+  };
+})();
 const state = { diff:null, solved:{}, hintsUsed:0, start:null, disc:{}, found:{} };
+
+/* ---------- 진행상황 저장 (localStorage) ----------
+   교실에서 종이 치거나 탭이 닫혀도 이어할 수 있게. 방+난이도 단위 1세션. */
+const SAVE_KEY = 'escapelab:session:v1';
+let customCfg = null;   // 조립기 맞춤 방 원본 cfg (복원용)
+
+function saveProgress(){
+  if(!state.diff) return;
+  try{
+    localStorage.setItem(SAVE_KEY, JSON.stringify({
+      themeId: THEME.id, diff: state.diff,
+      custom: !!ROOM.custom, cfg: customCfg,
+      solved: state.solved, disc: state.disc, found: state.found,
+      hintsUsed: state.hintsUsed,
+      elapsedMs: state.start ? (Date.now()-state.start) : 0,
+      ts: Date.now(),
+    }));
+  }catch(e){}
+}
+function loadSave(){
+  try{ return JSON.parse(localStorage.getItem(SAVE_KEY)||'null'); }catch(e){ return null; }
+}
+function clearProgress(){ try{ localStorage.removeItem(SAVE_KEY); }catch(e){} }
+function saveHasProgress(s){
+  return s && s.solved && Object.keys(s.solved).length>0
+    && !(THEMES[s.themeId] && Object.keys(s.solved).length >= (s.custom ? (s.cfg&&s.cfg.l?s.cfg.l.length:6) : 6));
+}
 
 /* ======================= 회로(배전반) 퍼즐 ======================= */
 
@@ -752,7 +847,7 @@ function mountCipher(el, cfg, api){
         setTimeout(()=>api.solve(), 900);
       } else {
         const cab = stage.querySelector('#cab');
-        cab.classList.remove('shake'); void cab.offsetWidth; cab.classList.add('shake');
+        SFX.error(); cab.classList.remove('shake'); void cab.offsetWidth; cab.classList.add('shake');
         status.className='status-line warn';
         status.textContent='자물쇠가 꿈쩍도 하지 않는다. 어딘가 틀렸다.';
       }
@@ -1148,13 +1243,302 @@ function mountMoon(el, cfg, api){
         setTimeout(()=>api.solve(), 900);
       } else {
         const cab = stage.querySelector('#mcab');
-        cab.classList.remove('shake'); void cab.offsetWidth; cab.classList.add('shake');
+        SFX.error(); cab.classList.remove('shake'); void cab.offsetWidth; cab.classList.add('shake');
         status.className='status-line warn';
         status.textContent='관측판이 꿈쩍도 하지 않는다. 위상이 틀렸다.';
       }
     }
   });
   render();
+}
+
+/* ======================= 분수 원판(분수·비율) 퍼즐 ======================= */
+// 두 원판의 분수를 더해 목표 분수를 만든다. 분수의 덧셈·통분·약분·비와 비율.
+const gcd = (a,b)=>b?gcd(b,a%b):a;
+function fracReduce(n,d){ if(n===0) return [0,1]; const g=gcd(Math.abs(n),Math.abs(d))||1; return [n/g, d/g]; }
+function fracAdd(a,b){ return fracReduce(a[0]*b[1]+b[0]*a[1], a[1]*b[1]); }
+function fracEq(a,b){ const x=fracReduce(a[0],a[1]), y=fracReduce(b[0],b[1]); return x[0]===y[0] && x[1]===y[1]; }
+
+function fractionConfig(diff){
+  if(diff==='easy') return {
+    target:[3,4], dials:[{d:4},{d:4}], solution:[[1,4],[2,4]],
+    curri:'수학 5 분수의 덧셈 · 같은 분모',
+    desc:'두 원판이 있다. 각 원판을 나눠 색칠해 분수를 만들고, 두 분수의 합이 목표와 같아지면 자물쇠가 풀린다. 두 원판은 4등분.',
+    hints:['분모가 같으니 색칠한 칸수(분자)만 더하면 된다.','목표는 3/4. 1/4 + 2/4 = 3/4.'],
+  };
+  if(diff==='mid') return {
+    target:[5,6], dials:[{d:2},{d:3}], solution:[[1,2],[1,3]],
+    curri:'수학 5-6 분수의 덧셈 · 다른 분모(통분)',
+    desc:'두 원판의 등분이 다르다. 분모가 다른 분수를 더하려면 통분이 필요하다. 두 분수의 합을 목표에 맞추자.',
+    hints:['분모가 다르면 공통분모로 바꿔 더한다. 1/2 = 3/6, 1/3 = 2/6.','목표는 5/6. 1/2 + 1/3 = 3/6 + 2/6 = 5/6.'],
+  };
+  return {
+    target:[1,1], dials:[{d:3},{d:6}], solution:[[2,3],[2,6]],
+    curri:'수학 심화 · 분수와 1(비와 비율)',
+    desc:'두 분수를 더해 정확히 1(원판을 가득)로 만들어야 한다. 등분이 다른 두 원판의 비를 생각하자.',
+    hints:['1은 3/3, 또는 6/6이다. 두 분수의 합이 1이 되려면?','2/3 + 2/6 = 4/6 + 2/6 = 6/6 = 1.'],
+  };
+}
+
+function fractionSolved(cfg, vals){
+  // vals: [[n,d],[n,d]] — 분자 0이면 미설정 취급하되 합만 맞으면 통과
+  const sum = fracAdd(vals[0], vals[1]);
+  return (vals[0][0]>0 || vals[1][0]>0) && fracEq(sum, cfg.target);
+}
+
+function piePath(cx, cy, r, n, k){
+  // n등분 중 k칸 색칠한 파이 경로들
+  if(k<=0) return '';
+  if(k>=n) return `<circle cx="${cx}" cy="${cy}" r="${r}" fill="#ffd76a" opacity=".85"/>`;
+  let s = '';
+  for(let i=0;i<k;i++){
+    const a0 = -Math.PI/2 + i*2*Math.PI/n, a1 = -Math.PI/2 + (i+1)*2*Math.PI/n;
+    const x0=cx+Math.cos(a0)*r, y0=cy+Math.sin(a0)*r, x1=cx+Math.cos(a1)*r, y1=cy+Math.sin(a1)*r;
+    s += `<path d="M${cx} ${cy} L${x0} ${y0} A${r} ${r} 0 0 1 ${x1} ${y1} Z" fill="#ffd76a" opacity=".85"/>`;
+  }
+  return s;
+}
+
+function mountFraction(el, cfg, api){
+  const stage = document.createElement('div'); stage.className = 'stage';
+  const status = document.createElement('div'); status.className = 'status-line';
+  el.appendChild(stage); el.appendChild(status);
+  const vals = cfg.dials.map(x=>[0, x.d]); // [분자, 분모]
+  let done = false;
+
+  function pie(idx){
+    const [n,d] = vals[idx]; const D = cfg.dials[idx].d; const R = 58, C = 70;
+    let s = `<svg viewBox="0 0 140 175" width="140" xmlns="http://www.w3.org/2000/svg">`;
+    s += `<circle cx="${C}" cy="${C}" r="${R}" fill="#101632" stroke="#39425f" stroke-width="2"/>`;
+    s += piePath(C, C, R, D, n);
+    for(let i=0;i<D;i++){ const a=-Math.PI/2+i*2*Math.PI/D; s += `<line x1="${C}" y1="${C}" x2="${C+Math.cos(a)*R}" y2="${C+Math.sin(a)*R}" stroke="#55618a" stroke-width="1.5"/>`; }
+    s += `<text x="${C}" y="${C+R+30}" fill="#ffd76a" font-size="20" font-weight="800" text-anchor="middle">${n}/${D}</text>`;
+    s += `</svg>`;
+    return `<div class="frac-dial">${s}<div class="frac-btns"><button class="btn" data-fr="${idx}" data-v="-1">−</button><button class="btn" data-fr="${idx}" data-v="1">＋</button></div></div>`;
+  }
+
+  function render(){
+    const sum = fracAdd(vals[0], vals[1]);
+    const [tn,td] = cfg.target;
+    stage.innerHTML = `
+      <div class="frac-target">목표 <b>${tn}/${td}</b>${td!==1&&tn===td?'':(tn===td?' (원판 가득 = 1)':'')}</div>
+      <div class="frac-row">${pie(0)}<span class="frac-plus">+</span>${pie(1)}<span class="frac-plus">=</span>
+        <div class="frac-sum">${sum[0]}/${sum[1]}</div></div>`;
+    const solved = fractionSolved(cfg, vals);
+    if(done || solved){ status.className='status-line ok'; status.textContent = cfg.__success || '딸깍 — 두 분수의 합이 딱 맞았다! 자물쇠가 풀렸다.';
+      if(!done){ done=true; SFX.solve(); setTimeout(()=>api.solve(), 900); } }
+    else { status.className='status-line info'; status.textContent = `＋ − 로 각 원판의 색칠 칸을 정하자. 지금 합: ${sum[0]}/${sum[1]}`; }
+  }
+  stage.addEventListener('click', ev=>{
+    if(done) return; const b = ev.target.closest('[data-fr]'); if(!b) return;
+    const i=+b.dataset.fr; const D=cfg.dials[i].d;
+    vals[i][0] = (vals[i][0] + +b.dataset.v + (D+1)) % (D+1);
+    SFX.click(); render();
+  });
+  render();
+}
+
+/* ======================= 천칭 방정식(일차방정식) 퍼즐 ======================= */
+// 양팔 저울로 등식을 시각화. 왼쪽 식 = 오른쪽 식이 되도록 x 다이얼을 맞춘다.
+function equationConfig(diff){
+  if(diff==='easy') return {
+    // x + 3 = 8  → x=5
+    a:1, b:3, c:0, d:8, answer:5, xmax:10,
+    curri:'수학 6 · 간단한 방정식(□ 구하기)',
+    desc:'양팔 저울이 등식이다. 왼쪽 접시엔 상자 x와 추 3개, 오른쪽엔 추 8개. 저울이 수평이 되도록 상자 x의 무게(다이얼)를 맞추자.',
+    hints:['양쪽이 같아야 수평이다. x + 3 = 8.','8에서 3을 빼면 x가 보인다. x = 5.'],
+  };
+  if(diff==='mid') return {
+    // 2x + 3 = 11 → x=4
+    a:2, b:3, c:0, d:11, answer:4, xmax:10,
+    curri:'중1 수학 · 일차방정식(이항)',
+    desc:'왼쪽엔 상자 x 두 개와 추 3개, 오른쪽엔 추 11개. 저울이 수평이 되는 x를 찾자.',
+    hints:['2x + 3 = 11. 먼저 양쪽에서 3을 덜어낸다.','2x = 8 이니 x = 4.'],
+  };
+  return {
+    // 3x + 2 = x + 10 → x=4
+    a:3, b:2, c:1, d:10, answer:4, xmax:12,
+    curri:'중1 수학 심화 · 미지수가 양변에 있는 방정식',
+    desc:'양쪽 접시에 모두 상자 x가 있다. 왼쪽은 x 세 개와 추 2개, 오른쪽은 x 한 개와 추 10개. 수평이 되는 x를 찾자.',
+    hints:['3x + 2 = x + 10. 양변에서 x를 하나씩 덜어내 본다.','2x + 2 = 10 → 2x = 8 → x = 4.'],
+  };
+}
+const eqLeft = (cfg,x)=>cfg.a*x + cfg.b, eqRight = (cfg,x)=>cfg.c*x + cfg.d;
+function equationSolved(cfg, x){ return x!==null && eqLeft(cfg,x)===eqRight(cfg,x); }
+
+function mountEquation(el, cfg, api){
+  const stage = document.createElement('div'); stage.className='stage';
+  const status = document.createElement('div'); status.className='status-line';
+  el.appendChild(stage); el.appendChild(status);
+  let x = 0, done = false;
+  function render(){
+    const L = eqLeft(cfg,x), R = eqRight(cfg,x);
+    const tilt = Math.max(-12, Math.min(12, (R-L)*2.2));
+    const CX=300, CY=150, ANG=tilt*Math.PI/180;
+    const rot=(px,py)=>{ const dx=px-CX,dy=py-CY,c=Math.cos(ANG),s=Math.sin(ANG); return [CX+dx*c-dy*s, CY+dx*s+dy*c]; };
+    const boxSVG=(bx,by,lbl,fill)=>`<rect x="${bx-16}" y="${by-16}" width="32" height="32" rx="5" fill="${fill}" stroke="#cfd8ec" stroke-width="1.5"/><text x="${bx}" y="${by+5}" fill="#0b0e18" font-size="15" font-weight="800" text-anchor="middle">${lbl}</text>`;
+    const pan=(side)=>{
+      const [hx,hy]=rot(CX+side*130, CY);
+      let s=`<line x1="${CX+(side*7)}" y1="${CY}" x2="${hx}" y2="${hy}" stroke="#66708c" stroke-width="2"/>`;
+      s+=`<line x1="${hx-40}" y1="${hy}" x2="${hx+40}" y2="${hy}" stroke="#8a93a6" stroke-width="3"/>`;
+      const nx = side<0 ? cfg.a : cfg.c, nn = side<0 ? cfg.b : cfg.d;
+      let items=[]; for(let i=0;i<nx;i++) items.push(['x','#6aa8ff']); for(let i=0;i<nn;i++) items.push([nn>9?'':'',''].length?['●','#39425f']:['',''] );
+      // 상자 x
+      let ix=0;
+      for(let i=0;i<nx;i++){ const bx=hx-30+ (ix%3)*30, by=hy-22-Math.floor(ix/3)*30; s+=boxSVG(bx,by,'x','#6aa8ff'); ix++; }
+      // 추(작은 원) 개수 표기
+      s+=`<circle cx="${hx+ (nx?26:0)}" cy="${hy-16}" r="11" fill="#39425f" stroke="#66708c" stroke-width="1.5"/><text x="${hx+(nx?26:0)}" y="${hy-11}" fill="#e8ecf6" font-size="12" font-weight="700" text-anchor="middle">${nn}</text>`;
+      return s;
+    };
+    stage.innerHTML=`<svg viewBox="0 0 600 300" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="${CX-24},250 ${CX+24},250 ${CX},${CY+6}" fill="#2a3350" stroke="#55618a" stroke-width="2"/>
+      <line x1="120" y1="250" x2="480" y2="250" stroke="#2a3350" stroke-width="5" stroke-linecap="round"/>
+      ${(()=>{const[a]=rot(CX-130,CY),[,]=[0,0];const p1=rot(CX-130,CY),p2=rot(CX+130,CY);return `<line x1="${p1[0]}" y1="${p1[1]}" x2="${p2[0]}" y2="${p2[1]}" stroke="#8a93a6" stroke-width="6" stroke-linecap="round"/>`;})()}
+      <circle cx="${CX}" cy="${CY}" r="7" fill="#ffd76a"/>
+      ${pan(-1)}${pan(1)}
+      <g><text x="${CX}" y="286" fill="#8a93a6" font-size="14" text-anchor="middle">상자 x = <tspan fill="#ffd76a" font-weight="800" font-size="18">${x}</tspan></text></g>
+      </svg>
+      <div class="eq-ctrl"><button class="btn" data-ex="-1">− x 줄이기</button><button class="btn" data-ex="1">＋ x 늘리기</button></div>`;
+    const solved = equationSolved(cfg,x);
+    if(done||solved){ status.className='status-line ok'; status.textContent=cfg.__success||'수평이다! 철컹 — 등식이 맞아떨어지며 걸쇠가 풀렸다.';
+      if(!done){done=true;SFX.solve();setTimeout(()=>api.solve(),900);} }
+    else { status.className='status-line info'; const cmp=L<R?'왼쪽이 가볍다':'왼쪽이 무겁다'; status.textContent=`왼쪽 ${L} · 오른쪽 ${R} — ${cmp}. x를 조절하자.`; }
+  }
+  stage.addEventListener('click', ev=>{ if(done)return; const b=ev.target.closest('[data-ex]'); if(!b)return;
+    x=Math.max(0,Math.min(cfg.xmax, x + +b.dataset.ex)); SFX.click(); render(); });
+  render();
+}
+
+/* ======================= 선대칭 완성(도형) 퍼즐 ======================= */
+// 거울선 왼쪽 무늬가 주어지고, 오른쪽을 채워 좌우대칭(또는 점대칭)을 완성한다.
+function symmetryConfig(diff){
+  if(diff==='easy') return {
+    rows:4, cols:6, mode:'line', // 세로 거울선(가운데)
+    left:[[0,1],[1,0],[1,2],[2,1],[3,2]],
+    curri:'수학 4 · 선대칭 도형',
+    desc:'가운데 거울선을 기준으로 왼쪽에 무늬가 있다. 오른쪽 칸을 눌러 좌우가 똑같은 대칭 무늬를 완성하자.',
+    hints:['거울선에서 같은 거리의 칸을 칠하면 된다.','왼쪽에서 거울선까지 n칸 떨어진 칸은, 오른쪽에서도 n칸 떨어진 칸.'],
+  };
+  if(diff==='mid') return {
+    rows:5, cols:8, mode:'line',
+    left:[[0,0],[0,3],[1,1],[2,2],[2,0],[3,1],[4,3]],
+    curri:'수학 5 · 선대칭의 성질',
+    desc:'거울선 왼쪽 무늬가 복잡해졌다. 오른쪽을 채워 완벽한 좌우대칭을 만들자.',
+    hints:['한 칸씩, 왼쪽 칸의 거울선 반대편 짝을 찾아 칠한다.','거울선에서 열 거리(1,2,3,4…)가 같은 칸끼리 짝이다.'],
+  };
+  return {
+    rows:6, cols:6, mode:'point', // 점대칭(중심 180° 회전)
+    left:[[0,0],[0,1],[1,0],[2,1],[2,2],[1,4]],
+    curri:'수학 5 · 점대칭 도형(180° 회전)',
+    desc:'이번엔 점대칭이다. 판의 중심을 기준으로 180° 돌렸을 때 똑같아지도록 나머지 칸을 채우자.',
+    hints:['점대칭은 중심을 기준으로 반 바퀴 돌린 모양. (r,c)의 짝은 (행수-1-r, 열수-1-c).','왼쪽 위 칸의 짝은 오른쪽 아래 대각선 끝 칸이다.'],
+  };
+}
+function symMate(cfg, r, c){
+  if(cfg.mode==='line') return [r, cfg.cols-1-c];
+  return [cfg.rows-1-r, cfg.cols-1-c]; // point
+}
+function symmetrySolved(cfg, filled){
+  // 주어진 left 칸은 항상 채워짐. 모든 채워진 칸의 짝도 채워져 있고, 짝 없는 여분이 없어야.
+  const set = new Set([...cfg.left.map(([r,c])=>r+','+c), ...filled]);
+  for(const key of set){ const [r,c]=key.split(',').map(Number); const [mr,mc]=symMate(cfg,r,c);
+    if(!set.has(mr+','+mc)) return false; }
+  // 최소 하나는 플레이어가 채웠어야(빈 시작 방지) + left 자기짝이 이미 대칭이면 자명하지 않게: 여분 없음 보장은 위에서 됨
+  return filled.length>0;
+}
+function mountSymmetry(el, cfg, api){
+  const stage=document.createElement('div'); stage.className='stage';
+  const status=document.createElement('div'); status.className='status-line';
+  el.appendChild(stage); el.appendChild(status);
+  const leftSet=new Set(cfg.left.map(([r,c])=>r+','+c));
+  const filled=new Set(); let done=false;
+  const CS=46, OX=20, OY=20;
+  function render(){
+    const W=cfg.cols*CS, H=cfg.rows*CS;
+    let s=`<svg viewBox="0 0 ${W+OX*2} ${H+OY*2}" xmlns="http://www.w3.org/2000/svg">`;
+    for(let r=0;r<cfg.rows;r++)for(let c=0;c<cfg.cols;c++){
+      const key=r+','+c, px=OX+c*CS, py=OY+r*CS;
+      const on = leftSet.has(key)||filled.has(key);
+      const isLeftGiven=leftSet.has(key);
+      const fill = on ? (isLeftGiven?'#6aa8ff':'#5fd39a') : '#101632';
+      s+=`<rect x="${px+2}" y="${py+2}" width="${CS-4}" height="${CS-4}" rx="6" fill="${fill}" stroke="#2a3350" stroke-width="1.5" ${isLeftGiven?'':`data-cell="${key}" style="cursor:pointer"`}/>`;
+    }
+    if(cfg.mode==='line'){ const mx=OX+cfg.cols/2*CS; s+=`<line x1="${mx}" y1="${OY-6}" x2="${mx}" y2="${OY+H+6}" stroke="#ffd76a" stroke-width="2" stroke-dasharray="5 4"/>`; }
+    else { s+=`<circle cx="${OX+W/2}" cy="${OY+H/2}" r="5" fill="#ffd76a"/>`; }
+    s+=`</svg>`;
+    stage.innerHTML=s;
+    const solved=symmetrySolved(cfg,[...filled]);
+    if(done||solved){ status.className='status-line ok'; status.textContent=cfg.__success||'찰칵 — 무늬가 완벽히 대칭을 이루자 판이 열렸다!';
+      if(!done){done=true;SFX.solve();setTimeout(()=>api.solve(),900);} }
+    else { status.className='status-line info'; status.textContent = cfg.mode==='line'?'칸을 눌러 오른쪽을 채우자. 거울선(노란 점선) 기준 좌우대칭.':'칸을 눌러 채우자. 가운데 점 기준 180° 점대칭.'; }
+  }
+  stage.addEventListener('click', ev=>{ if(done)return; const c=ev.target.closest('[data-cell]'); if(!c)return;
+    const key=c.dataset.cell; if(filled.has(key)) filled.delete(key); else filled.add(key); SFX.click(); render(); });
+  render();
+}
+
+/* ======================= 지층 순서(지구과학) 퍼즐 ======================= */
+// 뒤섞인 지층을 쌓인 순서(아래=오래됨, 누중의 법칙)대로 정렬한다.
+function strataConfig(diff){
+  if(diff==='easy') return {
+    // 정답 순서: 위→아래 (최신→최고). 단서=입자 크기/화석
+    correct:['이암','사암','역암'],
+    clue:'누중의 법칙: 아래로 갈수록 먼저 쌓인 오래된 층이다. 일지: 강 하구가 점점 얕아지며 자갈→모래→진흙 순으로 덮였다.',
+    curri:'과학 4 · 지층과 퇴적암(쌓인 순서)',
+    desc:'뒤섞인 지층 카드를 실제 쌓인 순서대로 세우자. 화살표로 위아래를 바꿔 정렬한다.',
+    hints:['먼저 쌓인 층이 맨 아래다.','자갈(역암)이 가장 먼저, 진흙(이암)이 가장 나중에 덮였다.'],
+  };
+  if(diff==='mid') return {
+    correct:['삼엽충 없음','암모나이트','삼엽충'],
+    clue:'표준화석 일지: 삼엽충은 고생대, 암모나이트는 중생대의 대표 화석. 오래된 층일수록 아래.',
+    curri:'과학 · 표준화석과 지질 시대 순서',
+    desc:'화석으로 시대를 읽어 지층을 쌓인 순서대로 세우자.',
+    hints:['더 오래된 시대의 화석이 든 층이 아래.','삼엽충(고생대)이 맨 아래, 그 위 암모나이트(중생대), 화석 없는 최근 층이 위.'],
+  };
+  return {
+    correct:['부정합면','관입암맥','셰일','석회암'],
+    clue:'심화 일지: 관입은 이미 있던 층을 뚫고 들어오므로 그 층들보다 나중이다. 부정합은 오랜 침식의 흔적으로 맨 위.',
+    curri:'과학 심화 · 관입·부정합의 선후 관계',
+    desc:'관입과 부정합까지 얽혔다. 형성된 순서(아래=먼저)대로 정렬하자.',
+    hints:['퇴적층이 먼저 쌓이고, 관입은 그 뒤에 뚫고 들어온다. 부정합(침식)은 가장 나중.','아래부터: 석회암 → 셰일 → 관입암맥 → 부정합면.'],
+  };
+}
+function strataSolved(cfg, order){ return order.length===cfg.correct.length && order.every((v,i)=>v===cfg.correct[i]); }
+function mountStrata(el, cfg, api){
+  const stage=document.createElement('div'); stage.className='stage';
+  const status=document.createElement('div'); status.className='status-line';
+  el.appendChild(stage); el.appendChild(status);
+  // 시작 순서: 섞기(고정 셔플로 재현성). correct를 회전+뒤집기.
+  let order = cfg.correct.slice().reverse();
+  if(order.every((v,i)=>v===cfg.correct[i])) order = cfg.correct.slice(1).concat(cfg.correct[0]);
+  let done=false;
+  const shades=['#8a6a3a','#6a5a3a','#9a7a4a','#5a4a2a','#7a6a4a'];
+  function render(){
+    stage.innerHTML = `<div class="strata-clue">🪨 ${cfg.clue}</div>`
+      + `<div class="strata-stack">` + order.map((name,i)=>`
+        <div class="strata-layer" style="background:${shades[i%shades.length]}">
+          <span class="sl-name">${name}</span>
+          <span class="sl-btns">
+            <button class="btn" data-mv="${i}" data-dir="-1" ${i===0?'disabled':''}>▲</button>
+            <button class="btn" data-mv="${i}" data-dir="1" ${i===order.length-1?'disabled':''}>▼</button>
+          </span>
+        </div>`).join('') + `</div>`
+      + `<div class="strata-axis"><span>↑ 나중에 쌓임 (위)</span><span>먼저 쌓임 (아래) ↓</span></div>`
+      + `<div class="lever-row"><button class="btn primary" id="strata-check">정렬 확인</button></div>`;
+  }
+  stage.addEventListener('click', ev=>{
+    if(done) return;
+    const mv=ev.target.closest('[data-mv]');
+    if(mv){ const i=+mv.dataset.mv, dir=+mv.dataset.dir, j=i+dir;
+      if(j<0||j>=order.length) return; [order[i],order[j]]=[order[j],order[i]]; SFX.click(); render(); return; }
+    if(ev.target.closest('#strata-check')){
+      if(strataSolved(cfg,order)){ done=true; SFX.solve(); status.className='status-line ok';
+        status.textContent=cfg.__success||'우르릉 — 지층이 제 순서로 맞물리며 통로가 드러났다!'; setTimeout(()=>api.solve(),900); }
+      else { SFX.error(); status.className='status-line warn'; status.textContent='쌓인 순서가 맞지 않는다. 아래일수록 먼저 쌓인 층이다.'; }
+    }
+  });
+  render();
+  status.className='status-line info'; status.textContent='▲▼로 지층을 옮겨 쌓인 순서대로 세우자.';
 }
 
 /* ======================= 퍼즐 레지스트리 & 방 정의 ======================= */
@@ -1178,6 +1562,22 @@ const PUZZLES = {
   moon:{ name:'달 관측판', icon:'🌓', digit:'1',
     config:moonConfig, mount:mountMoon,
     reward:'관측판 뒷면에 새겨진 숫자' },
+  fraction:{ name:'분수 원판', icon:'🥧', digit:'6',
+    config:fractionConfig, mount:mountFraction,
+    reward:'원판 뒷면에 드러난 숫자',
+    discover:'두 개의 원판이 맞물린 장치다. 각 원판을 나눠 색칠하면 분수가 된다.' },
+  equation:{ name:'천칭 방정식', icon:'⚖️', digit:'8',
+    config:equationConfig, mount:mountEquation,
+    reward:'저울 받침에 새겨진 숫자',
+    discover:'양팔 저울 장치. 접시마다 상자 x와 추가 놓여 있고, 상자의 무게를 돌리는 다이얼이 있다.' },
+  symmetry:{ name:'대칭 무늬판', icon:'◐', digit:'4',
+    config:symmetryConfig, mount:mountSymmetry,
+    reward:'무늬판이 열리며 드러난 숫자',
+    discover:'격자 무늬판. 한쪽에만 무늬가 새겨져 있고, 나머지를 채우면 무늬가 완성될 듯하다.' },
+  strata:{ name:'지층 코어', icon:'🪨', digit:'0',
+    config:strataConfig, mount:mountStrata,
+    reward:'맞춰진 지층 사이에 드러난 숫자',
+    discover:'뽑아 올린 지층 표본(코어)이 순서 없이 흩어져 있다. 쌓인 순서대로 세울 수 있을 것 같다.' },
 };
 
 // 방 정의: 잠금 = {id, diff, digit}. diff가 null이면 방 전체 난이도를 따른다.
@@ -1218,14 +1618,33 @@ function startRoom(diff){
     $('#scene3d').innerHTML = '<div style="padding:48px 20px;text-align:center;color:#8a93a6;font-size:14px;line-height:1.7">이 브라우저에서는 3D(WebGL)를 켤 수 없다.<br>최신 크롬·엣지·사파리로 열어 주세요.</div>';
   }
   refresh3D();
-  const bo = $('#blackout');
-  bo.classList.add('on');
-  setTimeout(()=>bo.classList.remove('on'), 2300);
-  setInterval(()=>{
-    if(!state.start) return;
-    const t = Math.floor((Date.now()-state.start)/1000);
-    $('#timer').textContent = String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
-  }, 1000);
+  if(!state._resumed){
+    const bo = $('#blackout');
+    bo.classList.add('on');
+    setTimeout(()=>bo.classList.remove('on'), 2300);
+  }
+  if(!startRoom._ticking){
+    startRoom._ticking = true;
+    setInterval(()=>{
+      if(!state.start) return;
+      const t = Math.floor((Date.now()-state.start)/1000);
+      $('#timer').textContent = String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0');
+    }, 1000);
+  }
+  saveProgress();
+}
+
+// 저장된 세션 복원 → 방으로 바로 진입
+function resumeSession(s){
+  THEME = THEMES[s.themeId] || THEMES.lab;
+  if(s.custom && s.cfg){ applyCustomCfg(s.cfg); }
+  else { ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join(''); }
+  state.solved = s.solved||{}; state.disc = s.disc||{}; state.found = s.found||{};
+  state.hintsUsed = s.hintsUsed||0;
+  state._resumed = true;
+  $('#hint-count').textContent = state.hintsUsed;
+  startRoom(s.diff);
+  state.start = Date.now() - (s.elapsedMs||0);  // 경과 시간 이어가기
 }
 
 /* ---------- 벽면 탐색 씬 ---------- */
@@ -1249,6 +1668,10 @@ const SCENE_OBJECTS = {
   lock_cipher: {type:'lock', lockId:'cipher', discover:'먼지 쌓인 천을 걷어내자, 다이얼 자물쇠가 달린 시약장이 드러났다! 자물쇠 옆에 쪽지 한 장. "규칙을 찾은 사람만 여시길."'},
   lock_mirror: {type:'lock', lockId:'mirror', discover:'레이저와 거울이 놓인 광학 장치. 받침대에 새겨진 글씨. "빛은 거짓말을 못 한단다. 다만 방향을 바꿀 뿐."'},
   lock_moon:   {type:'lock', lockId:'moon', discover:'달의 모양이 빙 둘러 새겨진 관측판. 한가운데에 이렇게 적혀 있다. "모든 것에는 차오르는 때와 기우는 때가 있지."'},
+  lock_fraction:{type:'lock', lockId:'fraction', discover:'두 개의 원판이 맞물린 장치다. 각 원판을 나눠 색칠하면 분수가 된다.'},
+  lock_equation:{type:'lock', lockId:'equation', discover:'양팔 저울 장치. 접시마다 상자 x와 추가 놓여 있고, 상자의 무게를 돌리는 다이얼이 있다.'},
+  lock_symmetry:{type:'lock', lockId:'symmetry', discover:'격자 무늬판. 한쪽에만 무늬가 새겨져 있고, 나머지를 채우면 무늬가 완성될 듯하다.'},
+  lock_strata:{type:'lock', lockId:'strata', discover:'뽑아 올린 지층 표본이 순서 없이 흩어져 있다. 쌓인 순서대로 세울 수 있을 것 같다.'},
   books:       {type:'decor', name:'책장', text:'낡은 책 "수의 정원"이 꽂혀 있다. 접힌 갈피에 메모가 있다. "다음 수는 늘, 앞의 수들이 데려온단다."'},
   bucket:      {type:'decor', name:'양동이', text:'잘 마른 걸레가 개켜져 있다. 바닥의 물자국이 반질해서, 비상등 불빛이 거울처럼 비친다.'},
 };
@@ -1565,7 +1988,2314 @@ function texCanvas(w, h, draw){
   return new THREE.CanvasTexture(c);
 }
 
-function buildRoomScene(){ return THEME.scene(); }
+// 조립기 맞춤 장치는 큐레이트 4방엔 없고 맞춤 방에만 등장 → ROOM에 있을 때만 3D 벽패널 배치.
+// 남쪽 벽 위쪽 띠(y=2.15, z=3.94)에 x를 나눠 겹치지 않게 건다.
+// 조립기 애드온 장치의 3D 벽패널 외형(위치는 방에 담긴 애드온끼리 동적 배분).
+const ADDON_DEVICES = {
+  fraction: {glyph:'🥧', color:0xd8b048, recolor:0x3a2a08},
+  equation: {glyph:'⚖x', color:0x6aa8ff, recolor:0x0a1a3a},
+  symmetry: {glyph:'◐',  color:0x5fd39a, recolor:0x0c3a1e},
+  strata:   {glyph:'≣',  color:0xc98f45, recolor:0x3a2408},
+};
+function buildRoomScene(){
+  const built = THEME.scene();
+  if(ROOM && ROOM.locks){
+    const addons = ROOM.locks.filter(l=>ADDON_DEVICES[l.id]);
+    addons.forEach((l,i)=>addAddonDevice(built, l.id, i, addons.length));
+  }
+  return built;
+}
+// idx/total로 남쪽 벽 위쪽 띠(y=2.15)에 겹치지 않게 배치. 몇 개든 균등 배분.
+function addAddonDevice(built, id, idx, total){
+  const d = ADDON_DEVICES[id];
+  const span = Math.min(6.4, total*1.15);
+  const x = total<=1 ? 0 : -span/2 + (idx/(total-1))*span;
+  const g = new THREE.Group();
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(1.0,.62,.1),
+    new THREE.MeshStandardMaterial({color:0x2a3350, roughness:.8}));
+  frame.position.set(x, 2.15, 3.93);
+  const face = new THREE.Mesh(new THREE.PlaneGeometry(.9,.52),
+    new THREE.MeshStandardMaterial({color:d.color, emissive:d.recolor, emissiveIntensity:.5,
+      map: texCanvas(180,104, g2=>{
+        g2.fillStyle='#0d1226'; g2.fillRect(0,0,180,104);
+        g2.fillStyle='#e8ecf6'; g2.font='58px sans-serif'; g2.textAlign='center'; g2.textBaseline='middle';
+        g2.fillText(d.glyph, 90, 54);
+      })}));
+  face.position.set(x, 2.15, 3.88);
+  g.add(frame, face);
+  g.userData.obj = 'lock_'+id;
+  built.scene.add(g); built.pickables.push(g);
+}
+
+/* ---------- 애드온 퍼즐 플러그인 API ----------
+   새 퍼즐은 registerAddon() 한 번으로 자기등록한다.
+   PUZZLES / SCENE_OBJECTS / ADDON_DEVICES / 셀프테스트에 동시 배선. 큐레이트 4방엔 안 나오고
+   조립기 맞춤 방에만 등장(스토리 조각·문 코드 파장 없음). 조립기 목록은 builder.html에서 별도 관리. */
+const ADDON_TESTS = [];
+const ADDON_META = [];   // 조립기 동기화용 참조(빌더는 별도지만 여기에도 남겨 둠)
+function registerAddon(spec){
+  PUZZLES[spec.id] = { name:spec.name, icon:spec.icon, digit:String(spec.digit),
+    config:spec.config, mount:spec.mount, reward:spec.reward||'장치 안에서 드러난 숫자',
+    discover:spec.discover };
+  SCENE_OBJECTS['lock_'+spec.id] = { type:'lock', lockId:spec.id, discover:spec.discover };
+  ADDON_DEVICES[spec.id] = { glyph:spec.glyph||'?', color:spec.color||0x8a93a6, recolor:spec.recolor||0x1a2030 };
+  if(spec.selftest) ADDON_TESTS.push(spec.selftest);
+  ADDON_META.push({ id:spec.id, name:spec.name, icon:spec.icon, digit:String(spec.digit),
+    curri:spec.curri||{easy:'',mid:'',hard:''} });
+}
+
+/* ===== ADDON REGISTRATIONS (drop-in 퍼즐 모듈; 각 블록은 registerAddon 한 번 호출) ===== */
+
+// [참조 템플릿] 경우의 수 자물쇠 — 숫자 다이얼 + 레버 패턴
+registerAddon({
+  id:'counting', name:'경우의 수 자물쇠', icon:'🎲', digit:'3',
+  glyph:'🎲', color:0xb98ad0, recolor:0x2a1838,
+  discover:'여러 갈래로 갈라지는 회전판 자물쇠. 상황에 맞는 경우의 수를 맞춰야 열린다.',
+  reward:'회전판 안쪽에 드러난 숫자',
+  curri:{ easy:'수학 심화 · 곱의 법칙', mid:'중2 수학 · 순열', hard:'중2 수학 · 조합' },
+  config:function(diff){
+    if(diff==='easy') return { q:'윗옷 3벌과 아랫옷 2벌로 만들 수 있는 서로 다른 옷차림은 몇 가지일까?',
+      ans:6, max:24, curri:'수학 심화 · 곱의 법칙',
+      desc:'상황을 읽고 경우의 수를 다이얼로 맞춘 뒤 레버를 당기자.',
+      hints:['각 윗옷마다 아랫옷 2가지를 고를 수 있다.','3 × 2 = 6.'] };
+    if(diff==='mid') return { q:'4명 중에서 회장과 부회장을 한 명씩 뽑는 방법의 수는? (순서가 있다)',
+      ans:12, max:30, curri:'중2 수학 · 순열',
+      desc:'뽑아서 나열하는 경우다. 경우의 수를 맞춰 레버를 당기자.',
+      hints:['회장 4가지, 그 각각에 부회장은 남은 3가지.','4 × 3 = 12.'] };
+    return { q:'5명 중에서 대표 2명을 뽑는 방법의 수는? (순서는 없다)',
+      ans:10, max:30, curri:'중2 수학 · 조합',
+      desc:'순서 없이 뽑는 경우다. 경우의 수를 맞춰 레버를 당기자.',
+      hints:['순서 있게 뽑으면 5×4=20. 두 명 사이 순서는 세지 않으니 2로 나눈다.','20 ÷ 2 = 10.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function render(){
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:18px"><button class="btn" data-cv="-1">−</button>'
+        +'<div class="val" style="font-size:30px;width:70px;height:60px">'+val+'</div>'
+        +'<button class="btn" data-cv="1">＋</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="cnt-lever">🔓 레버 당기기</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-cv]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val + (+b.dataset.cv))); SFX.click(); render(); return; }
+      if(ev.target.closest('#cnt-lever')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent=cfg.__success||'딸깍 — 경우의 수가 맞아떨어지며 회전판이 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='회전판이 헛돈다. 경우의 수가 맞지 않는다.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='＋ − 로 경우의 수를 맞춘 뒤 레버를 당기자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.counting.config(d);
+      T('counting '+d+': 정답이 범위 안(0~max)', c.ans>=0 && c.ans<=c.max);
+      T('counting '+d+': 정답 계산 일치', {easy:6,mid:12,hard:10}[d]===c.ans);
+      T('counting '+d+': 힌트 2개', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+// ── 확률·비례·열/기체 묶음 (probability, proportion, heat, gaslaw) ──
+
+registerAddon({
+  id:'probability', name:'확률 자물쇠', icon:'🎯', digit:'7',
+  glyph:'½', color:0x6aa8ff, recolor:0x121c34,
+  discover:'분자와 분모가 따로 도는 두 짝 다이얼 자물쇠. 상황에 맞는 확률을 분수로 맞춰야 열린다.',
+  reward:'분수막대 아래로 드러난 숫자',
+  curri:{ easy:'중2 수학 · 확률의 뜻', mid:'중2 수학 · 확률의 계산', hard:'중2 수학 · 두 사건의 확률' },
+  config:function(diff){
+    if(diff==='easy') return {
+      q:'주머니에 빨간 공 2개, 파란 공 3개가 있다. 하나를 꺼낼 때 빨간 공일 확률은?',
+      fav:2, total:5, max:12, curri:'중2 수학 · 확률의 뜻',
+      hints:['확률 = (해당 경우) / (전체 경우).','빨간 공 2개, 전체 공 5개. 2/5.'] };
+    if(diff==='mid') return {
+      q:'주사위 한 개를 던질 때 4 이상(4,5,6)이 나올 확률은?',
+      fav:3, total:6, max:12, curri:'중2 수학 · 확률의 계산',
+      hints:['4 이상은 4,5,6 세 가지. 전체는 1~6 여섯 가지.','3/6. 약분하면 1/2 도 같은 값.'] };
+    return {
+      q:'주사위 두 개를 던져 나온 눈의 합이 7일 확률은?',
+      fav:6, total:36, max:40, curri:'중2 수학 · 두 사건의 확률',
+      hints:['두 주사위의 모든 경우는 6×6 = 36가지.','합이 7인 경우는 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 여섯 가지. 6/36.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var num=0, den=1, done=false, p=cfg.fav/cfg.total;
+    function gcd(a,b){ return b? gcd(b, a%b) : a; }
+    function render(){
+      var g=gcd(num,den)||1, simp = num>0? (num/g)+'/'+(den/g) : '—';
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="seq-row" style="justify-content:center;align-items:center;gap:16px">'
+          +'<div style="text-align:center"><div style="color:#8a93a6;font-size:12px">해당 경우</div>'
+            +'<div class="seq-row" style="gap:8px;justify-content:center"><button class="btn" data-n="-1">−</button>'
+            +'<div class="val" style="width:56px">'+num+'</div><button class="btn" data-n="1">＋</button></div></div>'
+          +'<div style="font-size:38px;color:#8a93a6;padding-top:14px">／</div>'
+          +'<div style="text-align:center"><div style="color:#8a93a6;font-size:12px">전체 경우</div>'
+            +'<div class="seq-row" style="gap:8px;justify-content:center"><button class="btn" data-d="-1">−</button>'
+            +'<div class="val" style="width:56px">'+den+'</div><button class="btn" data-d="1">＋</button></div></div>'
+        +'</div>'
+        +'<div class="status-line info" style="text-align:center">현재 분수  '+num+'／'+den+'  =  '+simp+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="prb-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var bn=ev.target.closest('[data-n]'), bd=ev.target.closest('[data-d]');
+      if(bn){ num=Math.max(0, Math.min(cfg.max, num+(+bn.dataset.n))); SFX.click(); render(); return; }
+      if(bd){ den=Math.max(1, Math.min(cfg.max, den+(+bd.dataset.d))); SFX.click(); render(); return; }
+      if(ev.target.closest('#prb-go')){
+        if(num>0 && den>0 && Math.abs(num/den - p) < 1e-9){
+          done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 확률이 맞아떨어지며 자물쇠가 풀렸다!'; setTimeout(function(){api.solve();},900);
+        } else { SFX.error(); status.className='status-line warn'; status.textContent='자물쇠가 흔들린다. 확률이 맞지 않는다.'; }
+      }
+    });
+    render();
+    status.textContent='해당 경우와 전체 경우를 맞춰 분수 확률을 만들자. 같은 값이면 약분 형태도 열린다.';
+  },
+  selftest:function(T){
+    var exp={easy:2/5, mid:3/6, hard:6/36};
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.probability.config(d);
+      var p=c.fav/c.total;
+      T('probability '+d+': 확률 = 경우/전체 개념 일치', Math.abs(p - exp[d]) < 1e-9);
+      T('probability '+d+': 정답 분수가 실제로 풀림(fav/total)', Math.abs(c.fav/c.total - p) < 1e-9);
+      T('probability '+d+': 다른 분수는 안 풀림', Math.abs((c.fav+1)/c.total - p) > 1e-9);
+      T('probability '+d+': 힌트 2개 이상', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+registerAddon({
+  id:'proportion', name:'비례표 자물쇠', icon:'📊', digit:'4',
+  glyph:'∝', color:0x5fd39a, recolor:0x0f2a20,
+  discover:'값들이 표로 배열된 자물쇠. 빈칸 하나가 비어 있다. 정비례 또는 반비례 규칙을 읽어 채워야 한다.',
+  reward:'표의 빈칸이 채워지며 켜진 숫자',
+  curri:{ easy:'중1 수학 · 정비례', mid:'중1 수학 · 반비례', hard:'중1 수학 · 반비례 활용' },
+  config:function(diff){
+    if(diff==='easy') return {
+      kind:'정비례', rule:'direct', rows:[[1,4],[3,12],[5,null]], ans:20, max:60,
+      curri:'중1 수학 · 정비례',
+      q:'y 가 x 에 정비례한다. 표의 빈칸에 들어갈 y 값은?',
+      hints:['정비례는 y = a×x. x 가 1일 때 y 가 4이므로 a = 4.','x = 5 이면 y = 4×5 = 20.'] };
+    if(diff==='mid') return {
+      kind:'반비례', rule:'inverse', rows:[[2,12],[3,8],[6,null]], ans:4, max:60,
+      curri:'중1 수학 · 반비례',
+      q:'y 가 x 에 반비례한다. 표의 빈칸에 들어갈 y 값은?',
+      hints:['반비례는 x×y = a 로 일정하다. 2×12 = 24 이므로 a = 24.','x = 6 이면 y = 24 ÷ 6 = 4.'] };
+    return {
+      kind:'반비례', rule:'inverse', rows:[[4,12],[6,8],[8,null]], ans:6, max:60,
+      curri:'중1 수학 · 반비례 활용',
+      q:'y 가 x 에 반비례한다. 표의 빈칸에 들어갈 y 값은?',
+      hints:['x×y 가 일정하다. 4×12 = 48, 6×8 = 48. 곱이 항상 48.','x = 8 이면 y = 48 ÷ 8 = 6.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function tableHTML(){
+      var xr='', yr='';
+      cfg.rows.forEach(function(r){
+        xr+='<td style="border:1px solid #2a3350;padding:8px 14px;color:#e8ecf6">'+r[0]+'</td>';
+        if(r[1]===null) yr+='<td style="border:1px solid #ffd76a;padding:8px 14px;color:#ffd76a;font-weight:700;background:#101632">'+val+'</td>';
+        else yr+='<td style="border:1px solid #2a3350;padding:8px 14px;color:#e8ecf6">'+r[1]+'</td>';
+      });
+      return '<table style="border-collapse:collapse;margin:6px auto;text-align:center">'
+        +'<tr><td style="border:1px solid #2a3350;padding:8px 14px;color:#8a93a6">x</td>'+xr+'</tr>'
+        +'<tr><td style="border:1px solid #2a3350;padding:8px 14px;color:#8a93a6">y</td>'+yr+'</tr></table>';
+    }
+    function render(){
+      var h='<div class="cab">'
+        +'<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+' <span style="color:#8a93a6">('+cfg.kind+')</span></div>'
+        +tableHTML()
+        +'<div class="seq-row" style="justify-content:center;gap:6px;flex-wrap:wrap">'
+          +'<button class="btn" data-step="-10">-10</button><button class="btn" data-step="-1">−</button>'
+          +'<div class="val" style="width:80px;font-size:26px">'+val+'</div>'
+          +'<button class="btn" data-step="1">＋</button><button class="btn" data-step="10">+10</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="prp-go">🔓 빈칸 채우기</button></div></div>';
+      stage.innerHTML=h;
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-step]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val+(+b.dataset.step))); SFX.click(); render(); return; }
+      if(ev.target.closest('#prp-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 규칙에 맞는 값이 들어가며 자물쇠가 풀렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='표가 어긋난다. 비례 규칙에 맞지 않는 값이다.'; }
+      }
+    });
+    render();
+    status.textContent='표에서 x 와 y 의 관계를 읽고 빈칸 값을 맞추자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.proportion.config(d);
+      var bx=null; c.rows.forEach(function(r){ if(r[1]===null) bx=r[0]; });
+      var f=c.rows[0]; // 알려진 첫 쌍
+      if(c.rule==='direct'){
+        var a=f[1]/f[0];
+        T('proportion '+d+': 정비례 a 로 계산 일치', a*bx===c.ans);
+      } else {
+        var a=f[0]*f[1];
+        T('proportion '+d+': 반비례 a 로 계산 일치', a/bx===c.ans);
+      }
+      T('proportion '+d+': 정답이 범위 안', c.ans>0 && c.ans<=c.max);
+      T('proportion '+d+': 오답은 규칙 위반', (c.ans+1)!==c.ans);
+      T('proportion '+d+': 힌트 2개 이상', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+registerAddon({
+  id:'heat', name:'열평형 자물쇠', icon:'🌡️', digit:'2',
+  glyph:'🌡', color:0xff8a5f, recolor:0x33160c,
+  discover:'온도가 다른 두 물통이 관을 사이에 두고 놓인 자물쇠. 섞였을 때의 열평형 온도를 맞춰야 열린다.',
+  reward:'온도계 눈금이 멈춘 자리의 숫자',
+  curri:{ easy:'중2 과학 · 열평형', mid:'중2 과학 · 열량과 비열', hard:'중2 과학 · 열량 계산' },
+  config:function(diff){
+    // 같은 물(같은 비열)이므로 비열은 약분됨. 열평형 = 질량 가중 평균.
+    if(diff==='easy') return {
+      parts:[[1,40],[1,60]], ans:50, max:100, curri:'중2 과학 · 열평형',
+      q:'같은 양의 물 두 컵을 섞는다. 40°C 물과 60°C 물이다. 열평형 온도는?',
+      hints:['양이 같고 같은 물이면 열평형 온도는 두 온도의 한가운데.','(40 + 60) ÷ 2 = 50.'] };
+    if(diff==='mid') return {
+      parts:[[1,20],[3,60]], ans:50, max:100, curri:'중2 과학 · 열량과 비열',
+      q:'같은 물을 섞는다. 20°C 물 1컵과 60°C 물 3컵이다. 열평형 온도는?',
+      hints:['양이 다르면 양이 많은 쪽 온도에 더 가깝다. 질량으로 가중 평균한다.','(20×1 + 60×3) ÷ (1+3) = 200 ÷ 4 = 50.'] };
+    return {
+      parts:[[2,15],[3,65]], ans:45, max:100, curri:'중2 과학 · 열량 계산',
+      q:'같은 물을 섞는다. 15°C 물 2컵과 65°C 물 3컵이다. 열평형 온도는?',
+      hints:['잃은 열 = 얻은 열. 같은 물이니 비열은 약분되고 컵 수(질량)만 남는다.','(15×2 + 65×3) ÷ (2+3) = 225 ÷ 5 = 45.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function cups(){
+      var h='<div class="seq-row" style="justify-content:center;gap:24px;margin:6px 0">';
+      cfg.parts.forEach(function(p){
+        h+='<div style="text-align:center"><div style="font-size:28px">🥤</div>'
+          +'<div style="color:#e8ecf6;font-weight:700">'+p[1]+'°C</div>'
+          +'<div style="color:#8a93a6;font-size:12px">'+p[0]+'컵</div></div>';
+      });
+      return h+'</div>';
+    }
+    function render(){
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +cups()
+        +'<div class="status-line info" style="text-align:center">열평형 온도 맞추기</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:6px;flex-wrap:wrap">'
+          +'<button class="btn" data-step="-10">-10</button><button class="btn" data-step="-1">−</button>'
+          +'<div class="val" style="width:96px;font-size:26px">'+val+'°C</div>'
+          +'<button class="btn" data-step="1">＋</button><button class="btn" data-step="10">+10</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="heat-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-step]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val+(+b.dataset.step))); SFX.click(); render(); return; }
+      if(ev.target.closest('#heat-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 온도계가 멈추며 자물쇠가 풀렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='온도계가 요동친다. 열평형 온도가 아니다.'; }
+      }
+    });
+    render();
+    status.textContent='두 물통이 섞여 하나의 온도가 될 때의 값을 맞추자.';
+  },
+  selftest:function(T){
+    var exp={easy:50, mid:50, hard:45};
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.heat.config(d);
+      var mt=0, m=0, lo=Infinity, hi=-Infinity;
+      c.parts.forEach(function(p){ mt+=p[0]*p[1]; m+=p[0]; lo=Math.min(lo,p[1]); hi=Math.max(hi,p[1]); });
+      var eq=mt/m;
+      T('heat '+d+': 질량가중 평균과 정답 일치', eq===c.ans);
+      T('heat '+d+': 정답이 두 온도 사이', c.ans>=lo && c.ans<=hi);
+      T('heat '+d+': 기대값 일치', exp[d]===c.ans);
+      T('heat '+d+': 힌트 2개 이상', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+registerAddon({
+  id:'gaslaw', name:'기체법칙 자물쇠', icon:'🎈', digit:'9',
+  glyph:'PV', color:0x6ad0c8, recolor:0x0e2a28,
+  discover:'압력과 부피, 온도가 얽힌 실린더 자물쇠. 한 값을 바꾸면 다른 값이 규칙대로 따라 변한다.',
+  reward:'실린더 눈금이 가리키는 숫자',
+  curri:{ easy:'중2 과학 · 보일 법칙', mid:'중2 과학 · 보일 법칙', hard:'중2 과학 · 샤를 법칙' },
+  config:function(diff){
+    if(diff==='easy') return {
+      law:'boyle', P1:1, V1:12, P2:2, ans:6, unit:'mL', max:40, curri:'중2 과학 · 보일 법칙',
+      q:'온도가 일정할 때 기체의 압력×부피는 일정하다. 압력 1기압, 부피 12mL 기체를 압력 2기압으로 눌렀다. 부피는?',
+      hints:['보일 법칙: P1×V1 = P2×V2. 1×12 = 12 로 일정.','12 ÷ 2 = 6. 압력을 2배로 하면 부피는 절반.'] };
+    if(diff==='mid') return {
+      law:'boyle', P1:2, V1:30, P2:3, ans:20, unit:'mL', max:80, curri:'중2 과학 · 보일 법칙',
+      q:'온도가 일정할 때 압력×부피는 일정하다. 압력 2기압, 부피 30mL 기체를 압력 3기압으로 눌렀다. 부피는?',
+      hints:['P1×V1 = P2×V2. 2×30 = 60 로 일정.','60 ÷ 3 = 20.'] };
+    return {
+      law:'charles', V1:300, T1:250, T2:400, ans:480, unit:'mL', max:800, curri:'중2 과학 · 샤를 법칙',
+      q:'압력이 일정할 때 부피는 절대온도에 정비례한다. 250K에서 부피 300mL 기체를 400K로 데웠다. 부피는?',
+      hints:['샤를 법칙: V1÷T1 = V2÷T2. 300÷250 = 1.2 로 일정.','V2 = 300 × (400 ÷ 250) = 300 × 1.6 = 480.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function stateHTML(){
+      if(cfg.law==='boyle') return '<div class="seq-row" style="justify-content:center;gap:20px;margin:6px 0">'
+        +'<div style="text-align:center"><div style="color:#8a93a6;font-size:12px">처음</div>'
+          +'<div style="color:#e8ecf6">'+cfg.P1+'기압 · '+cfg.V1+'mL</div></div>'
+        +'<div style="font-size:22px;color:#6ad0c8;padding-top:14px">→</div>'
+        +'<div style="text-align:center"><div style="color:#8a93a6;font-size:12px">나중</div>'
+          +'<div style="color:#ffd76a">'+cfg.P2+'기압 · ? mL</div></div></div>';
+      return '<div class="seq-row" style="justify-content:center;gap:20px;margin:6px 0">'
+        +'<div style="text-align:center"><div style="color:#8a93a6;font-size:12px">처음</div>'
+          +'<div style="color:#e8ecf6">'+cfg.T1+'K · '+cfg.V1+'mL</div></div>'
+        +'<div style="font-size:22px;color:#6ad0c8;padding-top:14px">→</div>'
+        +'<div style="text-align:center"><div style="color:#8a93a6;font-size:12px">나중</div>'
+          +'<div style="color:#ffd76a">'+cfg.T2+'K · ? mL</div></div></div>';
+    }
+    function render(){
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +stateHTML()
+        +'<div class="status-line info" style="text-align:center">나중 부피 맞추기</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:6px;flex-wrap:wrap">'
+          +'<button class="btn" data-step="-100">-100</button><button class="btn" data-step="-10">-10</button>'
+          +'<button class="btn" data-step="-1">−</button>'
+          +'<div class="val" style="width:110px;font-size:24px">'+val+cfg.unit+'</div>'
+          +'<button class="btn" data-step="1">＋</button><button class="btn" data-step="10">+10</button>'
+          +'<button class="btn" data-step="100">+100</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="gas-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-step]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val+(+b.dataset.step))); SFX.click(); render(); return; }
+      if(ev.target.closest('#gas-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 실린더가 제자리에 멈추며 자물쇠가 풀렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='실린더가 어긋난다. 법칙에 맞는 부피가 아니다.'; }
+      }
+    });
+    render();
+    status.textContent='법칙을 읽고 바뀐 상태의 부피를 맞추자.';
+  },
+  selftest:function(T){
+    var exp={easy:6, mid:20, hard:480};
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.gaslaw.config(d);
+      if(c.law==='boyle'){
+        T('gaslaw '+d+': 보일 P1V1=P2V2 성립', c.P1*c.V1===c.P2*c.ans);
+        T('gaslaw '+d+': 오답은 법칙 위반', c.P1*c.V1!==c.P2*(c.ans+1));
+      } else {
+        T('gaslaw '+d+': 샤를 V1/T1=V2/T2 성립', c.V1*c.T2===c.ans*c.T1);
+        T('gaslaw '+d+': 오답은 법칙 위반', c.V1*c.T2!==(c.ans+1)*c.T1);
+      }
+      T('gaslaw '+d+': 기대값 일치', exp[d]===c.ans);
+      T('gaslaw '+d+': 정답 범위 안', c.ans>0 && c.ans<=c.max);
+      T('gaslaw '+d+': 힌트 2개 이상', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+// ===== 물리 애드온 4종: speed / ohm / magnet / sound =====
+
+// [1] 속력 = 거리 ÷ 시간
+registerAddon({
+  id:'speed', name:'속력 계기판', icon:'🏃', digit:'5',
+  glyph:'v', color:0x6aa8ff, recolor:0x0e1a33,
+  discover:'일정한 빠르기로 움직이는 물체를 비추는 계기판. 거리와 시간의 관계를 맞춰야 잠금이 풀린다.',
+  reward:'계기판 눈금 위로 떠오른 숫자',
+  curri:{ easy:'중2 과학 · 속력', mid:'중2 과학 · 속력', hard:'중2 과학 · 속력의 단위 환산' },
+  config:function(diff){
+    if(diff==='easy') return { q:'거리 100 m를 20초 동안 일정한 빠르기로 이동했다. 속력은 몇 m/s일까?',
+      dist:'100 m', time:'20초', unit:'m/s', ans:5, max:30,
+      desc:'속력 = 거리 ÷ 시간. 계기판 눈금을 맞춘 뒤 잠금 레버를 당기자.',
+      curri:'중2 과학 · 속력',
+      hints:['속력은 거리를 시간으로 나눈 값이다.','100 ÷ 20 = 5.'] };
+    if(diff==='mid') return { q:'속력 8 m/s로 6초 동안 일정하게 이동했다. 이동한 거리는 몇 m일까?',
+      dist:'?', time:'6초', unit:'m', ans:48, max:100,
+      desc:'거리 = 속력 × 시간. 계기판 눈금을 맞춘 뒤 레버를 당기자.',
+      curri:'중2 과학 · 속력',
+      hints:['거리는 속력에 시간을 곱한 값이다.','8 × 6 = 48.'] };
+    return { q:'90 km를 1.5시간 동안 일정하게 이동했다. 속력은 몇 km/h일까?',
+      dist:'90 km', time:'1.5시간', unit:'km/h', ans:60, max:120,
+      desc:'속력 = 거리 ÷ 시간. 단위에 주의해서 눈금을 맞추자.',
+      curri:'중2 과학 · 속력의 단위 환산',
+      hints:['거리(km)를 시간(h)으로 나누면 km/h가 된다.','90 ÷ 1.5 = 60.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function svg(){
+      return '<svg viewBox="0 0 320 90" style="width:100%">'
+        +'<line x1="20" y1="60" x2="300" y2="60" stroke="#2a3350" stroke-width="3"/>'
+        +'<circle cx="20" cy="60" r="7" fill="#6aa8ff">'
+        +'<animate attributeName="cx" values="20;300;20" dur="3s" repeatCount="indefinite"/></circle>'
+        +'<text x="20" y="30" fill="#8a93a6" font-size="12">출발</text>'
+        +'<text x="255" y="30" fill="#8a93a6" font-size="12">도착</text>'
+        +'<text x="160" y="82" fill="#e8ecf6" font-size="12" text-anchor="middle">거리 '+cfg.dist+' · 시간 '+cfg.time+'</text>'
+        +'</svg>';
+    }
+    function render(){
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="stage" style="padding:4px 0">'+svg()+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:8px">'
+        +'<button class="btn" data-s="-10">−10</button><button class="btn" data-s="-1">−1</button>'
+        +'<div class="val" style="font-size:26px;width:96px;height:56px">'+val+' <span style="font-size:12px;color:#8a93a6">'+cfg.unit+'</span></div>'
+        +'<button class="btn" data-s="1">＋1</button><button class="btn" data-s="10">＋10</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="sp-lever">🔓 잠금 레버</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-s]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val + (+b.dataset.s))); SFX.click(); render(); return; }
+      if(ev.target.closest('#sp-lever')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 속력이 맞아떨어지며 계기판이 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='바늘이 흔들린다. 거리와 시간의 관계를 다시 보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='버튼으로 눈금을 맞춘 뒤 레버를 당기자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.speed.config(d);
+      T('speed '+d+': 정답이 범위 안(0~max)', c.ans>0 && c.ans<=c.max);
+      T('speed '+d+': 정답 계산 일치', {easy:100/20, mid:8*6, hard:90/1.5}[d]===c.ans);
+      T('speed '+d+': 오답은 안 열림', (c.ans+1)!==c.ans);
+      T('speed '+d+': 힌트 2개', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+// [2] 옴의 법칙 V = I × R
+registerAddon({
+  id:'ohm', name:'옴의 법칙 회로', icon:'⚡', digit:'3',
+  glyph:'Ω', color:0xffd76a, recolor:0x33280a,
+  discover:'전지와 저항이 이어진 회로 자물쇠. 전압·전류·저항 세 값의 관계를 맞춰야 전류가 흐른다.',
+  reward:'전류계 바늘이 가리킨 숫자',
+  curri:{ easy:'중2 과학 · 옴의 법칙', mid:'중2 과학 · 옴의 법칙', hard:'중2 과학 · 옴의 법칙' },
+  config:function(diff){
+    if(diff==='easy') return { q:'전압 12 V, 저항 4 Ω인 회로에 흐르는 전류는 몇 A일까?',
+      given:'V = 12 V · R = 4 Ω', find:'전류 I', unit:'A', ans:3, max:20,
+      desc:'옴의 법칙 V = I × R. 구하려는 값의 눈금을 맞추고 스위치를 올리자.',
+      curri:'중2 과학 · 옴의 법칙',
+      hints:['I = V ÷ R.','12 ÷ 4 = 3.'] };
+    if(diff==='mid') return { q:'전류 2 A가 흐르고 저항이 5 Ω일 때 전압은 몇 V일까?',
+      given:'I = 2 A · R = 5 Ω', find:'전압 V', unit:'V', ans:10, max:30,
+      desc:'옴의 법칙 V = I × R. 구하려는 값의 눈금을 맞추고 스위치를 올리자.',
+      curri:'중2 과학 · 옴의 법칙',
+      hints:['V = I × R.','2 × 5 = 10.'] };
+    return { q:'전압 9 V일 때 전류가 3 A 흘렀다. 저항은 몇 Ω일까?',
+      given:'V = 9 V · I = 3 A', find:'저항 R', unit:'Ω', ans:3, max:20,
+      desc:'옴의 법칙 V = I × R. 구하려는 값의 눈금을 맞추고 스위치를 올리자.',
+      curri:'중2 과학 · 옴의 법칙',
+      hints:['R = V ÷ I.','9 ÷ 3 = 3.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function svg(){
+      return '<svg viewBox="0 0 320 100" style="width:100%">'
+        +'<rect x="30" y="30" width="260" height="50" rx="6" fill="none" stroke="#2a3350" stroke-width="3"/>'
+        +'<line x1="45" y1="22" x2="45" y2="38" stroke="#ffd76a" stroke-width="4"/>'
+        +'<line x1="55" y1="16" x2="55" y2="44" stroke="#ffd76a" stroke-width="2"/>'
+        +'<text x="34" y="14" fill="#8a93a6" font-size="11">전지</text>'
+        +'<rect x="150" y="22" width="60" height="16" rx="3" fill="#101632" stroke="#6aa8ff"/>'
+        +'<text x="180" y="34" fill="#e8ecf6" font-size="10" text-anchor="middle">저항</text>'
+        +'<circle cx="180" cy="80" r="12" fill="#101632" stroke="#5fd39a"/>'
+        +'<text x="180" y="84" fill="#5fd39a" font-size="11" text-anchor="middle">A</text>'
+        +'<text x="160" y="98" fill="#8a93a6" font-size="11" text-anchor="middle">주어진 값: '+cfg.given+'</text>'
+        +'</svg>';
+    }
+    function render(){
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="stage" style="padding:4px 0">'+svg()+'</div>'
+        +'<div style="text-align:center;color:#8a93a6;font-size:12px">구할 값: '+cfg.find+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:8px">'
+        +'<button class="btn" data-s="-10">−10</button><button class="btn" data-s="-1">−1</button>'
+        +'<div class="val" style="font-size:26px;width:96px;height:56px">'+val+' <span style="font-size:12px;color:#8a93a6">'+cfg.unit+'</span></div>'
+        +'<button class="btn" data-s="1">＋1</button><button class="btn" data-s="10">＋10</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="ohm-sw">🔌 스위치 올리기</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-s]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val + (+b.dataset.s))); SFX.click(); render(); return; }
+      if(ev.target.closest('#ohm-sw')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='전류가 흐르며 회로 잠금이 풀렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='전류계 바늘이 어긋난다. V = I × R을 다시 보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='구할 값의 눈금을 맞춘 뒤 스위치를 올리자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.ohm.config(d);
+      T('ohm '+d+': 정답이 범위 안(0~max)', c.ans>0 && c.ans<=c.max);
+      T('ohm '+d+': V=IR 관계 일치', {easy:12/4, mid:2*5, hard:9/3}[d]===c.ans);
+      T('ohm '+d+': 오답은 안 열림', (c.ans+1)!==c.ans);
+      T('ohm '+d+': 힌트 2개', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+// [3] 자석·자기장 — 극 배열 맞추기 (다른 극 인력 · 같은 극 척력)
+registerAddon({
+  id:'magnet', name:'자석 극 정렬', icon:'🧲', digit:'4',
+  glyph:'🧲', color:0xff6b6b, recolor:0x330f0f,
+  discover:'천장에 자석 극이 고정된 실험대. 아래 자석의 극을 뒤집어 붙거나 밀어내게 맞춰야 열린다.',
+  reward:'제자리에 붙은 자석 위로 떠오른 숫자',
+  curri:{ easy:'초3 과학 · 자석의 성질', mid:'중2 과학 · 자기장', hard:'중2 과학 · 자기장' },
+  config:function(diff){
+    // ceiling: 천장 자석이 아래로 향한 극. goal: attract(붙기) / repel(밀기)
+    // 정답 위쪽 극: attract이면 반대 극, repel이면 같은 극
+    if(diff==='easy') return {
+      slots:[{ceiling:'N',goal:'attract'},{ceiling:'S',goal:'attract'},{ceiling:'N',goal:'attract'}],
+      curri:'초3 과학 · 자석의 성질',
+      desc:'다른 극끼리는 서로 끌어당긴다. 모든 자석이 천장에 붙도록 극을 뒤집자.',
+      hints:['N극과 S극은 서로 끌어당긴다(인력).','천장이 N이면 붙으려면 위쪽을 S로.'] };
+    if(diff==='mid') return {
+      slots:[{ceiling:'S',goal:'attract'},{ceiling:'N',goal:'attract'},{ceiling:'N',goal:'attract'},{ceiling:'S',goal:'attract'}],
+      curri:'중2 과학 · 자기장',
+      desc:'네 자석이 모두 천장에 붙도록 위쪽 극을 하나씩 맞추자.',
+      hints:['다른 극이 마주 봐야 붙는다(인력).','천장 극의 반대 극을 위로 향하게.'] };
+    return {
+      slots:[{ceiling:'N',goal:'attract'},{ceiling:'S',goal:'repel'},{ceiling:'N',goal:'repel'},{ceiling:'S',goal:'attract'}],
+      curri:'중2 과학 · 자기장',
+      desc:'붙이기(인력)와 밀어내기(척력)가 섞여 있다. 표시대로 극을 맞추자.',
+      hints:['같은 극끼리는 밀어낸다(척력), 다른 극끼리는 끌어당긴다(인력).','밀어내려면 천장과 같은 극을, 붙이려면 반대 극을 위로.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false;
+    function opp(p){ return p==='N'?'S':'N'; }
+    function want(s){ return s.goal==='attract' ? opp(s.ceiling) : s.ceiling; }
+    var up=cfg.slots.map(function(){ return 'N'; }); // 초기값(대부분 미해결)
+    function poleColor(p){ return p==='N' ? '#ff6b6b' : '#6aa8ff'; }
+    function svg(){
+      var n=cfg.slots.length, w=300, colW=w/n, s='<svg viewBox="0 0 300 150" style="width:100%">';
+      s+='<rect x="0" y="4" width="300" height="14" fill="#101632" stroke="#2a3350"/>';
+      s+='<text x="150" y="15" fill="#8a93a6" font-size="10" text-anchor="middle">천장</text>';
+      for(var i=0;i<n;i++){
+        var cx=colW*i+colW/2, cp=cfg.slots[i].ceiling, ok=(up[i]===want(cfg.slots[i]));
+        // 천장 자석(아래 향한 극)
+        s+='<rect x="'+(cx-18)+'" y="20" width="36" height="20" rx="3" fill="'+poleColor(cp)+'" opacity="0.85"/>';
+        s+='<text x="'+cx+'" y="34" fill="#0b0f1e" font-size="12" font-weight="bold" text-anchor="middle">'+cp+'</text>';
+        // 상태 아이콘
+        s+='<text x="'+cx+'" y="62" font-size="14" text-anchor="middle">'+(ok?'🟢':'⚪')+'</text>';
+        // 목표 라벨
+        s+='<text x="'+cx+'" y="80" fill="'+(cfg.slots[i].goal==='attract'?'#5fd39a':'#ffd76a')+'" font-size="10" text-anchor="middle">'+(cfg.slots[i].goal==='attract'?'붙이기':'밀기')+'</text>';
+        // 아래 자석(위쪽 극) — 클릭으로 뒤집기
+        s+='<g data-slot="'+i+'" style="cursor:pointer">';
+        s+='<rect x="'+(cx-18)+'" y="90" width="36" height="40" rx="4" fill="#101632" stroke="'+poleColor(up[i])+'" stroke-width="2"/>';
+        s+='<rect x="'+(cx-18)+'" y="90" width="36" height="20" rx="4" fill="'+poleColor(up[i])+'" opacity="0.85"/>';
+        s+='<text x="'+cx+'" y="105" fill="#0b0f1e" font-size="12" font-weight="bold" text-anchor="middle">'+up[i]+'</text>';
+        s+='<text x="'+cx+'" y="125" fill="'+poleColor(opp(up[i]))+'" font-size="11" font-weight="bold" text-anchor="middle">'+opp(up[i])+'</text>';
+        s+='</g>';
+      }
+      s+='<text x="150" y="146" fill="#8a93a6" font-size="10" text-anchor="middle">자석을 눌러 위·아래 극을 뒤집기</text>';
+      s+='</svg>';
+      return s;
+    }
+    function render(){
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:13px;color:#cbd3e6">'+cfg.desc+'</div>'
+        +'<div class="stage" style="padding:4px 0">'+svg()+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="mg-lock">🔓 정렬 확인</button></div></div>';
+    }
+    function allOk(){ return cfg.slots.every(function(s,i){ return up[i]===want(s); }); }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var g=ev.target.closest('[data-slot]');
+      if(g){ var i=+g.dataset.slot; up[i]=opp(up[i]); SFX.click(); render(); return; }
+      if(ev.target.closest('#mg-lock')){
+        if(allOk()){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='모든 자석이 제자리에 맞아 잠금이 풀렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='아직 어긋난 자석이 있다. 인력·척력을 다시 보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='자석을 눌러 극을 뒤집고, 목표(붙이기/밀기)에 맞추자.';
+  },
+  selftest:function(T){
+    function opp(p){ return p==='N'?'S':'N'; }
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.magnet.config(d);
+      var sol=c.slots.map(function(s){ return s.goal==='attract'?opp(s.ceiling):s.ceiling; });
+      // 정답이 규칙(인력=반대극, 척력=같은극)과 일치
+      var ruleOk=c.slots.every(function(s,i){
+        return s.goal==='attract' ? sol[i]!==s.ceiling : sol[i]===s.ceiling;
+      });
+      T('magnet '+d+': 정답이 인력/척력 규칙과 일치', ruleOk);
+      // 초기값(모두 N)이 정답과 달라 바로 안 열림
+      var initAllOk=c.slots.every(function(s,i){ return 'N'===sol[i]; });
+      T('magnet '+d+': 초기 상태로는 안 열림', !initAllOk);
+      // 한 칸만 뒤집으면 실패
+      var flipped=sol.slice(); flipped[0]=opp(flipped[0]);
+      var brokenOk=c.slots.every(function(s,i){ return flipped[i]===sol[i]; });
+      T('magnet '+d+': 한 극만 뒤집으면 실패', !brokenOk);
+      T('magnet '+d+': 힌트 2개', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+// [4] 소리·파동 — 진동수(높낮이)·진폭(크기)·파장
+registerAddon({
+  id:'sound', name:'파형 조율기', icon:'🔊', digit:'6',
+  glyph:'〰️', color:0x5fd39a, recolor:0x0e2a1e,
+  discover:'목표 소리의 파형이 흐릿하게 새겨진 조율기. 진동수와 진폭을 맞춰 파형을 포개야 열린다.',
+  reward:'파형이 겹친 자리에 떠오른 숫자',
+  curri:{ easy:'초3 과학 · 소리의 성질', mid:'중1 과학 · 파동', hard:'중1 과학 · 파장과 진동수' },
+  config:function(diff){
+    if(diff==='easy') return {
+      q:'목표 소리: 1초에 4번 진동하고, 진폭(크기)은 50. 진동수와 진폭을 맞추자.',
+      startFreq:2, startAmp:20, tFreq:4, tAmp:50, freqMax:8, ampMax:80,
+      curri:'초3 과학 · 소리의 성질',
+      desc:'진동수가 클수록 높은 소리, 진폭이 클수록 큰 소리다.',
+      hints:['높낮이는 진동수, 소리 크기는 진폭이 정한다.','목표는 진동수 4, 진폭 50.'] };
+    if(diff==='mid') return {
+      q:'지금 소리(진동수 2)보다 두 배 높은 소리를 만들자. 크기(진폭 40)는 그대로 둔다.',
+      startFreq:2, startAmp:40, tFreq:4, tAmp:40, freqMax:8, ampMax:80,
+      curri:'중1 과학 · 파동',
+      desc:'두 배 높은 소리는 진동수가 두 배다. 진폭은 소리 크기라 그대로.',
+      hints:['소리를 높이려면 진동수만 올린다.','2의 두 배는 4, 진폭은 40 유지.'] };
+    return {
+      q:'파장을 절반으로 줄이고 소리 크기도 절반으로 줄이자. (지금 진동수 3, 진폭 60)',
+      startFreq:3, startAmp:60, tFreq:6, tAmp:30, freqMax:10, ampMax:80,
+      curri:'중1 과학 · 파장과 진동수',
+      desc:'파장과 진동수는 반비례. 파장이 절반이면 진동수는 두 배가 된다.',
+      hints:['파장이 절반이 되면 진동수는 두 배(3→6).','소리 크기 절반은 진폭 절반(60→30).'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false, freq=cfg.startFreq, amp=cfg.startAmp;
+    function wave(f, a, color, opacity){
+      var W=300, midY=55, pts=[];
+      for(var x=0;x<=W;x+=4){
+        var y=midY - a*Math.sin(2*Math.PI*f*x/W);
+        pts.push(x.toFixed(0)+','+y.toFixed(1));
+      }
+      return '<polyline points="'+pts.join(' ')+'" fill="none" stroke="'+color+'" stroke-width="2" opacity="'+opacity+'"/>';
+    }
+    function svg(){
+      return '<svg viewBox="0 0 300 110" style="width:100%">'
+        +'<line x1="0" y1="55" x2="300" y2="55" stroke="#2a3350" stroke-width="1"/>'
+        +wave(cfg.tFreq, cfg.tAmp, '#ffd76a', '0.4')
+        +wave(freq, amp, '#5fd39a', '1')
+        +'<text x="6" y="14" fill="#ffd76a" font-size="10" opacity="0.7">목표 파형</text>'
+        +'<text x="230" y="14" fill="#5fd39a" font-size="10">내 파형</text>'
+        +'<text x="150" y="105" fill="#8a93a6" font-size="10" text-anchor="middle">진동수 '+freq+' · 진폭 '+amp+'</text>'
+        +'</svg>';
+    }
+    function render(){
+      stage.innerHTML='<div class="cab">'
+        +'<div class="log-box" style="font-size:13px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="stage" style="padding:4px 0">'+svg()+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:8px">'
+        +'<span style="color:#8a93a6;font-size:12px;width:52px">진동수</span>'
+        +'<button class="btn" data-f="-1">−</button>'
+        +'<div class="val" style="font-size:20px;width:48px;height:40px">'+freq+'</div>'
+        +'<button class="btn" data-f="1">＋</button></div>'
+        +'<div class="seq-row" style="justify-content:center;gap:8px">'
+        +'<span style="color:#8a93a6;font-size:12px;width:52px">진폭</span>'
+        +'<button class="btn" data-a="-10">−</button>'
+        +'<div class="val" style="font-size:20px;width:48px;height:40px">'+amp+'</div>'
+        +'<button class="btn" data-a="10">＋</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="snd-lock">🔓 파형 맞추기</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var bf=ev.target.closest('[data-f]'), ba=ev.target.closest('[data-a]');
+      if(bf){ freq=Math.max(1, Math.min(cfg.freqMax, freq + (+bf.dataset.f))); SFX.click(); render(); return; }
+      if(ba){ amp=Math.max(0, Math.min(cfg.ampMax, amp + (+ba.dataset.a))); SFX.click(); render(); return; }
+      if(ev.target.closest('#snd-lock')){
+        if(freq===cfg.tFreq && amp===cfg.tAmp){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='두 파형이 포개지며 조율기가 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='파형이 어긋난다. 진동수는 높낮이, 진폭은 크기다.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='진동수와 진폭을 조절해 목표 파형에 포개자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.sound.config(d);
+      T('sound '+d+': 목표가 범위 안', c.tFreq>=1 && c.tFreq<=c.freqMax && c.tAmp>=0 && c.tAmp<=c.ampMax);
+      T('sound '+d+': 시작값과 목표가 다름', c.startFreq!==c.tFreq || c.startAmp!==c.tAmp);
+      // 개념 값 검증: mid=진동수 두 배, hard=진동수 두 배·진폭 절반
+      if(d==='mid'){ T('sound mid: 두 배 높은 소리(진동수 2배)', c.tFreq===c.startFreq*2 && c.tAmp===c.startAmp); }
+      if(d==='hard'){ T('sound hard: 파장 절반→진동수 2배, 진폭 절반', c.tFreq===c.startFreq*2 && c.tAmp===c.startAmp/2); }
+      T('sound '+d+': 힌트 2개', Array.isArray(c.hints) && c.hints.length>=2);
+    });
+  }
+});
+
+// [수학 대수·함수 A] ratio / graph / lcm / factorize
+registerAddon({
+  id:'ratio', name:'비례식 자물쇠', icon:'⚖️', digit:'6',
+  glyph:'a:b', color:0xffd76a, recolor:0x2a2410,
+  discover:'네 칸으로 나뉜 비례식 자물쇠. 빈 항을 십자곱으로 맞추면 열린다.',
+  reward:'비례식이 균형을 이룬 자리에 드러난 숫자',
+  curri:{ easy:'초6 수학 · 비와 비율', mid:'초6 수학 · 비례식', hard:'중2 수학 · 닮음비 응용' },
+  config:function(diff){
+    function make(a,b,c,curri,q,hints,max){
+      var ans=b*c/a;
+      return { a:a, b:b, c:c, ans:ans, max:max, q:q, curri:curri, hints:hints,
+        check:function(v){ return a*v===b*c; } };
+    }
+    if(diff==='easy') return make(2,3,4,'초6 수학 · 비와 비율',
+      '2 : 3 = 4 : ? 를 만족하는 ? 를 맞춰라.',
+      ['십자로 곱해 서로 같게 만든다. 2 × ? = 3 × 4.','3 × 4 = 12, 12 ÷ 2 = 6.'], 20);
+    if(diff==='mid') return make(5,8,15,'초6 수학 · 비례식',
+      '비례식 5 : 8 = 15 : ? 의 빈 항을 찾아라.',
+      ['바깥쪽 곱과 안쪽 곱이 같다. 5 × ? = 8 × 15.','8 × 15 = 120, 120 ÷ 5 = 24.'], 40);
+    return make(3,5,12,'중2 수학 · 닮음비 응용',
+      '닮은 두 도형의 닮음비가 3 : 5 이다. 작은 도형의 한 변이 12일 때 큰 도형의 대응변은? (3 : 5 = 12 : ?)',
+      ['대응변의 비가 곧 닮음비다. 3 : 5 = 12 : ?.','3 × ? = 5 × 12 = 60, 60 ÷ 3 = 20.'], 40);
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function render(){
+      var left=cfg.a*val, right=cfg.b*cfg.c;
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:10px;font-size:26px;color:#ffd76a">'
+        +'<span>'+cfg.a+'</span><span style="color:#8a93a6">:</span><span>'+cfg.b+'</span>'
+        +'<span style="color:#8a93a6">=</span><span>'+cfg.c+'</span><span style="color:#8a93a6">:</span>'
+        +'<span class="val" style="display:inline-flex;width:56px;height:50px;font-size:24px">'+val+'</span></div>'
+        +'<div class="seq-row" style="justify-content:center;gap:18px"><button class="btn" data-rv="-1">−</button>'
+        +'<button class="btn" data-rv="1">＋</button></div>'
+        +'<div class="log-box" style="text-align:center;color:'+(left===right?'#5fd39a':'#8a93a6')+'">'
+        +'십자곱  '+cfg.a+' × '+val+' = '+left+'   vs   '+cfg.b+' × '+cfg.c+' = '+right+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="rat-go">🔓 비례식 맞추기</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-rv]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val + (+b.dataset.rv))); SFX.click(); render(); return; }
+      if(ev.target.closest('#rat-go')){
+        if(cfg.check(val)){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 안쪽 곱과 바깥쪽 곱이 같아지며 자물쇠가 풀렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='두 곱이 아직 다르다. 십자곱을 같게 맞추자.'; }
+      }
+    });
+    render(); status.className='status-line info'; status.textContent='＋ − 로 빈 항을 맞춘 뒤 버튼을 누르자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.ratio.config(d);
+      T('ratio '+d+': 정답이 풀린다', c.check(c.ans)===true);
+      T('ratio '+d+': 오답이 막힌다', c.check(c.ans+1)===false && c.check(0)===false);
+      T('ratio '+d+': 십자곱 개념 일치(a·ans=b·c)', c.a*c.ans===c.b*c.c);
+      T('ratio '+d+': 힌트 2개+범위', c.hints.length>=2 && c.ans<=c.max);
+    });
+    T('ratio easy: ans=6', PUZZLES.ratio.config('easy').ans===6);
+    T('ratio mid: ans=24', PUZZLES.ratio.config('mid').ans===24);
+    T('ratio hard: ans=20', PUZZLES.ratio.config('hard').ans===20);
+  }
+});
+registerAddon({
+  id:'graph', name:'좌표 패널', icon:'📈', digit:'2',
+  glyph:'x,y', color:0x6aa8ff, recolor:0x101a30,
+  discover:'격자무늬가 그려진 좌표 패널. 정확한 점을 찍어야 잠금이 풀린다.',
+  reward:'점이 맞아떨어진 격자 위에 뜬 숫자',
+  curri:{ easy:'중1 수학 · 좌표평면', mid:'중2 수학 · 일차함수', hard:'중2 수학 · 일차함수 그래프' },
+  config:function(diff){
+    if(diff==='easy'){ var tx=2, ty=3;
+      return { mode:'point', tgt:{x:tx,y:ty}, min:-5, max:5, curri:'중1 수학 · 좌표평면',
+        q:'점 P(2, 3) 의 자리에 점을 찍어라. 가로가 x, 세로가 y.',
+        hints:['원점에서 오른쪽으로 x칸(2), 위로 y칸(3) 간 자리다.','오른쪽 2, 위 3 이 만나는 점.'],
+        check:function(p){ return p.x===tx && p.y===ty; } };
+    }
+    if(diff==='mid'){ var a=2, b=-1, rx=3, ry=a*rx+b;
+      return { mode:'line', a:a, b:b, tgt:{x:rx,y:ry}, min:-5, max:5, curri:'중2 수학 · 일차함수',
+        q:'직선 y = 2x − 1 위의 점 가운데 x가 3인 점을 찍어라.',
+        hints:['x에 3을 넣는다. y = 2×3 − 1.','y = 6 − 1 = 5 이므로 (3, 5).'],
+        lines:[{a:a,b:b}],
+        check:function(p){ return p.x===rx && p.y===a*p.x+b; } };
+    }
+    var a1=1, b1=1, a2=-1, b2=5; var ix=(b2-b1)/(a1-a2), iy=a1*ix+b1;
+    return { mode:'cross', tgt:{x:ix,y:iy}, min:-5, max:5, curri:'중2 수학 · 일차함수 그래프',
+      q:'두 직선 y = x + 1 과 y = −x + 5 가 만나는 점을 찍어라.',
+      hints:['두 직선의 y가 같아지는 x를 찾는다. x + 1 = −x + 5.','2x = 4, x = 2 이므로 y = 3. 교점 (2, 3).'],
+      lines:[{a:a1,b:b1},{a:a2,b:b2}],
+      check:function(p){ return p.y===a1*p.x+b1 && p.y===a2*p.x+b2; } };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var lo=cfg.min, hi=cfg.max, U=28, O=180;
+    function px(x){ return O + x*U; }
+    function py(y){ return O - y*U; }
+    var sel=null, done=false;
+    function svg(){
+      var s='<svg viewBox="0 0 360 360" style="width:100%;max-width:340px">', i, j;
+      for(i=lo;i<=hi;i++){
+        s+='<line x1="'+px(i)+'" y1="'+py(lo)+'" x2="'+px(i)+'" y2="'+py(hi)+'" stroke="#2a3350" stroke-width="1"/>';
+        s+='<line x1="'+px(lo)+'" y1="'+py(i)+'" x2="'+px(hi)+'" y2="'+py(i)+'" stroke="#2a3350" stroke-width="1"/>';
+      }
+      s+='<line x1="'+px(lo)+'" y1="'+py(0)+'" x2="'+px(hi)+'" y2="'+py(0)+'" stroke="#8a93a6" stroke-width="1.6"/>';
+      s+='<line x1="'+px(0)+'" y1="'+py(lo)+'" x2="'+px(0)+'" y2="'+py(hi)+'" stroke="#8a93a6" stroke-width="1.6"/>';
+      if(cfg.lines){ cfg.lines.forEach(function(ln){
+        s+='<line x1="'+px(lo)+'" y1="'+py(ln.a*lo+ln.b)+'" x2="'+px(hi)+'" y2="'+py(ln.a*hi+ln.b)+'" stroke="#6aa8ff" stroke-width="2"/>';
+      }); }
+      for(i=lo;i<=hi;i++){ for(j=lo;j<=hi;j++){
+        var on=sel && sel.x===i && sel.y===j;
+        s+='<circle data-gx="'+i+'" data-gy="'+j+'" cx="'+px(i)+'" cy="'+py(j)+'" r="'+(on?6:8)+'" fill="'+(on?'#ffd76a':'rgba(255,255,255,0.01)')+'" stroke="'+(on?'#ffd76a':'none')+'" style="cursor:pointer"/>';
+      }}
+      return s+'</svg>';
+    }
+    function render(){
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="text-align:center">'+svg()+'</div>'
+        +'<div class="status-line info" style="text-align:center">선택한 점: '+(sel?('('+sel.x+', '+sel.y+')'):'없음')+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="grf-go">🔓 여기에 찍기</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var c=ev.target.closest('[data-gx]');
+      if(c){ sel={x:+c.dataset.gx, y:+c.dataset.gy}; SFX.click(); render(); return; }
+      if(ev.target.closest('#grf-go')){
+        if(sel && cfg.check(sel)){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 좌표가 맞아떨어지며 패널이 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='그 자리가 아니다. 좌표를 다시 읽어보자.'; }
+      }
+    });
+    render(); status.className='status-line info'; status.textContent='격자의 점을 눌러 고른 뒤 버튼을 누르자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.graph.config(d);
+      T('graph '+d+': 목표 좌표가 풀린다', c.check(c.tgt)===true);
+      T('graph '+d+': 빗나간 점은 막힌다', c.check({x:c.tgt.x+1,y:c.tgt.y})===false && c.check({x:c.tgt.x,y:c.tgt.y+1})===false);
+      T('graph '+d+': 힌트 2개', c.hints.length>=2);
+    });
+    var m=PUZZLES.graph.config('mid');
+    T('graph mid: 목표가 직선 위(y=ax+b)', m.tgt.y===m.a*m.tgt.x+m.b && m.tgt.x===3 && m.tgt.y===5);
+    var h=PUZZLES.graph.config('hard');
+    T('graph hard: 교점이 두 직선 위', h.tgt.y===h.lines[0].a*h.tgt.x+h.lines[0].b && h.tgt.y===h.lines[1].a*h.tgt.x+h.lines[1].b && h.tgt.x===2 && h.tgt.y===3);
+  }
+});
+registerAddon({
+  id:'lcm', name:'톱니바퀴 자물쇠', icon:'⚙️', digit:'4',
+  glyph:'⚙', color:0x5fd39a, recolor:0x0f2a20,
+  discover:'맞물린 두 톱니바퀴 자물쇠. 다시 처음처럼 맞물리는 주기를 알아야 열린다.',
+  reward:'톱니가 다시 맞물린 축에 새겨진 숫자',
+  curri:{ easy:'초5 수학 · 최대공약수', mid:'초5 수학 · 최소공배수', hard:'초5 수학 · 최소공배수 활용' },
+  config:function(diff){
+    function gcd(a,b){ while(b){ var t=a%b; a=b; b=t; } return a; }
+    function lcm(a,b){ return a*b/gcd(a,b); }
+    if(diff==='easy'){ var m=12, n=18, ans=gcd(m,n);
+      return { kind:'gcd', m:m, n:n, ans:ans, max:20, curri:'초5 수학 · 최대공약수',
+        q:'두 수 12 와 18 의 최대공약수를 다이얼로 맞춰라.',
+        hints:['두 수를 함께 나누는 가장 큰 수다. 12=2×2×3, 18=2×3×3.','공통은 2×3 = 6.'],
+        check:function(v){ return v===ans; } };
+    }
+    if(diff==='mid'){ var A=8, B=12, L=lcm(A,B), ans2=L/A;
+      return { kind:'gear', A:A, B:B, L:L, ans:ans2, max:12, curri:'초5 수학 · 최소공배수',
+        q:'톱니 8 개와 12 개인 두 톱니바퀴다. 처음처럼 다시 맞물리려면 작은(8개) 톱니바퀴는 몇 바퀴 돌아야 할까?',
+        hints:['맞물린 톱니 수가 8과 12의 공배수가 되어야 한다. 최소공배수는 24.','24 ÷ 8 = 3 바퀴.'],
+        check:function(v){ return v===ans2; } };
+    }
+    var A2=6, B2=9, L2=lcm(A2,B2);
+    return { kind:'gear', A:A2, B:B2, L:L2, ans:L2, max:40, curri:'초5 수학 · 최소공배수 활용',
+      q:'톱니 6 개와 9 개인 두 톱니바퀴가 처음 자리에서 다시 맞물릴 때까지, 지나가는 톱니는 모두 몇 개일까?',
+      hints:['6과 9의 공배수만큼 맞물려야 한다. 최소공배수를 찾자.','6=2×3, 9=3×3 → 최소공배수 18.'],
+      check:function(v){ return v===L2; } };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function gear(cx,cy,r,teeth,col){
+      var s='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#101632" stroke="'+col+'" stroke-width="2"/>';
+      for(var k=0;k<teeth;k++){ var ang=k/teeth*Math.PI*2;
+        var x1=cx+Math.cos(ang)*r, y1=cy+Math.sin(ang)*r, x2=cx+Math.cos(ang)*(r+6), y2=cy+Math.sin(ang)*(r+6);
+        s+='<line x1="'+x1.toFixed(1)+'" y1="'+y1.toFixed(1)+'" x2="'+x2.toFixed(1)+'" y2="'+y2.toFixed(1)+'" stroke="'+col+'" stroke-width="2"/>';
+      }
+      return s+'<text x="'+cx+'" y="'+(cy+4)+'" text-anchor="middle" fill="'+col+'" font-size="14">'+teeth+'</text>';
+    }
+    function render(){
+      var g='<svg viewBox="0 0 300 150" style="width:100%;max-width:300px">';
+      if(cfg.kind==='gear'){ g+=gear(95,75,40,cfg.A,'#ffd76a')+gear(200,75,52,cfg.B,'#6aa8ff'); }
+      else { g+='<text x="150" y="70" text-anchor="middle" fill="#e8ecf6" font-size="22">'+cfg.m+'   와   '+cfg.n+'</text>'
+        +'<text x="150" y="100" text-anchor="middle" fill="#8a93a6" font-size="13">최대공약수는?</text>'; }
+      g+='</svg>';
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="text-align:center">'+g+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:18px"><button class="btn" data-lv="-1">−</button>'
+        +'<div class="val" style="font-size:30px;width:70px;height:60px">'+val+'</div>'
+        +'<button class="btn" data-lv="1">＋</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="lcm-go">🔓 맞물림 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-lv]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val + (+b.dataset.lv))); SFX.click(); render(); return; }
+      if(ev.target.closest('#lcm-go')){
+        if(cfg.check(val)){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 톱니가 처음처럼 맞물리며 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='아직 맞물리지 않는다. 주기를 다시 세어보자.'; }
+      }
+    });
+    render(); status.className='status-line info'; status.textContent='＋ − 로 수를 맞춘 뒤 버튼을 누르자.';
+  },
+  selftest:function(T){
+    function gcd(a,b){ while(b){ var t=a%b; a=b; b=t; } return a; }
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.lcm.config(d);
+      T('lcm '+d+': 정답이 풀린다', c.check(c.ans)===true);
+      T('lcm '+d+': 오답이 막힌다', c.check(c.ans+1)===false && c.check(0)===false);
+      T('lcm '+d+': 힌트 2개+범위', c.hints.length>=2 && c.ans<=c.max);
+    });
+    var e=PUZZLES.lcm.config('easy'); T('lcm easy: gcd(12,18)=6', e.ans===gcd(12,18) && e.ans===6);
+    var m=PUZZLES.lcm.config('mid'); T('lcm mid: 작은톱니 회전수 = LCM/8 = 3', m.ans===m.L/m.A && m.ans===3);
+    var h=PUZZLES.lcm.config('hard'); T('lcm hard: LCM(6,9)=18', h.ans===18);
+  }
+});
+registerAddon({
+  id:'factorize', name:'소인수 자물쇠', icon:'🌳', digit:'8',
+  glyph:'×', color:0xb98ad0, recolor:0x2a1838,
+  discover:'소수 다이얼이 늘어선 자물쇠. 목표 수를 소수의 곱으로 분해해야 열린다.',
+  reward:'소인수의 곱이 맞물린 자리에 드러난 숫자',
+  curri:{ easy:'중1 수학 · 소인수분해', mid:'중1 수학 · 소인수분해', hard:'중1 수학 · 소인수분해' },
+  config:function(diff){
+    var opts=[1,2,3,5,7,11];
+    if(diff==='easy') return { N:12, slots:4, opts:opts, curri:'중1 수학 · 소인수분해',
+      q:'12 를 소수의 곱으로 분해하라. 칸을 눌러 소수를 바꾸고, 곱이 12 가 되게 하라.',
+      hints:['12 = 2 × 6 = 2 × 2 × 3.','2, 2, 3 을 고르고 남는 칸은 1 로 둔다.'],
+      check:function(a){ return a.reduce(function(p,x){return p*x;},1)===12; } };
+    if(diff==='mid') return { N:60, slots:5, opts:opts, curri:'중1 수학 · 소인수분해',
+      q:'60 을 소수의 곱으로 분해하라. 곱이 60 이 되게 소수를 고르자.',
+      hints:['60 = 2 × 30 = 2 × 2 × 15 = 2 × 2 × 3 × 5.','2, 2, 3, 5 를 고르고 남는 칸은 1.'],
+      check:function(a){ return a.reduce(function(p,x){return p*x;},1)===60; } };
+    return { N:180, slots:6, opts:opts, curri:'중1 수학 · 소인수분해',
+      q:'180 을 소수의 곱으로 분해하라. 곱이 180 이 되게 소수를 고르자.',
+      hints:['180 = 2 × 90 = 2 × 2 × 45 = 2 × 2 × 9 × 5.','2, 2, 3, 3, 5 를 고른다.'],
+      check:function(a){ return a.reduce(function(p,x){return p*x;},1)===180; } };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var pick=[]; for(var i=0;i<cfg.slots;i++) pick.push(0);
+    var done=false;
+    function vals(){ return pick.map(function(ix){ return cfg.opts[ix]; }); }
+    function prod(){ return vals().reduce(function(p,x){return p*x;},1); }
+    function render(){
+      var dials='', s;
+      for(s=0;s<cfg.slots;s++){
+        dials+='<div class="dial" data-fs="'+s+'" style="cursor:pointer;min-width:52px;text-align:center">'
+          +'<div class="val" style="font-size:24px">'+cfg.opts[pick[s]]+'</div></div>';
+        if(s<cfg.slots-1) dials+='<span style="align-self:center;color:#8a93a6;font-size:20px">×</span>';
+      }
+      var p=prod();
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:8px;flex-wrap:wrap">'+dials+'</div>'
+        +'<div class="log-box" style="text-align:center;color:'+(p===cfg.N?'#5fd39a':'#8a93a6')+'">현재 곱 = '+p+'   /   목표 = '+cfg.N+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="fac-go">🔓 분해 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var d=ev.target.closest('[data-fs]');
+      if(d){ var s=+d.dataset.fs; pick[s]=(pick[s]+1)%cfg.opts.length; SFX.click(); render(); return; }
+      if(ev.target.closest('#fac-go')){
+        if(cfg.check(vals())){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 소인수의 곱이 맞아떨어지며 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='곱이 목표와 다르다. 소수를 다시 골라보자.'; }
+      }
+    });
+    render(); status.className='status-line info'; status.textContent='칸을 눌러 소수를 바꾸자. 곱이 목표수가 되면 열린다.';
+  },
+  selftest:function(T){
+    function isPrime(n){ if(n<2) return false; for(var i=2;i*i<=n;i++) if(n%i===0) return false; return true; }
+    function facs(n){ var f=[], d=2; while(n>1){ while(n%d===0){ f.push(d); n/=d; } d++; } return f; }
+    var expect={easy:12,mid:60,hard:180};
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.factorize.config(d);
+      var f=facs(c.N);
+      T('factorize '+d+': 소인수분해가 풀린다', c.check(f)===true);
+      T('factorize '+d+': 인수가 모두 소수', f.every(isPrime));
+      T('factorize '+d+': 곱이 목표수 '+c.N, f.reduce(function(p,x){return p*x;},1)===c.N && c.N===expect[d]);
+      T('factorize '+d+': 오답이 막힌다', c.check(f.concat([2]))===false && c.check([1])===false);
+      T('factorize '+d+': 힌트 2개', c.hints.length>=2);
+    });
+  }
+});
+
+// ===== 화학 애드온 4종: separate / solubility / density / massbalance =====
+
+// ---- 1) 혼합물의 분리 ----
+registerAddon({
+  id:'separate', name:'혼합물의 분리', icon:'⚗️', digit:'2',
+  glyph:'⚗️', color:0x6aa8ff, recolor:0x0e1b33,
+  discover:'체·자석·거름·증발 장치가 늘어선 분리대. 섞인 물질을 성질에 맞는 방법으로 차례차례 갈라내야 열린다.',
+  reward:'마지막 물질이 분리되며 바닥에 드러난 숫자',
+  curri:{ easy:'초4 과학 · 혼합물의 분리', mid:'초4~중1 과학 · 혼합물의 분리', hard:'중1 과학 · 혼합물의 분리' },
+  config:function(diff){
+    var M={
+      mag:{id:'mag',label:'자석',icon:'🧲',removes:'iron'},
+      sie:{id:'sie',label:'체',icon:'🔲',removes:'big'},
+      flo:{id:'flo',label:'뜨는 것 건지기',icon:'🫧',removes:'float'},
+      fil:{id:'fil',label:'거름',icon:'💧',removes:'insoluble'},
+      eva:{id:'eva',label:'증발',icon:'♨️',removes:'soluble'}
+    };
+    var C={
+      iron:{name:'철가루',icon:'⚫',prop:'iron'},
+      sand:{name:'모래',icon:'🟫',prop:'insoluble'},
+      salt:{name:'소금',icon:'🧂',prop:'soluble'},
+      saw:{name:'톱밥',icon:'🪵',prop:'float'}
+    };
+    if(diff==='easy') return {
+      q:'모래와 소금이 물에 섞여 있다. 두 가지를 따로 얻으려면 어떤 방법을 어떤 순서로 써야 할까?',
+      comps:[C.sand,C.salt],
+      methods:[M.fil,M.eva,M.mag,M.sie],
+      curri:'초4 과학 · 혼합물의 분리',
+      hints:['소금은 물에 녹지만 모래는 안 녹는다. 먼저 안 녹는 것부터 걸러낸다.','거름으로 모래를 빼고, 남은 소금물을 증발시켜 소금을 얻는다.'] };
+    if(diff==='mid') return {
+      q:'철가루·모래·소금이 물과 함께 섞여 있다. 세 가지를 모두 분리하자.',
+      comps:[C.iron,C.sand,C.salt],
+      methods:[M.mag,M.fil,M.eva,M.sie],
+      curri:'초4~중1 과학 · 혼합물의 분리',
+      hints:['자석에 붙는 것이 하나 있다. 그것부터 뽑아낸다.','철가루는 자석, 모래는 거름, 소금은 증발. 안 녹는 모래를 먼저 거른 뒤 증발시킨다.'] };
+    return {
+      q:'철가루·톱밥·모래·소금이 물과 함께 섞여 있다. 네 가지를 모두 분리하자.',
+      comps:[C.iron,C.saw,C.sand,C.salt],
+      methods:[M.mag,M.flo,M.fil,M.eva],
+      curri:'중1 과학 · 혼합물의 분리',
+      hints:['자석에 붙는 철가루, 물에 뜨는 톱밥, 가라앉아 안 녹는 모래, 물에 녹는 소금. 성질이 모두 다르다.','자석 → 뜨는 것 건지기 → 거름 → 증발. 증발은 걸러낼 것이 남아 있으면 쓸 수 없다.'] };
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var remaining=cfg.comps.slice(), log=[], done=false;
+    function has(p){ return remaining.some(function(c){return c.prop===p;}); }
+    function need(m){
+      if(m.removes==='soluble') return !has('insoluble') && !has('float');
+      if(m.removes==='insoluble') return has('soluble');
+      if(m.removes==='float') return has('soluble');
+      return true;
+    }
+    function render(){
+      var comp=remaining.length? remaining.map(function(c){
+        return '<span class="val" style="width:auto;padding:4px 10px;height:auto;font-size:14px">'+c.icon+' '+c.name+'</span>'; }).join('')
+        : '<span class="val" style="width:auto;padding:4px 12px;height:auto;color:#5fd39a">모두 분리됨</span>';
+      var meth=cfg.methods.map(function(m){
+        return '<button class="btn" data-m="'+m.id+'">'+m.icon+' '+m.label+'</button>'; }).join('');
+      var seq=log.length? log.join('  →  ') : '아직 없음';
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="color:#8a93a6;font-size:12px;margin:8px 2px 2px">남은 물질</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:8px">'+comp+'</div>'
+        +'<div style="color:#8a93a6;font-size:12px;margin:10px 2px 2px">분리 방법</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:8px">'+meth+'</div>'
+        +'<div class="log-box" style="margin-top:10px;font-size:13px;color:#8a93a6">적용 순서: <span style="color:#ffd76a">'+seq+'</span></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-m]'); if(!b) return;
+      var m=null, id=b.dataset.m;
+      for(var i=0;i<cfg.methods.length;i++){ if(cfg.methods[i].id===id) m=cfg.methods[i]; }
+      if(!need(m)){ SFX.error(); status.className='status-line warn';
+        status.textContent='지금은 그 방법을 쓸 수 없다. 녹지 않고 남은 것이 있는지 보자.'; return; }
+      var before=remaining.length;
+      remaining=remaining.filter(function(c){ return c.prop!==m.removes; });
+      if(remaining.length===before){ SFX.error(); status.className='status-line warn';
+        status.textContent='그 방법으로는 걸러지는 것이 없다.'; return; }
+      SFX.click(); log.push(m.label);
+      if(remaining.length===0){ done=true; SFX.solve(); status.className='status-line ok';
+        status.textContent='딸깍 — 모든 물질이 성질대로 분리되며 자물쇠가 열렸다!'; render(); setTimeout(function(){api.solve();},900); return; }
+      status.className='status-line info'; status.textContent='좋다. 남은 물질을 마저 분리하자.'; render();
+    });
+    render();
+    status.className='status-line info'; status.textContent='물질의 성질에 맞는 방법을 순서대로 누르자.';
+  },
+  selftest:function(T){
+    function run(cfg, seq){
+      var rem=cfg.comps.slice();
+      function has(p){ return rem.some(function(c){return c.prop===p;}); }
+      function need(m){
+        if(m.removes==='soluble') return !has('insoluble') && !has('float');
+        if(m.removes==='insoluble'||m.removes==='float') return has('soluble');
+        return true;
+      }
+      for(var i=0;i<seq.length;i++){
+        var m=null; for(var j=0;j<cfg.methods.length;j++){ if(cfg.methods[j].id===seq[i]) m=cfg.methods[j]; }
+        if(!m||!need(m)) return false;
+        var before=rem.length;
+        rem=rem.filter(function(c){ return c.prop!==m.removes; });
+        if(rem.length===before) return false;
+      }
+      return rem.length===0;
+    }
+    var ok={ easy:['fil','eva'], mid:['mag','fil','eva'], hard:['mag','flo','fil','eva'] };
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.separate.config(d);
+      T('separate '+d+': 올바른 순서로 완전 분리', run(c, ok[d])===true);
+      T('separate '+d+': 증발부터 하면 실패', run(c, ['eva'].concat(ok[d]))===false);
+      T('separate '+d+': 빈 순서는 안 열림', run(c, [])===false);
+      T('separate '+d+': 힌트 2개', Array.isArray(c.hints)&&c.hints.length>=2);
+    });
+  }
+});
+
+// ---- 2) 용해도 ----
+registerAddon({
+  id:'solubility', name:'용해도 곡선', icon:'📈', digit:'7',
+  glyph:'📈', color:0x5fd39a, recolor:0x0e2a20,
+  discover:'온도에 따라 녹는 양이 달라지는 용해도 곡선판. 그래프를 읽어 맞는 양을 입력해야 열린다.',
+  reward:'곡선판 뒤에 새겨진 숫자',
+  curri:{ easy:'중1~2 과학 · 용해도 곡선 읽기', mid:'중2 과학 · 석출량', hard:'중2 과학 · 용해도와 냉각' },
+  config:function(diff){
+    var pts=[[0,15],[20,30],[40,60],[60,110],[80,170]]; // g / 물 100g
+    if(diff==='easy') return {
+      q:'물 100g에 이 물질을 40°C에서 최대로 녹이면 몇 g이 녹을까?',
+      pts:pts, marks:[40], ans:60, max:200, step:[10,1],
+      curri:'중1~2 과학 · 용해도 곡선 읽기',
+      hints:['40°C에서 곡선의 높이를 읽는다.','물 100g 기준 40°C 용해도는 60g이다.'] };
+    if(diff==='mid') return {
+      q:'60°C 물 100g에 최대로 녹인 포화용액을 20°C로 식히면 몇 g이 석출될까?',
+      pts:pts, marks:[20,60], ans:80, max:200, step:[10,1],
+      curri:'중2 과학 · 석출량',
+      hints:['석출량 = 60°C 용해도 − 20°C 용해도.','110 − 30 = 80(g).'] };
+    return {
+      q:'물 200g에 80°C에서 최대로 녹인 뒤 40°C로 식히면 몇 g이 석출될까?',
+      pts:pts, marks:[40,80], ans:220, max:400, step:[10,1],
+      curri:'중2 과학 · 용해도와 냉각',
+      hints:['물 100g당 석출량은 (80°C 용해도 − 40°C 용해도) = 170 − 60 = 110g.','물이 200g이면 110 × 2 = 220(g).'] };
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function xm(t){ return 42 + t/80*258; }
+    function ym(s){ return 182 - s/180*162; }
+    function svg(){
+      var line=cfg.pts.map(function(p){ return xm(p[0])+','+ym(p[1]); }).join(' ');
+      var s='<svg viewBox="0 0 320 210" style="width:100%;max-width:420px">';
+      s+='<rect x="0" y="0" width="320" height="210" fill="#101632"/>';
+      // grid + axes
+      s+='<line x1="42" y1="182" x2="310" y2="182" stroke="#2a3350"/>';
+      s+='<line x1="42" y1="182" x2="42" y2="18" stroke="#2a3350"/>';
+      [0,20,40,60,80].forEach(function(t){ s+='<text x="'+xm(t)+'" y="198" fill="#8a93a6" font-size="10" text-anchor="middle">'+t+'</text>'; });
+      [0,60,120,180].forEach(function(v){ s+='<text x="36" y="'+(ym(v)+3)+'" fill="#8a93a6" font-size="10" text-anchor="end">'+v+'</text>'; });
+      s+='<text x="176" y="209" fill="#8a93a6" font-size="10" text-anchor="middle">온도(°C)</text>';
+      s+='<text x="14" y="14" fill="#8a93a6" font-size="10">g/물100g</text>';
+      // mark lines
+      cfg.marks.forEach(function(t){
+        var sol; for(var i=0;i<cfg.pts.length;i++){ if(cfg.pts[i][0]===t) sol=cfg.pts[i][1]; }
+        s+='<line x1="'+xm(t)+'" y1="182" x2="'+xm(t)+'" y2="'+ym(sol)+'" stroke="#ffd76a" stroke-dasharray="3 3"/>';
+        s+='<line x1="42" y1="'+ym(sol)+'" x2="'+xm(t)+'" y2="'+ym(sol)+'" stroke="#ffd76a" stroke-dasharray="3 3"/>';
+        s+='<circle cx="'+xm(t)+'" cy="'+ym(sol)+'" r="3.5" fill="#ffd76a"/>';
+      });
+      s+='<polyline points="'+line+'" fill="none" stroke="#5fd39a" stroke-width="2"/>';
+      cfg.pts.forEach(function(p){ s+='<circle cx="'+xm(p[0])+'" cy="'+ym(p[1])+'" r="2.5" fill="#5fd39a"/>'; });
+      s+='</svg>';
+      return s;
+    }
+    function render(){
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="text-align:center;margin:6px 0">'+svg()+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:8px">'
+        +'<button class="btn" data-cv="-10">−10</button><button class="btn" data-cv="-1">−1</button>'
+        +'<div class="val" style="font-size:26px;width:88px;height:56px">'+val+'<span style="font-size:14px;color:#8a93a6">g</span></div>'
+        +'<button class="btn" data-cv="1">＋1</button><button class="btn" data-cv="10">＋10</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="sol-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-cv]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val+(+b.dataset.cv))); SFX.click(); render(); return; }
+      if(ev.target.closest('#sol-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 곡선을 정확히 읽었다. 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='곡선판이 반응하지 않는다. 값을 다시 읽어보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='노란 점선이 읽어야 할 지점이다. 값을 맞추고 확인.';
+  },
+  selftest:function(T){
+    var tbl={0:15,20:30,40:60,60:110,80:170};
+    var exp={ easy:tbl[40], mid:tbl[60]-tbl[20], hard:(tbl[80]-tbl[40])*2 };
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.solubility.config(d);
+      T('solubility '+d+': 정답이 개념 계산과 일치', c.ans===exp[d]);
+      T('solubility '+d+': 정답이 범위 안', c.ans>=0 && c.ans<=c.max);
+      T('solubility '+d+': 힌트 2개', Array.isArray(c.hints)&&c.hints.length>=2);
+    });
+    T('solubility easy 60 / mid 80 / hard 220',
+      PUZZLES.solubility.config('easy').ans===60 &&
+      PUZZLES.solubility.config('mid').ans===80 &&
+      PUZZLES.solubility.config('hard').ans===220);
+  }
+});
+
+// ---- 3) 밀도 ----
+registerAddon({
+  id:'density', name:'밀도 저울', icon:'⚖️', digit:'4',
+  glyph:'⚖️', color:0xffd76a, recolor:0x33280e,
+  discover:'물통 옆에 놓인 저울과 눈금실린더. 밀도를 따져 뜨고 가라앉는 것을 가려야 열린다.',
+  reward:'저울 받침에 나타난 숫자',
+  curri:{ easy:'중2 과학 · 물질의 특성(밀도)', mid:'중2 과학 · 밀도와 부력', hard:'중2 과학 · 밀도 비교' },
+  config:function(diff){
+    if(diff==='easy') return {
+      mode:'calc', q:'어떤 금속의 질량은 24g, 부피는 3cm³이다. 밀도는 몇 g/cm³일까?',
+      mass:24, vol:3, ans:8, max:20, curri:'중2 과학 · 물질의 특성(밀도)',
+      hints:['밀도 = 질량 ÷ 부피.','24 ÷ 3 = 8 (g/cm³).'] };
+    if(diff==='mid') return {
+      mode:'float', q:'각 물체가 물(밀도 1 g/cm³)에 뜰지 가라앉을지 정하자.',
+      objs:[{name:'나무 도막',icon:'🪵',mass:6,vol:12},
+            {name:'알루미늄',icon:'🔩',mass:27,vol:10},
+            {name:'얼음',icon:'🧊',mass:9,vol:10}],
+      curri:'중2 과학 · 밀도와 부력',
+      hints:['각 물체의 밀도 = 질량 ÷ 부피를 먼저 구한다.','밀도가 1보다 작으면 뜨고, 1보다 크면 가라앉는다.'] };
+    return {
+      mode:'order', q:'네 물질을 밀도가 작은 것부터 큰 것 순으로 놓자.',
+      objs:[{id:'al',name:'알루미늄',icon:'🔩',mass:27,vol:10},
+            {id:'fe',name:'철',icon:'⚙️',mass:39,vol:5},
+            {id:'sf',name:'스티로폼',icon:'⬜',mass:5,vol:50},
+            {id:'wd',name:'참나무',icon:'🪵',mass:30,vol:50}],
+      curri:'중2 과학 · 밀도 비교',
+      hints:['각 물질의 밀도 = 질량 ÷ 부피를 모두 구한다.','스티로폼 0.1, 참나무 0.6, 알루미늄 2.7, 철 7.8 순으로 커진다.'] };
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false;
+
+    if(cfg.mode==='calc'){
+      var val=0;
+      var render=function(){
+        stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+          +'<div class="seq-row" style="justify-content:center;gap:16px;margin:8px 0">'
+          +'<span class="val" style="width:auto;padding:6px 12px;height:auto">질량 '+cfg.mass+' g</span>'
+          +'<span class="val" style="width:auto;padding:6px 12px;height:auto">부피 '+cfg.vol+' cm³</span></div>'
+          +'<div class="seq-row" style="justify-content:center;gap:12px"><button class="btn" data-cv="-1">−</button>'
+          +'<div class="val" style="font-size:26px;width:96px;height:56px">'+val+'<span style="font-size:13px;color:#8a93a6"> g/cm³</span></div>'
+          +'<button class="btn" data-cv="1">＋</button></div>'
+          +'<div class="lever-row"><button class="btn primary" id="den-go">🔓 확인</button></div></div>';
+      };
+      stage.addEventListener('click', function(ev){
+        if(done) return;
+        var b=ev.target.closest('[data-cv]');
+        if(b){ val=Math.max(0, Math.min(cfg.max, val+(+b.dataset.cv))); SFX.click(); render(); return; }
+        if(ev.target.closest('#den-go')){
+          if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+            status.textContent='딸깍 — 밀도가 맞아떨어졌다. 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+          else { SFX.error(); status.className='status-line warn'; status.textContent='저울이 흔들린다. 질량 ÷ 부피를 다시 계산하자.'; }
+        }
+      });
+      render();
+      status.className='status-line info'; status.textContent='밀도 = 질량 ÷ 부피. 값을 맞추고 확인.';
+      return;
+    }
+
+    if(cfg.mode==='float'){
+      var sel={};
+      var render2=function(){
+        var rows=cfg.objs.map(function(o,i){
+          var f=sel[i]==='float', s=sel[i]==='sink';
+          return '<div class="seq-row" style="justify-content:space-between;align-items:center;margin:6px 0">'
+            +'<span class="val" style="width:auto;padding:6px 12px;height:auto">'+o.icon+' '+o.name+' <span style="color:#8a93a6;font-size:12px">('+o.mass+'g / '+o.vol+'cm³)</span></span>'
+            +'<span><button class="btn'+(f?' primary':'')+'" data-o="'+i+'" data-v="float">뜬다</button> '
+            +'<button class="btn'+(s?' primary':'')+'" data-o="'+i+'" data-v="sink">가라앉는다</button></span></div>';
+        }).join('');
+        stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+          +rows+'<div class="lever-row"><button class="btn primary" id="den-go2">🔓 확인</button></div></div>';
+      };
+      stage.addEventListener('click', function(ev){
+        if(done) return;
+        var b=ev.target.closest('[data-o]');
+        if(b){ sel[+b.dataset.o]=b.dataset.v; SFX.click(); render2(); return; }
+        if(ev.target.closest('#den-go2')){
+          var allSet=cfg.objs.every(function(o,i){ return sel[i]; });
+          if(!allSet){ SFX.error(); status.className='status-line warn'; status.textContent='모든 물체의 뜸/가라앉음을 정하자.'; return; }
+          var allOk=cfg.objs.every(function(o,i){ var d=o.mass/o.vol; return sel[i]===(d<1?'float':'sink'); });
+          if(allOk){ done=true; SFX.solve(); status.className='status-line ok';
+            status.textContent='딸깍 — 밀도로 뜸과 가라앉음을 모두 맞혔다. 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+          else { SFX.error(); status.className='status-line warn'; status.textContent='물에서의 움직임이 다르다. 밀도를 1과 비교해보자.'; }
+        }
+      });
+      render2();
+      status.className='status-line info'; status.textContent='밀도가 1보다 작으면 뜨고, 크면 가라앉는다.';
+      return;
+    }
+
+    // order
+    var seq=[];
+    var render3=function(){
+      var chips=cfg.objs.map(function(o){
+        var used=seq.indexOf(o.id)>=0;
+        return '<button class="btn'+(used?'':'')+'" data-s="'+o.id+'"'+(used?' disabled style="opacity:.35"':'')+'>'+o.icon+' '+o.name+' <span style="color:#8a93a6;font-size:12px">('+o.mass+'/'+o.vol+')</span></button>';
+      }).join(' ');
+      var slots=cfg.objs.map(function(_,i){
+        var id=seq[i], o=null; if(id){ for(var k=0;k<cfg.objs.length;k++){ if(cfg.objs[k].id===id) o=cfg.objs[k]; } }
+        return '<span class="val" style="width:auto;padding:6px 10px;height:auto;min-width:64px">'+(o? o.icon+' '+o.name : (i+1)+'번')+'</span>';
+      }).join(' <span style="color:#8a93a6">→</span> ');
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="color:#8a93a6;font-size:12px;margin:8px 2px 2px">물질 (질량/부피)</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:8px">'+chips+'</div>'
+        +'<div style="color:#8a93a6;font-size:12px;margin:12px 2px 2px">작은 밀도 → 큰 밀도</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:6px;align-items:center">'+slots+'</div>'
+        +'<div class="lever-row" style="gap:8px"><button class="btn" id="den-reset">초기화</button><button class="btn primary" id="den-go3">🔓 확인</button></div></div>';
+    };
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-s]');
+      if(b && seq.indexOf(b.dataset.s)<0){ seq.push(b.dataset.s); SFX.click(); render3(); return; }
+      if(ev.target.closest('#den-reset')){ seq=[]; SFX.click(); render3(); return; }
+      if(ev.target.closest('#den-go3')){
+        if(seq.length<cfg.objs.length){ SFX.error(); status.className='status-line warn'; status.textContent='네 물질을 모두 순서에 놓자.'; return; }
+        var exp=cfg.objs.slice().sort(function(a,b2){ return a.mass/a.vol - b2.mass/b2.vol; }).map(function(o){ return o.id; });
+        var ok=seq.every(function(id,i){ return id===exp[i]; });
+        if(ok){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 밀도 순서를 정확히 맞췄다. 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='순서가 맞지 않는다. 각 밀도를 다시 계산해보자.'; }
+      }
+    });
+    render3();
+    status.className='status-line info'; status.textContent='밀도 = 질량 ÷ 부피. 작은 것부터 눌러 놓자.';
+  },
+  selftest:function(T){
+    var e=PUZZLES.density.config('easy');
+    T('density easy: 24÷3=8', e.mass/e.vol===8 && e.ans===8);
+    T('density easy: 힌트 2개', e.hints.length>=2);
+    var m=PUZZLES.density.config('mid');
+    var expFloat=m.objs.map(function(o){ return o.mass/o.vol<1; });
+    T('density mid: 나무 뜸/알루미늄 가라앉음/얼음 뜸', expFloat[0]&&!expFloat[1]&&expFloat[2]);
+    T('density mid: 힌트 2개', m.hints.length>=2);
+    var h=PUZZLES.density.config('hard');
+    var order=h.objs.slice().sort(function(a,b){ return a.mass/a.vol - b.mass/b.vol; }).map(function(o){ return o.id; });
+    var ds=h.objs.slice().sort(function(a,b){ return a.mass/a.vol - b.mass/b.vol; }).map(function(o){ return o.mass/o.vol; });
+    var strict=true; for(var i=1;i<ds.length;i++){ if(ds[i]<=ds[i-1]) strict=false; }
+    T('density hard: 밀도 서로 달라 순서 유일', strict);
+    T('density hard: 오름차순 = sf,wd,al,fe', order.join(',')==='sf,wd,al,fe');
+    T('density hard: 힌트 2개', h.hints.length>=2);
+  }
+});
+
+// ---- 4) 질량보존 · 화학반응식 계수 맞추기 ----
+registerAddon({
+  id:'massbalance', name:'반응 저울', icon:'🧪', digit:'6',
+  glyph:'🧪', color:0xff8f6a, recolor:0x331a10,
+  discover:'좌우 접시가 달린 반응 저울. 화학반응식의 계수를 맞춰 양쪽 원자 수를 같게 하면 열린다.',
+  reward:'저울 중심축에 떠오른 숫자',
+  curri:{ easy:'중3 과학 · 질량보존', mid:'중3 과학 · 화학반응식', hard:'중3 과학 · 화학반응식 계수' },
+  config:function(diff){
+    if(diff==='easy') return {
+      q:'물이 만들어지는 반응이다. 계수를 맞춰 양쪽 원자 수를 같게 하자.',
+      parts:[{side:'L',f:'H₂',atoms:{H:2}},{side:'L',f:'O₂',atoms:{O:2}},{side:'R',f:'H₂O',atoms:{H:2,O:1}}],
+      ans:[2,1,2], max:6, curri:'중3 과학 · 질량보존',
+      hints:['화학반응 전후 원자의 종류와 개수는 변하지 않는다(질량보존).','O는 왼쪽 2개인데 오른쪽엔 물 1개당 1개다. 물 2개면 산소가 맞는다. 2H₂ + O₂ → 2H₂O.'] };
+    if(diff==='mid') return {
+      q:'암모니아가 만들어지는 반응이다. 계수를 맞추자.',
+      parts:[{side:'L',f:'N₂',atoms:{N:2}},{side:'L',f:'H₂',atoms:{H:2}},{side:'R',f:'NH₃',atoms:{N:1,H:3}}],
+      ans:[1,3,2], max:6, curri:'중3 과학 · 화학반응식',
+      hints:['N₂의 질소 2개를 맞추려면 NH₃가 2개 필요하다.','NH₃ 2개엔 H가 6개. H₂ 3개가 있어야 한다. N₂ + 3H₂ → 2NH₃.'] };
+    return {
+      q:'메테인이 타는 반응이다. 계수를 맞추자.',
+      parts:[{side:'L',f:'CH₄',atoms:{C:1,H:4}},{side:'L',f:'O₂',atoms:{O:2}},
+             {side:'R',f:'CO₂',atoms:{C:1,O:2}},{side:'R',f:'H₂O',atoms:{H:2,O:1}}],
+      ans:[1,2,1,2], max:6, curri:'중3 과학 · 화학반응식 계수',
+      hints:['C 1개 → CO₂ 1개. H 4개 → H₂O 2개.','오른쪽 산소는 CO₂ 2개 + H₂O 2개 = 4개. O₂ 2개가 필요하다. CH₄ + 2O₂ → CO₂ + 2H₂O.'] };
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var cs=cfg.parts.map(function(){ return 1; }), done=false;
+    function elems(){ var set={}; cfg.parts.forEach(function(p){ for(var k in p.atoms) set[k]=1; }); return Object.keys(set); }
+    function count(side){ var t={}; cfg.parts.forEach(function(p,i){ if(p.side!==side) return; for(var k in p.atoms){ t[k]=(t[k]||0)+cs[i]*p.atoms[k]; } }); return t; }
+    function gcd(a,b){ return b? gcd(b,a%b):a; }
+    function balanced(){ var L=count('L'), R=count('R'); return elems().every(function(k){ return (L[k]||0)===(R[k]||0); }); }
+    function simplest(){ var g=cs[0]; for(var i=1;i<cs.length;i++) g=gcd(g,cs[i]); return g===1; }
+    function eqHtml(){
+      var L=cfg.parts.filter(function(p){return p.side==='L';});
+      var R=cfg.parts.filter(function(p){return p.side==='R';});
+      function seg(p){ var i=cfg.parts.indexOf(p); return '<span style="color:#ffd76a;font-weight:700">'+cs[i]+'</span> '+p.f; }
+      return L.map(seg).join(' + ')+' <span style="color:#8a93a6">→</span> '+R.map(seg).join(' + ');
+    }
+    function tally(){
+      var L=count('L'), R=count('R');
+      return elems().map(function(k){
+        var ok=(L[k]||0)===(R[k]||0);
+        return '<span class="val" style="width:auto;padding:4px 10px;height:auto;font-size:13px;color:'+(ok?'#5fd39a':'#ff6b6b')+'">'
+          +k+': 왼쪽 '+(L[k]||0)+' / 오른쪽 '+(R[k]||0)+'</span>';
+      }).join(' ');
+    }
+    function render(){
+      var dials=cfg.parts.map(function(p,i){
+        return '<div style="text-align:center"><div style="color:#8a93a6;font-size:12px;margin-bottom:2px">'+p.f+'</div>'
+          +'<div class="seq-row" style="justify-content:center;gap:4px"><button class="btn" data-d="'+i+'" data-v="-1">−</button>'
+          +'<div class="val" style="width:38px;height:40px;font-size:20px">'+cs[i]+'</div>'
+          +'<button class="btn" data-d="'+i+'" data-v="1">＋</button></div></div>';
+      }).join('');
+      stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="log-box" style="text-align:center;font-size:20px;margin:8px 0;color:#e8ecf6">'+eqHtml()+'</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:10px;justify-content:center">'+dials+'</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:6px;justify-content:center;margin-top:8px">'+tally()+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="mb-go">🔓 반응 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-d]');
+      if(b){ var i=+b.dataset.d; cs[i]=Math.max(1, Math.min(cfg.max, cs[i]+(+b.dataset.v))); SFX.click(); render(); return; }
+      if(ev.target.closest('#mb-go')){
+        if(balanced() && simplest()){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent='딸깍 — 양쪽 원자 수가 같아졌다. 질량보존이 성립하며 자물쇠가 열렸다!'; setTimeout(function(){api.solve();},900); }
+        else if(balanced() && !simplest()){ SFX.error(); status.className='status-line warn';
+          status.textContent='원자 수는 같지만 계수를 더 줄일 수 있다. 가장 간단한 정수비로 맞추자.'; }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='양쪽 원자 수가 다르다. 빨간 원소를 맞춰보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='＋ − 로 계수를 조절해 양쪽 원자 수를 같게 하자.';
+  },
+  selftest:function(T){
+    function make(cfg, cs){
+      function elems(){ var s={}; cfg.parts.forEach(function(p){ for(var k in p.atoms) s[k]=1; }); return Object.keys(s); }
+      function count(side){ var t={}; cfg.parts.forEach(function(p,i){ if(p.side!==side) return; for(var k in p.atoms){ t[k]=(t[k]||0)+cs[i]*p.atoms[k]; } }); return t; }
+      var L=count('L'), R=count('R');
+      return elems().every(function(k){ return (L[k]||0)===(R[k]||0); });
+    }
+    function gcd(a,b){ return b? gcd(b,a%b):a; }
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.massbalance.config(d);
+      T('massbalance '+d+': 정답 계수가 균형', make(c, c.ans)===true);
+      var ones=c.ans.map(function(){ return 1; });
+      T('massbalance '+d+': 모두 1이면 불균형', make(c, ones)===false);
+      var g=c.ans.reduce(function(a,b){ return gcd(a,b); });
+      T('massbalance '+d+': 정답이 최소 정수비', g===1);
+      var dbl=c.ans.map(function(x){ return x*2; });
+      var gd=dbl.reduce(function(a,b){ return gcd(a,b); });
+      T('massbalance '+d+': 2배도 원자수는 맞지만 최소비 아님', make(c,dbl)===true && gd!==1);
+      T('massbalance '+d+': 힌트 2개', Array.isArray(c.hints)&&c.hints.length>=2);
+    });
+  }
+});
+
+// ===== 수학 기하·측정·통계 애드온 (mathB) =====
+
+// --- 1) 피타고라스 정리 ---
+registerAddon({
+  id:'pythagoras', name:'피타고라스 자물쇠', icon:'📐', digit:'5',
+  glyph:'📐', color:0x6aa8ff, recolor:0x14233d,
+  discover:'벽에 새겨진 직각삼각형 자물쇠. 두 변을 알면 나머지 한 변의 길이가 잠금 숫자가 된다.',
+  reward:'구한 변 옆에 떠오르는 숫자',
+  curri:{ easy:'중2 수학 · 피타고라스 정리(빗변)', mid:'중2 수학 · 피타고라스 정리(3:4:5 배수)', hard:'중2 수학 · 피타고라스 정리(한 변 구하기)' },
+  config:function(diff){
+    if(diff==='easy') return { q:'직각을 낀 두 변이 3과 4다. 빗변의 길이를 구해 다이얼에 맞추자.',
+      legA:3, legB:4, hyp:5, unknown:'hyp', ans:5, max:20,
+      success:'딸깍 — 세 변이 피타고라스 정리에 들어맞으며 자물쇠가 풀렸다!',
+      curri:'중2 수학 · 피타고라스 정리(빗변)',
+      hints:['직각을 낀 두 변을 각각 제곱해서 더한다.','3² + 4² = 9 + 16 = 25. 25의 제곱근은 5.'] };
+    if(diff==='mid') return { q:'직각을 낀 두 변이 6과 8이다. 빗변의 길이를 구하자.',
+      legA:6, legB:8, hyp:10, unknown:'hyp', ans:10, max:20,
+      success:'딸깍 — 6·8·10이 정리에 맞아떨어졌다!',
+      curri:'중2 수학 · 피타고라스 정리(3:4:5 배수)',
+      hints:['6² + 8² 을 구한 뒤 제곱근을 찾는다.','36 + 64 = 100. √100 = 10.'] };
+    return { q:'빗변이 13, 한 직각변이 5다. 나머지 직각변의 길이를 구하자.',
+      legA:5, legB:12, hyp:13, unknown:'legB', ans:12, max:20,
+      success:'딸깍 — 나머지 변이 딱 맞아 자물쇠가 열렸다!',
+      curri:'중2 수학 · 피타고라스 정리(한 변 구하기)',
+      hints:['빗변의 제곱에서 아는 변의 제곱을 뺀다.','13² − 5² = 169 − 25 = 144. √144 = 12.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function svg(){
+      var uk='#ffd76a';
+      var baseLabel=cfg.unknown==='legB'?'?':cfg.legB;
+      var hypLabel=cfg.unknown==='hyp'?'?':cfg.hyp;
+      var baseColor=cfg.unknown==='legB'?uk:'#e8ecf6';
+      var hypColor=cfg.unknown==='hyp'?uk:'#e8ecf6';
+      return '<svg viewBox="0 0 250 200" style="max-width:260px">'
+        +'<polygon points="45,160 210,160 45,45" fill="#101632" stroke="#6aa8ff" stroke-width="2"/>'
+        +'<path d="M45 143 L62 143 L62 160" fill="none" stroke="#8a93a6" stroke-width="1.6"/>'
+        +'<text x="24" y="108" fill="#e8ecf6" font-size="18" text-anchor="middle">'+cfg.legA+'</text>'
+        +'<text x="128" y="184" fill="'+baseColor+'" font-size="18" text-anchor="middle">'+baseLabel+'</text>'
+        +'<text x="142" y="96" fill="'+hypColor+'" font-size="18" text-anchor="middle">'+hypLabel+'</text>'
+        +'</svg>';
+    }
+    function render(){
+      stage.innerHTML='<div style="text-align:center">'+svg()+'</div>'
+        +'<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:18px"><button class="btn" data-pv="-1">−</button>'
+        +'<div class="val" style="font-size:28px;width:66px;height:56px">'+val+'</div>'
+        +'<button class="btn" data-pv="1">＋</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="pyt-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-pv]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val + (+b.dataset.pv))); SFX.click(); render(); return; }
+      if(ev.target.closest('#pyt-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent=cfg.success; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='길이가 맞지 않는다. 두 변을 제곱해 더하거나 빼 보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='＋ − 로 길이를 맞춘 뒤 확인을 누르자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.pythagoras.config(d);
+      T('pythagoras '+d+': a²+b²=c²', c.legA*c.legA + c.legB*c.legB === c.hyp*c.hyp);
+      var expect = c.unknown==='hyp' ? c.hyp : c.legB;
+      T('pythagoras '+d+': 정답이 미지변 길이와 일치', c.ans===expect);
+      T('pythagoras '+d+': 정답 범위·힌트', c.ans>0 && c.ans<=c.max && c.hints.length>=2);
+      T('pythagoras '+d+': 오답은 안 열림', (c.ans+1)!==c.ans);
+    });
+  }
+});
+
+// --- 2) 넓이·부피 ---
+registerAddon({
+  id:'area', name:'넓이·부피 자물쇠', icon:'📦', digit:'4',
+  glyph:'📦', color:0x5fd39a, recolor:0x123024,
+  discover:'도형의 넓이와 부피를 재는 측정 자물쇠. 치수를 곱해 값을 맞추면 열린다.',
+  reward:'도형 안쪽에 새겨진 숫자',
+  curri:{ easy:'초5 수학 · 직사각형의 넓이', mid:'초5 수학 · 삼각형의 넓이', hard:'초6 수학 · 직육면체의 부피' },
+  config:function(diff){
+    if(diff==='easy') return { shape:'rect', q:'가로 8, 세로 5인 직사각형의 넓이를 구하자.',
+      w:8, h:5, ans:40, max:90, unit:'cm²',
+      success:'딸깍 — 넓이가 맞아떨어지며 자물쇠가 열렸다!',
+      curri:'초5 수학 · 직사각형의 넓이',
+      hints:['직사각형 넓이는 가로 × 세로.','8 × 5 = 40.'] };
+    if(diff==='mid') return { shape:'tri', q:'밑변 6, 높이 4인 삼각형의 넓이를 구하자.',
+      base:6, ht:4, ans:12, max:40, unit:'cm²',
+      success:'딸깍 — 삼각형 넓이가 맞았다!',
+      curri:'초5 수학 · 삼각형의 넓이',
+      hints:['삼각형 넓이는 밑변 × 높이 ÷ 2.','6 × 4 ÷ 2 = 24 ÷ 2 = 12.'] };
+    return { shape:'box', q:'가로 4, 세로 3, 높이 5인 직육면체의 부피를 구하자.',
+      bw:4, bd:3, bh:5, ans:60, max:120, unit:'cm³',
+      success:'딸깍 — 부피가 맞아떨어져 자물쇠가 열렸다!',
+      curri:'초6 수학 · 직육면체의 부피',
+      hints:['직육면체 부피는 가로 × 세로 × 높이.','4 × 3 × 5 = 60.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function svg(){
+      if(cfg.shape==='rect'){
+        return '<svg viewBox="0 0 240 180" style="max-width:260px">'
+          +'<rect x="45" y="48" width="150" height="90" fill="#101632" stroke="#5fd39a" stroke-width="2"/>'
+          +'<text x="120" y="36" fill="#e8ecf6" font-size="16" text-anchor="middle">'+cfg.w+'</text>'
+          +'<text x="214" y="98" fill="#e8ecf6" font-size="16" text-anchor="middle">'+cfg.h+'</text>'
+          +'</svg>';
+      }
+      if(cfg.shape==='tri'){
+        return '<svg viewBox="0 0 240 190" style="max-width:260px">'
+          +'<polygon points="45,150 205,150 125,48" fill="#101632" stroke="#5fd39a" stroke-width="2"/>'
+          +'<line x1="125" y1="48" x2="125" y2="150" stroke="#8a93a6" stroke-width="1.4" stroke-dasharray="4 4"/>'
+          +'<text x="125" y="172" fill="#e8ecf6" font-size="16" text-anchor="middle">'+cfg.base+'</text>'
+          +'<text x="140" y="104" fill="#e8ecf6" font-size="16" text-anchor="middle">'+cfg.ht+'</text>'
+          +'</svg>';
+      }
+      return '<svg viewBox="0 0 240 190" style="max-width:260px">'
+        +'<polygon points="45,65 78,40 198,40 165,65" fill="#132a20" stroke="#5fd39a" stroke-width="1.6"/>'
+        +'<polygon points="165,65 198,40 198,125 165,150" fill="#0d2418" stroke="#5fd39a" stroke-width="1.6"/>'
+        +'<rect x="45" y="65" width="120" height="85" fill="#101632" stroke="#5fd39a" stroke-width="2"/>'
+        +'<text x="105" y="170" fill="#e8ecf6" font-size="15" text-anchor="middle">가로 '+cfg.bw+'</text>'
+        +'<text x="26" y="112" fill="#e8ecf6" font-size="15" text-anchor="middle">높이 '+cfg.bh+'</text>'
+        +'<text x="188" y="34" fill="#e8ecf6" font-size="15" text-anchor="middle">세로 '+cfg.bd+'</text>'
+        +'</svg>';
+    }
+    function render(){
+      stage.innerHTML='<div style="text-align:center">'+svg()+'</div>'
+        +'<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:18px"><button class="btn" data-ar="-1">−</button>'
+        +'<div class="val" style="font-size:26px;width:80px;height:56px">'+val+'</div>'
+        +'<button class="btn" data-ar="1">＋</button></div>'
+        +'<div style="text-align:center;color:#8a93a6;font-size:12px;margin-top:2px">단위 '+cfg.unit+'</div>'
+        +'<div class="lever-row"><button class="btn primary" id="area-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-ar]');
+      if(b){ var step=(+b.dataset.ar); val=Math.max(0, Math.min(cfg.max, val+step)); SFX.click(); render(); return; }
+      if(ev.target.closest('#area-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent=cfg.success; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='값이 맞지 않는다. 치수를 다시 곱해 보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='＋ − 로 값을 맞춘 뒤 확인을 누르자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.area.config(d);
+      var calc = c.shape==='rect' ? c.w*c.h : c.shape==='tri' ? c.base*c.ht/2 : c.bw*c.bd*c.bh;
+      T('area '+d+': 넓이/부피 공식 일치', c.ans===calc);
+      T('area '+d+': 정답 범위·힌트', c.ans>0 && c.ans<=c.max && c.hints.length>=2);
+      T('area '+d+': 오답은 정답과 다름', (c.ans-1)!==c.ans);
+    });
+  }
+});
+
+// --- 3) 평균·대푯값 ---
+registerAddon({
+  id:'average', name:'평균 저울 자물쇠', icon:'📊', digit:'3',
+  glyph:'📊', color:0xffd76a, recolor:0x2a2410,
+  discover:'막대들의 평균을 재는 저울 자물쇠. 대푯값을 맞추면 잠금이 풀린다.',
+  reward:'평균선 위에 뜨는 숫자',
+  curri:{ easy:'초5 수학 · 평균', mid:'초6 수학 · 평균', hard:'중1 수학 · 평균과 대푯값' },
+  config:function(diff){
+    if(diff==='easy') return { mode:'find', q:'막대 네 개의 평균을 구해 평균선을 맞추자.',
+      bars:[10,20,30,40], ans:25, max:60,
+      success:'딸깍 — 평균선이 딱 맞으며 자물쇠가 열렸다!',
+      curri:'초5 수학 · 평균',
+      hints:['모두 더한 뒤 개수로 나눈다.','(10+20+30+40) ÷ 4 = 100 ÷ 4 = 25.'] };
+    if(diff==='mid') return { mode:'find', q:'막대 다섯 개의 평균을 구하자.',
+      bars:[6,8,10,12,14], ans:10, max:30,
+      success:'딸깍 — 평균이 맞아떨어졌다!',
+      curri:'초6 수학 · 평균',
+      hints:['다섯 값을 더해 5로 나눈다.','(6+8+10+12+14) ÷ 5 = 50 ÷ 5 = 10.'] };
+    return { mode:'target', q:'마지막 막대를 조절해 다섯 막대의 평균이 15가 되게 하자.',
+      bars:[10,12,18,20], target:15, ans:15, max:40,
+      success:'딸깍 — 평균이 목표에 닿으며 자물쇠가 열렸다!',
+      curri:'중1 수학 · 평균과 대푯값',
+      hints:['평균 15가 되려면 전체 합은 15 × 5 = 75여야 한다.','75 − (10+12+18+20) = 75 − 60 = 15. 마지막 막대는 15.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var val=0, done=false;
+    function sum(a){ var s=0; for(var i=0;i<a.length;i++) s+=a[i]; return s; }
+    function view(){
+      var disp = cfg.mode==='target' ? cfg.bars.concat([val]) : cfg.bars.slice();
+      var refs = cfg.mode==='target' ? [cfg.target] : [val];
+      var maxV = Math.max.apply(null, disp.concat(refs).concat([1]));
+      var k = 108 / maxV;
+      var base=158, bw=30, gap=16, startX=34;
+      var right = startX + disp.length*(bw+gap);
+      var s='<svg viewBox="0 0 '+(right+18)+' 190" style="max-width:320px">';
+      s+='<line x1="18" y1="'+base+'" x2="'+right+'" y2="'+base+'" stroke="#2a3350" stroke-width="1.4"/>';
+      for(var i=0;i<disp.length;i++){
+        var v=disp[i], h=v*k, x=startX+i*(bw+gap), y=base-h;
+        var live = cfg.mode==='target' && i===disp.length-1;
+        var fill = live ? '#ffd76a' : '#6aa8ff';
+        s+='<rect x="'+x+'" y="'+y+'" width="'+bw+'" height="'+h+'" fill="'+fill+'" opacity="0.85" rx="2"/>';
+        s+='<text x="'+(x+bw/2)+'" y="'+(y-6)+'" fill="#e8ecf6" font-size="12" text-anchor="middle">'+v+'</text>';
+      }
+      if(cfg.mode==='find'){
+        var ly=base-val*k;
+        s+='<line x1="18" y1="'+ly+'" x2="'+right+'" y2="'+ly+'" stroke="#ffd76a" stroke-dasharray="5 4" stroke-width="2"/>';
+        s+='<text x="'+(right-2)+'" y="'+(ly-6)+'" fill="#ffd76a" font-size="12" text-anchor="end">평균 '+val+'</text>';
+      } else {
+        var ty=base-cfg.target*k;
+        s+='<line x1="18" y1="'+ty+'" x2="'+right+'" y2="'+ty+'" stroke="#5fd39a" stroke-dasharray="5 4" stroke-width="2"/>';
+        s+='<text x="'+(right-2)+'" y="'+(ty-6)+'" fill="#5fd39a" font-size="12" text-anchor="end">목표 평균 '+cfg.target+'</text>';
+      }
+      s+='</svg>';
+      return s;
+    }
+    function render(){
+      var readout='';
+      if(cfg.mode==='target'){
+        var avg=(sum(cfg.bars)+val)/(cfg.bars.length+1);
+        readout='<div class="status-line info" style="justify-content:center">현재 평균 = '+(Math.round(avg*10)/10)+'</div>';
+      }
+      stage.innerHTML='<div style="text-align:center">'+view()+'</div>'
+        +'<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +readout
+        +'<div class="seq-row" style="justify-content:center;gap:18px"><button class="btn" data-av="-1">−</button>'
+        +'<div class="val" style="font-size:26px;width:66px;height:56px">'+val+'</div>'
+        +'<button class="btn" data-av="1">＋</button></div>'
+        +'<div class="lever-row"><button class="btn primary" id="avg-go">🔓 확인</button></div></div>';
+    }
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-av]');
+      if(b){ val=Math.max(0, Math.min(cfg.max, val+(+b.dataset.av))); SFX.click(); render(); return; }
+      if(ev.target.closest('#avg-go')){
+        if(val===cfg.ans){ done=true; SFX.solve(); status.className='status-line ok';
+          status.textContent=cfg.success; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn';
+          status.textContent = cfg.mode==='target' ? '평균이 목표에 닿지 않는다. 전체 합부터 따져 보자.' : '평균선이 맞지 않는다. 합을 개수로 나눠 보자.'; }
+      }
+    });
+    render();
+    status.className='status-line info'; status.textContent='＋ − 로 값을 맞춘 뒤 확인을 누르자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.average.config(d);
+      var s=0,i; for(i=0;i<c.bars.length;i++) s+=c.bars[i];
+      if(c.mode==='find'){
+        T('average '+d+': 평균 계산 일치', c.ans === s/c.bars.length);
+      } else {
+        var cnt=c.bars.length+1;
+        T('average '+d+': 목표 평균 달성 값 일치', c.ans === c.target*cnt - s);
+        T('average '+d+': 정답 넣으면 평균이 목표', (s+c.ans)/cnt === c.target);
+      }
+      T('average '+d+': 정답 범위·힌트', c.ans>=0 && c.ans<=c.max && c.hints.length>=2);
+    });
+  }
+});
+
+// --- 4) 전개도 (마주보는 면) ---
+registerAddon({
+  id:'netfold', name:'전개도 자물쇠', icon:'🧊', digit:'6',
+  glyph:'🧊', color:0xb98ad0, recolor:0x2a1838,
+  discover:'전개도를 접으면 정육면체가 되는 자물쇠. 기준 면과 마주보는 면을 짚어야 열린다.',
+  reward:'맞은 면에 드러나는 숫자',
+  curri:{ easy:'초5 수학 · 정육면체의 전개도', mid:'초5 수학 · 전개도의 마주보는 면', hard:'초5 수학 · 전개도 겨냥(심화)' },
+  config:function(diff){
+    if(diff==='easy') return {
+      q:'접으면 정육면체가 된다. ■ 면과 마주보는 면을 누르자.',
+      faces:[ {id:'A',col:1,row:0,sym:'★'}, {id:'B',col:0,row:1,sym:'●'}, {id:'C',col:1,row:1,sym:'■'},
+              {id:'D',col:2,row:1,sym:'▲'}, {id:'E',col:3,row:1,sym:'◆'}, {id:'F',col:1,row:2,sym:'✚'} ],
+      pairs:[['A','F'],['B','D'],['C','E']], marked:'C', answer:'E',
+      success:'딸깍 — 접었을 때 마주보는 면을 정확히 짚었다!',
+      curri:'초5 수학 · 정육면체의 전개도',
+      hints:['일자로 늘어선 네 면에서는 한 칸 건너뛴 면끼리 마주본다.','■ 의 양옆은 옆면이 된다. 한 칸 건너뛴 ◆ 가 마주보는 면.'] };
+    if(diff==='mid') return {
+      q:'접으면 정육면체가 된다. ★ 면과 마주보는 면을 누르자.',
+      faces:[ {id:'A',col:0,row:0,sym:'★'}, {id:'B',col:0,row:1,sym:'●'}, {id:'C',col:1,row:1,sym:'■'},
+              {id:'D',col:2,row:1,sym:'▲'}, {id:'E',col:3,row:1,sym:'◆'}, {id:'F',col:2,row:2,sym:'✚'} ],
+      pairs:[['A','F'],['B','D'],['C','E']], marked:'A', answer:'F',
+      success:'딸깍 — 뚜껑과 바닥이 맞아떨어졌다!',
+      curri:'초5 수학 · 전개도의 마주보는 면',
+      hints:['위아래로 튀어나온 두 조각은 접으면 뚜껑과 바닥이 되어 마주본다.','★ 은 위로 튀어나온 조각, 반대편은 아래로 튀어나온 ✚.'] };
+    return {
+      q:'접으면 정육면체가 된다. ▲ 면과 마주보는 면을 누르자.',
+      faces:[ {id:'A',col:3,row:0,sym:'★'}, {id:'B',col:0,row:1,sym:'●'}, {id:'C',col:1,row:1,sym:'■'},
+              {id:'D',col:2,row:1,sym:'▲'}, {id:'E',col:3,row:1,sym:'◆'}, {id:'F',col:1,row:2,sym:'✚'} ],
+      pairs:[['A','F'],['B','D'],['C','E']], marked:'D', answer:'B',
+      success:'딸깍 — 헷갈리는 면 사이에서 마주보는 짝을 찾아냈다!',
+      curri:'초5 수학 · 전개도 겨냥(심화)',
+      hints:['일자 네 면에서 한 칸 건너뛴 면끼리 마주본다.','▲ 에서 한 칸 건너뛴 ● 가 마주보는 면.'] };
+  },
+  mount:function(el, cfg, api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false;
+    function gridSVG(){
+      var cell=46, pad=14, cols=4, rows=3;
+      var W=cols*cell+pad*2, H=rows*cell+pad*2;
+      var s='<svg viewBox="0 0 '+W+' '+H+'" style="max-width:280px">';
+      cfg.faces.forEach(function(f){
+        var x=pad+f.col*cell, y=pad+f.row*cell, sz=cell-4;
+        var mk=f.id===cfg.marked;
+        var fill=mk?'#2a2140':'#101632', st=mk?'#ffd76a':'#2a3350', sw=mk?3:1.5, tc=mk?'#ffd76a':'#e8ecf6';
+        s+='<g data-fid="'+f.id+'" style="cursor:pointer">'
+          +'<rect x="'+x+'" y="'+y+'" width="'+sz+'" height="'+sz+'" rx="5" fill="'+fill+'" stroke="'+st+'" stroke-width="'+sw+'"/>'
+          +'<text x="'+(x+sz/2)+'" y="'+(y+sz/2+7)+'" fill="'+tc+'" font-size="21" text-anchor="middle">'+f.sym+'</text>'
+          +'</g>';
+      });
+      s+='</svg>';
+      return s;
+    }
+    stage.innerHTML='<div class="cab"><div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+      +'<div style="text-align:center">'+gridSVG()+'</div>'
+      +'<div style="text-align:center;color:#8a93a6;font-size:12px">노란 테두리가 기준 면. 마주보는 면을 누르자.</div></div>';
+    stage.addEventListener('click', function(ev){
+      if(done) return;
+      var g=ev.target.closest('[data-fid]');
+      if(!g) return;
+      var fid=g.getAttribute('data-fid');
+      if(fid===cfg.marked){ SFX.error(); status.className='status-line warn'; status.textContent='그 면은 기준 면이다. 마주보는 면을 고르자.'; return; }
+      if(fid===cfg.answer){ done=true; SFX.solve(); status.className='status-line ok';
+        status.textContent=cfg.success; setTimeout(function(){api.solve();},900); }
+      else { SFX.error(); status.className='status-line warn'; status.textContent='접으면 그 면은 기준 면과 옆에서 맞닿는다. 마주보는 면이 아니다.'; }
+    });
+    status.className='status-line info'; status.textContent='전개도를 머릿속으로 접어 마주보는 면을 짚어 보자.';
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.netfold.config(d);
+      T('netfold '+d+': 면 6개', c.faces.length===6);
+      var isPair=false;
+      c.pairs.forEach(function(p){ if((p[0]===c.marked&&p[1]===c.answer)||(p[1]===c.marked&&p[0]===c.answer)) isPair=true; });
+      T('netfold '+d+': 정답이 마주보는 짝', isPair && c.marked!==c.answer);
+      var flat=[]; c.pairs.forEach(function(p){ flat.push(p[0],p[1]); }); flat.sort();
+      var ids=c.faces.map(function(f){ return f.id; }).sort();
+      T('netfold '+d+': 세 짝이 6면을 모두 덮음', flat.length===6 && flat.join('')===ids.join(''));
+      T('netfold '+d+': 힌트 2개', c.hints.length>=2);
+    });
+  }
+});
+
+// ===== 생명·지구·우주 애드온 (foodchain, genetics, orbit, moonorbit) =====
+
+// ---- 1) 먹이사슬·에너지 흐름 : 순서 정렬 자물쇠 ----
+registerAddon({
+  id:'foodchain', name:'먹이사슬 자물쇠', icon:'🌾', digit:'4',
+  glyph:'🌾', color:0x5fd39a, recolor:0x0f2a1e,
+  discover:'화살표가 한 방향으로만 새겨진 사슬 자물쇠. 에너지가 흐르는 차례대로 생물을 꿰어야 열린다.',
+  reward:'사슬 고리 안쪽에 드러난 숫자',
+  curri:{ easy:'초6 과학 · 생물과 환경(먹이사슬)', mid:'초6 과학 · 생물과 환경(먹이 관계)', hard:'고1 통합과학 · 생태계와 에너지 흐름' },
+  config:function(diff){
+    var base={
+      success:'딸깍 — 에너지가 한 방향으로 흐르며 사슬이 열렸다!',
+      axis:'왼쪽 = 에너지가 시작되는 생산자 → 오른쪽 = 최종 소비자',
+      hint0:'생산자부터 차례로 눌러 사슬을 꿰자. 잘못 꿰면 처음부터.'
+    };
+    var mk=function(o){ o.solves=function(seq){ return seq.length===o.order.length && o.order.every(function(id,i){return seq[i]===id;}); }; return o; };
+    if(diff==='easy') return mk(Object.assign({}, base, {
+      q:'에너지가 흐르는 순서대로 생물을 놓자. 먹는 쪽으로 에너지가 이동한다.',
+      curri:'초6 과학 · 생물과 환경(먹이사슬)',
+      items:[
+        {id:'rice',emoji:'🌾',label:'벼',sub:'생산자',role:'생산자'},
+        {id:'hopper',emoji:'🦗',label:'메뚜기',sub:'1차 소비자',role:'1차소비자'},
+        {id:'frog',emoji:'🐸',label:'개구리',sub:'2차 소비자',role:'2차소비자'},
+        {id:'snake',emoji:'🐍',label:'뱀',sub:'최종 소비자',role:'최종소비자'}
+      ],
+      order:['rice','hopper','frog','snake'],
+      hints:['에너지는 햇빛으로 양분을 만드는 생산자에서 시작한다.','벼 → 메뚜기 → 개구리 → 뱀. 먹히는 쪽에서 먹는 쪽으로.']
+    }));
+    if(diff==='mid') return mk(Object.assign({}, base, {
+      q:'바다 먹이사슬이다. 에너지가 흐르는 순서대로 놓자.',
+      curri:'초6 과학 · 생물과 환경(먹이 관계)',
+      items:[
+        {id:'phyto',emoji:'🌿',label:'식물플랑크톤',sub:'생산자',role:'생산자'},
+        {id:'zoo',emoji:'🦐',label:'동물플랑크톤',sub:'1차 소비자',role:'1차소비자'},
+        {id:'anchovy',emoji:'🐟',label:'멸치',sub:'2차 소비자',role:'2차소비자'},
+        {id:'mackerel',emoji:'🐠',label:'고등어',sub:'3차 소비자',role:'3차소비자'},
+        {id:'shark',emoji:'🦈',label:'상어',sub:'최종 소비자',role:'최종소비자'}
+      ],
+      order:['phyto','zoo','anchovy','mackerel','shark'],
+      hints:['바다에서도 광합성하는 식물플랑크톤이 생산자다.','플랑크톤 → 멸치 → 고등어 → 상어 순으로 잡아먹는다.']
+    }));
+    return mk(Object.assign({}, base, {
+      q:'생태 피라미드의 에너지 흐름이다. 생산자부터 순서대로(왼쪽 → 오른쪽) 놓자. 단계가 올라갈수록 에너지는 줄어든다.',
+      curri:'고1 통합과학 · 생태계와 에너지 흐름',
+      items:[
+        {id:'rice',emoji:'🌾',label:'벼',sub:'생산자',role:'생산자'},
+        {id:'hopper',emoji:'🦗',label:'메뚜기',sub:'1차 소비자',role:'1차소비자'},
+        {id:'frog',emoji:'🐸',label:'개구리',sub:'2차 소비자',role:'2차소비자'},
+        {id:'snake',emoji:'🐍',label:'뱀',sub:'3차 소비자',role:'3차소비자'},
+        {id:'hawk',emoji:'🦅',label:'매',sub:'최종 소비자',role:'최종소비자'}
+      ],
+      order:['rice','hopper','frog','snake','hawk'],
+      hints:['맨 처음(왼쪽)은 언제나 생산자다. 여기에 에너지가 가장 많다.','벼 → 메뚜기 → 개구리 → 뱀 → 매. 한 방향으로만 흐른다.']
+    }));
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false, seq=[];
+    var pool=cfg.items.slice();
+    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+    function byId(id){ for(var k=0;k<cfg.items.length;k++) if(cfg.items[k].id===id) return cfg.items[k]; }
+    function card(it,where){
+      return '<button class="btn" data-id="'+it.id+'" data-where="'+where+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:92px;padding:8px 6px">'
+        +'<span style="font-size:26px">'+it.emoji+'</span>'
+        +'<span style="font-size:13px;color:#e8ecf6">'+it.label+'</span>'
+        +'<span style="font-size:11px;color:#8a93a6">'+it.sub+'</span></button>';
+    }
+    function render(){
+      var slots='';
+      for(var i=0;i<cfg.order.length;i++){
+        if(i<seq.length) slots+=card(byId(seq[i]),'slot');
+        else slots+='<div class="val" style="min-width:92px;height:80px;display:flex;align-items:center;justify-content:center;color:#8a93a6;font-size:13px">'+(i+1)+'단계</div>';
+        if(i<cfg.order.length-1) slots+='<span style="color:#5fd39a;font-size:18px;align-self:center">➜</span>';
+      }
+      var poolHtml=pool.filter(function(p){return seq.indexOf(p.id)<0;}).map(function(it){return card(it,'pool');}).join('');
+      stage.innerHTML='<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="font-size:12px;color:#8a93a6;margin:6px 0 10px">'+cfg.axis+'</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px">'+slots+'</div>'
+        +'<div style="height:1px;background:#2a3350;margin:8px 0"></div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:8px;justify-content:center">'+(poolHtml||'<span style="color:#8a93a6;font-size:13px">모두 배치했다</span>')+'</div>';
+    }
+    stage.addEventListener('click',function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-id]'); if(!b) return;
+      var id=b.dataset.id;
+      if(b.dataset.where==='slot'){ if(seq.length && seq[seq.length-1]===id){ seq.pop(); SFX.click(); render(); } return; }
+      if(id===cfg.order[seq.length]){
+        seq.push(id); SFX.click();
+        if(seq.length===cfg.order.length){ done=true; SFX.solve(); status.className='status-line ok'; status.textContent=cfg.success; render(); setTimeout(function(){api.solve();},900); return; }
+        render();
+      } else { SFX.error(); status.className='status-line warn'; status.textContent='흐름이 끊긴다. 에너지가 시작되는 쪽부터 다시.'; seq=[]; render(); }
+    });
+    render(); status.textContent=cfg.hint0;
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.foodchain.config(d);
+      T('foodchain '+d+': 힌트 2개+', Array.isArray(c.hints)&&c.hints.length>=2);
+      T('foodchain '+d+': 카드 수와 정답 순서 수 일치', c.order.length===c.items.length);
+      T('foodchain '+d+': 정답 순서로 놓으면 풀린다', c.solves(c.order.slice())===true);
+      T('foodchain '+d+': 역순은 안 풀린다', c.solves(c.order.slice().reverse())===false);
+      T('foodchain '+d+': 빈 배열은 안 풀린다', c.solves([])===false);
+      var first=c.items.filter(function(it){return it.id===c.order[0];})[0];
+      T('foodchain '+d+': 맨 앞은 생산자', first && first.role==='생산자');
+    });
+  }
+});
+
+// ---- 2) 멘델 유전 : 퍼넷 사각형 채우기 자물쇠 ----
+registerAddon({
+  id:'genetics', name:'유전 격자 자물쇠', icon:'🧬', digit:'3',
+  glyph:'Aa', color:0x6aa8ff, recolor:0x101a2e,
+  discover:'가로세로로 유전자가 새겨진 격자 자물쇠. 부모의 대립유전자를 짝지어 자손 칸을 채워야 열린다.',
+  reward:'격자 한가운데 드러난 숫자',
+  curri:{ easy:'중3 과학 · 멘델 유전(단성 잡종교배)', mid:'중3 과학 · 우열의 원리', hard:'중3 과학 · 검정교배' },
+  config:function(diff){
+    function combine(a,b){
+      var up=[a,b].filter(function(x){return x===x.toUpperCase();});
+      var lo=[a,b].filter(function(x){return x!==x.toUpperCase();});
+      return up.concat(lo).join('');
+    }
+    function build(p1,p2){ return [combine(p1[0],p2[0]),combine(p1[0],p2[1]),combine(p1[1],p2[0]),combine(p1[1],p2[1])]; }
+    var mk=function(o){
+      o.grid=build(o.p1,o.p2);
+      o.dominant=o.grid.filter(function(g){return /[A-Z]/.test(g);}).length;
+      o.recessive=4-o.dominant;
+      o.solves=function(fill){ return fill.length===4 && fill.every(function(v,i){return v===o.grid[i];}); };
+      return o;
+    };
+    if(diff==='easy') return mk({
+      p1:['A','a'], p2:['A','a'], gene:'A',
+      q:'둥근 완두(A)는 주름진 완두(a)에 대해 우성이다. Aa × Aa 의 자손 4칸을 채우자.',
+      concept:'자손은 부모 각각에게서 대립유전자를 하나씩 물려받는다.',
+      curri:'중3 과학 · 멘델 유전(단성 잡종교배)',
+      success:'딸깍 — 자손 유전자형이 맞아떨어지며 격자가 열렸다! 우성 : 열성 = 3 : 1.',
+      hints:['각 칸 = 세로 대립유전자 + 가로 대립유전자.','A와 a가 만나면 Aa, a와 a가 만나면 aa. 우성 표현형은 3칸.']
+    });
+    if(diff==='mid') return mk({
+      p1:['A','A'], p2:['A','a'], gene:'A',
+      q:'순종 우성 AA 와 잡종 Aa 를 교배한다. AA × Aa 의 자손 4칸을 채우자.',
+      concept:'한쪽 부모가 대립유전자를 모두 A로 물려주면 자손에 a끼리 만날 수 없다.',
+      curri:'중3 과학 · 우열의 원리',
+      success:'딸깍 — 네 칸 모두 우성 표현형이다. 격자가 열렸다!',
+      hints:['위쪽 부모는 A만, 왼쪽 부모는 A와 a를 준다.','aa 칸은 생기지 않는다. AA 2칸, Aa 2칸.']
+    });
+    return mk({
+      p1:['A','a'], p2:['a','a'], gene:'A',
+      q:'표현형이 둥근 완두의 유전자형이 궁금하다. 검정교배로 Aa × aa 의 자손 4칸을 채우자.',
+      concept:'열성 순종(aa)과 교배하면 자손의 표현형으로 상대 유전자형을 알 수 있다.',
+      curri:'중3 과학 · 검정교배',
+      success:'딸깍 — Aa : aa = 1 : 1. 잡종이었음이 드러나며 격자가 열렸다!',
+      hints:['한쪽 부모가 a만 주므로 자손은 Aa 아니면 aa.','둥근 : 주름진 = 2 : 2 = 1 : 1 로 나온다.']
+    });
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false;
+    var opts=['—','AA','Aa','aa'];
+    var fill=['—','—','—','—'];
+    function cell(i){
+      var v=fill[i];
+      var col = v==='—' ? '#8a93a6' : (/[A-Z]/.test(v)?'#6aa8ff':'#ff6b6b');
+      return '<button class="btn" data-cell="'+i+'" style="width:74px;height:60px;font-size:22px;font-weight:700;color:'+col+'">'+v+'</button>';
+    }
+    function render(){
+      stage.innerHTML='<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="font-size:12px;color:#8a93a6;margin:6px 0 12px">'+cfg.concept+' 칸을 눌러 바꾼다.</div>'
+        +'<div style="display:grid;grid-template-columns:44px 74px 74px;gap:6px;justify-content:center;align-items:center">'
+        +'<div></div>'
+        +'<div class="val" style="width:74px;height:30px;color:#ffd76a;font-size:18px;display:flex;align-items:center;justify-content:center">'+cfg.p2[0]+'</div>'
+        +'<div class="val" style="width:74px;height:30px;color:#ffd76a;font-size:18px;display:flex;align-items:center;justify-content:center">'+cfg.p2[1]+'</div>'
+        +'<div class="val" style="width:44px;height:60px;color:#ffd76a;font-size:18px;display:flex;align-items:center;justify-content:center">'+cfg.p1[0]+'</div>'
+        + cell(0)+cell(1)
+        +'<div class="val" style="width:44px;height:60px;color:#ffd76a;font-size:18px;display:flex;align-items:center;justify-content:center">'+cfg.p1[1]+'</div>'
+        + cell(2)+cell(3)
+        +'</div>'
+        +'<div style="font-size:11px;color:#8a93a6;text-align:center;margin-top:8px">위 = 한쪽 부모, 왼쪽 = 다른 부모의 대립유전자</div>'
+        +'<div class="lever-row" style="justify-content:center;margin-top:12px"><button class="btn primary" data-check="1">🔓 자손 확인</button></div>';
+    }
+    stage.addEventListener('click',function(ev){
+      if(done) return;
+      var c=ev.target.closest('[data-cell]');
+      if(c){ var i=+c.dataset.cell; fill[i]=opts[(opts.indexOf(fill[i])+1)%opts.length]; SFX.click(); render(); return; }
+      if(ev.target.closest('[data-check]')){
+        if(fill.indexOf('—')>=0){ SFX.error(); status.className='status-line warn'; status.textContent='아직 빈 칸이 있다. 네 칸을 모두 채우자.'; return; }
+        if(cfg.solves(fill)){ done=true; SFX.solve(); status.className='status-line ok'; status.textContent=cfg.success; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='격자가 헛돈다. 각 칸은 세로와 가로 유전자를 짝지은 것이다.'; }
+      }
+    });
+    render(); status.textContent='각 칸을 눌러 AA · Aa · aa 로 맞춘 뒤 자손 확인을 누르자.';
+  },
+  selftest:function(T){
+    var expect={easy:{grid:['AA','Aa','Aa','aa'],dom:3},mid:{grid:['AA','Aa','AA','Aa'],dom:4},hard:{grid:['Aa','Aa','aa','aa'],dom:2}};
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.genetics.config(d), e=expect[d];
+      T('genetics '+d+': 힌트 2개+', Array.isArray(c.hints)&&c.hints.length>=2);
+      T('genetics '+d+': 격자 계산이 개념과 일치', c.grid.join(',')===e.grid.join(','));
+      T('genetics '+d+': 우성 표현형 칸 수 일치', c.dominant===e.dom);
+      T('genetics '+d+': 정답 채우면 풀린다', c.solves(c.grid.slice())===true);
+      T('genetics '+d+': 오답(모두 Aa)은 안 풀린다', c.solves(['Aa','Aa','Aa','Aa'])===(c.grid.join(',')==='Aa,Aa,Aa,Aa'));
+      T('genetics '+d+': 빈 칸이면 안 풀린다', c.solves(['—','—','—','—'])===false);
+    });
+    T('genetics easy: 우성:열성 = 3:1', PUZZLES.genetics.config('easy').dominant===3 && PUZZLES.genetics.config('easy').recessive===1);
+  }
+});
+
+// ---- 3) 태양계·공전 : 거리/주기 순서 정렬 자물쇠 ----
+registerAddon({
+  id:'orbit', name:'행성 궤도 자물쇠', icon:'🪐', digit:'8',
+  glyph:'🪐', color:0xffd76a, recolor:0x2a220f,
+  discover:'태양을 가운데 두고 행성 원반이 돌아가는 자물쇠. 궤도를 바른 차례로 맞춰야 열린다.',
+  reward:'태양 원반 안쪽에 드러난 숫자',
+  curri:{ easy:'초5 과학 · 태양계 행성(거리)', mid:'중2 과학 · 태양계(행성의 공전)', hard:'중2 과학 · 태양계의 구성' },
+  config:function(diff){
+    var base={
+      success:'딸깍 — 궤도가 바른 차례로 맞물리며 자물쇠가 열렸다!',
+      axis:'왼쪽 = 태양에서 가까움 → 오른쪽 = 멀다',
+      hint0:'가장 가까운(또는 주기가 짧은) 행성부터 눌러 배열하자.'
+    };
+    var mk=function(o){ o.solves=function(seq){ return seq.length===o.order.length && o.order.every(function(id,i){return seq[i]===id;}); }; return o; };
+    var P={
+      mer:{id:'mer',emoji:'🟤',label:'수성',dist:0.39,per:88,perT:'88일'},
+      ven:{id:'ven',emoji:'🟡',label:'금성',dist:0.72,per:225,perT:'225일'},
+      ear:{id:'ear',emoji:'🌍',label:'지구',dist:1.00,per:365,perT:'365일'},
+      mar:{id:'mar',emoji:'🔴',label:'화성',dist:1.52,per:687,perT:'687일'},
+      jup:{id:'jup',emoji:'🟠',label:'목성',dist:5.20,per:4333,perT:'약 12년'},
+      sat:{id:'sat',emoji:'🪐',label:'토성',dist:9.58,per:10759,perT:'약 29년'},
+      ura:{id:'ura',emoji:'🔵',label:'천왕성',dist:19.2,per:30687,perT:'약 84년'},
+      nep:{id:'nep',emoji:'🔷',label:'해왕성',dist:30.1,per:60190,perT:'약 165년'}
+    };
+    if(diff==='easy'){
+      var e=[P.mer,P.ven,P.ear,P.mar].map(function(p){return {id:p.id,emoji:p.emoji,label:p.label,sub:p.dist+' AU',key:p.dist};});
+      return mk(Object.assign({},base,{ q:'태양에서 가까운 순서대로 행성을 놓자.', keyName:'거리', curri:'초5 과학 · 태양계 행성(거리)',
+        items:e, order:['mer','ven','ear','mar'],
+        hints:['수성이 태양에 가장 가깝다.','수성 → 금성 → 지구 → 화성 순으로 멀어진다.'] }));
+    }
+    if(diff==='mid'){
+      var m=[P.mer,P.ven,P.ear,P.mar,P.jup].map(function(p){return {id:p.id,emoji:p.emoji,label:p.label,sub:'공전 '+p.perT,key:p.per};});
+      return mk(Object.assign({},base,{ q:'공전 주기가 짧은 순서대로 놓자. 태양에서 멀수록 주기가 길다.', keyName:'주기', axis:'왼쪽 = 공전 주기가 짧음 → 오른쪽 = 길다', curri:'중2 과학 · 태양계(행성의 공전)',
+        items:m, order:['mer','ven','ear','mar','jup'],
+        hints:['궤도가 클수록 한 바퀴 도는 데 오래 걸린다.','88일 → 225일 → 365일 → 687일 → 약 12년.'] }));
+    }
+    var h=[P.mer,P.ven,P.ear,P.mar,P.jup,P.sat,P.ura,P.nep].map(function(p){return {id:p.id,emoji:p.emoji,label:p.label,sub:p.dist+' AU',key:p.dist};});
+    return mk(Object.assign({},base,{ q:'태양계 8행성을 태양에서 가까운 순서대로 모두 놓자.', keyName:'거리', curri:'중2 과학 · 태양계의 구성',
+      items:h, order:['mer','ven','ear','mar','jup','sat','ura','nep'],
+      hints:['수-금-지-화가 안쪽 지구형 행성, 목-토-천-해가 바깥쪽이다.','수성 → 금성 → 지구 → 화성 → 목성 → 토성 → 천왕성 → 해왕성.'] }));
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false, seq=[];
+    var pool=cfg.items.slice();
+    for(var i=pool.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+    function byId(id){ for(var k=0;k<cfg.items.length;k++) if(cfg.items[k].id===id) return cfg.items[k]; }
+    function card(it,where){
+      return '<button class="btn" data-id="'+it.id+'" data-where="'+where+'" style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:78px;padding:8px 6px">'
+        +'<span style="font-size:24px">'+it.emoji+'</span>'
+        +'<span style="font-size:13px;color:#e8ecf6">'+it.label+'</span>'
+        +'<span style="font-size:10px;color:#8a93a6">'+it.sub+'</span></button>';
+    }
+    function render(){
+      var slots='<span style="font-size:24px;align-self:center">☀️</span>';
+      for(var i=0;i<cfg.order.length;i++){
+        if(i<seq.length) slots+=card(byId(seq[i]),'slot');
+        else slots+='<div class="val" style="min-width:64px;height:76px;display:flex;align-items:center;justify-content:center;color:#8a93a6;font-size:12px">'+(i+1)+'</div>';
+      }
+      var poolHtml=pool.filter(function(p){return seq.indexOf(p.id)<0;}).map(function(it){return card(it,'pool');}).join('');
+      stage.innerHTML='<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="font-size:12px;color:#8a93a6;margin:6px 0 10px">'+cfg.axis+'</div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:6px;justify-content:center;margin-bottom:10px">'+slots+'</div>'
+        +'<div style="height:1px;background:#2a3350;margin:8px 0"></div>'
+        +'<div class="seq-row" style="flex-wrap:wrap;gap:8px;justify-content:center">'+(poolHtml||'<span style="color:#8a93a6;font-size:13px">모두 배치했다</span>')+'</div>';
+    }
+    stage.addEventListener('click',function(ev){
+      if(done) return;
+      var b=ev.target.closest('[data-id]'); if(!b) return;
+      var id=b.dataset.id;
+      if(b.dataset.where==='slot'){ if(seq.length && seq[seq.length-1]===id){ seq.pop(); SFX.click(); render(); } return; }
+      if(id===cfg.order[seq.length]){
+        seq.push(id); SFX.click();
+        if(seq.length===cfg.order.length){ done=true; SFX.solve(); status.className='status-line ok'; status.textContent=cfg.success; render(); setTimeout(function(){api.solve();},900); return; }
+        render();
+      } else { SFX.error(); status.className='status-line warn'; status.textContent='궤도가 어긋난다. 태양에 가까운 쪽부터 다시.'; seq=[]; render(); }
+    });
+    render(); status.textContent=cfg.hint0;
+  },
+  selftest:function(T){
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.orbit.config(d);
+      T('orbit '+d+': 힌트 2개+', Array.isArray(c.hints)&&c.hints.length>=2);
+      T('orbit '+d+': 카드 수와 정답 순서 수 일치', c.order.length===c.items.length);
+      T('orbit '+d+': 정답 순서로 놓으면 풀린다', c.solves(c.order.slice())===true);
+      T('orbit '+d+': 뒤바꾼 순서는 안 풀린다', c.solves(c.order.slice().reverse())===false);
+      T('orbit '+d+': 빈 배열은 안 풀린다', c.solves([])===false);
+      function keyOf(id){ for(var k=0;k<c.items.length;k++) if(c.items[k].id===id) return c.items[k].key; }
+      var mono=true; for(var i=1;i<c.order.length;i++) if(keyOf(c.order[i])<=keyOf(c.order[i-1])) mono=false;
+      T('orbit '+d+': 정답 순서는 '+c.keyName+'가 커지는 순', mono);
+    });
+  }
+});
+
+// ---- 4) 달의 위상 : 달·지구·태양 위치로 위상 만들기 자물쇠 ----
+// (별자리 잇기는 순수 좌표 따라긋기라 '원리가 곧 잠금'이 성립하지 않아 위상으로 대체)
+registerAddon({
+  id:'moonorbit', name:'달의 위상 자물쇠', icon:'🌙', digit:'2',
+  glyph:'🌙', color:0xcdd6ee, recolor:0x14161f,
+  discover:'태양빛이 한쪽에서만 드는 궤도판. 달을 궤도 위 알맞은 자리에 놓아 정해진 위상을 만들면 열린다.',
+  reward:'궤도판 가운데 드러난 숫자',
+  curri:{ easy:'초6 과학 · 달의 위상 변화(보름달)', mid:'중2 과학 · 달의 위상과 위치(상현달)', hard:'중2 과학 · 달의 위상과 위치(하현달)' },
+  config:function(diff){
+    // 슬롯 8개: phi = i*45도. phi=0 태양 쪽(오른쪽) -> 삭. 반시계로 커짐.
+    var names=['삭(안 보임)','초승달','상현달','차오르는 볼록달','보름달','기우는 볼록달','하현달','그믐달'];
+    var mk=function(o){
+      o.slots=8; o.step=45; o.names=names;
+      o.frac=function(phi){ return (1-Math.cos(phi*Math.PI/180))/2; };           // 보이는 밝은 부분 비율
+      o.side=function(phi){ var p=((phi%360)+360)%360; return p===0||p===180?'none':(p<180?'right':'left'); };
+      o.answerIndex=Math.round(o.target/45);
+      return o;
+    };
+    if(diff==='easy') return mk({ target:180, targetName:'보름달',
+      q:'보름달을 만들자. 달을 궤도 위 알맞은 자리에 놓으면 지구에서 둥근 보름달이 보인다.',
+      concept:'달의 위상은 태양-지구-달의 위치 관계로 정해진다. 태양빛은 언제나 한쪽 반만 비춘다.',
+      curri:'초6 과학 · 달의 위상 변화(보름달)',
+      success:'딸깍 — 태양 반대편에서 달 전체가 빛난다. 보름달! 궤도판이 열렸다.',
+      hints:['보름달은 지구를 사이에 두고 태양과 달이 정반대에 있을 때 보인다.','태양(오른쪽)의 반대편, 궤도 맨 왼쪽 자리에 놓자.'] });
+    if(diff==='mid') return mk({ target:90, targetName:'상현달',
+      q:'상현달(오른쪽 반이 밝은 반달)을 만들자.',
+      concept:'달이 태양과 90도를 이루면 밝은 반쪽만 보여 반달이 된다.',
+      curri:'중2 과학 · 달의 위상과 위치(상현달)',
+      success:'딸깍 — 오른쪽 반이 빛나는 상현달! 궤도판이 열렸다.',
+      hints:['상현달은 초승에서 보름으로 차오르는 도중, 태양과 90도를 이루는 자리에 있다.','태양이 오른쪽일 때 궤도 위쪽 자리에 놓으면 오른쪽 반이 밝다.'] });
+    return mk({ target:270, targetName:'하현달',
+      q:'하현달(왼쪽 반이 밝은 반달)을 만들자.',
+      concept:'보름을 지나 기울 때 달은 태양 서쪽 90도에 오고 왼쪽 반만 보인다.',
+      curri:'중2 과학 · 달의 위상과 위치(하현달)',
+      success:'딸깍 — 왼쪽 반이 빛나는 하현달! 궤도판이 열렸다.',
+      hints:['하현달은 보름에서 그믐으로 기우는 도중의 반달이다.','태양이 오른쪽일 때 궤도 아래쪽 자리에 놓으면 왼쪽 반이 밝다.'] });
+  },
+  mount:function(el,cfg,api){
+    var stage=document.createElement('div'); stage.className='stage';
+    var status=document.createElement('div'); status.className='status-line info';
+    el.appendChild(stage); el.appendChild(status);
+    var done=false, sel=-1;
+    function frac(phi){ return (1-Math.cos(phi*Math.PI/180))/2; }
+    function litSide(phi){ var p=((phi%360)+360)%360; return p<180?'right':'left'; }
+    // 달 원반: 밝은 부분 path
+    function moonDisk(cx,cy,r,phi){
+      var f=frac(phi), side=litSide(phi);
+      var base='<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#101632" stroke="#2a3350" stroke-width="1"/>';
+      if(f<0.005) return base;
+      if(f>0.995) return base+'<circle cx="'+cx+'" cy="'+cy+'" r="'+r+'" fill="#ffd76a" stroke="#2a3350" stroke-width="1"/>';
+      var rx=(r*Math.abs(1-2*f)).toFixed(2);
+      var outerSweep = side==='right'?1:0;
+      var innerSweep = (f<0.5)?(side==='right'?1:0):(side==='right'?0:1);
+      var top=(cy-r), bot=(cy+r);
+      var p='M '+cx+' '+top
+        +' A '+r+' '+r+' 0 0 '+outerSweep+' '+cx+' '+bot
+        +' A '+rx+' '+r+' 0 0 '+innerSweep+' '+cx+' '+top+' Z';
+      return base+'<path d="'+p+'" fill="#ffd76a"/>';
+    }
+    function render(){
+      var cx=170, cy=118, R=72, er=16;
+      var svg='<svg viewBox="0 0 340 236" style="width:100%;max-width:360px">';
+      // 태양빛 방향(오른쪽에서 옴)
+      svg+='<defs></defs>';
+      for(var y=54;y<=182;y+=32){ svg+='<line x1="330" y1="'+y+'" x2="250" y2="'+y+'" stroke="#3a4468" stroke-width="1.5" stroke-dasharray="3 4"/>'; svg+='<path d="M250 '+y+' l7 -4 v8 z" fill="#3a4468"/>'; }
+      svg+='<circle cx="322" cy="118" r="16" fill="#ffd76a"/><text x="322" y="146" fill="#8a93a6" font-size="10" text-anchor="middle">태양</text>';
+      // 궤도
+      svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#2a3350" stroke-width="1.5"/>';
+      // 지구
+      svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+er+'" fill="#6aa8ff"/><text x="'+cx+'" y="'+(cy+4)+'" fill="#0b1020" font-size="10" text-anchor="middle">지구</text>';
+      // 슬롯 8개 + 미니 위상
+      for(var i=0;i<8;i++){
+        var phi=i*45, ang=phi*Math.PI/180;
+        var sx=cx+R*Math.cos(ang), sy=cy-R*Math.sin(ang);
+        if(i===sel) svg+='<circle cx="'+sx+'" cy="'+sy+'" r="16" fill="none" stroke="#ffd76a" stroke-width="2"/>';
+        svg+=moonDisk(sx,sy,11,phi);
+        svg+='<circle cx="'+sx+'" cy="'+sy+'" r="14" fill="transparent" data-slot="'+i+'" style="cursor:pointer"/>';
+      }
+      svg+='</svg>';
+      // 목표 위상 참조 + 현재 선택 미리보기
+      var refSvg='<svg viewBox="0 0 60 60" style="width:52px;height:52px">'+moonDisk(30,30,24,cfg.target)+'</svg>';
+      var selPhi = sel<0?null:sel*45;
+      var selSvg = sel<0 ? '<div class="val" style="width:52px;height:52px;color:#8a93a6;font-size:11px;display:flex;align-items:center;justify-content:center">?</div>'
+        : '<svg viewBox="0 0 60 60" style="width:52px;height:52px">'+moonDisk(30,30,24,selPhi)+'</svg>';
+      var selName = sel<0 ? '자리를 고르자' : cfg.names[sel];
+      stage.innerHTML='<div class="log-box" style="font-size:14px;color:#cbd3e6">'+cfg.q+'</div>'
+        +'<div style="font-size:12px;color:#8a93a6;margin:6px 0 8px">'+cfg.concept+'</div>'
+        +'<div class="stage" style="padding:4px">'+svg+'</div>'
+        +'<div class="seq-row" style="justify-content:center;gap:22px;align-items:center;margin-top:6px">'
+          +'<div style="text-align:center"><div style="font-size:11px;color:#8a93a6">목표</div>'+refSvg+'<div style="font-size:12px;color:#ffd76a">'+cfg.targetName+'</div></div>'
+          +'<div style="text-align:center"><div style="font-size:11px;color:#8a93a6">지금 보이는 달</div>'+selSvg+'<div style="font-size:12px;color:#e8ecf6">'+selName+'</div></div>'
+        +'</div>'
+        +'<div class="lever-row" style="justify-content:center;margin-top:10px"><button class="btn primary" data-fix="1">🔓 이 자리로 확정</button></div>';
+    }
+    stage.addEventListener('click',function(ev){
+      if(done) return;
+      var s=ev.target.closest('[data-slot]');
+      if(s){ sel=+s.dataset.slot; SFX.click(); render(); status.className='status-line info'; status.textContent='궤도 위 자리를 옮기며 위상을 살펴보자.'; return; }
+      if(ev.target.closest('[data-fix]')){
+        if(sel<0){ SFX.error(); status.className='status-line warn'; status.textContent='먼저 궤도 위 자리를 고르자.'; return; }
+        if(sel===cfg.answerIndex){ done=true; SFX.solve(); status.className='status-line ok'; status.textContent=cfg.success; setTimeout(function(){api.solve();},900); }
+        else { SFX.error(); status.className='status-line warn'; status.textContent='이 자리의 위상은 '+cfg.names[sel]+'. 목표는 '+cfg.targetName+'이다.'; }
+      }
+    });
+    render(); status.textContent='궤도 위 달을 눌러 자리를 고르고, 목표 위상이 되면 확정하자.';
+  },
+  selftest:function(T){
+    function frac(phi){ return (1-Math.cos(phi*Math.PI/180))/2; }
+    function side(phi){ var p=((phi%360)+360)%360; return p===0||p===180?'none':(p<180?'right':'left'); }
+    var expect={easy:{f:1,idx:4,side:'none'},mid:{f:0.5,idx:2,side:'right'},hard:{f:0.5,idx:6,side:'left'}};
+    ['easy','mid','hard'].forEach(function(d){
+      var c=PUZZLES.moonorbit.config(d), e=expect[d];
+      T('moonorbit '+d+': 힌트 2개+', Array.isArray(c.hints)&&c.hints.length>=2);
+      T('moonorbit '+d+': 정답 자리 index 일치', c.answerIndex===e.idx);
+      T('moonorbit '+d+': 목표 위상 밝기 비율 일치', Math.abs(frac(c.target)-e.f)<1e-9);
+      T('moonorbit '+d+': 밝은 쪽 일치', side(c.target)===e.side);
+      // 정답 자리만 목표 위상을 만든다(유일성)
+      var cnt=0; for(var i=0;i<8;i++){ var phi=i*45; if(Math.abs(frac(phi)-frac(c.target))<1e-9 && side(phi)===side(c.target)) cnt++; }
+      T('moonorbit '+d+': 목표 위상을 만드는 자리는 유일', cnt===1);
+    });
+    // 보름/삭 극단값 확인
+    T('moonorbit: 태양쪽(0도)은 삭(밝기 0)', Math.abs(frac(0)-0)<1e-9);
+    T('moonorbit: 반대편(180도)은 보름(밝기 1)', Math.abs(frac(180)-1)<1e-9);
+  }
+});
+
+/* @@ADDON_INSERT@@ 이 줄 위에 새 registerAddon 블록을 붙인다 */
+/* ===== END ADDON REGISTRATIONS ===== */
 
 function buildLabScene(){
   const scene = new THREE.Scene();
@@ -2619,7 +5349,7 @@ function handleObj(id){
   $('#note-pop').classList.remove('on');
   if(o.type==='door') return openDoor();
   if(o.type==='decor'){
-    if(id==='drawer' && !state.found.drawer){ state.found.drawer = true; update3D(); }
+    if(id==='drawer' && !state.found.drawer){ state.found.drawer = true; update3D(); saveProgress(); }
     showNote(o.name, o.text);
     return;
   }
@@ -2633,7 +5363,9 @@ function handleObj(id){
   }
   if(!state.disc[o.lockId]){
     state.disc[o.lockId] = true;
+    SFX.discover();
     update3D();
+    saveProgress();
     showNote(lm.name + ' 발견!', (lm.discover || o.discover) + ' (다시 누르면 조사한다)');
     return;
   }
@@ -2642,6 +5374,11 @@ function handleObj(id){
 
 $('#note-pop').addEventListener('click', ()=>$('#note-pop').classList.remove('on'));
 $('#pieces-btn').addEventListener('click', openPieces);
+(function(){ const mb = $('#mute-btn'); if(!mb) return;
+  const sync = ()=>{ mb.textContent = SFX.isMuted() ? '🔇' : '🔊'; };
+  sync();
+  mb.addEventListener('click', ()=>{ SFX.toggle(); sync(); if(!SFX.isMuted()) SFX.click(); });
+})();
 $('#nav-l').addEventListener('click', ()=>rotateStep(-1));
 $('#nav-r').addEventListener('click', ()=>rotateStep(1));
 document.addEventListener('keydown', e=>{
@@ -2661,7 +5398,7 @@ function openPuzzle(id){
   modal.innerHTML = `
     <div class="modal-head"><h3>${p.icon} ${p.name}${diffNm?` <span style="font-size:11px;color:var(--amber);font-weight:500">${diffNm}</span>`:''}</h3>
       <button class="x-btn" id="m-close">✕</button></div>
-    <p class="modal-desc">${cfg.desc}</p>
+    ${cfg.desc?`<p class="modal-desc">${cfg.desc}</p>`:''}
     ${cfg.curri ? `<div class="curri-badge">📚 ${cfg.curri}</div>` : ''}
     <div id="puzzle-body"></div>
     <div id="hint-area"></div>
@@ -2672,7 +5409,7 @@ function openPuzzle(id){
   $('#m-close').onclick = closeModal;
   $('#m-hint').onclick = ()=>{
     if(hintIdx >= cfg.hints.length) return;
-    state.hintsUsed++; $('#hint-count').textContent = state.hintsUsed;
+    state.hintsUsed++; $('#hint-count').textContent = state.hintsUsed; saveProgress();
     const d = document.createElement('div');
     d.className='hint-box'; d.textContent = cfg.hints[hintIdx++];
     $('#hint-area').appendChild(d);
@@ -2681,7 +5418,9 @@ function openPuzzle(id){
   p.mount($('#puzzle-body'), cfg, {
     solve(){
       state.solved[id] = true;
+      SFX.solve();
       refresh3D();
+      saveProgress();
       setTimeout(()=>{ closeModal(); showPiece(id); }, 700);
     }
   });
@@ -2763,11 +5502,11 @@ function openDoor(){
     const k = b.dataset.k;
     if(k==='C'){ entered=''; draw(); return; }
     if(k==='E'){
-      if(entered===doorEntryCode()){ escapeRoom(); }
-      else { disp.classList.remove('shake'); void disp.offsetWidth; disp.classList.add('shake'); entered=''; setTimeout(draw,350); }
+      if(entered===doorEntryCode()){ SFX.door(); escapeRoom(); }
+      else { SFX.error(); disp.classList.remove('shake'); void disp.offsetWidth; disp.classList.add('shake'); entered=''; setTimeout(draw,350); }
       return;
     }
-    if(entered.length < DOOR_CODE.length){ entered += k; draw(); }
+    if(entered.length < DOOR_CODE.length){ SFX.click(); entered += k; draw(); }
   };
   draw();
 }
@@ -2792,6 +5531,7 @@ function escapeRoom(){
   } else {
     $('#win-story').innerHTML = '';
   }
+  clearProgress();
   closeModal();
   const fl = $('#flash');
   fl.classList.add('on');
@@ -2838,13 +5578,14 @@ function decodeCfg(str){
   return JSON.parse(new TextDecoder().decode(bytes));
 }
 function applyCustomCfg(c){
-  THEME = THEMES.lab; // 조립기 맞춤 방은 실험실 테마 기준
+  THEME = (c.th && THEMES[c.th]) ? THEMES[c.th] : THEMES.lab; // 조립기가 고른 방 테마
   const locks = (c.l||[])
     .filter(x=>PUZZLES[x.p])
-    .map(x=>({ id:x.p, diff:DIFF_LABEL[x.d]?x.d:'mid', digit:/^[0-9]$/.test(String(x.g))?String(x.g):PUZZLES[x.p].digit }));
+    .map(x=>({ id:x.p, diff:DIFF_LABEL[x.d]?x.d:'mid', digit:/^[0-9]$/.test(String(x.g))?String(x.g):lockMeta(x.p).digit }));
   if(!locks.length) return false;
   ROOM = { title:String(c.t||'맞춤 방').slice(0,40), story:String(c.s||'장치를 풀어 비밀번호를 모으자.').slice(0,200), custom:true, locks };
   DOOR_CODE = locks.map(l=>l.digit).join('');
+  customCfg = c;
   return true;
 }
 
@@ -2902,6 +5643,29 @@ function runSelftest(){
     T(`moon ${diff}: 오답 위상 잠김`, !moonSolved(oc, oc.rowsQ.map(r=>(r.ans+1)%6)));
     T(`moon ${diff}: 정답 인덱스 유효(0~5)`, oc.rowsQ.every(r=>r.ans>=0 && r.ans<=5));
 
+    const fc = fractionConfig(diff);
+    T(`fraction ${diff}: 정답 조합 해결`, fractionSolved(fc, fc.solution.map(x=>x.slice())));
+    T(`fraction ${diff}: 빈 원판 미해결`, !fractionSolved(fc, fc.dials.map(x=>[0,x.d])));
+    T(`fraction ${diff}: 정답 합 = 목표(약분)`, fracEq(fracAdd(fc.solution[0],fc.solution[1]), fc.target));
+    T(`fraction ${diff}: 정답 분자 ≤ 분모`, fc.solution.every(s=>s[0]>=0 && s[0]<=s[1]));
+
+    const ec = equationConfig(diff);
+    T(`equation ${diff}: 정답 x로 수평`, equationSolved(ec, ec.answer));
+    T(`equation ${diff}: 오답 x는 기울어짐`, !equationSolved(ec, ec.answer+1));
+    T(`equation ${diff}: 정답이 실제 등식`, eqLeft(ec,ec.answer)===eqRight(ec,ec.answer));
+    T(`equation ${diff}: 답 x가 범위 안(0~xmax)`, ec.answer>=0 && ec.answer<=ec.xmax);
+
+    const sc = symmetryConfig(diff);
+    const mates = sc.left.map(([r,c])=>symMate(sc,r,c).join(',')).filter(k=>!sc.left.some(([r,c])=>r+','+c===k));
+    T(`symmetry ${diff}: 정답(짝 채우기) 해결`, symmetrySolved(sc, mates));
+    T(`symmetry ${diff}: 빈 채움 미해결`, !symmetrySolved(sc, []));
+    T(`symmetry ${diff}: 짝 좌표 격자 안`, sc.left.every(([r,c])=>{const[mr,mc]=symMate(sc,r,c);return mr>=0&&mr<sc.rows&&mc>=0&&mc<sc.cols;}));
+
+    const tc = strataConfig(diff);
+    T(`strata ${diff}: 정답 순서 해결`, strataSolved(tc, tc.correct.slice()));
+    T(`strata ${diff}: 뒤집힌 순서 미해결`, !strataSolved(tc, tc.correct.slice().reverse()));
+    T(`strata ${diff}: 층 이름 중복 없음`, new Set(tc.correct).size===tc.correct.length);
+
     T(`교육과정 ${diff}: 전 퍼즐 curri 메타 보유`,
       Object.keys(PUZZLES).every(id=>typeof PUZZLES[id].config(diff).curri === 'string'));
   });
@@ -2914,9 +5678,19 @@ function runSelftest(){
     T('맞춤 방: 적용 성공', ok && ROOM.title==='테스트 방' && ROOM.locks.length===2 && DOOR_CODE==='12');
     T('맞춤 방: 난이도 잠금별 반영', ROOM.locks[0].diff==='easy' && ROOM.locks[1].diff==='hard');
     T('맞춤 방: 엉터리 설정 거부', !applyCustomCfg({l:[{p:'없는퍼즐'}]}));
+    // 테마 지정 맞춤 방: 그 방의 장치 이름·씬을 따른다
+    applyCustomCfg({th:'mars', t:'화성반', s:'', l:[{p:'circuit',d:'mid',g:'3'},{p:'moon',d:'mid',g:'8'}]});
+    T('맞춤 방: 테마 지정 시 THEME 반영', THEME.id==='mars' && lockMeta('circuit').name==='메인 배전반');
+    T('맞춤 방: 테마 지정 후에도 커스텀', ROOM.custom===true && DOOR_CODE==='38');
+    THEME = THEMES.lab;
     ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
     T('기본 방: 문 코드 6자리(잠금 6종)', DOOR_CODE.length===6);
   }
+
+  // 효과음 모듈 (에셋 없이 존재/토글만 확인, 재생은 headless에서 무음)
+  T('오디오: SFX API 존재', typeof SFX.solve==='function' && typeof SFX.door==='function' && typeof SFX.toggle==='function');
+  { const before = SFX.isMuted(); SFX.toggle(); const after = SFX.isMuted(); if(before!==after) SFX.toggle();
+    T('오디오: 음소거 토글 동작', before!==after); }
 
   // 이야기 조각 메커니즘 + 테마별 씬 (실험실/저택)
   const EXPECT_ENTRY = {lab:'954721', mansion:'836072', frequency:'986314', mars:'273509'};
@@ -2933,13 +5707,26 @@ function runSelftest(){
       try{
         const b = buildRoomScene();
         const ids = new Set(b.pickables.map(p=>p.userData.obj));
-        return Object.keys(SCENE_OBJECTS).every(id=>ids.has(id))
+        // 조립기 애드온 장치는 조건부 배치 → 기본 방 검사에서 제외(ADDON_DEVICES에 있는 lock_* 전부)
+        return Object.keys(SCENE_OBJECTS).filter(id=>!ADDON_DEVICES[id.replace(/^lock_/,'')]).every(id=>ids.has(id))
           && REQ_REFS.every(k=>b.refs[k]!==undefined)
           && b.refs.dial.visible===false
           && b.refs.cloth.every(m=>m.visible!==false);
       }catch(e){ return false; }
     })());
   });
+  // 조건부 애드온 장치: 포함된 방에서만 3D 배치
+  {
+    THEME = THEMES.lab;
+    ['fraction','equation','symmetry','strata'].forEach(id=>{
+      ROOM = {title:'t', story:'', custom:true, locks:[{id, diff:'mid', digit:'5'}]};
+      const withIt = new Set(buildRoomScene().pickables.map(p=>p.userData.obj));
+      ROOM = defaultRoom();
+      const without = new Set(buildRoomScene().pickables.map(p=>p.userData.obj));
+      T(`애드온 ${id}: 포함 방에만 3D 등장`, withIt.has('lock_'+id) && !without.has('lock_'+id));
+    });
+    ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+  }
   THEME = THEMES.lab;
   {
     ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
@@ -2950,12 +5737,44 @@ function runSelftest(){
       ['easy','mid','hard'].every(d=>moonConfig(d).rowsQ.some(r2=>r2.q.includes('동쪽') && r2.ans===3)));
   }
 
+  // 진행상황 저장/복원
+  {
+    THEME = THEMES.mansion; ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+    state.diff='mid'; state.solved={circuit:true, ph:true}; state.disc={circuit:true}; state.found={}; state.hintsUsed=2; state.start=Date.now()-5000;
+    clearProgress(); saveProgress();
+    const s = loadSave();
+    T('저장: 세션이 기록됨', !!s && s.themeId==='mansion' && s.diff==='mid');
+    T('저장: 푼 장치·힌트 보존', s && Object.keys(s.solved).length===2 && s.hintsUsed===2);
+    T('저장: 경과 시간 보존(>0)', s && s.elapsedMs>0);
+    T('저장: 진행 있음 판정', saveHasProgress(s));
+    // 완료 상태는 저장 안 남김
+    state.solved={circuit:1,balance:1,cipher:1,ph:1,mirror:1,moon:1};
+    T('저장: 6개 완료면 진행중 아님', !saveHasProgress({themeId:'mansion',diff:'mid',custom:false,solved:state.solved}));
+    clearProgress();
+    T('저장: clear 후 null', !loadSave());
+    state.solved={}; state.disc={}; state.found={}; state.hintsUsed=0; state.diff=null; state.start=null; state._resumed=false;
+    THEME = THEMES.lab; ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+  }
+
   // 탐색 씬
   T('탐색: 모든 퍼즐이 벽면에 배치됨',
     Object.keys(PUZZLES).every(id=>Object.values(SCENE_OBJECTS).some(o=>o.lockId===id)));
   T('3D: THREE 로드됨', typeof THREE !== 'undefined');
   T('탐색: 씬 오브젝트가 전부 유형 보유',
     Object.values(SCENE_OBJECTS).every(o=>['door','decor','lock'].includes(o.type)));
+
+  // 등록된 애드온 퍼즐 자가 테스트 + 계약 검증
+  ADDON_META.forEach(m=>{
+    T(`애드온계약 ${m.id}: 레지스트리·씬·장치 배선`,
+      !!PUZZLES[m.id] && !!SCENE_OBJECTS['lock_'+m.id] && !!ADDON_DEVICES[m.id]
+      && ['easy','mid','hard'].every(d=>typeof PUZZLES[m.id].config(d).curri==='string'));
+    THEME = THEMES.lab;
+    ROOM = {title:'t', story:'', custom:true, locks:[{id:m.id, diff:'mid', digit:'5'}]};
+    const withIt = new Set(buildRoomScene().pickables.map(p=>p.userData.obj));
+    T(`애드온계약 ${m.id}: 포함 방에만 3D 등장`, withIt.has('lock_'+m.id));
+  });
+  ROOM = defaultRoom(); DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
+  ADDON_TESTS.forEach(fn=>{ try{ fn(T); }catch(e){ T('애드온 테스트 예외: '+e.message, false); } });
 
   const allPass = results.every(r=>r[1]);
   document.title = 'SELFTEST ' + (allPass?'PASS':'FAIL');
@@ -2969,7 +5788,7 @@ function runSelftest(){
   // 조립기가 만든 맞춤 방: #cfg=...
   const h = location.hash.match(/cfg=([^&]+)/);
   if(h){
-    try{ if(applyCustomCfg(decodeCfg(h[1]))) return startRoom('custom'); }
+    try{ if(applyCustomCfg(decodeCfg(h[1]))){ startRoom('custom'); if(q.get('wall')){ camYaw=((+q.get('wall'))%4)*Math.PI/2; } return; } }
     catch(e){ /* 잘못된 링크면 기본 인트로로 */ }
   }
   // 개발용: ?theme=mansion&screen=room&diff=mid&open=circuit&wall=1&disc=cipher&solved=circuit,ph
@@ -2989,6 +5808,19 @@ function runSelftest(){
     else if(op==='pieces') openPieces();
     else if(op==='piece') showPiece(q.get('lock')||'circuit');
     else if(op) openPuzzle(op);
+    return;
+  }
+  // 이어하기 배너 (저장된 진행이 있으면)
+  const saved = loadSave();
+  if(saveHasProgress(saved)){
+    const th = THEMES[saved.themeId] || THEMES.lab;
+    const total = saved.custom ? (saved.cfg&&saved.cfg.l?saved.cfg.l.length:6) : 6;
+    const done = Object.keys(saved.solved).length;
+    $('#resume-title').textContent = `이어하기 · ${saved.custom ? (saved.cfg&&saved.cfg.t||'맞춤 방') : th.title}`;
+    $('#resume-sub').textContent = `${DIFF_LABEL[saved.diff]||'맞춤 방'} · 장치 ${done}/${total} 해제됨`;
+    $('#resume-banner').style.display = 'flex';
+    $('#resume-btn').addEventListener('click', ()=>resumeSession(saved));
+    $('#resume-clear').addEventListener('click', ()=>{ clearProgress(); $('#resume-banner').style.display='none'; });
   }
 })();
 </script>
