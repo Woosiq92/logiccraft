@@ -102,12 +102,46 @@ const eduCount = eduGroups.reduce((n, g) => n + g.count, 0);
           <p class="eyebrow">SYNERGEION CAMPUS · 웹에서 둘러보기</p>
           <h2 class="section-title">걸어서 둘러보는 배움의 캠퍼스.</h2>
           <div class="campus-cta">
-            <a class="btn btn-primary" href="https://logicschool.co.kr/">캠퍼스 입장하기</a>
+            <button class="btn btn-primary" type="button" id="campus-enter">캠퍼스 입장하기</button>
           </div>
         </div>
       </div>
     </div>
+
+    <!-- 캠퍼스는 다른 도메인(logicschool.co.kr)에 있고 CORS 도 없다. 여기서 바로 로그인시킬 수는
+         없으므로 코드만 받아 캠퍼스로 넘긴다 — 세션은 캠퍼스가 자기 오리진에서 세운다.
+         코드는 해시로 넘어간다(서버 로그·Referer 에 안 남는다). -->
+    <dialog class="code-modal" id="campus-modal">
+      <form method="dialog" class="code-form" id="campus-form">
+        <h3>구독 코드</h3>
+        <input id="campus-code" name="code" inputmode="latin" autocapitalize="characters"
+               placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" />
+        <div class="code-row">
+          <button class="btn btn-ghost" type="button" id="campus-cancel">닫기</button>
+          <button class="btn btn-primary" type="submit">들어가기</button>
+        </div>
+      </form>
+    </dialog>
   </section>
+
+  <script is:inline>
+    (function () {
+      var dlg = document.getElementById('campus-modal');
+      var open = document.getElementById('campus-enter');
+      if (!dlg || !open) return;
+      var input = document.getElementById('campus-code');
+      open.addEventListener('click', function () {
+        dlg.showModal();
+        input.focus();
+      });
+      document.getElementById('campus-cancel').addEventListener('click', function () { dlg.close(); });
+      document.getElementById('campus-form').addEventListener('submit', function () {
+        var code = (input.value || '').trim();
+        if (!code) return;
+        location.href = 'https://logicschool.co.kr/#code=' + encodeURIComponent(code);
+      });
+    })();
+  </script>
 
   <!-- ============ PRODUCTS ============ -->
   <section class="products" id="products" style="padding-top:clamp(20px,3vw,36px)">
