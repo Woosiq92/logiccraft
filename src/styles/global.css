@@ -388,6 +388,8 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 }
 .campus-desc { color: var(--muted); font-size: 15.5px; margin: 16px 0 0; max-width: 42ch; }
 .campus-cta { margin-top: clamp(22px, 3vw, 30px); }
+/* 들어가 보면 코드를 묻는다. 누르기 전에 알려 주지 않으면 문 앞에서 헛걸음한다. */
+.campus-note { color: var(--muted); font-size: 13.5px; margin: 12px 0 0; }
 
 @media (max-width: 780px) {
   .campus-card { grid-template-columns: 1fr; gap: 22px; }
