@@ -730,7 +730,7 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .bio .who p { color: var(--ink-soft); font-size: 14.5px; margin: 8px 0 0; line-height: 1.6; }
 
 /* contact email card */
-.contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: stretch; margin-top: clamp(36px, 5vw, 56px); }
+.contact-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 22px; align-items: stretch; margin-top: clamp(36px, 5vw, 56px); }
 .contact-card {
   background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-lg);
   padding: clamp(28px, 4vw, 40px); box-shadow: var(--shadow-sm);
@@ -749,6 +749,11 @@ body.menu-open .mobile-menu { opacity: 1; transform: none; pointer-events: auto;
 .contact-card.dark .yt-row { display: flex; align-items: center; gap: 14px; }
 .contact-card .yt-mark { width: 50px; height: 36px; border-radius: 10px; background: #ff3b30; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .contact-card .yt-mark::after { content: ""; width: 0; height: 0; border-left: 12px solid #fff; border-top: 7px solid transparent; border-bottom: 7px solid transparent; margin-left: 3px; }
+.contact-card.dark .ig-row { display: flex; align-items: center; gap: 14px; }
+.contact-card .yt-row .ck, .contact-card .ig-row .ck { display: block; }
+.contact-card .yt-row .cv, .contact-card .ig-row .cv { display: block; margin-top: 2px; word-break: normal; }
+.contact-card .ig-mark { width: 44px; height: 44px; border-radius: 13px; background: linear-gradient(135deg, #fbb040 0%, #ee2a7b 52%, #6228d7 100%); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.contact-card .ig-mark svg { width: 25px; height: 25px; display: block; }
 
 /* ============================================================
    Responsive
