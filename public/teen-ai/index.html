@@ -186,6 +186,31 @@ footer a{font-weight:600}
   font-size:13.5px; font-weight:600;
 }
 .gc div span{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted-2); font-weight:400; margin-top:2px}
+/* ---------- 들고 갈 곳 ---------- */
+.routes{padding:clamp(34px,5vw,60px) 0; border-top:1px solid var(--line); background:var(--paper-2)}
+.routes h2{margin:0 0 8px; font-size:clamp(22px,3vw,30px); letter-spacing:-.02em; font-weight:800}
+.routes .sub{margin:0 0 24px; color:var(--ink-soft); font-size:15.5px; max-width:64ch}
+.rt-head{
+  margin:clamp(26px,3vw,38px) 0 4px; font-size:12px; letter-spacing:.12em;
+  font-family:'IBM Plex Mono',monospace; color:var(--muted); text-transform:uppercase; font-weight:500;
+}
+.rt-head:first-of-type{margin-top:0}
+.rt-lead{margin:0 0 14px; font-size:14px; color:var(--ink-soft)}
+.rt{display:grid; gap:11px; grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.rt article{background:var(--card); border:1px solid var(--line); border-radius:15px; padding:16px 17px}
+.rt article.star{border-color:var(--blue); box-shadow:0 0 0 3px var(--blue-tint)}
+.rt h4{margin:0; font-size:15.5px; font-weight:800; letter-spacing:-.01em}
+.rt h4 a{color:var(--ink)}
+.rt h4 a:hover{color:var(--blue)}
+.rt .by{margin:3px 0 0; font-size:12px; color:var(--muted); font-family:'IBM Plex Mono',monospace}
+.rt .facts{display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 0}
+.rt .facts span{font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; background:var(--paper-2); color:var(--ink-soft); border:1px solid var(--line)}
+.rt p.d{margin:10px 0 0; font-size:13.5px; color:var(--ink-soft); line-height:1.6}
+.rt p.path{margin:10px 0 0; padding:9px 11px; border-radius:10px; background:var(--blue-tint); color:var(--blue-deep); font-size:13px; font-weight:700}
+.rt.us article{background:transparent; border-style:dashed}
+.rt.us h4{font-size:14.5px; font-weight:700; color:var(--ink-soft)}
+.rt.us p.d{font-size:13px; color:var(--muted)}
+
 .sdg-note{
   margin:22px 0 -8px; padding:11px 15px; border-radius:12px; background:var(--ink); color:#fff;
   font-size:13.5px; font-weight:600; display:flex; flex-wrap:wrap; gap:10px; align-items:center;
@@ -323,6 +348,25 @@ footer a{font-weight:600}
       <a href="https://www.engineeringchallenges.org/challenges.aspx" target="_blank" rel="noopener">NAE Grand Challenges ↗</a>.
       사례를 어느 목표에 넣을지는 우리가 판단해 붙인 것이라, 달리 볼 여지가 있습니다.
     </p>
+  </div>
+</section>
+
+<section class="routes">
+  <div class="wrap">
+    <h2>만든 다음 들고 갈 곳</h2>
+    <p class="sub">문제를 골랐다면 다음은 어디로 가느냐입니다. 마감 날짜는 해마다 바뀌어서 적지 않았습니다. 몇 월쯤인지와 누가 나갈 수 있는지만 두었습니다. 나가기 전에는 그해 요강을 꼭 확인하세요.</p>
+
+    <p class="rt-head">국내</p>
+    <p class="rt-lead">중·고등학생이 지금 바로 지원할 수 있는 곳입니다.</p>
+    <div class="rt" id="rtKr"></div>
+
+    <p class="rt-head">국외 — 한국 학생도 나갈 수 있는 곳</p>
+    <p class="rt-lead">국적이나 거주지 제한 없이 열려 있거나, 국내 선발을 거쳐 나가는 대회입니다.</p>
+    <div class="rt" id="rtWorld"></div>
+
+    <p class="rt-head">국외 — 미국 학생만</p>
+    <p class="rt-lead">이 페이지의 사례 여럿이 여기 출신입니다. 한국에서는 지원할 수 없으니, 사례를 읽을 때 참고만 하세요.</p>
+    <div class="rt us" id="rtUs"></div>
   </div>
 </section>
 
@@ -809,6 +853,84 @@ const GC = [
   ['한 사람에 맞는 배움', 'Advance Personalized Learning'],
   ['과학이 쓸 도구 만들기', 'Engineer the Tools of Scientific Discovery']
 ];
+/* 들고 갈 곳. 마감 날짜는 해마다 바뀌므로 월까지만 적는다. */
+const ROUTES = {
+  rtKr: [
+    {
+      n: '한국코드페어', by: '과학기술정보통신부 · 한국과학창의재단', u: 'https://kcf.or.kr',
+      who: '초·중·고 · 3인 이하', when: '접수 5–6월 · 본선 10월', star: true,
+      d: 'SW공모전과 해커톤, 온라인 SW공부방 셋으로 굴러간다. 2026년 주제는 AI와 데이터로 푸는 우리 사회의 문제.',
+      path: 'SW공모전에서 동상 이상이면 ISEF 한국 대표로 뽑히는 길이 열린다.'
+    },
+    {
+      n: 'AI Youth Challenge', by: '포스코DX · 한국인공지능산업협회 (교육부 후원)', u: 'https://aichallenge.poscodx.com',
+      who: '만 12–18세 · 2–3인 팀', when: '접수 4–6월 · 본선 8월',
+      d: '전국 청소년 AI창의 경진대회. 총상금 1,600만 원. 이 페이지의 Null 팀이 여기서 나왔다.'
+    },
+    {
+      n: 'SW미래채움 고교 AI·SW 챌린지', by: '과학기술정보통신부', u: 'https://wevity.com/index.php?c=find&cidx=21&gbn=viewok&gp=1&gub=1&ix=107260&s=1',
+      who: '고등학교 1–3학년', when: '접수 5월 · 해커톤 7–8월',
+      d: '온라인 교육을 두 달 듣고 해커톤으로 붙는다. 대상에는 ROBOFEST 한국대표 출전권과 해외연수가 함께 온다.'
+    },
+    {
+      n: '전국민 AI 경진대회 청소년 트랙', by: '정부 주관', u: 'https://aichallenge4all.or.kr/moduai',
+      who: '청소년', when: '연 1회',
+      d: '전국민 대회 안에 청소년만 겨루는 갈래가 따로 있다.'
+    },
+    {
+      n: 'KSEF 한국과학창의력대회', by: '한국과학기술지원단', u: 'http://www.ksef.or.kr',
+      who: '초4 이상 – 대학원', when: '1차 서면 · 2차 발표심사',
+      d: '1차에서 60팀을 추려 2차에서 발표로 겨룬다. 코드페어가 SW·AI 통로라면 이쪽은 과학 전 분야 통로다.'
+    }
+  ],
+  rtWorld: [
+    {
+      n: 'ISEF 국제과학기술경진대회', by: 'Society for Science', u: 'https://www.societyforscience.org/isef/',
+      who: '고등학생 · 60여 개국', when: '5월',
+      d: '세계 최대 고교 과학경진대회. 2,000여 명이 모인다. 한국에서는 한국코드페어나 KSEF를 거쳐 나간다. 이 페이지의 이지호·양은석·김택현·정재욱·조한선이 이 문을 지나갔다.'
+    },
+    {
+      n: 'Technovation Girls', by: 'Technovation', u: 'https://technovationchallenge.org/',
+      who: '8–16세 여학생과 젊은 여성 · 전 세계', when: '등록 3월 · 제출 4월', star: true,
+      d: '팀을 짜서 실제 문제를 푸는 모바일 앱을 만들어 낸다. 성별 자체가 자격인 국제 대회라, 여학생에게 가장 곧게 열린 길이다.'
+    },
+    {
+      n: 'Conrad Challenge', by: 'Space Center Houston', u: 'https://conrad.spacecenter.org/',
+      who: '13–18세 · 전 세계', when: '등록 10월 · 마감 1월 · 서밋 4월',
+      d: '에너지, 건강, 항공우주, 사이버보안, 물 부족 다섯 갈래 중 하나를 골라 사업까지 설계한다.'
+    },
+    {
+      n: 'IOAI 국제 인공지능 올림피아드', by: 'IOAI', u: 'https://ioai-official.org/',
+      who: '국가대표로 선발', when: '8월',
+      d: '나라마다 대표를 뽑아 겨루는 올림피아드. 2026년 제3회는 카자흐스탄 아스타나에서 열린다.'
+    },
+    {
+      n: 'WAICY 세계 청소년 AI 경진대회', by: 'WAICY', u: 'https://www.waicy.org/',
+      who: '6–12학년', when: '마감 11월',
+      d: 'AI로 현실 문제를 푸는 작품을 낸다. 참가비가 없다.'
+    }
+  ],
+  rtUs: [
+    { n: 'Regeneron 과학경시(STS)', who: '미국 고교 3학년', d: '마테오 파스가 1등상 25만 달러를 받은 대회.' },
+    { n: '3M Young Scientist Challenge', who: '미국 5–8학년', d: '아니카 체브롤루, 리샤브 자인, 시리시 수바시, 리앤 팬이 모두 여기 우승자다.' },
+    { n: 'Congressional App Challenge', who: '미국 하원 선거구별', d: '지역구 단위로 앱을 겨룬다.' },
+    { n: 'USA AI Olympiad', who: '미국', d: 'IOAI 미국 대표 선발을 겸한다.' }
+  ]
+};
+
+function buildRoutes() {
+  for (const [id, list] of Object.entries(ROUTES)) {
+    document.getElementById(id).innerHTML = list.map(r => `
+      <article${r.star ? ' class="star"' : ''}>
+        <h4>${r.u ? `<a href="${r.u}" target="_blank" rel="noopener">${esc(r.n)} ↗</a>` : esc(r.n)}</h4>
+        ${r.by ? `<p class="by">${esc(r.by)}</p>` : ''}
+        <div class="facts">${[r.who, r.when].filter(Boolean).map(f => `<span>${esc(f)}</span>`).join('')}</div>
+        <p class="d">${esc(r.d)}</p>
+        ${r.path ? `<p class="path">${esc(r.path)}</p>` : ''}
+      </article>`).join('');
+  }
+}
+
 let activeSdg = null;
 const goalGrid = document.getElementById('goalGrid');
 const sdgNote = document.getElementById('sdgNote');
@@ -991,6 +1113,7 @@ function buildStats() {
 
 buildStats();
 buildGoals();
+buildRoutes();
 render();
 </script>
 </body>
