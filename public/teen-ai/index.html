@@ -113,6 +113,10 @@ input[type="search"]:focus,select:focus{outline:2px solid var(--blue-tint); bord
 .tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
 .tag{font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; background:var(--paper-2); color:var(--ink-soft); border:1px solid var(--line)}
 .tag.kind{background:var(--clay-soft); color:#8a4f26; border-color:#e8d3bf}
+.tag.money{background:var(--blue-tint); color:var(--blue-deep); border-color:#cfdaff; font-weight:700}
+.tag.money b{color:var(--ink); font-weight:800}
+.age.unknown{background:var(--paper-2); color:var(--muted)}
+.age.unknown .u{color:var(--muted-2)}
 .what{margin:13px 0 0; font-size:14.5px; color:var(--ink-soft)}
 .more{margin:12px 0 0; font-size:12.5px; font-weight:600; color:var(--blue); font-family:'IBM Plex Mono',monospace}
 .case[open] .more{display:none}
@@ -149,6 +153,50 @@ footer p{margin:0 0 10px; max-width:74ch}
 footer .fine{font-size:12.5px; color:var(--muted-2)}
 footer a{font-weight:600}
 
+/* ---------- 목표·난제 ---------- */
+.goals{padding:clamp(34px,5vw,60px) 0; border-top:1px solid var(--line)}
+.goals h2{margin:0 0 8px; font-size:clamp(22px,3vw,30px); letter-spacing:-.02em; font-weight:800}
+.goals .sub{margin:0 0 24px; color:var(--ink-soft); font-size:15.5px; max-width:64ch}
+.goal-grid{display:grid; gap:9px; grid-template-columns:repeat(auto-fill,minmax(200px,1fr))}
+.goal{
+  display:flex; align-items:flex-start; gap:10px; text-align:left; width:100%;
+  font:inherit; padding:12px 13px; border-radius:13px; background:var(--card);
+  border:1px solid var(--line); color:var(--ink); cursor:default;
+}
+.goal .no{
+  flex:0 0 auto; width:26px; height:26px; border-radius:8px; display:grid; place-items:center;
+  font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:600;
+  background:var(--blue-tint); color:var(--blue-deep);
+}
+.goal .nm{font-size:13.5px; font-weight:700; line-height:1.35}
+.goal .ct{display:block; font-size:11.5px; font-weight:600; color:var(--blue); margin-top:2px; font-family:'IBM Plex Mono',monospace}
+.goal.has{cursor:pointer}
+.goal.has:hover{border-color:var(--blue)}
+.goal.has[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fff}
+.goal.has[aria-pressed="true"] .no{background:#3a4470; color:#fff}
+.goal.has[aria-pressed="true"] .ct{color:#9fb6ff}
+.goal.empty{background:transparent; border-style:dashed; border-color:var(--line-strong)}
+.goal.empty .no{background:var(--paper-2); color:var(--muted-2)}
+.goal.empty .nm{color:var(--muted); font-weight:600}
+.goal.empty .ct{color:var(--clay)}
+.gc-head{margin:clamp(30px,4vw,46px) 0 8px; font-size:clamp(18px,2.2vw,23px); font-weight:800; letter-spacing:-.02em}
+.gc{display:grid; gap:7px; grid-template-columns:repeat(auto-fill,minmax(230px,1fr)); margin-top:14px}
+.gc div{
+  padding:10px 13px; border-radius:11px; background:var(--card); border:1px solid var(--line);
+  font-size:13.5px; font-weight:600;
+}
+.gc div span{display:block; font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--muted-2); font-weight:400; margin-top:2px}
+.sdg-note{
+  margin:22px 0 -8px; padding:11px 15px; border-radius:12px; background:var(--ink); color:#fff;
+  font-size:13.5px; font-weight:600; display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+}
+.sdg-note[hidden]{display:none}
+.sdg-note button{
+  font:inherit; font-size:12.5px; font-weight:600; background:transparent; color:#c3c9e4;
+  border:1px solid #39426e; border-radius:8px; padding:4px 11px; cursor:pointer;
+}
+.sdg-note button:hover{border-color:#7ea2ff; color:#fff}
+
 /* ---------- 발표 모드 ---------- */
 .present-btn{
   font:inherit; font-size:13.5px; font-weight:700; padding:7px 14px; border-radius:10px;
@@ -181,6 +229,9 @@ footer a{font-weight:600}
 .p-age small{font-size:.3em; color:#8f97b8; margin-left:.15em; font-family:'Pretendard Variable',Pretendard,sans-serif}
 .p-name{font-size:clamp(24px,3vw,48px); font-weight:800; letter-spacing:-.02em}
 .p-name span{display:block; font-size:.52em; font-weight:600; color:#8f97b8; margin-top:6px; font-family:'IBM Plex Mono',monospace}
+.p-money{margin:0; display:flex; align-items:baseline; gap:clamp(10px,1.2vw,18px); flex-wrap:wrap}
+.p-money b{font-size:clamp(26px,4.2vw,66px); font-weight:800; letter-spacing:-.02em; color:#ffd48a}
+.p-money span{font-family:'IBM Plex Mono',monospace; font-size:clamp(13px,1.4vw,22px); color:#8f97b8}
 .p-slots{display:grid; gap:clamp(12px,1.6vw,24px); grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
 .p-slot h4{
   margin:0 0 6px; font-family:'IBM Plex Mono',monospace; font-weight:500;
@@ -224,7 +275,7 @@ footer a{font-weight:600}
   <div class="wrap">
     <p class="eyebrow">BETA LAB · 사례집</p>
     <h1>10대가 만든 AI.</h1>
-    <p class="lead">열넷에서 열아홉 사이에 AI로 무언가를 만들어 세상에 내놓은 사람들을 모았습니다. 한 사람마다 같은 네 칸을 채웠습니다. 몇 살이었는지, 왜 시작했는지, 무엇으로 만들었는지, 어떻게 알려졌는지.</p>
+    <p class="lead">열셋에서 열아홉 사이에 AI로 무언가를 만들어 세상에 내놓은 사람들을 모았습니다. 한 사람마다 같은 네 칸으로 정리했습니다. 몇 살이었는지, 왜 시작했는지, 무엇으로 만들었는지, 어떻게 알려졌는지. 기록이 없어 못 채운 칸은 비워 뒀습니다.</p>
     <div class="stat" id="stat"></div>
   </div>
 </section>
@@ -237,6 +288,7 @@ footer a{font-weight:600}
       <select id="sort" aria-label="정렬">
         <option value="year">최근 순</option>
         <option value="age">나이 어린 순</option>
+        <option value="money">금액 큰 순</option>
       </select>
       <button type="button" class="present-btn" id="presentBtn">발표 모드</button>
     </div>
@@ -244,6 +296,7 @@ footer a{font-weight:600}
 </section>
 
 <main class="wrap">
+  <p class="sdg-note" id="sdgNote" hidden></p>
   <div class="grid" id="grid"></div>
   <p class="empty" id="empty" hidden>찾는 사례가 없습니다.</p>
 </main>
@@ -256,10 +309,28 @@ footer a{font-weight:600}
   </div>
 </section>
 
+<section class="goals">
+  <div class="wrap">
+    <h2>아직 비어 있는 칸</h2>
+    <p class="sub">유엔이 정한 지속가능발전목표(SDGs) 열일곱 칸에 이 사례들을 얹어 봤습니다. 채워진 칸을 누르면 그 목표를 건드린 사례만 남습니다. 점선으로 남은 칸은 여기 모인 10대 중 아무도 손대지 않은 문제입니다.</p>
+    <div class="goal-grid" id="goalGrid"></div>
+
+    <h3 class="gc-head">공학이 아직 못 푼 열네 가지</h3>
+    <p class="sub">미국 공학한림원(NAE)이 2008년에 추린 21세기 공학 난제입니다. 지금도 그대로 남아 있습니다. 고를 문제가 마땅치 않을 때 여기서 하나 집으면 됩니다.</p>
+    <div class="gc" id="gcList"></div>
+    <p class="sub" style="margin:18px 0 0; font-size:13.5px; color:var(--muted)">
+      출처 — <a href="https://ncsd.go.kr/unsdgs/goals" target="_blank" rel="noopener">지속가능발전포털 UN-SDGs ↗</a> ·
+      <a href="https://www.engineeringchallenges.org/challenges.aspx" target="_blank" rel="noopener">NAE Grand Challenges ↗</a>.
+      사례를 어느 목표에 넣을지는 우리가 판단해 붙인 것이라, 달리 볼 여지가 있습니다.
+    </p>
+  </div>
+</section>
+
 <footer>
   <div class="wrap">
-    <p>사례는 언론 보도와 주최 기관 발표를 근거로 정리했습니다. 각 카드를 펼치면 출처 링크가 있습니다. 기업가치·매출 수치는 해당 시점의 발표나 보도를 그대로 옮긴 값이라 이후 상황과 다를 수 있습니다.</p>
-    <p class="fine">표본에 관해 한 가지. 여기 실린 대부분은 미국의 대회·미디어 생태계 안에서 발견된 사람들입니다. 그 생태계에 닿을 수 있었던 10대에 가깝고, 같은 일을 하고도 알려지지 않은 사람이 훨씬 많다는 전제로 읽는 편이 정확합니다.</p>
+    <p>사례는 언론 보도와 주최 기관 발표를 근거로 정리했습니다. 각 카드를 펼치면 출처 링크가 있습니다. 상금·매출·기업가치는 해당 시점의 발표나 보도를 그대로 옮긴 값이라 이후 상황과 다를 수 있습니다. 원화는 1달러 1,400원으로 어림한 값입니다.</p>
+    <p class="fine">계기 칸이 “보도에 없다”로 적힌 사례가 여럿입니다. 지어내는 대신 비워 뒀습니다. 국내 사례의 나이는 학년에서 환산했고, 학년이 안 적힌 팀은 나이를 미상으로 뒀습니다.</p>
+    <p class="fine">표본에 관해 한 가지. 여기 실린 사례는 대회와 미디어에 걸린 사람들입니다. 그 통로에 닿을 수 있었던 10대에 가깝고, 같은 일을 하고도 알려지지 않은 사람이 훨씬 많다는 전제로 읽는 편이 정확합니다.</p>
     <p class="fine" style="margin-top:16px">© 로직크래프트 · <a href="/">logiccraft.co.kr</a> · <a href="/apps">전체 제품</a></p>
   </div>
 </footer>
@@ -281,6 +352,7 @@ const CASES = [
   {
     name: 'Kavya Kopparapu', ko: '카비아 코파라푸', age: 16, year: 2017, country: '미국',
     field: '의료·건강', kind: '대회',
+    sdg: [3],
     what: '스마트폰 카메라와 3D 프린팅 렌즈만으로 당뇨망막병증을 가려내는 Eyeagnosis를 만들었다. 두 시간짜리 검사와 수천 달러짜리 장비가 필요하던 일을 사진 한 장으로 옮겼다.',
     trigger: '할아버지가 당뇨망막병증으로 시력을 잃을 뻔했다. 검사 장비가 있는 병원까지 가는 일 자체가 장벽이라는 걸 그때 알았다.',
     triggerKind: 'family',
@@ -288,6 +360,7 @@ const CASES = [
     dataKind: 'public',
     channel: 'contest',
     channelText: '한 병원에서 안과 전문의 판독과 맞대어 시험했고 다섯 건 전부 일치했다. 이후 Regeneron 과학경시(STS) 결선에 올랐고 데이비드슨 영재재단 장학금 5만 달러를 받았다. 비영리 Girls Computing League를 세워 백악관에서 발표했다.',
+    money: { k: '장학금', usd: '5만 달러', krw: '약 7,000만 원', n: 50000 },
     sources: [
       { t: 'ScienceAlert', u: 'https://www.sciencealert.com/this-teenage-girl-invented-a-brilliant-ai-based-app-that-can-quickly-diagnose-eye-disease' },
       { t: '본인 사이트', u: 'https://www.kavyakopparapu.com/' }
@@ -296,6 +369,7 @@ const CASES = [
   {
     name: 'Emma Yang', ko: '에마 양', age: 14, year: 2018, country: '홍콩·미국',
     field: '의료·건강', kind: '서비스',
+    sdg: [3],
     what: '알츠하이머 환자가 카메라를 사람에게 비추면 누구인지, 어떤 관계인지 알려주는 앱 Timeless를 2년에 걸쳐 만들었다.',
     trigger: '일고여덟 살 무렵부터 할머니가 자꾸 잊기 시작했다. 초기 알츠하이머였다. 가족과 계속 이어져 있게 해줄 무언가를 만들고 싶었다.',
     triggerKind: 'family',
@@ -311,6 +385,7 @@ const CASES = [
   {
     name: 'Gitanjali Rao', ko: '기탄잘리 라오', age: 15, year: 2020, country: '미국',
     field: '안전·사회', kind: '서비스',
+    sdg: [16, 3],
     what: '올리려는 문장이 누군가에게 상처가 될 것 같으면 게시 직전에 알려주는 사이버불링 방지 서비스 Kindly를 만들었다.',
     trigger: '온라인에서 오가는 말이 또래를 어디까지 무너뜨리는지 봤다. 이미 벌어진 일을 지우는 대신 올리기 직전에 한 번 멈추게 하는 쪽을 택했다.',
     triggerKind: 'community',
@@ -325,6 +400,7 @@ const CASES = [
   {
     name: 'Anika Chebrolu', ko: '아니카 체브롤루', age: 14, year: 2020, country: '미국',
     field: '의료·건강', kind: '대회',
+    sdg: [3],
     what: '6억 9,800만 개 분자 데이터베이스를 컴퓨터로 훑어, 코로나19 바이러스의 스파이크 단백질에 달라붙어 기능을 막을 후보 물질을 찾아냈다.',
     trigger: '원래 독감 치료제를 주제로 잡고 있었다. 그 사이 팬데믹이 왔고, 같은 방법을 코로나19로 돌렸다.',
     triggerKind: 'self',
@@ -332,6 +408,7 @@ const CASES = [
     dataKind: 'public',
     channel: 'contest',
     channelText: '3M Young Scientist Challenge에서 우승해 2만 5,000달러를 받고 "미국 최고의 청소년 과학자"로 소개됐다.',
+    money: { k: '상금', usd: '2만 5,000달러', krw: '약 3,500만 원', n: 25000 },
     note: '엄밀히는 학습 모델보다 계산 스크리닝(in-silico)에 가깝습니다. 당시 여러 매체가 AI로 묶어 보도해 함께 실었습니다.',
     sources: [
       { t: 'CNN', u: 'https://edition.cnn.com/2020/10/18/us/anika-chebrolu-covid-treatment-award-scn-trnd/index.html' },
@@ -341,13 +418,15 @@ const CASES = [
   {
     name: 'Michelle Hua', ko: '미셸 화', age: 16, year: 2021, country: '미국',
     field: '우주·과학', kind: '대회',
+    sdg: [9],
     what: '영상 속 사람의 동작을 알아보는 새로운 행동 인식 알고리즘을 설계했다.',
-    trigger: '사람의 움직임을 기계가 읽어내는 문제 자체에 붙었다.',
-    triggerKind: 'self',
+    trigger: '사람의 움직임을 기계가 읽어내는 문제 자체에 붙었다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
     how: '공개된 행동 인식 벤치마크 위에서 기존 방식보다 나은 성능을 내는 구조를 직접 짰다.',
     dataKind: 'public',
     channel: 'contest',
     channelText: '세계 최대 고등학생 과학경진대회인 Regeneron ISEF에서 최고상 7만 5,000달러를 받았다.',
+    money: { k: '상금', usd: '7만 5,000달러', krw: '약 1억 원', n: 75000 },
     sources: [
       { t: 'Society for Science', u: 'https://www.societyforscience.org/press-release/2021-regeneron-isef-top-winners/' }
     ]
@@ -355,6 +434,7 @@ const CASES = [
   {
     name: 'Pranjali Awasthi', ko: '프란잘리 아와스티', age: 15, year: 2022, country: '미국',
     field: '창업·서비스', kind: '창업',
+    sdg: [9],
     what: '흩어진 논문과 문서에서 필요한 데이터만 끌어내 요약해 주는 Delv.AI를 창업했다.',
     trigger: '열세 살부터 대학 연구실에서 머신러닝 일을 돕다가, 연구자들이 자료를 찾는 데 쓰는 시간이 얼마나 큰지 옆에서 봤다.',
     triggerKind: 'self',
@@ -362,6 +442,7 @@ const CASES = [
     dataKind: 'public',
     channel: 'market',
     channelText: '투자를 받아 열여섯에 기업가치 1,200만 달러대로 평가받았고, Forbes가 "17세 CEO"로 다뤘다.',
+    money: { k: '기업가치', usd: '1,200만 달러', krw: '약 168억 원', n: 12000000 },
     note: '기업가치는 투자 라운드 발표를 옮긴 값입니다. 실제 매출·이후 회사 상황과는 별개로 봐야 합니다.',
     sources: [
       { t: 'Forbes', u: 'https://www.forbes.com/sites/josipamajic/2024/11/02/meet-the-17-year-old-ceo-behind-a-12m-ai-powered-nutrition-app/' },
@@ -371,9 +452,10 @@ const CASES = [
   {
     name: 'Angela Chen', ko: '앤절라 첸', age: 17, year: 2023, country: '미국',
     field: '기후·환경', kind: '대회',
+    sdg: [13],
     what: '캘리포니아 산불이 얼마나 심각해질지를 머신러닝으로 평가하고 예측하는 모델을 만들었다.',
-    trigger: '해마다 커지는 캘리포니아 산불이 사는 지역의 일상이었다.',
-    triggerKind: 'community',
+    trigger: '해마다 커지는 캘리포니아 산불을 대상으로 삼았다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
     how: '위성 원격탐사와 기상 재분석 데이터를 학습 데이터로 삼아 심각도를 예측했다.',
     dataKind: 'public',
     channel: 'contest',
@@ -385,9 +467,10 @@ const CASES = [
   {
     name: 'Sophia Liu', ko: '소피아 리우', age: 17, year: 2024, country: '미국',
     field: '의료·건강', kind: '대회',
+    sdg: [3],
     what: '스마트워치 같은 웨어러블 신호만으로 심근경색을 잡아내는 모델을 만들었다. 모두에게 같은 기준을 쓰는 모델과 개인에 맞춰 가는 모델을 함께 비교했다.',
-    trigger: '심장 이상은 병원 밖에서 먼저 시작되는데, 감지는 병원 안에서만 이뤄진다는 간극에 붙었다.',
-    triggerKind: 'self',
+    trigger: '심장 이상은 병원 밖에서 먼저 시작되는데, 감지는 병원 안에서만 이뤄진다는 간극에 붙었다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
     how: '공개 웨어러블 생체신호 데이터셋으로 일반 모델과 개인화 모델을 각각 학습시켜 성능을 갈랐다.',
     dataKind: 'public',
     channel: 'contest',
@@ -399,6 +482,7 @@ const CASES = [
   {
     name: 'Nikita Agrawal', ko: '니키타 아그라왈', age: 17, year: 2024, country: '미국',
     field: '기후·환경', kind: '대회',
+    sdg: [13, 10],
     what: '대형 산불을 미리 예측하는 머신러닝 모델을 만들되, 피해가 어느 동네에 몰리는지를 함께 놓고 봤다.',
     trigger: '같은 산불이라도 대비할 자원이 없는 지역에 훨씬 크게 남는다는 점에서 시작했다.',
     triggerKind: 'community',
@@ -413,6 +497,7 @@ const CASES = [
   {
     name: 'Zach Yadegari', ko: '잭 야데가리', age: 17, year: 2024, country: '미국',
     field: '창업·서비스', kind: '창업',
+    sdg: [3],
     what: '음식 사진을 찍으면 칼로리를 추정해 주는 앱 Cal AI를 고등학생 때 만들어 냈다. 2024년 5월 출시 뒤 2025년 7월까지 830만 번 내려받혔다.',
     trigger: '중학생 때 학교 와이파이에서도 게임을 할 수 있는 사이트를 만들어 10만 달러에 팔았다. 다음 판을 찾고 있었다.',
     triggerKind: 'self',
@@ -420,6 +505,7 @@ const CASES = [
     dataKind: 'public',
     channel: 'market',
     channelText: '2025년 매출 3,000만 달러 규모로 올라섰고, 그해 12월 MyFitnessPal에 회사를 넘겼다.',
+    money: { k: '연매출', usd: '3,000만 달러', krw: '약 420억 원', n: 30000000 },
     note: '학교 성적은 4.0 만점이었지만 지원한 18개 대학 중 15곳에서 떨어졌습니다. 이 사례가 대회·입시 경로와 얼마나 다르게 흘렀는지 보여주는 대목입니다.',
     sources: [
       { t: 'CNBC', u: 'https://www.cnbc.com/2025/09/06/cal-ai-how-a-teenage-ceo-built-a-fast-growing-calorie-tracking-app.html' },
@@ -429,6 +515,7 @@ const CASES = [
   {
     name: 'Tejasvi Manoj', ko: '테자스비 마노지', age: 16, year: 2024, country: '미국',
     field: '안전·사회', kind: '서비스',
+    sdg: [16],
     what: '노인이 수상한 메일이나 문자를 올리면 사기인지 판별해 주고 신고 경로까지 안내하는 Shield Seniors를 만들었다.',
     trigger: '여든다섯 살 할아버지가 2,000달러를 요구하는 메일 사기에 당할 뻔했다. 찾아보니 노인 대상 사기 피해가 한 해 50억 달러에 가까웠다.',
     triggerKind: 'family',
@@ -444,13 +531,15 @@ const CASES = [
   {
     name: 'Matteo Paz', ko: '마테오 파스', age: 18, year: 2025, country: '미국',
     field: '우주·과학', kind: '대회',
+    sdg: [9],
     what: '적외선 전천 탐사 데이터 2,000억 건을 훑어 천체를 열 종류로 분류하는 머신러닝 알고리즘을 설계했다.',
-    trigger: '천문 데이터는 이미 쌓여 있는데 사람 손으로는 다 볼 수 없다는 지점에서 출발했다.',
-    triggerKind: 'self',
-    how: '공개된 적외선 탐사 아카이브를 대상으로, 방대한 관측 기록을 효율적으로 훑는 알고리즘을 짰다.',
+    trigger: '천문 데이터는 이미 쌓여 있는데 사람 손으로는 다 볼 수 없다는 지점에서 출발했다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
+    how: '공개된 적외선 탐사 아카이브를 대상으로, 2,000억 건을 한 번에 훑어 내려가는 알고리즘을 짰다.',
     dataKind: 'public',
     channel: 'contest',
     channelText: 'Regeneron 과학경시(STS)에서 1등상 25만 달러를 받았다.',
+    money: { k: '상금', usd: '25만 달러', krw: '약 3억 5,000만 원', n: 250000 },
     sources: [
       { t: 'Regeneron', u: 'https://investor.regeneron.com/news-releases/news-release-details/regeneron-science-talent-search-2025-awards-more-18-million-high' }
     ]
@@ -458,13 +547,15 @@ const CASES = [
   {
     name: 'Christine Zhang', ko: '크리스틴 장', age: 19, year: 2025, country: '미국',
     field: '창업·서비스', kind: '창업',
+    sdg: [9],
     what: '하버드 1학년을 휴학하고 룸메이트와 함께 샌프란시스코로 옮겨 AI 스타트업 Veil을 세웠다.',
-    trigger: '학교를 계속 다니면서 미룰 수 있는 일과 지금 해야 하는 일을 갈랐다.',
-    triggerKind: 'self',
-    how: '공동창업자와 둘이 살림집에 들어가 제품을 만들며 여름 한 철을 보냈다.',
-    dataKind: 'public',
+    trigger: '학교를 계속 다니면서 미룰 수 있는 일과 지금 해야 하는 일을 갈랐다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
+    how: '공동창업자와 둘이 살림집에 들어가 제품을 만들며 여름 한 철을 보냈다. 무엇으로 만들었는지는 공개되지 않았다.',
+    dataKind: 'unknown',
     channel: 'market',
     channelText: '그해 여름이 끝나기 전 100만 달러 넘는 투자를 받았다.',
+    money: { k: '투자', usd: '100만 달러', krw: '약 14억 원', n: 1000000 },
     sources: [
       { t: 'VnExpress International', u: 'https://e.vnexpress.net/news/tech/personalities/from-harvard-to-silicon-valley-teenage-girl-bets-big-on-ai-startup-4963174.html' }
     ]
@@ -472,11 +563,12 @@ const CASES = [
   {
     name: 'Ishani Singh', ko: '이샤니 싱', age: 14, year: 2021, country: '미국',
     field: '교육·커뮤니티', kind: '비영리',
+    sdg: [4, 5],
     what: '또래 여학생이 AI를 배울 자리를 직접 만들려고 Girls Rule AI를 세웠다.',
     trigger: '고등학교 1학년 때 나간 주 컴퓨터과학 대회에서 여학생이 거의 없었다. 자기가 그 몇 안 되는 참가자 중 하나라는 걸 그 자리에서 알았다.',
     triggerKind: 'community',
     how: '기술을 만드는 대신 배울 통로를 조직으로 만들었다. 관찰 하나를 프로그램으로 옮긴 경우다.',
-    dataKind: 'own',
+    dataKind: 'unknown',
     channel: 'press',
     channelText: 'ABC·Good Morning America가 다루면서 알려졌다.',
     sources: [
@@ -484,18 +576,146 @@ const CASES = [
     ]
   },
   {
-    name: 'Null 팀 (정지효·강현·김수아)', ko: '', age: 17, year: 2025, country: '한국',
-    field: '안전·사회', kind: '대회',
-    what: '시각장애인의 보행을 돕는 대화형 AI 주행 로봇을 만들었다.',
-    trigger: '길을 걷는 일이 누구에게나 같은 난이도가 아니라는 데서 출발했다.',
+    name: 'Rishab Jain', ko: '리샤브 자인', age: 13, year: 2018, country: '미국',
+    field: '의료·건강', kind: '대회',
+    sdg: [3],
+    what: '췌장암 방사선 치료 중에 췌장이 어디 있는지 실시간으로 짚어 주는 PCDLS Net을 만들었다. 췌장은 다른 장기에 가려지고 숨 쉴 때마다 움직여서, 의사들은 넉넉한 “오차 원”을 잡고 쏜다. 그만큼 멀쩡한 세포가 같이 죽는다.',
+    trigger: '가까이 지내던 가족의 지인이 암으로 세상을 떠났다. 그 전 해 보스턴에 갔다가 췌장암에 관심이 생긴 참이었다.',
     triggerKind: 'community',
-    how: '주행 로봇에 대화형 인터페이스를 붙여, 화면 대신 말로 길을 안내하게 했다.',
+    how: '의료 영상을 학습시켜 움직이는 췌장의 위치를 프레임마다 따라가게 했다. 학습에 쓴 자료의 출처는 공개되지 않았다.',
+    dataKind: 'unknown',
+    channel: 'contest',
+    channelText: '3M Young Scientist Challenge에서 우승해 2만 5,000달러를 받고 "미국 최고의 청소년 과학자"가 됐다. 당시 중학교 7학년이었다.',
+    money: { k: '상금', usd: '2만 5,000달러', krw: '약 3,500만 원', n: 25000 },
+    sources: [
+      { t: 'TIME', u: 'https://time.com/5429621/rishab-jain-young-scientist-challenge/' },
+      { t: 'Physics World', u: 'https://physicsworld.com/a/americas-top-young-scientist-uses-ai-to-improve-pancreatic-radiotherapy/' }
+    ]
+  },
+  {
+    name: 'Sirish Subash', ko: '시리시 수바시', age: 14, year: 2024, country: '미국',
+    field: '안전·사회', kind: '대회',
+    sdg: [3, 12],
+    what: '과일과 채소에 남은 농약을 손에 든 기기로 찍어 내는 PestiSCAND를 만들었다. 표면에 빛을 쏘고 되돌아오는 파장을 읽으면 농약이 남긴 특유의 무늬가 보인다.',
+    trigger: '엄마가 늘 “씻어 먹어라”라고 했다. 씻는 게 정말 차이가 있는지 궁금해서 찾아보니, 미국에서 파는 농산물의 70%에 농약 잔류물이 있었다.',
+    triggerKind: 'family',
+    how: '분광 센서에 판별 모델을 붙였다. 사과·시금치·딸기·토마토로 1만 2,000개 넘는 표본을 직접 측정해 가며 다듬어 정확도 85% 이상까지 올렸다.',
     dataKind: 'own',
     channel: 'contest',
+    channelText: '3M Young Scientist Challenge에서 우승해 2만 5,000달러를 받았다. 당시 조지아주 9학년이었다.',
+    money: { k: '상금', usd: '2만 5,000달러', krw: '약 3,500만 원', n: 25000 },
+    sources: [
+      { t: 'Discovery Education', u: 'https://www.discoveryeducation.com/details/14-year-old-named-americas-top-young-scientist-for-inventing-an-ai-handheld-pesticide-detector/' },
+      { t: 'Interesting Engineering', u: 'https://interestingengineering.com/culture/america-top-young-scientist-sirish-subash' }
+    ]
+  },
+  {
+    name: 'Leanne Fan', ko: '리앤 팬', age: 13, year: 2022, country: '미국',
+    field: '의료·건강', kind: '대회',
+    sdg: [3],
+    what: '중이염을 잡아내고 빛으로 치료까지 하는 헤드폰 Finsen Headphones를 만들었다. 진단과 처치를 한 기기 안에 넣었다.',
+    trigger: '보도에는 결과만 남았다. 본인이 밝힌 계기는 찾지 못했다.',
+    triggerKind: 'unknown',
+    how: '귀 안의 상태를 판별하는 모델에 광선 치료를 붙였다. 학습에 쓴 자료의 출처는 공개되지 않았다.',
+    dataKind: 'unknown',
+    channel: 'contest',
+    channelText: '3M Young Scientist Challenge에서 우승해 2만 5,000달러를 받았다.',
+    money: { k: '상금', usd: '2만 5,000달러', krw: '약 3,500만 원', n: 25000 },
+    sources: [
+      { t: 'Young Scientist Lab', u: 'https://youngscientistlab.com/annual-challenge/finalists-mentors-judges/winners/' }
+    ]
+  },
+  {
+    name: 'Null 팀 (정지효·강현·김수아)', ko: '', age: 17, year: 2025, country: '한국',
+    field: '안전·사회', kind: '대회',
+    sdg: [10, 11],
+    what: '시각장애인의 이동권을 위한 적정기술 시스템으로, 보행을 돕는 대화형 AI 주행 로봇을 만들었다.',
+    trigger: '보도에는 결과만 남았다. 무엇을 보고 시작했는지는 적혀 있지 않다.',
+    triggerKind: 'unknown',
+    how: '주행 로봇에 대화형 인터페이스를 붙여, 화면 대신 말로 길을 안내하게 했다. 무엇으로 학습시켰는지는 공개되지 않았다.',
+    dataKind: 'unknown',
+    channel: 'contest',
     channelText: '전국 청소년 AI창의 경진대회(AI Youth Challenge)에서 포스코DX 사장상을 받았다. 교육부가 후원하고 한국인공지능산업협회가 공동 주최하는 대회다.',
-    note: '한국에서는 개인 창업가 서사보다 대회 팀 단위로 기록이 남는 편입니다. 국내 사례가 이 한 건뿐인 것은 실제로 드물어서라기보다 개인 단위로 보도되는 통로가 얇기 때문으로 보입니다.',
     sources: [
       { t: '포스코DX 뉴스룸', u: 'https://www.poscodx.com/kor/pr/newsRoomView.do?num=7075' }
+    ]
+  },
+  {
+    name: '떠라드론 팀 (정찬교·박원희)', ko: '', age: null, year: 2025, country: '한국',
+    field: '기후·환경', kind: '대회',
+    sdg: [13, 15],
+    what: '“잔불 레인저” — 강화학습으로 스스로 나는 드론이 산불이 지나간 자리의 잔불을 찾아내고 소화 캡슐을 떨어뜨린다.',
+    trigger: '보도에는 결과만 남았다. 무엇을 보고 시작했는지는 적혀 있지 않다.',
+    triggerKind: 'unknown',
+    how: '드론에 달린 카메라로 잔불을 식별하고, 강화학습으로 비행 경로를 스스로 정하게 했다.',
+    dataKind: 'unknown',
+    channel: 'contest',
+    channelText: '2025 AI Youth Challenge에서 대상인 교육부장관상을 받았다.',
+    note: '나이가 어디에도 적혀 있지 않습니다. 중·고등학생 대회라는 것만 확인됩니다.',
+    sources: [
+      { t: '포스코DX 뉴스룸', u: 'https://www.poscodx.com/kor/pr/newsRoomView.do?num=7075' }
+    ]
+  },
+  {
+    name: '이지호', ko: '', age: 15, grade: 'NLCS Jeju 9학년', year: 2026, country: '한국',
+    field: '안전·사회', kind: '대회',
+    sdg: [10, 4],
+    what: '악보와 실제 연주를 맞대어 비교해, 시각장애인이 자기 연주가 어디서 어긋났는지 스스로 찾게 돕는 음악 실습 앱 “싱크로놈”을 만들었다.',
+    trigger: '악보를 눈으로 볼 수 없으면 자기 연주가 어디서 틀렸는지 확인할 길이 없다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
+    how: '연주 소리를 악보와 맞춰 어긋난 지점을 짚어 준다. 무엇으로 학습시켰는지는 공개되지 않았다.',
+    dataKind: 'unknown',
+    channel: 'contest',
+    channelText: '국제과학기술경진대회(ISEF) 2026 기술·예술 분야에서 본상 3등상을 받았다. 60여 개국 청소년 2,000여 명이 모인 대회다.',
+    sources: [
+      { t: '데일리안', u: 'https://www.dailian.co.kr/news/view/1645678/' },
+      { t: '헤럴드경제', u: 'https://biz.heraldcorp.com/article/10740819' }
+    ]
+  },
+  {
+    name: '양은석', ko: '', age: 17, grade: '옥과고 2학년', year: 2026, country: '한국',
+    field: '의료·건강', kind: '대회',
+    sdg: [3, 10],
+    what: '무성증으로 목소리를 내기 어려운 사람의 음성기관 움직임을 읽어 글로 바꾸는 “I can speak”를 만들었다.',
+    trigger: '말이 나오지 않으면 의사 표현 자체가 막힌다. 본인이 밝힌 계기는 보도에 없다.',
+    triggerKind: 'unknown',
+    how: '목과 입 주변 기관이 움직이는 모양을 읽어 문장으로 옮긴다. 무엇으로 학습시켰는지는 공개되지 않았다.',
+    dataKind: 'unknown',
+    channel: 'contest',
+    channelText: 'ISEF 2026 생의공학 분야 본상 4등상에 더해 특별상 두 개(Mawhiba, Midjourney)까지 세 부문에서 받았다. 이 대회 한국 학생 중 가장 많이 받았다.',
+    sources: [
+      { t: '데일리안', u: 'https://www.dailian.co.kr/news/view/1645678/' },
+      { t: '헤럴드경제', u: 'https://biz.heraldcorp.com/article/10740819' }
+    ]
+  },
+  {
+    name: '정재욱 · 조한선', ko: '', age: 18, grade: '한국과학영재학교 3학년', year: 2026, country: '한국',
+    field: '로봇·기계', kind: '대회',
+    sdg: [9],
+    what: '캡스턴 드라이브와 강화학습을 얹어 네 발로 걷는 로봇을 직접 만들고 제어했다.',
+    trigger: '보도에는 결과만 남았다. 무엇을 보고 시작했는지는 적혀 있지 않다.',
+    triggerKind: 'unknown',
+    how: '강화학습으로 보행 제어를 익히게 했다. 무엇으로 학습시켰는지는 공개되지 않았다.',
+    dataKind: 'unknown',
+    channel: 'contest',
+    channelText: 'ISEF 2026 로봇공학·지능형 기계 분야에서 본상 4등상을 받았다.',
+    sources: [
+      { t: '데일리안', u: 'https://www.dailian.co.kr/news/view/1645678/' }
+    ]
+  },
+  {
+    name: '김택현', ko: '', age: 15, grade: '채드윅송도국제학교 9학년', year: 2026, country: '한국',
+    field: '창업·서비스', kind: '대회',
+    sdg: [11],
+    what: '방 하나를 어떻게 꾸밀지 사람마다 다르게 제안해 주는 공간 디자인 앱 “Redi-up”을 만들었다.',
+    trigger: '보도에는 결과만 남았다. 무엇을 보고 시작했는지는 적혀 있지 않다.',
+    triggerKind: 'unknown',
+    how: '기성 생성 모델을 공간 디자인 쪽으로 붙였다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: 'ISEF 2026 소프트웨어 디자인 분야에서 특별상(Midjourney)을 받았다.',
+    sources: [
+      { t: '데일리안', u: 'https://www.dailian.co.kr/news/view/1645678/' }
     ]
   }
 ];
@@ -530,19 +750,21 @@ function esc(s) {
 
 function card(c) {
   const title = c.ko ? `${esc(c.ko)} <span style="color:var(--muted);font-weight:600">${esc(c.name)}</span>` : esc(c.name);
+  const meta = [c.year, c.country, c.grade].filter(Boolean).map(esc).join(' · ');
   return `
   <details class="case">
     <summary>
       <div class="head">
-        <div class="age"><span class="n">${c.age}</span><span class="u">세</span></div>
+        <div class="age${c.age == null ? ' unknown' : ''}"><span class="n">${c.age ?? '?'}</span><span class="u">${c.age == null ? '미상' : '세'}</span></div>
         <div class="who">
           <h2>${title}</h2>
-          <p class="meta">${c.year} · ${esc(c.country)}</p>
+          <p class="meta">${meta}</p>
         </div>
       </div>
       <div class="tags">
         <span class="tag kind">${esc(c.kind)}</span>
         <span class="tag">${esc(c.field)}</span>
+        ${c.money ? `<span class="tag money">${esc(c.money.k)} ${esc(c.money.usd)} <b>${esc(c.money.krw)}</b></span>` : ''}
       </div>
       <p class="what">${esc(c.what)}</p>
       <p class="more">펼쳐 보기 ↓</p>
@@ -551,6 +773,7 @@ function card(c) {
       <div class="slot"><h3>왜 시작했나</h3><p>${esc(c.trigger)}</p></div>
       <div class="slot"><h3>무엇으로 만들었나</h3><p>${esc(c.how)}</p></div>
       <div class="slot"><h3>어떻게 알려졌나</h3><p>${esc(c.channelText)}</p></div>
+      ${(c.sdg || []).length ? `<div class="slot"><h3>어느 목표에 닿나</h3><p>${c.sdg.map(n => `${n}. ${esc(SDGS[n - 1])}`).join(' · ')}</p></div>` : ''}
       ${c.note ? `<p class="note">${esc(c.note)}</p>` : ''}
       <div class="srcs">${c.sources.map(s => `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)} ↗</a>`).join('')}</div>
     </div>
@@ -560,16 +783,87 @@ function card(c) {
 function render() {
   const q = qEl.value.trim().toLowerCase();
   let list = CASES.filter(c => activeField === '전체' || c.field === activeField);
+  if (activeSdg) list = list.filter(c => (c.sdg || []).includes(activeSdg));
   if (q) {
     list = list.filter(c =>
       [c.name, c.ko, c.what, c.trigger, c.how, c.channelText, c.country, c.field].join(' ').toLowerCase().includes(q)
     );
   }
-  list.sort(sortEl.value === 'age' ? (a, b) => a.age - b.age || a.year - b.year : (a, b) => b.year - a.year || a.age - b.age);
+  const SORTS = {
+    year: (a, b) => b.year - a.year || (a.age ?? 99) - (b.age ?? 99),
+    age: (a, b) => (a.age ?? 99) - (b.age ?? 99) || a.year - b.year,
+    money: (a, b) => (b.money?.n || 0) - (a.money?.n || 0) || b.year - a.year
+  };
+  list.sort(SORTS[sortEl.value] || SORTS.year);
   shown = list;
   grid.innerHTML = list.map(card).join('');
   empty.hidden = list.length > 0;
 }
+
+/* ---------- 지속가능발전목표 · 공학 난제 ----------
+   SDGS/GC 는 공식 목록 그대로. 사례를 어느 목표에 넣을지는 CASES 의 sdg 배열에서 온다. */
+const SDGS = [
+  '빈곤 퇴치', '기아 종식', '건강과 웰빙', '양질의 교육', '성평등',
+  '깨끗한 물과 위생', '지속가능한 청정에너지', '양질의 일자리와 경제성장',
+  '산업·혁신·사회기반시설', '불평등 완화', '지속가능한 도시와 공동체',
+  '책임 있는 소비와 생산', '기후변화 대응', '해양 생태계 보호',
+  '육상 생태계 보호', '평화·정의·포용 제도', '지구촌 협력'
+];
+const GC = [
+  ['태양에너지를 값싸게', 'Make Solar Energy Economical'],
+  ['핵융합으로 에너지를', 'Provide Energy from Fusion'],
+  ['탄소를 붙잡아 가두기', 'Develop Carbon Sequestration Methods'],
+  ['질소 순환 관리하기', 'Manage the Nitrogen Cycle'],
+  ['깨끗한 물 닿게 하기', 'Provide Access to Clean Water'],
+  ['도시 기반시설 되살리기', 'Restore and Improve Urban Infrastructure'],
+  ['건강 정보학 밀고 나가기', 'Advance Health Informatics'],
+  ['더 나은 약 설계하기', 'Engineer Better Medicines'],
+  ['뇌를 거꾸로 뜯어보기', 'Reverse Engineer the Brain'],
+  ['핵 테러 막기', 'Prevent Nuclear Terror'],
+  ['사이버 공간 지키기', 'Secure Cyberspace'],
+  ['가상현실 넓히기', 'Enhance Virtual Reality'],
+  ['한 사람에 맞는 배움', 'Advance Personalized Learning'],
+  ['과학이 쓸 도구 만들기', 'Engineer the Tools of Scientific Discovery']
+];
+let activeSdg = null;
+const goalGrid = document.getElementById('goalGrid');
+const sdgNote = document.getElementById('sdgNote');
+
+function buildGoals() {
+  goalGrid.innerHTML = SDGS.map((nm, i) => {
+    const no = i + 1;
+    const hit = CASES.filter(c => (c.sdg || []).includes(no)).length;
+    return `<button type="button" class="goal ${hit ? 'has' : 'empty'}" data-sdg="${no}"${hit ? ' aria-pressed="false"' : ' disabled'}>
+      <span class="no">${no}</span>
+      <span class="nm">${nm}<span class="ct">${hit ? `사례 ${hit}건` : '비어 있음'}</span></span>
+    </button>`;
+  }).join('');
+  document.getElementById('gcList').innerHTML =
+    GC.map(([ko, en]) => `<div>${ko}<span>${en}</span></div>`).join('');
+}
+
+function drawSdgNote() {
+  if (!activeSdg) { sdgNote.hidden = true; return; }
+  sdgNote.hidden = false;
+  sdgNote.innerHTML = `지속가능발전목표 ${activeSdg} · ${SDGS[activeSdg - 1]} 을(를) 건드린 사례만 보고 있습니다.<button type="button" id="sdgClear">전체 보기</button>`;
+  document.getElementById('sdgClear').onclick = () => { setSdg(null); };
+}
+
+function setSdg(no) {
+  activeSdg = no;
+  [...goalGrid.querySelectorAll('.goal.has')].forEach(g =>
+    g.setAttribute('aria-pressed', String(Number(g.dataset.sdg) === activeSdg)));
+  drawSdgNote();
+  render();
+}
+
+goalGrid.addEventListener('click', e => {
+  const b = e.target.closest('.goal.has');
+  if (!b) return;
+  const no = Number(b.dataset.sdg);
+  setSdg(activeSdg === no ? null : no);
+  if (activeSdg) document.querySelector('main').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
 
 /* ---------- 발표 모드 ----------
    화면에 걸린 필터·정렬을 그대로 들고 간다. 한 사례가 세 단계로 열린다:
@@ -597,9 +891,10 @@ function drawSlide() {
     html += `<p class="p-what">${esc(c.what)}</p><p class="p-ask">몇 살이었을까?</p>`;
   } else {
     html += `<div class="p-who">
-      <span class="p-age">${c.age}<small>세</small></span>
-      <span class="p-name">${esc(c.ko || c.name)}<span>${[c.ko ? c.name : '', c.year, c.country].filter(Boolean).map(esc).join(' · ')}</span></span>
+      <span class="p-age">${c.age ?? '?'}<small>${c.age == null ? '나이 미상' : '세'}</small></span>
+      <span class="p-name">${esc(c.ko || c.name)}<span>${[c.ko ? c.name : '', c.year, c.country, c.grade].filter(Boolean).map(esc).join(' · ')}</span></span>
     </div>`;
+    if (c.money) html += `<p class="p-money"><b>${esc(c.money.krw)}</b><span>${esc(c.money.k)} · ${esc(c.money.usd)}</span></p>`;
     html += `<p class="p-what${ps === 2 ? ' small' : ''}">${esc(c.what)}</p>`;
   }
   if (ps === 2) {
@@ -654,39 +949,51 @@ document.addEventListener('keydown', e => {
 
 /* ---------- 상단 요약 · 패턴 (숫자는 전부 데이터에서 센다) ---------- */
 function buildStats() {
-  const ages = CASES.map(c => c.age);
+  const ages = CASES.map(c => c.age).filter(a => a != null);
   const years = CASES.map(c => c.year);
+  const top = CASES.filter(c => c.money).sort((a, b) => b.money.n - a.money.n)[0];
   document.getElementById('stat').innerHTML = [
     `사례 <i>${CASES.length}</i>건`,
+    `국내 <i>${CASES.filter(c => c.country === '한국').length}</i>건`,
     `최연소 <i>${Math.min(...ages)}</i>세`,
-    `${Math.min(...years)}–${Math.max(...years)}`,
-    `분야 <i>${new Set(CASES.map(c => c.field)).size}</i>개`
-  ].map(s => `<b>${s}</b>`).join('');
+    top ? `최고 ${top.money.k} <i>${top.money.krw.replace('약 ', '')}</i>` : '',
+    `${Math.min(...years)}–${Math.max(...years)}`
+  ].filter(Boolean).map(s => `<b>${s}</b>`).join('');
 
   const n = CASES.length;
   const cnt = (k, v) => CASES.filter(c => c[k] === v).length;
   const [self, community, family] = ['self', 'community', 'family'].map(v => cnt('triggerKind', v));
+  const told = self + community + family;
   const pub = cnt('dataKind', 'public');
+  const own = cnt('dataKind', 'own');
   const [contest, press, market] = ['contest', 'press', 'market'].map(v => cnt('channel', v));
+  const kr = CASES.filter(c => c.country === '한국');
+  const krTold = kr.filter(c => c.triggerKind !== 'unknown').length;
 
   const pats = [
     {
       num: 'PATTERN 01',
       h: '문제는 팔 닿는 거리에 있었다',
-      p: '할아버지의 눈, 할머니의 기억, 우리 동네에 해마다 오는 산불, 대회장에 여학생이 나뿐이던 순간. 무엇을 만들지 고르는 일이 전부 직접 겪거나 눈으로 본 범위 안에서 풀렸다. 멀리 있는 시장 조사에서 출발한 경우는 한 건도 없다.',
-      fig: `본인이 붙은 문제 ${self} · 가까운 공동체 ${community} · 가족 ${family}`
+      p: '할아버지의 눈, 할머니의 기억, 할아버지가 당할 뻔한 사기, 대회장에 여학생이 나뿐이던 순간. 시작한 이유가 기록으로 남은 경우를 모아 보면 전부 직접 겪거나 눈으로 본 범위 안이다. 멀리 있는 시장 조사에서 출발한 사례는 한 건도 없다.',
+      fig: `계기가 남은 ${told}건 — 가족 ${family} · 공동체 ${community} · 본인 ${self}`
     },
     {
       num: 'PATTERN 02',
-      h: '데이터는 남이 열어둔 것을 썼다',
-      p: 'NIH의 안저 이미지, 공개 분자 데이터베이스, 위성 원격탐사 기록, 적외선 전천 탐사 아카이브. 새로 데이터를 모아 승부한 경우는 드물다. 10대가 닿을 수 있는 자원 안에서 결판이 났다.',
-      fig: `${n}건 중 ${pub}건이 공개 데이터 기반`
+      h: '재료는 남이 열어둔 것을 썼다',
+      p: 'NIH의 안저 이미지, 공개 분자 데이터베이스, 위성 원격탐사 기록, 적외선 전천 탐사 아카이브, 기성 생성 모델. 재료가 밝혀진 사례는 대부분 누군가 이미 열어 둔 것을 가져다 썼다. 딸기와 시금치를 1만 2,000번 직접 찍어 데이터를 만든 쪽은 하나뿐이다.',
+      fig: `공개된 것 ${pub} · 직접 모은 것 ${own}`
     },
     {
       num: 'PATTERN 03',
       h: '대회가 유통 채널이었다',
       p: 'ISEF, Regeneron STS, 3M Young Scientist Challenge, TIME 올해의 어린이. 만든 것을 세상에 연결한 통로는 대체로 대회와 미디어였다. 앱 마켓으로 곧장 간 쪽은 소수다.',
       fig: `대회 ${contest} · 언론 ${press} · 시장 ${market}`
+    },
+    {
+      num: 'PATTERN 04',
+      h: '국내는 결과만 남는다',
+      p: '국내 사례는 수상 기록으로는 잘 남는데, 무엇을 보고 시작했는지가 어디에도 없다. 나이조차 안 적힌 팀도 있다. 실력의 차이가 아니라 이야기를 남기는 통로의 차이다. 이 칸은 지금 이 페이지를 보는 사람이 채울 수 있다.',
+      fig: `국내 ${kr.length}건 중 계기가 적힌 것 ${krTold}건`
     }
   ];
   document.getElementById('pats').innerHTML = pats.map(p => `
@@ -699,6 +1006,7 @@ function buildStats() {
 }
 
 buildStats();
+buildGoals();
 render();
 </script>
 </body>
