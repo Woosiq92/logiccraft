@@ -1,0 +1,1217 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>차원 사다리 — 4차원을 손으로 밟아 올라가기</title>
+<meta name="description" content="평면에 갇힌 존재가 되어 보고, 점에서 테서랙트까지 한 규칙으로 올라가고, 4차원 물체가 우리 공간을 지나가는 단면을 본다. 시너지언 수학.">
+<meta property="og:title" content="차원 사다리">
+<meta property="og:description" content="4차원은 보여줄 수 없다. 3차원을 잃어 본 사람만 올라간다.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0f16'/%3E%3Cpath d='M8 22h16M8 22V10h12v12M12 18h12V6' stroke='%2338bdf8' stroke-width='1.8' fill='none'/%3E%3C/svg%3E">
+<style>
+:root{
+  --bg:#0a0f16; --card:#111823; --card2:#0d141d; --line:#1e2937;
+  --ink:#e6edf5; --dim:#93a3b8; --faint:#5f6f83;
+  --acc:#38bdf8; --acc2:#0369a1;
+  --go:#34d399; --warn:#fbbf24; --stop:#f87171;
+  --w4:#c084fc;                 /* 네 번째 축은 어디서나 보라다 — 색이 곧 규약 */
+  --r:14px; --max:1040px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo",Pretendard,"Malgun Gothic",system-ui,sans-serif;
+  line-height:1.7; letter-spacing:-.01em;
+  word-break:keep-all; overflow-wrap:anywhere;   /* 한국어는 어절 단위로 끊는다 */
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 18px}
+
+/* ---- 머리 ---- */
+header{border-bottom:1px solid var(--line);background:linear-gradient(180deg,#0d141d,#0a0f16)}
+.head{padding:26px 0 18px}
+.ttl{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+h1{font-size:26px;font-weight:800;letter-spacing:-.03em}
+.sub{color:var(--dim);font-size:14px}
+.lede{margin-top:10px;color:var(--dim);font-size:15px;max-width:62ch}
+.lede b{color:var(--ink);font-weight:600}
+
+nav{display:flex;gap:6px;overflow-x:auto;padding:12px 0 0;scrollbar-width:none}
+nav::-webkit-scrollbar{display:none}
+nav button{
+  flex:0 0 auto;background:var(--card);border:1px solid var(--line);color:var(--dim);
+  padding:9px 14px;border-radius:999px;font-size:13.5px;cursor:pointer;font-family:inherit;
+  transition:.15s; white-space:nowrap;
+}
+nav button:hover{border-color:#2f3f52;color:var(--ink)}
+nav button.on{background:var(--acc2);border-color:var(--acc);color:#fff;font-weight:600}
+nav button .dot{color:var(--go);margin-left:5px}
+
+/* ---- 막 ---- */
+section.act{display:none;padding:26px 0 60px}
+section.act.on{display:block}
+.actHead{margin-bottom:18px}
+.actHead h2{font-size:20px;font-weight:750;letter-spacing:-.02em}
+.actHead p{color:var(--dim);font-size:14.5px;margin-top:7px;max-width:64ch}
+
+.grid{display:grid;gap:14px;grid-template-columns:1fr 340px;align-items:start}
+@media(max-width:860px){.grid{grid-template-columns:1fr}}
+
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.card .ch{padding:11px 14px;border-bottom:1px solid var(--line);font-size:13px;color:var(--dim);
+  display:flex;justify-content:space-between;align-items:center;gap:10px}
+.card .ch b{color:var(--ink);font-weight:650;font-size:13.5px}
+.card .cb{padding:14px}
+
+canvas{display:block;width:100%;background:var(--card2)}
+
+/* 조작 */
+.ctl{display:flex;flex-direction:column;gap:6px;margin:12px 0}
+.ctl label{font-size:12.5px;color:var(--dim);display:flex;justify-content:space-between;gap:8px}
+.ctl label span{color:var(--acc);font-variant-numeric:tabular-nums}
+input[type=range]{width:100%;accent-color:var(--acc);height:22px}
+.btn{background:var(--card);border:1px solid var(--line);color:var(--ink);padding:9px 14px;
+  border-radius:9px;font-size:13.5px;cursor:pointer;font-family:inherit;transition:.15s}
+.btn:hover{border-color:var(--acc);color:var(--acc)}
+.btn.pri{background:var(--acc2);border-color:var(--acc2);color:#fff;font-weight:600}
+.btn.pri:hover{background:#0284c7;color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+.btn.sm{padding:6px 11px;font-size:12.5px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* 선택지 */
+.opts{display:grid;gap:8px;margin-top:4px}
+.opt{text-align:left;background:var(--card2);border:1px solid var(--line);color:var(--ink);
+  padding:11px 13px;border-radius:10px;font-size:14px;cursor:pointer;font-family:inherit;transition:.12s;
+  display:flex;justify-content:space-between;align-items:center;gap:10px}
+.opt:hover:not(:disabled){border-color:var(--acc);background:#0f1a26}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--go);background:#0d2019}
+.opt.wrong{border-color:var(--stop);background:#201014}
+/* 지금 보고 있는 단계. 초록(정답)과 색을 나눠야 "아직 안 했는데 맞았다"로 안 읽힌다 */
+.opt.active{border-color:var(--acc);background:#0d1a26}
+.opt .mk{font-size:12px;color:var(--dim)}
+.opt.right .mk{color:var(--go)} .opt.wrong .mk{color:var(--stop)}
+
+.verdict{margin-top:12px;padding:12px 13px;border-radius:10px;font-size:14px;display:none;
+  border:1px solid var(--line);background:var(--card2);color:var(--dim)}
+.verdict.show{display:block}
+.verdict b{color:var(--ink)}
+.verdict.ok{border-color:#1c5c46} .verdict.no{border-color:#5c2430}
+
+/* 표 */
+table{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 9px;border-bottom:1px solid var(--line);text-align:right}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--faint);font-weight:600;font-size:12px}
+td.hit{color:var(--go)} td.miss{color:var(--stop)}
+tr.now td{background:#0f1a26;color:var(--ink)}
+
+/* 예측 입력 */
+.pred{display:grid;gap:10px;margin-top:6px}
+.pf{display:grid;grid-template-columns:1fr 92px;gap:9px;align-items:center}
+.pf span{font-size:13.5px;color:var(--dim)}
+.pf input{background:var(--card2);border:1px solid var(--line);color:var(--ink);
+  padding:9px 10px;border-radius:8px;font-size:15px;font-family:inherit;width:100%;text-align:right;
+  font-variant-numeric:tabular-nums}
+.pf input:focus{outline:none;border-color:var(--acc)}
+.pf input.right{border-color:var(--go)} .pf input.wrong{border-color:var(--stop)}
+
+/* 축 토글 */
+.planes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:4px}
+.pl{background:var(--card2);border:1px solid var(--line);color:var(--dim);padding:8px 4px;
+  border-radius:8px;font-size:12.5px;cursor:pointer;font-family:inherit;text-align:center;transition:.12s}
+.pl:hover{border-color:#2f3f52;color:var(--ink)}
+.pl.on{border-color:var(--acc);color:var(--acc);background:#0d1a26}
+.pl.on.w{border-color:var(--w4);color:var(--w4);background:#170f24}
+
+.note{font-size:13px;color:var(--dim);margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.note b{color:var(--ink);font-weight:600}
+.warnbox{border:1px solid #5c2430;background:#1a0e12;color:#f8b4b4;padding:10px 12px;border-radius:9px;
+  font-size:13px;margin-top:10px;display:none}
+.warnbox.show{display:block}
+.okbox{border:1px solid #1c5c46;background:#0c1c17;color:#8ee7c0;padding:10px 12px;border-radius:9px;
+  font-size:13px;margin-top:10px;display:none}
+.okbox.show{display:block}
+
+.stat{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--dim);margin-top:10px}
+.stat i{font-style:normal;color:var(--ink);font-variant-numeric:tabular-nums}
+
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12px;color:var(--faint);margin-top:9px}
+.legend i{font-style:normal;display:inline-flex;align-items:center;gap:5px}
+.legend .sw{width:16px;height:3px;border-radius:2px;display:inline-block}
+
+footer{border-top:1px solid var(--line);padding:22px 0 40px;color:var(--faint);font-size:12.5px}
+footer a{color:var(--dim)}
+.kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--card2);
+  border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:12px;color:var(--dim)}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="wrap head">
+  <div class="ttl"><h1>차원 사다리</h1><span class="sub">시너지언 수학 · 도구 선반</span></div>
+  <p class="lede">4차원은 그림으로 보여줄 수 없다. <b>3차원을 한 번 잃어 본 사람</b>만 유추로 올라간다.
+    그래서 순서가 이렇다 — 먼저 평면에 갇히고, 그다음 같은 규칙으로 한 칸씩 올라가고, 마지막에 우리가 단면을 받는 쪽이 된다.</p>
+  <nav id="nav"></nav>
+ </div>
+</header>
+
+<main class="wrap">
+
+<!-- ══════════ 1막 ══════════ -->
+<section class="act" id="act1">
+ <div class="actHead">
+  <h2>1막 · 평면에 갇히다</h2>
+  <p>여기는 두께가 없는 세상이다. 사는 것들은 평면 안에서만 움직이고, 위아래라는 말을 모른다.
+     그 평면을 3차원 물체가 통과한다. 평면 존재가 받는 것은 <b>단면 하나</b>다 — 시간에 따라 크기와 모양이 변하는 도형으로 온다.
+     그것만 보고 무엇이 지나갔는지 알아맞힌다.</p>
+ </div>
+ <div class="grid">
+  <div>
+   <div class="card">
+    <div class="ch"><b>평면 세계</b><span>물체가 평면을 자른 자리</span></div>
+    <canvas id="c1w" height="380"></canvas>
+   </div>
+   <div class="card" style="margin-top:14px">
+    <div class="ch"><b>평면 존재의 눈</b><span>1차원 망막 — 폭 하나로만 들어온다</span></div>
+    <canvas id="c1e" height="86"></canvas>
+    <div class="cb" style="padding-top:0">
+      <p class="note" style="border:0;margin:0;padding:8px 0 0">
+        평면 존재의 눈은 선이다. 원인지 정사각형인지도 그 자리에서는 못 본다 — 폭만 안다.
+        모양을 알려면 세계 지도(위 화면)처럼 <b>돌아다니며 재는 수밖에</b> 없다.
+        우리 눈도 같다. 망막은 2차원이고, 3차원은 뇌가 재구성한 값이다.</p>
+    </div>
+   </div>
+   <!-- 진실 화면은 넓은 왼쪽 칸에 둔다. 오른쪽 340px 에 넣었더니 도형이 눌려
+        자르는 평면이 잘려 나갔다 — 이 카드는 공간을 먹는 그림이다. -->
+   <div id="truth1" style="display:none;margin-top:14px">
+     <div class="card">
+       <div class="ch"><b>3차원에서 본 진실</b><span>회색 판이 평면 세계다</span></div>
+       <canvas id="c1t" height="300"></canvas>
+     </div>
+   </div>
+  </div>
+
+  <div class="card">
+   <div class="ch"><b>통과시키기</b><span id="s1score">0 / 0</span></div>
+   <div class="cb">
+    <div class="ctl">
+      <label>물체의 높이 <span id="v1h">0.00</span></label>
+      <input type="range" id="r1h" min="-160" max="160" value="-160">
+    </div>
+    <div class="row">
+      <button class="btn sm" id="b1play">자동으로 통과</button>
+      <button class="btn sm" id="b1new">다른 물체</button>
+    </div>
+
+    <p class="note" style="margin-top:14px;padding-top:14px">무엇이 지나갔나</p>
+    <div class="opts" id="o1"></div>
+    <div class="verdict" id="v1"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ══════════ 2막 ══════════ -->
+<section class="act" id="act2">
+ <div class="actHead">
+  <h2>2막 · 사다리</h2>
+  <p>차원을 올리는 규칙은 하나뿐이다. <b>지금까지의 모든 방향과 수직인 새 방향으로 밀기.</b>
+     점을 밀면 선분, 선분을 밀면 정사각형, 정사각형을 밀면 정육면체. 여기서 멈출 이유가 없다.
+     각 칸마다 먼저 예측을 적고, 그다음 밀어 본다.</p>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <div class="ch"><b id="c2name">0차원 · 점</b><span id="c2hint">밀어 보기</span></div>
+   <canvas id="c2" height="400"></canvas>
+   <div class="cb">
+    <div class="row">
+      <button class="btn sm" id="b2push">밀기</button>
+      <button class="btn sm" id="b2spin">회전 멈춤</button>
+      <span class="stat" style="margin:0"><span>단면 아닌 그림자다 —
+        <i id="c2proj">투영 없음</i></span></span>
+    </div>
+    <div id="planes2" style="display:none">
+      <p class="note" style="margin-top:12px;padding-top:12px">회전 평면 여섯. 3차원은 축을 고정하고 돌지만
+        4차원은 <b>평면을 고정하고</b> 돈다. 보라색 셋이 w를 물고 도는 회전이다.</p>
+      <div class="planes" id="pl2"></div>
+      <div class="legend">
+        <i><span class="sw" style="background:#4b6b8a"></span>안쪽(w 작음)</i>
+        <i><span class="sw" style="background:var(--acc)"></span>바깥(w 큼)</i>
+        <i><span class="sw" style="background:var(--w4)"></span>w 축을 따라 난 모서리</i>
+      </div>
+    </div>
+   </div>
+  </div>
+
+  <div class="card">
+   <div class="ch"><b>예측하고 올라가기</b><span id="s2score">0 / 0</span></div>
+   <div class="cb">
+    <div id="pred2"></div>
+    <div class="verdict" id="v2"></div>
+    <div class="row" style="margin-top:12px">
+      <button class="btn" id="b2prev">이전 칸</button>
+      <button class="btn pri" id="b2check">맞나 보기</button>
+      <button class="btn" id="b2next">다음 칸</button>
+    </div>
+    <table style="margin-top:16px">
+      <thead><tr><th>차원</th><th>꼭짓점</th><th>모서리</th><th>회전평면</th></tr></thead>
+      <tbody id="t2"></tbody>
+    </table>
+    <p class="note">규칙은 하나다. 새 방향으로 밀면 <b>꼭짓점은 두 벌</b>이 되고(2ⁿ),
+      모서리는 <b>예전 것 두 벌 + 짝끼리 이은 새 모서리</b>가 된다. 회전평면은 축 둘을 고르는 경우의 수다.</p>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ══════════ 3막 ══════════ -->
+<section class="act" id="act3">
+ <div class="actHead">
+  <h2>3막 · 이번엔 우리 차례</h2>
+  <p>1막을 그대로 한 칸 올린다. 이번에 갇힌 쪽은 우리다. 4차원 물체가 우리 3차원 공간을 지나가면
+     우리가 받는 것은 <b>시간에 따라 변하는 3차원 단면</b>이다. 평면 존재가 원의 크기 변화만 받았듯이.
+     단면만 보고 무엇이 지나갔는지 알아맞힌다.</p>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <div class="ch"><b>우리 공간에 남은 단면</b><span>실제 물체는 여기 없다</span></div>
+   <canvas id="c3" height="400"></canvas>
+   <div class="cb">
+    <div class="row">
+      <button class="btn sm" id="b3spin">회전 멈춤</button>
+      <span class="stat" style="margin:0"><span>단면의 지름 <i id="v3d">0.00</i></span></span>
+    </div>
+   </div>
+  </div>
+
+  <div class="card">
+   <div class="ch"><b>통과시키기</b><span id="s3score">0 / 0</span></div>
+   <div class="cb">
+    <div class="ctl">
+      <label>물체의 w 좌표 <span id="v3w">0.00</span></label>
+      <input type="range" id="r3w" min="-160" max="160" value="-160">
+    </div>
+    <div class="row">
+      <button class="btn sm" id="b3play">자동으로 통과</button>
+      <button class="btn sm" id="b3new">다른 물체</button>
+    </div>
+    <p class="note" style="margin-top:14px;padding-top:14px">무엇이 지나갔나</p>
+    <div class="opts" id="o3"></div>
+    <div class="verdict" id="v3"></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ══════════ 4막 ══════════ -->
+<section class="act" id="act4">
+ <div class="actHead">
+  <h2>4막 · 매듭이 풀린다</h2>
+  <p>차원이 하나 늘면 <b>가능한 일 자체가 달라진다</b>. 평면에서는 원 안에 갇힌 점이 절대 못 나온다.
+     3차원에서는 한 번 묶인 고리가 절대 안 풀린다. 두 문장은 같은 문장이다.</p>
+ </div>
+
+ <div class="grid">
+  <div class="card">
+   <div class="ch"><b id="c4name">가</b><span id="c4sub"></span></div>
+   <canvas id="c4" height="420"></canvas>
+   <div class="cb">
+    <div class="ctl" id="wrap4a">
+      <label>세 번째 방향으로 들어 올리기 <span id="v4z">0.00</span></label>
+      <input type="range" id="r4z" min="0" max="100" value="0">
+    </div>
+    <div class="ctl" id="wrap4s" style="display:none">
+      <label>푸는 중 <span id="v4s">0%</span></label>
+      <input type="range" id="r4s" min="0" max="100" value="0">
+    </div>
+    <div class="ctl" id="wrap4w" style="display:none">
+      <label>한 가닥을 w 축으로 밀어내기 <span id="v4w">꺼짐</span></label>
+      <input type="range" id="r4w" min="0" max="100" value="0">
+    </div>
+    <div class="warnbox" id="w4"></div>
+    <div class="okbox" id="k4"></div>
+   </div>
+  </div>
+
+  <div class="card">
+   <div class="ch"><b>두 단계</b><span id="s4score">0 / 2</span></div>
+   <div class="cb">
+    <div class="opts">
+      <button class="opt" id="st4a"><span>가 · 평면에 갇힌 점</span><span class="mk" id="mk4a">—</span></button>
+      <button class="opt" id="st4b"><span>나 · 3차원에 묶인 고리</span><span class="mk" id="mk4b">—</span></button>
+    </div>
+    <div id="txt4a">
+      <p class="note">평면 존재를 원 하나가 가둔다. 평면 안에서는 어느 쪽으로 가도 선을 넘어야 하고,
+        선을 넘는 것은 그 세계에서 벽을 뚫는 일이다. 그런데 우리는 그냥 <b>집어서 위로 들면</b> 된다.
+        평면 존재가 보기에 이건 사라졌다가 밖에 나타나는 것이다. 슬라이더를 올려 본다.</p>
+      <p class="note">이 순간 평면 존재는 자기 세계의 법칙이 깨졌다고 느낀다.
+        깨진 것은 없다. 자기가 못 보는 방향이 하나 더 있었을 뿐이다.</p>
+    </div>
+    <div id="txt4b" style="display:none">
+      <p class="note">삼엽매듭이다. 3차원에서는 아무리 주물러도 안 풀린다 —
+        풀려면 가닥이 가닥을 <b>통과</b>해야 하는데, 3차원에서 그건 밧줄을 끊는 일이다.</p>
+      <p class="note">먼저 w를 끈 채로 "푸는 중"을 끝까지 밀어 본다. 어느 지점에서 붉은 경고가 뜬다.
+        거기가 가닥이 가닥을 뚫고 지나가는 자리다.
+        그다음 <b>w 슬라이더</b>로 한 가닥을 네 번째 방향으로 빼낸다. 보라색으로 변한 구간이
+        우리 공간에서 잠깐 없어진 부분이다. 없는 것끼리는 부딪히지 않는다.</p>
+      <p class="note">화면 아래 숫자는 장식이 아니다. 고리 위 점들을 4차원 거리로 전부 재서
+        <b>가장 가까운 두 점의 거리</b>를 매 프레임 계산한 값이다. 이 값이 0이면 밧줄이 자신을 뚫은 것이다.</p>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<!-- ══════════ 기록 ══════════ -->
+<section class="act" id="act5">
+ <div class="actHead">
+  <h2>기록</h2>
+  <p>맞힌 것보다 <b>어디서 틀렸는지</b>가 남는다. 단면 문제는 여러 번 풀 수 있고, 물체마다 따로 센다.</p>
+ </div>
+ <div class="grid">
+  <div class="card">
+   <div class="ch"><b>단면 알아맞히기</b><span>3차원 물체 · 4차원 물체</span></div>
+   <div class="cb"><table>
+     <thead><tr><th>물체</th><th>차원</th><th>맞힘</th><th>시도</th></tr></thead>
+     <tbody id="t5"></tbody>
+   </table></div>
+  </div>
+  <div class="card">
+   <div class="ch"><b>사다리 예측</b><span id="s5b"></span></div>
+   <div class="cb">
+    <table>
+      <thead><tr><th>칸</th><th>꼭짓점</th><th>모서리</th></tr></thead>
+      <tbody id="t5b"></tbody>
+    </table>
+    <p class="note">틀린 칸은 예측이 규칙을 안 쓰고 눈대중이었다는 뜻이다. 규칙 하나로 다시 올라가면 전부 맞는다.</p>
+    <div class="row" style="margin-top:12px"><button class="btn sm" id="b5reset">기록 지우기</button></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+</main>
+
+<footer><div class="wrap">
+  시너지언 수학 · 도구 선반 —
+  <a href="https://logiccraft.co.kr/nanje-dogam/">난제도감</a>과 나란한 자리.
+  중1 「다면체와 회전체를 공학 도구로 탐구한다(9수03-07)」의 다음 칸으로 쓸 수 있다.
+  <br>계정도 서버도 없다. 기록은 이 브라우저에만 남는다. · <a href="https://logiccraft.co.kr/">로직크래프트</a>
+</div></footer>
+
+<script>
+"use strict";
+/* ════════════════════════════════════════════════════════════════
+   n차원 엔진 — 0차원부터 4차원까지 같은 코드로 다룬다.
+   점은 길이 n 배열이다. 투영은 높은 축부터 하나씩 원근으로 눌러 2차원까지 내린다.
+   ════════════════════════════════════════════════════════════════ */
+
+const TAU = Math.PI * 2;
+
+/* n차원 초입방체. 꼭짓점은 비트마스크로 만들고, 모서리는 비트 하나만 다른 쌍이다.
+   그래서 꼭짓점 2ⁿ, 모서리 n·2ⁿ⁻¹ 이 코드에서 그대로 나온다 — 공식을 따로 적지 않는다. */
+function hypercube(n){
+  const V=[];
+  for(let i=0;i<(1<<n);i++){ const p=[]; for(let d=0;d<n;d++) p.push((i>>d&1)?1:-1); V.push(p); }
+  const E=[];
+  for(let i=0;i<V.length;i++) for(let d=0;d<n;d++){ const j=i^(1<<d); if(j>i) E.push([i,j,d]); }
+  return {V,E};
+}
+const nVerts = n => 1<<n;
+const nEdges = n => n===0?0:n*(1<<(n-1));
+const nPlanes = n => n*(n-1)/2;
+
+/* (i,j) 평면 회전. 축을 도는 게 아니라 평면을 고정하고 도는 것이 원본 정의다. */
+function rotate(p,i,j,t){
+  if(i>=p.length||j>=p.length) return p;
+  const c=Math.cos(t), s=Math.sin(t), a=p[i], b=p[j], q=p.slice();
+  q[i]=a*c-b*s; q[j]=a*s+b*c; return q;
+}
+
+/* 높은 축부터 원근으로 눌러 2차원까지. dist[k] 는 k차원 축을 누를 때 눈까지 거리.
+   반환값의 3번째 원소는 누적 축소율 — 멀수록 선을 얇고 어둡게 그리는 데 쓴다. */
+function flatten(p, dist){
+  let q=p.slice(), sc=1;
+  while(q.length>2){
+    const k=q.length, d=dist[k]||4, den=d-q[k-1];
+    const s = den>0.15 ? d/den : d/0.15;         // 눈 뒤로 넘어가면 뒤집히므로 막는다
+    sc*=s; q=q.slice(0,k-1).map(v=>v*s);
+  }
+  while(q.length<2) q.push(0);
+  return [q[0],q[1],sc];
+}
+
+/* ---- 캔버스 ---- */
+function fit(cv){
+  const dpr=Math.min(window.devicePixelRatio||1,2);
+  const w=cv.clientWidth||cv.parentElement.clientWidth;
+  /* ⚠️ cv.height 에 값을 넣으면 HTML 의 height 속성이 그 값으로 바뀐다.
+     매번 getAttribute 로 읽으면 dpr 2 에서 380 → 760 → 1520 으로 불어나 캔버스가 죽는다.
+     데스크톱(dpr 1)에서는 곱이 1 이라 끝까지 안 보인다 — 좁은 화면 검사에서야 나왔다. */
+  if(!cv.dataset.h) cv.dataset.h=cv.getAttribute('height');
+  const h=+cv.dataset.h;
+  if(cv.width!==Math.round(w*dpr)||cv.height!==Math.round(h*dpr)){
+    cv.width=Math.round(w*dpr); cv.height=Math.round(h*dpr);
+  }
+  cv.style.height=h+'px';
+  const g=cv.getContext('2d');
+  g.setTransform(dpr,0,0,dpr,0,0);
+  g.clearRect(0,0,w,h);
+  return {g,w,h};
+}
+function clearBg(g,w,h){ g.fillStyle='#0d141d'; g.fillRect(0,0,w,h); }
+function line(g,a,b){ g.beginPath(); g.moveTo(a[0],a[1]); g.lineTo(b[0],b[1]); g.stroke(); }
+function label(g,x,y,txt,col,size,align){
+  g.fillStyle=col||'#5f6f83'; g.font=(size||11)+'px -apple-system,system-ui,sans-serif';
+  g.textAlign=align||'left'; g.textBaseline='middle'; g.fillText(txt,x,y);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   물체 — 3차원 다섯과 4차원 다섯이 한 칸씩 짝이다.
+   단면 함수는 "한 차원 낮은 물체"를 돌려준다. 그래서 3차원의 단면은 2차원 도형,
+   4차원의 단면은 3차원 도형이 되고, 1막과 3막이 같은 규칙을 쓴다.
+   ════════════════════════════════════════════════════════════════ */
+
+// 2차원 단면 종류: 원 / 정사각형 / 마름모
+const SOLIDS3 = [
+  {k:'sphere', n:'구',       tell:'양 끝이 점으로 수렴하며 원이 부드럽게 커졌다 작아진다',
+   sec:h=>Math.abs(h)<1?{t:'circle',r:Math.sqrt(1-h*h)}:null},
+  {k:'cyl',    n:'원기둥',    tell:'원이 갑자기 나타나 크기가 한 번도 안 변하고 갑자기 사라진다',
+   sec:h=>Math.abs(h)<1?{t:'circle',r:1}:null},
+  {k:'cone',   n:'원뿔',      tell:'한쪽 끝은 점, 반대쪽은 최대 크기인 채로 뚝 끊긴다',
+   sec:h=>Math.abs(h)<=1?{t:'circle',r:(1-h)/2}:null},
+  {k:'cube',   n:'정육면체',   tell:'정사각형이 갑자기 나타나 같은 크기로 있다가 갑자기 사라진다',
+   sec:h=>Math.abs(h)<1?{t:'square',r:1}:null},
+  {k:'octa',   n:'정팔면체',   tell:'마름모가 점에서 자라 최대가 되었다가 다시 점으로 줄어든다',
+   sec:h=>Math.abs(h)<1?{t:'diamond',r:1-Math.abs(h)}:null},
+];
+
+// 3차원 단면 종류: 구 / 정육면체 / 정팔면체
+const SOLIDS4 = [
+  {k:'gsphere', n:'초구',      pair:'구',       tell:'구가 점에서 자라 최대가 되었다가 점으로 수렴한다',
+   sec:w=>Math.abs(w)<1?{t:'ball',r:Math.sqrt(1-w*w)}:null},
+  {k:'gcyl',    n:'초원기둥',   pair:'원기둥',    tell:'구가 갑자기 나타나 크기가 안 변한 채 갑자기 사라진다',
+   sec:w=>Math.abs(w)<1?{t:'ball',r:1}:null},
+  {k:'gcone',   n:'초원뿔',    pair:'원뿔',      tell:'한쪽 끝은 점, 반대쪽은 최대 크기인 채로 뚝 끊긴다',
+   sec:w=>Math.abs(w)<=1?{t:'ball',r:(1-w)/2}:null},
+  {k:'tess',    n:'테서랙트',   pair:'정육면체',  tell:'정육면체가 갑자기 나타나 같은 크기로 있다가 갑자기 사라진다',
+   sec:w=>Math.abs(w)<1?{t:'cube',r:1}:null},
+  {k:'cell16',  n:'정팔포체',   pair:'정팔면체',  tell:'정팔면체가 점에서 자라 최대가 되었다가 점으로 줄어든다',
+   sec:w=>Math.abs(w)<1?{t:'oct',r:1-Math.abs(w)}:null},
+];
+
+/* ---- 기록 ---- */
+const KEY='dimladder.v1';
+let REC = load();
+function load(){
+  try{ const o=JSON.parse(localStorage.getItem(KEY)||'{}');
+       return {sec:o.sec||{}, pred:o.pred||{}, knot:o.knot||{}}; }
+  catch(e){ return {sec:{},pred:{},knot:{}}; }
+}
+function save(){ try{ localStorage.setItem(KEY,JSON.stringify(REC)); }catch(e){} }
+function bumpSec(k,ok){ const r=REC.sec[k]||{hit:0,try:0}; r.try++; if(ok)r.hit++; REC.sec[k]=r; save(); }
+function scoreSec(list){ let h=0,t=0; list.forEach(s=>{const r=REC.sec[s.k]; if(r){h+=r.hit;t+=r.try;}}); return [h,t]; }
+
+/* ════════════════════════════════════════════════════════════════
+   1막 · 평면에 갇히다
+   ════════════════════════════════════════════════════════════════ */
+const A1 = { obj:null, h:-1.6, playing:false, answered:false, showTruth:false, spin:0 };
+
+function newQ1(){
+  A1.obj = SOLIDS3[Math.floor(Math.random()*SOLIDS3.length)];
+  A1.h=-1.6; A1.answered=false; A1.showTruth=false;
+  document.getElementById('r1h').value=-160;
+  document.getElementById('truth1').style.display='none';
+  document.getElementById('v1').className='verdict';
+  buildOpts('o1', SOLIDS3, pick1);
+  updScore1(); draw1();
+}
+function buildOpts(id, list, cb){
+  const box=document.getElementById(id); box.innerHTML='';
+  list.forEach(s=>{
+    const b=document.createElement('button'); b.className='opt'; b.dataset.k=s.k;
+    b.innerHTML='<span>'+s.n+'</span><span class="mk"></span>';
+    b.onclick=()=>cb(s); box.appendChild(b);
+  });
+}
+function pick1(s){
+  if(A1.answered) return;
+  A1.answered=true; A1.showTruth=true; A1.playing=false;
+  const ok = s.k===A1.obj.k;
+  bumpSec(A1.obj.k, ok);
+  document.querySelectorAll('#o1 .opt').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.k===A1.obj.k){ b.classList.add('right'); b.querySelector('.mk').textContent='정답'; }
+    else if(b.dataset.k===s.k){ b.classList.add('wrong'); b.querySelector('.mk').textContent='고른 것'; }
+  });
+  const v=document.getElementById('v1');
+  v.className='verdict show '+(ok?'ok':'no');
+  v.innerHTML=(ok?'<b>맞다.</b> ':'<b>'+A1.obj.n+'이었다.</b> ')+A1.obj.tell+'.'+
+    '<br><br>단면의 <b>모양</b>이 물체의 옆면을, 단면의 <b>크기 변화</b>가 물체의 위아래 생김새를 말한다. 둘을 따로 읽으면 다섯을 다 가른다.';
+  document.getElementById('truth1').style.display='block';
+  updScore1(); draw1();
+}
+function updScore1(){ const [h,t]=scoreSec(SOLIDS3); document.getElementById('s1score').textContent=h+' / '+t; }
+
+function sectionPts(sec, N){
+  // 2차원 단면을 점 목록으로. 원은 다각형으로 근사한다.
+  if(!sec) return [];
+  const P=[];
+  if(sec.t==='circle'){ const n=N||64; for(let i=0;i<n;i++){const a=i/n*TAU; P.push([Math.cos(a)*sec.r, Math.sin(a)*sec.r]);} }
+  else if(sec.t==='square'){ P.push([-sec.r,-sec.r],[sec.r,-sec.r],[sec.r,sec.r],[-sec.r,sec.r]); }
+  else if(sec.t==='diamond'){ P.push([sec.r,0],[0,sec.r],[-sec.r,0],[0,-sec.r]); }
+  return P;
+}
+
+/* 눈은 평면 안 (0, EYE_Y) 에 있다. 세계 화면과 망막 화면이 같은 값을 써야
+   "저 자리에서 보면 저 폭"이 맞는다. 축척도 눈이 화면 안에 들어오도록 맞춘다 —
+   처음에 축척을 키웠더니 눈 표시가 캔버스 밖으로 나가 아예 안 그려졌다. */
+const EYE_Y=-1.75;
+
+function draw1(){
+  // ── 평면 세계
+  const {g,w,h}=fit(document.getElementById('c1w')); clearBg(g,w,h);
+  const cx=w/2, cy=h*0.40, S=Math.min(w,h)/3.4;
+  g.strokeStyle='#16202c'; g.lineWidth=1;
+  for(let i=-4;i<=4;i++){ line(g,[cx+i*S/2,0],[cx+i*S/2,h]); line(g,[0,cy+i*S/2],[w,cy+i*S/2]); }
+  g.strokeStyle='#233246'; line(g,[0,cy],[w,cy]); line(g,[cx,0],[cx,h]);
+
+  const sec=A1.obj?A1.obj.sec(A1.h):null;
+  const P=sectionPts(sec);
+  if(P.length){
+    g.beginPath();
+    P.forEach((p,i)=>{ const x=cx+p[0]*S, y=cy-p[1]*S; i?g.lineTo(x,y):g.moveTo(x,y); });
+    g.closePath();
+    g.fillStyle='rgba(56,189,248,.13)'; g.fill();
+    g.strokeStyle='#38bdf8'; g.lineWidth=2.2; g.stroke();
+  } else {
+    label(g,cx,cy,'평면에 아무것도 없다','#3d4b5e',13,'center');
+  }
+  // 눈 위치 표시 — 망막 화면과 같은 EYE_Y 를 쓴다
+  const ey=cy-EYE_Y*S;
+  g.fillStyle='#fbbf24'; g.beginPath(); g.arc(cx,ey,4.5,0,TAU); g.fill();
+  g.strokeStyle='rgba(251,191,36,.28)'; g.lineWidth=1; g.setLineDash([3,4]);
+  line(g,[cx,ey],[cx,cy]); g.setLineDash([]);
+  label(g,cx+10,ey,'평면 존재 — 여기서 위쪽을 본다','#7c6a3a',11);
+  label(g,12,16,'평면 세계를 위에서 본 그림 — 평면 존재는 이 그림을 한눈에 못 본다','#3d4b5e',11);
+
+  draw1eye(sec);
+  if(A1.showTruth) draw1truth();
+}
+
+function draw1eye(sec){
+  const {g,w,h}=fit(document.getElementById('c1e')); clearBg(g,w,h);
+  const cy=h/2;
+  g.strokeStyle='#233246'; g.lineWidth=1; line(g,[14,cy],[w-14,cy]);
+  for(let i=0;i<=8;i++){ const x=14+(w-28)*i/8; g.strokeStyle='#1a2432'; line(g,[x,cy-5],[x,cy+5]); }
+  // 눈은 평면 안 (0, -2.1) 에서 +y 를 본다. 단면의 각폭을 띠로 옮긴다.
+  const P=sectionPts(sec,48);
+  if(P.length){
+    const FOV=1.15;
+    let lo=1e9, hi=-1e9;
+    P.forEach(p=>{ const ang=Math.atan2(p[0], p[1]-EYE_Y); if(ang<lo)lo=ang; if(ang>hi)hi=ang; });
+    const map=a=>14+(w-28)*(a/FOV+1)/2;
+    const x1=Math.max(14,map(lo)), x2=Math.min(w-14,map(hi));
+    if(x2>x1){
+      const grd=g.createLinearGradient(x1,0,x2,0);
+      grd.addColorStop(0,'rgba(56,189,248,.35)'); grd.addColorStop(.5,'rgba(56,189,248,.95)'); grd.addColorStop(1,'rgba(56,189,248,.35)');
+      g.strokeStyle=grd; g.lineWidth=9; g.lineCap='round'; line(g,[x1,cy],[x2,cy]); g.lineCap='butt';
+    }
+  } else label(g,w/2,cy-16,'아무것도 안 보인다','#3d4b5e',11,'center');
+}
+
+/* 3차원 진실 화면 — 물체를 회전하는 와이어프레임으로, 자르는 평면을 회색 판으로 */
+function solid3Mesh(k){
+  const P=[], E=[];
+  const push=p=>{P.push(p); return P.length-1;};
+  const ring=(z,r,n,close)=>{ const idx=[]; for(let i=0;i<n;i++){const a=i/n*TAU; idx.push(push([Math.cos(a)*r,Math.sin(a)*r,z]));}
+    for(let i=0;i<n;i++) if(close||i<n-1) E.push([idx[i],idx[(i+1)%n]]); return idx; };
+  if(k==='sphere'){
+    for(let j=1;j<7;j++){ const z=-1+2*j/7, r=Math.sqrt(Math.max(0,1-z*z)); ring(z,r,28,true); }
+    for(let m=0;m<8;m++){ const a=m/8*TAU, idx=[];
+      for(let j=0;j<=20;j++){ const t=-Math.PI/2+Math.PI*j/20; idx.push(push([Math.cos(t)*Math.cos(a),Math.cos(t)*Math.sin(a),Math.sin(t)])); }
+      for(let j=0;j<20;j++) E.push([idx[j],idx[j+1]]); }
+  } else if(k==='cyl'){
+    const a=ring(-1,1,28,true), b=ring(1,1,28,true);
+    for(let i=0;i<28;i+=4) E.push([a[i],b[i]]);
+  } else if(k==='cone'){
+    const b=ring(-1,1,28,true), ap=push([0,0,1]);
+    for(let i=0;i<28;i+=3) E.push([b[i],ap]);
+  } else if(k==='cube'){
+    const c=hypercube(3); c.V.forEach(v=>push(v)); c.E.forEach(e=>E.push([e[0],e[1]]));
+  } else if(k==='octa'){
+    const v=[[1,0,0],[-1,0,0],[0,1,0],[0,-1,0],[0,0,1],[0,0,-1]].map(push);
+    for(let i=0;i<6;i++) for(let j=i+1;j<6;j++){ const a=P[v[i]],b=P[v[j]];
+      if(!(a[0]===-b[0]&&a[1]===-b[1]&&a[2]===-b[2])) E.push([v[i],v[j]]); }
+  }
+  return {P,E};
+}
+function draw1truth(){
+  const {g,w,h}=fit(document.getElementById('c1t')); clearBg(g,w,h);
+  if(!A1.obj) return;
+  /* 원근을 세게 먹이면 자르는 평면 네 귀퉁이가 캔버스 밖으로 뻗어 잘린 것처럼 보인다.
+     눈을 멀리 두고(7.5) 판을 조금 줄여 판 전체가 프레임 안에 들어오게 맞췄다. */
+  const m=solid3Mesh(A1.obj.k), S=Math.min(w,h)/3.6, cx=w/2, cy=h/2, PLANE=1.4;
+  const rx=-0.42, ry=A1.spin;
+  const tf=p=>{ let q=rotate(p,0,2,ry); q=rotate(q,1,2,rx); const f=flatten(q,{3:7.5});
+                return [cx+f[0]*S, cy-f[1]*S, f[2]]; };
+  // 자르는 평면 (z = h)
+  const z=A1.h, quad=[[-PLANE,-PLANE,z],[PLANE,-PLANE,z],[PLANE,PLANE,z],[-PLANE,PLANE,z]].map(tf);
+  g.beginPath(); quad.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.closePath();
+  g.fillStyle='rgba(147,163,184,.10)'; g.fill(); g.strokeStyle='#3d4b5e'; g.lineWidth=1; g.stroke();
+  // 물체
+  g.lineWidth=1.1;
+  m.E.forEach(e=>{ const a=tf(m.P[e[0]]), b=tf(m.P[e[1]]);
+    const t=Math.max(0,Math.min(1,(a[2]-.85)/.42));
+    g.strokeStyle='rgba(125,162,198,'+(0.34+0.5*t)+')'; line(g,a,b); });
+  // 단면 자리
+  const sec=A1.obj.sec(z), P=sectionPts(sec,52);
+  if(P.length){
+    g.beginPath(); P.forEach((p,i)=>{ const q=tf([p[0],p[1],z]); i?g.lineTo(q[0],q[1]):g.moveTo(q[0],q[1]); });
+    g.closePath(); g.strokeStyle='#38bdf8'; g.lineWidth=2.2; g.stroke();
+    g.fillStyle='rgba(56,189,248,.15)'; g.fill();
+  }
+  label(g,12,15,'평면 존재가 받는 것은 파란 테두리 하나뿐이다','#3d4b5e',11);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   2막 · 사다리
+   ════════════════════════════════════════════════════════════════ */
+const A2 = { n:0, push:1, spin:true, ang:0, checked:{}, planes:{'0,1':false,'0,2':false,'1,2':false,'0,3':true,'1,3':false,'2,3':false} };
+const DIM_NAME=['점','선분','정사각형','정육면체','테서랙트'];
+
+function setDim(n){
+  A2.n=Math.max(0,Math.min(4,n)); A2.push=A2.n===0?1:0; A2.ang=0;
+  document.getElementById('c2name').textContent=A2.n+'차원 · '+DIM_NAME[A2.n];
+  document.getElementById('planes2').style.display=A2.n>=2?'block':'none';
+  document.getElementById('c2proj').textContent =
+    A2.n<=2?'투영 없음':(A2.n===3?'3차원 → 2차원':'4차원 → 3차원 → 2차원');
+  document.getElementById('c2hint').textContent = A2.n===0?'밀 것이 아직 없다':'밀기';
+  buildPred(); buildPlanes(); renderT2(); draw2();
+}
+function buildPred(){
+  const box=document.getElementById('pred2'), n=A2.n;
+  const done=REC.pred[n];
+  box.innerHTML='';
+  if(n===0){
+    box.innerHTML='<p class="note" style="border:0;padding:0;margin:0">점 하나. 꼭짓점 1개, 모서리 0개, 돌 수 있는 평면 0개.'+
+      ' 여기가 사다리의 바닥이다. <b>밀기</b>를 눌러 한 칸 올라간다.</p>';
+    document.getElementById('v2').className='verdict'; return;
+  }
+  box.innerHTML='<p class="note" style="border:0;padding:0;margin:0 0 4px">'+
+    (n-1)+'차원 '+DIM_NAME[n-1]+'을 새 방향으로 밀면 '+n+'차원 '+DIM_NAME[n]+'이 된다. 밀기 전에 적는다.</p>'+
+    '<div class="pred">'+
+    '<div class="pf"><span>꼭짓점은 몇 개가 되나</span><input id="p2v" inputmode="numeric" placeholder="?"></div>'+
+    '<div class="pf"><span>모서리는 몇 개가 되나</span><input id="p2e" inputmode="numeric" placeholder="?"></div></div>';
+  if(done){
+    document.getElementById('p2v').value=done.v; document.getElementById('p2e').value=done.e;
+    markPred(done.v===nVerts(n), done.e===nEdges(n));
+    showV2(done.v===nVerts(n)&&done.e===nEdges(n));
+  } else document.getElementById('v2').className='verdict';
+}
+function markPred(okv,oke){
+  const a=document.getElementById('p2v'), b=document.getElementById('p2e');
+  if(a) a.className=okv?'right':'wrong';
+  if(b) b.className=oke?'right':'wrong';
+}
+function showV2(all){
+  const n=A2.n, v=document.getElementById('v2');
+  v.className='verdict show '+(all?'ok':'no');
+  v.innerHTML=(all?'<b>맞다.</b> ':'<b>정답은 꼭짓점 '+nVerts(n)+'개, 모서리 '+nEdges(n)+'개다.</b> ')+
+    '밀면 '+DIM_NAME[n-1]+'이 두 벌이 되니 꼭짓점은 '+nVerts(n-1)+'×2 = '+nVerts(n)+'. '+
+    '모서리는 두 벌의 모서리 '+nEdges(n-1)+'×2 = '+(nEdges(n-1)*2)+'에, 짝지은 꼭짓점을 잇는 새 모서리 '+nVerts(n-1)+'개를 더해 '+nEdges(n)+'.'+
+    (n===4?'<br><br>4차원에서는 회전 평면이 3차원의 3개에서 <b>6개</b>로 늘어난다. 그중 셋은 w를 물고 돌아서, 우리 눈에는 도형이 안팎으로 뒤집히는 것처럼 보인다.':'');
+}
+function checkPred(){
+  const n=A2.n; if(n===0){ setDim(1); return; }
+  const a=document.getElementById('p2v'), b=document.getElementById('p2e');
+  const pv=parseInt(a.value,10), pe=parseInt(b.value,10);
+  if(isNaN(pv)||isNaN(pe)){ const v=document.getElementById('v2');
+    v.className='verdict show'; v.textContent='두 칸을 채우고 다시 누른다.'; return; }
+  const okv=pv===nVerts(n), oke=pe===nEdges(n);
+  REC.pred[n]={v:pv,e:pe,ok:okv&&oke}; save();
+  markPred(okv,oke); showV2(okv&&oke); updScore2(); renderT2();
+  if(A2.push<1) animPush();
+}
+function updScore2(){
+  let h=0,t=0; for(let n=1;n<=4;n++){ if(REC.pred[n]){ t++; if(REC.pred[n].ok)h++; } }
+  document.getElementById('s2score').textContent=h+' / '+t;
+}
+function renderT2(){
+  const tb=document.getElementById('t2'); tb.innerHTML='';
+  for(let n=0;n<=4;n++){
+    const tr=document.createElement('tr'); if(n===A2.n) tr.className='now';
+    const rec=REC.pred[n];
+    const cls=(val,got)=> rec? (got===val?'hit':'miss') : '';
+    tr.innerHTML='<td>'+n+'차원 '+DIM_NAME[n]+'</td>'+
+      '<td class="'+(rec?cls(nVerts(n),rec.v):'')+'">'+nVerts(n)+'</td>'+
+      '<td class="'+(rec?cls(nEdges(n),rec.e):'')+'">'+nEdges(n)+'</td>'+
+      '<td>'+nPlanes(n)+'</td>';
+    tb.appendChild(tr);
+  }
+}
+function buildPlanes(){
+  const box=document.getElementById('pl2'); box.innerHTML='';
+  const AX=['x','y','z','w'];
+  for(let i=0;i<A2.n;i++) for(let j=i+1;j<A2.n;j++){
+    const key=i+','+j, isW=(j===3);
+    const b=document.createElement('button');
+    b.className='pl'+(A2.planes[key]?' on':'')+(isW?' w':'');
+    b.textContent=AX[i]+AX[j];
+    b.onclick=()=>{ A2.planes[key]=!A2.planes[key]; b.classList.toggle('on'); };
+    box.appendChild(b);
+  }
+}
+function animPush(){
+  const t0=performance.now();
+  (function step(){
+    const k=Math.min(1,(performance.now()-t0)/700);
+    A2.push=k<1? (1-Math.pow(1-k,3)) : 1;
+    draw2(); if(k<1) requestAnimationFrame(step);
+  })();
+}
+function draw2(){
+  const {g,w,h}=fit(document.getElementById('c2')); clearBg(g,w,h);
+  const n=A2.n, cx=w/2, cy=h/2, S=Math.min(w,h)/(n>=4?5.2:4.0);
+  const c=hypercube(n);
+  const ang=A2.ang;
+  // 마지막 축은 "밀린 정도"만큼만 벌어진다 — 이게 밀기 애니메이션이다
+  const pts=c.V.map(v=>{
+    let p=v.slice();
+    if(n>0) p[n-1]*=A2.push;
+    for(let i=0;i<n;i++) for(let j=i+1;j<n;j++){
+      if(A2.planes[i+','+j]) p=rotate(p,i,j,ang*(1+(j===3?0.41:0)));
+    }
+    const f=flatten(p,{3:4.6,4:3.4});
+    return [cx+f[0]*S, cy-f[1]*S, f[2]];
+  });
+  A2.last=pts;   // 검증기가 "화면에 실제로 몇 점이 찍혔나" 를 세는 데 쓴다
+  // 모서리 — 새로 난 축의 모서리는 보라
+  c.E.forEach(e=>{
+    const a=pts[e[0]], b=pts[e[1]], isW = e[2]===3;
+    const t=Math.max(0,Math.min(1,(((a[2]+b[2])/2)-0.6)/0.85));
+    g.lineWidth = isW ? 1.6 : (1.0+1.5*t);
+    g.strokeStyle = isW ? 'rgba(192,132,252,'+(0.35+0.5*t)+')' : 'rgba('+Math.round(75+105*t)+','+Math.round(107+130*t)+','+Math.round(138+110*t)+','+(0.35+0.6*t)+')';
+    line(g,a,b);
+  });
+  // 꼭짓점
+  pts.forEach(p=>{
+    const t=Math.max(0,Math.min(1,(p[2]-0.6)/0.85));
+    g.fillStyle='rgba(56,189,248,'+(0.35+0.55*t)+')';
+    g.beginPath(); g.arc(p[0],p[1],1.6+2.2*t,0,TAU); g.fill();
+  });
+  /* ⚠️ 밀기 전에는 두 벌이 완전히 겹쳐 있어 화면에는 (n-1)차원 도형이 그려진다.
+     그 상태에서 "꼭짓점 16" 이라고 적으면 화면이 거짓말을 한다 — 정지 컷이 그렇게 찍혔다. */
+  if(n>0 && A2.push<0.97){
+    label(g,12,15,(n-1)+'차원 '+DIM_NAME[n-1]+' 두 벌이 아직 완전히 겹쳐 있다 — 밀기를 누른다','#7c6a3a',11);
+  } else {
+    label(g,12,15,n+'차원 '+DIM_NAME[n]+' · 꼭짓점 '+nVerts(n)+' · 모서리 '+nEdges(n),'#3d4b5e',11);
+  }
+  if(n>=3) label(g,12,h-13,'화면에 있는 것은 그림자다. 길이와 각도는 투영이 왜곡한 값이다.','#3d4b5e',11);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   3막 · 4차원 물체의 단면
+   ════════════════════════════════════════════════════════════════ */
+const A3 = { obj:null, w:-1.6, playing:false, answered:false, spin:true, ang:0 };
+
+function newQ3(){
+  A3.obj = SOLIDS4[Math.floor(Math.random()*SOLIDS4.length)];
+  A3.w=-1.6; A3.answered=false;
+  document.getElementById('r3w').value=-160;
+  document.getElementById('v3').className='verdict';
+  buildOpts('o3', SOLIDS4, pick3);
+  updScore3(); draw3();
+}
+function pick3(s){
+  if(A3.answered) return;
+  A3.answered=true; A3.playing=false;
+  const ok=s.k===A3.obj.k;
+  bumpSec(A3.obj.k, ok);
+  document.querySelectorAll('#o3 .opt').forEach(b=>{
+    b.disabled=true;
+    if(b.dataset.k===A3.obj.k){ b.classList.add('right'); b.querySelector('.mk').textContent='정답'; }
+    else if(b.dataset.k===s.k){ b.classList.add('wrong'); b.querySelector('.mk').textContent='고른 것'; }
+  });
+  const v=document.getElementById('v3');
+  v.className='verdict show '+(ok?'ok':'no');
+  v.innerHTML=(ok?'<b>맞다.</b> ':'<b>'+A3.obj.n+'이었다.</b> ')+A3.obj.tell+'.'+
+    '<br><br>1막의 <b>'+A3.obj.pair+'</b>과 같은 자리다. 그때 원이 하던 일을 여기서는 구가 한다. 규칙은 안 바뀌고 단면의 차원만 하나 올라갔다.';
+  updScore3();
+}
+function updScore3(){ const [h,t]=scoreSec(SOLIDS4); document.getElementById('s3score').textContent=h+' / '+t; }
+
+function sec3Mesh(sec){
+  if(!sec) return {P:[],E:[]};
+  const P=[],E=[]; const push=p=>{P.push(p);return P.length-1;};
+  const r=sec.r;
+  if(sec.t==='ball'){
+    for(let j=1;j<6;j++){ const z=(-1+2*j/6)*r, rr=Math.sqrt(Math.max(0,r*r-z*z)); const idx=[];
+      for(let i=0;i<24;i++){const a=i/24*TAU; idx.push(push([Math.cos(a)*rr,Math.sin(a)*rr,z]));}
+      for(let i=0;i<24;i++) E.push([idx[i],idx[(i+1)%24]]); }
+    for(let m=0;m<6;m++){ const a=m/6*TAU, idx=[];
+      for(let j=0;j<=16;j++){ const t=-Math.PI/2+Math.PI*j/16;
+        idx.push(push([Math.cos(t)*Math.cos(a)*r,Math.cos(t)*Math.sin(a)*r,Math.sin(t)*r])); }
+      for(let j=0;j<16;j++) E.push([idx[j],idx[j+1]]); }
+  } else if(sec.t==='cube'){
+    const c=hypercube(3); c.V.forEach(v=>push(v.map(x=>x*r))); c.E.forEach(e=>E.push([e[0],e[1]]));
+  } else if(sec.t==='oct'){
+    const v=[[r,0,0],[-r,0,0],[0,r,0],[0,-r,0],[0,0,r],[0,0,-r]].map(push);
+    for(let i=0;i<6;i++) for(let j=i+1;j<6;j++){ const a=P[v[i]],b=P[v[j]];
+      if(!(a[0]===-b[0]&&a[1]===-b[1]&&a[2]===-b[2])) E.push([v[i],v[j]]); }
+  }
+  return {P,E};
+}
+function draw3(){
+  const {g,w,h}=fit(document.getElementById('c3')); clearBg(g,w,h);
+  /* 원근을 먹이면 가까운 면이 1.3배로 커진다. 축척을 단면 기준으로만 잡았더니
+     우리 공간 상자의 윗면이 캔버스 밖으로 잘려 나갔다. 상자가 다 들어오는 값으로 맞춘다. */
+  const cx=w/2, cy=h/2, S=Math.min(w,h)/3.7, BOX=1.25;
+  const box=hypercube(3);
+  const tf=p=>{ let q=rotate(p,0,2,A3.ang); q=rotate(q,1,2,-0.38); const f=flatten(q,{3:5.4});
+                return [cx+f[0]*S, cy-f[1]*S, f[2]]; };
+  g.strokeStyle='rgba(60,75,94,.35)'; g.lineWidth=1;
+  box.E.forEach(e=>line(g, tf(box.V[e[0]].map(x=>x*BOX)), tf(box.V[e[1]].map(x=>x*BOX))));
+
+  const sec=A3.obj?A3.obj.sec(A3.w):null;
+  const m=sec3Mesh(sec);
+  if(m.E.length){
+    m.E.forEach(e=>{ const a=tf(m.P[e[0]]), b=tf(m.P[e[1]]);
+      const t=Math.max(0,Math.min(1,(((a[2]+b[2])/2)-0.72)/0.6));
+      g.lineWidth=0.9+1.3*t; g.strokeStyle='rgba(56,189,248,'+(0.2+0.62*t)+')'; line(g,a,b); });
+  } else {
+    label(g,cx,cy,'우리 공간에 아무것도 없다','#3d4b5e',13,'center');
+  }
+  const d=sec?(2*sec.r):0;
+  document.getElementById('v3d').textContent=d.toFixed(2);
+  label(g,12,15,'옅은 상자는 우리 3차원 공간이다. 물체 자체는 w 축에 있어 여기 안 들어온다.','#3d4b5e',11);
+}
+
+/* ════════════════════════════════════════════════════════════════
+   4막 · 매듭
+   ════════════════════════════════════════════════════════════════
+   나 단계의 상수는 손으로 고른 값이 아니라 수치 탐색으로 정했다.
+   삼엽매듭을 원으로 선형 보간하면 도중에 스스로를 통과한다(최소 자기거리 0.023 → 사실상 0).
+   한 호만 w 로 들어 올리면 전 구간에서 최소 4차원 자기거리 0.59 가 유지된다.
+   t0=5.498 · 반폭 1.1(고리의 35%) · 높이 5 가 그 값이다.
+*/
+const KT0=5.498, KD=1.1, KA=5;
+const A4 = { step:'a', z:0, s:0, wOn:0, ang:0, spin:true, done:{a:false,b:false} };
+
+const knotK0 = t => [Math.sin(t)+2*Math.sin(2*t), Math.cos(t)-2*Math.cos(2*t), -Math.sin(3*t)];
+const knotK1 = t => [3*Math.cos(t), 3*Math.sin(t), 0];
+function knotBump(t){
+  let x=t-KT0;
+  while(x>Math.PI) x-=TAU;
+  while(x<-Math.PI) x+=TAU;
+  if(Math.abs(x)>=KD) return 0;
+  return 0.5*(1+Math.cos(Math.PI*x/KD));
+}
+function knotPt(t,s,amp){
+  const a=knotK0(t), b=knotK1(t);
+  const wv = amp*Math.sin(Math.PI*s)*knotBump(t);
+  return [(1-s)*a[0]+s*b[0], (1-s)*a[1]+s*b[1], (1-s)*a[2]+s*b[2], wv];
+}
+/* 매 프레임 실제로 잰다. 곡선이라 매개변수로 이웃한 점끼리는 당연히 가까우므로 제외하고,
+   충분히 떨어진 쌍만 본다. 이 값이 0 이면 밧줄이 자기를 뚫은 것이다. */
+function knotMinDist(s,amp,N){
+  /* 표본이 성기면 실제 교차를 지나쳐 0 대신 0.07 같은 값이 잡힌다.
+     320점이면 프레임당 0.7ms 로 0.022 까지 내려가 "사실상 0" 이 화면에 보인다.
+     들어 올린 쪽은 표본을 아무리 늘려도 0.58 언저리에서 안 내려간다 — 그게 진짜 여유다. */
+  N=N||320; const gap=0.45, P=[];
+  for(let i=0;i<N;i++) P.push(knotPt(i/N*TAU,s,amp));
+  let best=Infinity;
+  for(let i=0;i<N;i++) for(let j=i+1;j<N;j++){
+    let dt=Math.abs(i-j)/N*TAU; if(dt>Math.PI) dt=TAU-dt;
+    if(dt<gap) continue;
+    const p=P[i],q=P[j];
+    const e=Math.hypot(p[0]-q[0],p[1]-q[1],p[2]-q[2],p[3]-q[3]);
+    if(e<best) best=e;
+  }
+  return best;
+}
+/* "전 구간에서 0보다 컸다" 는 화면이 하는 주장이다. 주장만 적어 두지 않고 실제로 훑어 잰다.
+   경로 전체(s 를 0~1 로 101칸) 를 한 번 재는 데 70ms 남짓이라 판정이 뜰 때 한 번만 계산하고 캐시한다. */
+const PATHMIN={};
+function pathMin(amp){
+  const key=amp.toFixed(3);
+  if(PATHMIN[key]!=null) return PATHMIN[key];
+  let m=Infinity;
+  for(let k=0;k<=100;k++) m=Math.min(m, knotMinDist(k/100, amp));
+  PATHMIN[key]=m; return m;
+}
+function setStep4(st){
+  A4.step=st;
+  const a=st==='a';
+  document.getElementById('c4name').textContent = a?'가 · 평면에 갇힌 점':'나 · 3차원에 묶인 고리';
+  document.getElementById('c4sub').textContent = a?'세 번째 방향은 위다':'네 번째 방향은 보라색이다';
+  document.getElementById('wrap4a').style.display=a?'flex':'none';
+  document.getElementById('wrap4s').style.display=a?'none':'flex';
+  document.getElementById('wrap4w').style.display=a?'none':'flex';
+  document.getElementById('txt4a').style.display=a?'block':'none';
+  document.getElementById('txt4b').style.display=a?'none':'block';
+  document.getElementById('st4a').classList.toggle('active',a);
+  document.getElementById('st4b').classList.toggle('active',!a);
+  document.getElementById('w4').className='warnbox';
+  document.getElementById('k4').className='okbox';
+  draw4();
+}
+function upd4Score(){
+  const n=(A4.done.a?1:0)+(A4.done.b?1:0);
+  document.getElementById('s4score').textContent=n+' / 2';
+  document.getElementById('mk4a').textContent=A4.done.a?'해냈다':'—';
+  document.getElementById('mk4b').textContent=A4.done.b?'해냈다':'—';
+  REC.knot=A4.done; save();
+}
+function draw4(){
+  const {g,w,h}=fit(document.getElementById('c4')); clearBg(g,w,h);
+  if(A4.step==='a') draw4a(g,w,h); else draw4b(g,w,h);
+}
+function draw4a(g,w,h){
+  const cx=w/2, cy=h/2+18, S=Math.min(w,h)/3.6;
+  const tf=p=>{ let q=rotate(p,1,2,-0.72); const f=flatten(q,{3:6.2}); return [cx+f[0]*S, cy-f[1]*S, f[2]]; };
+  // 평면
+  const quad=[[-2.3,-2.3,0],[2.3,-2.3,0],[2.3,2.3,0],[-2.3,2.3,0]].map(tf);
+  g.beginPath(); quad.forEach((p,i)=>i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])); g.closePath();
+  g.fillStyle='rgba(147,163,184,.07)'; g.fill(); g.strokeStyle='#2a3848'; g.lineWidth=1; g.stroke();
+  for(let i=-2;i<=2;i++){ g.strokeStyle='rgba(60,75,94,.28)';
+    line(g,tf([i,-2.3,0]),tf([i,2.3,0])); line(g,tf([-2.3,i,0]),tf([2.3,i,0])); }
+  // 가두는 원
+  g.beginPath();
+  for(let i=0;i<=72;i++){ const a=i/72*TAU, p=tf([Math.cos(a)*1.25,Math.sin(a)*1.25,0]);
+    i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1]); }
+  g.strokeStyle='#f87171'; g.lineWidth=2.4; g.stroke();
+  // 점
+  const z=A4.z, pz=tf([0,0,z*2.0]);
+  if(z>0.02){ g.setLineDash([3,4]); g.strokeStyle='rgba(251,191,36,.5)'; g.lineWidth=1.2;
+    line(g,tf([0,0,0]),pz); g.setLineDash([]); }
+  g.fillStyle='#fbbf24'; g.beginPath(); g.arc(pz[0],pz[1],6,0,TAU); g.fill();
+  // 평면 존재가 보는 것
+  if(z>0.02){
+    g.fillStyle='rgba(147,163,184,.25)'; g.beginPath(); g.arc(tf([0,0,0])[0],tf([0,0,0])[1],4,0,TAU); g.fill();
+    label(g, tf([0,0,0])[0]+10, tf([0,0,0])[1]+2, '평면 존재가 마지막으로 본 자리','#4a5a6e',11);
+  }
+  label(g,12,15,'붉은 원은 평면 안에서는 넘을 수 없는 벽이다','#3d4b5e',11);
+  const out = z>=0.55;
+  document.getElementById('v4z').textContent=(z*2).toFixed(2);
+  const k=document.getElementById('k4');
+  if(out){ k.className='okbox show';
+    k.innerHTML='점이 원 밖으로 나왔다. 평면 안에서 이동한 거리는 <b>0</b>이다 — 원을 넘은 적이 없다.'+
+      ' 평면 존재에게 이건 사라졌다가 다른 곳에 나타난 사건이다. 우리에게는 그냥 들어 올린 것이다.';
+    if(!A4.done.a){ A4.done.a=true; upd4Score(); }
+  } else k.className='okbox';
+}
+function draw4b(g,w,h){
+  const cx=w/2, cy=h/2, S=Math.min(w,h)/8.2;
+  const amp = A4.wOn*KA;
+  const N=170, pts=[], ws=[];
+  for(let i=0;i<=N;i++){
+    const t=i/N*TAU, p=knotPt(t,A4.s,amp);
+    let q=[p[0],p[1],p[2],p[3]];
+    q=rotate(q,0,2,A4.ang); q=rotate(q,1,2,-0.42);
+    const f=flatten(q,{3:11,4:9});
+    pts.push([cx+f[0]*S, cy-f[1]*S, f[2]]);
+    ws.push(Math.abs(p[3]));
+  }
+  const maxw=Math.max(0.001,...ws);
+  for(let i=0;i<N;i++){
+    const a=pts[i], b=pts[i+1];
+    const t=Math.max(0,Math.min(1,(((a[2]+b[2])/2)-0.85)/0.5));
+    const lift=Math.min(1, ws[i]/Math.max(0.6,maxw*0.55));
+    if(lift>0.02){
+      g.strokeStyle='rgba(192,132,252,'+(0.32+0.6*t)+')';
+      g.lineWidth=(1.6+2.4*t)*(1-0.35*lift);
+      g.setLineDash(lift>0.5?[4,4]:[]);
+    } else {
+      g.strokeStyle='rgba('+Math.round(56+40*t)+','+Math.round(140+49*t)+','+Math.round(200+48*t)+','+(0.4+0.55*t)+')';
+      g.lineWidth=2.0+3.0*t; g.setLineDash([]);
+    }
+    g.lineCap='round'; line(g,a,b);
+  }
+  g.setLineDash([]); g.lineCap='butt';
+
+  const d=knotMinDist(A4.s,amp);
+  const hit = d<0.08;
+  label(g,12,15,'삼엽매듭 → 원. 보라 점선은 w 축으로 빠져나가 우리 공간에 없는 구간이다','#3d4b5e',11);
+  label(g,12,h-14,'가장 가까운 두 지점의 4차원 거리 '+d.toFixed(3)+(hit?'  ← 자기 자신을 통과했다':''),
+        hit?'#f87171':'#4a5a6e',12);
+
+  document.getElementById('v4s').textContent=Math.round(A4.s*100)+'%';
+  document.getElementById('v4w').textContent = A4.wOn<0.01?'꺼짐':(A4.wOn*KA).toFixed(1);
+  const wb=document.getElementById('w4'), kb=document.getElementById('k4');
+  if(hit){
+    wb.className='warnbox show';
+    wb.innerHTML='<b>여기서 밧줄이 밧줄을 뚫었다.</b> 3차원에서 이건 끊었다 붙인 것이고, 매듭 풀이로 인정되지 않는다.'+
+      ' 아래 w 슬라이더로 한 가닥을 네 번째 방향으로 빼내면 같은 자리를 합법으로 지난다.';
+    kb.className='okbox';
+  } else {
+    wb.className='warnbox';
+    if(A4.s>=0.985 && amp>0){
+      kb.className='okbox show';
+      kb.innerHTML='<b>풀렸다.</b> 풀림 경로 전체를 훑어 잰 최소 4차원 거리는 <b>'+pathMin(amp).toFixed(3)+'</b>다 — 밧줄은 한 번도 자신을 뚫지 않았다.'+
+        ' 3차원에서 불가능하던 일이 방향 하나 늘었다고 가능해졌다. 4차원에서는 <b>어떤 매듭도 풀린다</b>.'+
+        ' 대신 그곳에서는 <b>면</b>이 매듭이 된다 — 2차원 시트가 4차원에서 묶인다.';
+      if(!A4.done.b){ A4.done.b=true; upd4Score(); }
+    } else kb.className='okbox';
+  }
+}
+
+/* ════════════════════════════════════════════════════════════════
+   기록 화면
+   ════════════════════════════════════════════════════════════════ */
+function renderRec(){
+  const tb=document.getElementById('t5'); tb.innerHTML='';
+  SOLIDS3.concat(SOLIDS4).forEach(s=>{
+    const r=REC.sec[s.k]||{hit:0,try:0};
+    const tr=document.createElement('tr');
+    const dim = SOLIDS3.indexOf(s)>=0 ? '3차원' : '4차원';
+    tr.innerHTML='<td>'+s.n+'</td><td>'+dim+'</td>'+
+      '<td class="'+(r.try?(r.hit===r.try?'hit':(r.hit?'':'miss')):'')+'">'+r.hit+'</td><td>'+r.try+'</td>';
+    tb.appendChild(tr);
+  });
+  const tb2=document.getElementById('t5b'); tb2.innerHTML='';
+  let h=0,t=0;
+  for(let n=1;n<=4;n++){
+    const r=REC.pred[n]; if(r){t++; if(r.ok)h++;}
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+n+'차원 '+DIM_NAME[n]+'</td>'+
+      '<td class="'+(r?(r.v===nVerts(n)?'hit':'miss'):'')+'">'+(r?r.v:'—')+'</td>'+
+      '<td class="'+(r?(r.e===nEdges(n)?'hit':'miss'):'')+'">'+(r?r.e:'—')+'</td>';
+    tb2.appendChild(tr);
+  }
+  document.getElementById('s5b').textContent=h+' / '+t;
+}
+
+/* ════════════════════════════════════════════════════════════════
+   막 전환 · 배선
+   ════════════════════════════════════════════════════════════════ */
+const ACTS=[
+  {id:'act1', n:'1막 · 평면에 갇히다'},
+  {id:'act2', n:'2막 · 사다리'},
+  {id:'act3', n:'3막 · 우리 차례'},
+  {id:'act4', n:'4막 · 매듭'},
+  {id:'act5', n:'기록'},
+];
+let CUR='act1';
+function go(id){
+  CUR=id;
+  ACTS.forEach(a=>document.getElementById(a.id).classList.toggle('on',a.id===id));
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.id===id));
+  if(id==='act5') renderRec();
+  location.hash=id;
+  drawAll();
+}
+function buildNav(){
+  const nav=document.getElementById('nav'); nav.innerHTML='';
+  ACTS.forEach(a=>{
+    const b=document.createElement('button'); b.dataset.id=a.id; b.textContent=a.n;
+    b.onclick=()=>go(a.id); nav.appendChild(b);
+  });
+}
+function drawAll(){
+  if(CUR==='act1') draw1();
+  else if(CUR==='act2') draw2();
+  else if(CUR==='act3') draw3();
+  else if(CUR==='act4') draw4();
+}
+
+/* 조작 배선 */
+document.getElementById('r1h').oninput=e=>{ A1.h=+e.target.value/100; A1.playing=false;
+  document.getElementById('v1h').textContent=A1.h.toFixed(2); draw1(); };
+document.getElementById('b1play').onclick=()=>{ A1.playing=!A1.playing; if(A1.playing&&A1.h>=1.55) A1.h=-1.6; };
+document.getElementById('b1new').onclick=newQ1;
+
+document.getElementById('b2push').onclick=()=>{ if(A2.n<4){ setDim(A2.n+1); animPush(); } else animPush(); };
+document.getElementById('b2spin').onclick=e=>{ A2.spin=!A2.spin; e.target.textContent=A2.spin?'회전 멈춤':'회전 시작'; };
+document.getElementById('b2check').onclick=checkPred;
+document.getElementById('b2prev').onclick=()=>setDim(A2.n-1);
+document.getElementById('b2next').onclick=()=>{ setDim(A2.n+1); animPush(); };
+
+document.getElementById('r3w').oninput=e=>{ A3.w=+e.target.value/100; A3.playing=false;
+  document.getElementById('v3w').textContent=A3.w.toFixed(2); draw3(); };
+document.getElementById('b3play').onclick=()=>{ A3.playing=!A3.playing; if(A3.playing&&A3.w>=1.55) A3.w=-1.6; };
+document.getElementById('b3new').onclick=newQ3;
+document.getElementById('b3spin').onclick=e=>{ A3.spin=!A3.spin; e.target.textContent=A3.spin?'회전 멈춤':'회전 시작'; };
+
+document.getElementById('st4a').onclick=()=>setStep4('a');
+document.getElementById('st4b').onclick=()=>setStep4('b');
+document.getElementById('r4z').oninput=e=>{ A4.z=+e.target.value/100; draw4(); };
+document.getElementById('r4s').oninput=e=>{ A4.s=+e.target.value/100; draw4(); };
+document.getElementById('r4w').oninput=e=>{ A4.wOn=+e.target.value/100; draw4(); };
+
+document.getElementById('b5reset').onclick=()=>{
+  REC={sec:{},pred:{},knot:{}}; save();
+  A4.done={a:false,b:false}; upd4Score();
+  updScore1(); updScore2(); updScore3(); renderT2(); buildPred(); renderRec();
+};
+
+window.addEventListener('resize',drawAll);
+
+/* 애니메이션 루프. 정지 화면은 언제나 draw*() 한 번으로 완성되므로
+   탭이 숨겨져 rAF 가 멈춰도 마지막 그림은 남는다(검증기가 이걸 찍는다). */
+let last=performance.now();
+function loop(now){
+  const dt=Math.min(0.05,(now-last)/1000); last=now;
+  let need=false;
+  if(CUR==='act1'){
+    if(A1.playing){ A1.h+=dt*0.62; if(A1.h>1.6){A1.h=1.6;A1.playing=false;}
+      document.getElementById('r1h').value=Math.round(A1.h*100);
+      document.getElementById('v1h').textContent=A1.h.toFixed(2); need=true; }
+    if(A1.showTruth){ A1.spin+=dt*0.5; need=true; }
+  } else if(CUR==='act2'){
+    if(A2.spin && A2.n>=2){ A2.ang+=dt*0.42; need=true; }
+  } else if(CUR==='act3'){
+    if(A3.spin){ A3.ang+=dt*0.5; need=true; }
+    if(A3.playing){ A3.w+=dt*0.55; if(A3.w>1.6){A3.w=1.6;A3.playing=false;}
+      document.getElementById('r3w').value=Math.round(A3.w*100);
+      document.getElementById('v3w').textContent=A3.w.toFixed(2); need=true; }
+  } else if(CUR==='act4'){
+    if(A4.step==='b' && A4.spin){ A4.ang+=dt*0.34; need=true; }
+  }
+  if(need) drawAll();
+  requestAnimationFrame(loop);
+}
+
+/* 시작 */
+buildNav();
+newQ1();
+setDim(0);
+newQ3();
+A4.done = {a:!!REC.knot.a, b:!!REC.knot.b};
+upd4Score(); setStep4('a');
+updScore2();
+const h0=(location.hash||'').replace('#','');
+go(ACTS.some(a=>a.id===h0)?h0:'act1');
+requestAnimationFrame(loop);
+
+/* 검증기 훅 — 화면 밖에서 상태를 확인할 때 쓴다 */
+window.__dim = {
+  hypercube, nVerts, nEdges, nPlanes, flatten, rotate,
+  SOLIDS3, SOLIDS4, knotMinDist, knotPt, K:{KT0,KD,KA},
+  state:()=>({cur:CUR, act1:{obj:A1.obj&&A1.obj.k,h:A1.h}, act2:{n:A2.n,push:A2.push},
+              act3:{obj:A3.obj&&A3.obj.k,w:A3.w}, act4:{step:A4.step,s:A4.s,w:A4.wOn,done:A4.done}}),
+  go, setDim, setStep4,
+  setPush:(v)=>{A2.push=v;draw2();},
+  /* 화면에 실제로 찍힌 꼭짓점 자리를 센다. 밀기 전에는 두 벌이 겹쳐 절반으로 줄어든다 —
+     "테서랙트를 그렸다" 는 주장을 바이트 크기 말고 이걸로 검사한다. */
+  drawnVerts:()=>{
+    const q=(A2.last||[]).map(p=>Math.round(p[0])+','+Math.round(p[1]));
+    return new Set(q).size;
+  },
+  /* 슬라이더 값도 같이 옮긴다. 상태만 바꾸면 화면의 손잡이가 왼쪽에 남아
+     "100% 인데 손잡이는 0" 인 컷이 찍힌다 — 실제로 그렇게 찍혔다. */
+  set4:(s,w)=>{
+    A4.s=s; A4.wOn=w;
+    document.getElementById('r4s').value=Math.round(s*100);
+    document.getElementById('r4w').value=Math.round(w*100);
+    draw4();
+  },
+  rec:()=>REC,
+};
+</script>
+</body>
+</html>
