@@ -1,0 +1,705 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>10대가 만든 AI — 로직크래프트</title>
+<meta name="description" content="10대가 AI로 무언가를 만들어 세상에 내놓은 사례를 모았습니다. 나이, 계기, 쓴 데이터, 알려진 경로를 같은 칸으로 정리했습니다." />
+<link rel="canonical" href="https://logiccraft.co.kr/teen-ai/" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="로직크래프트" />
+<meta property="og:title" content="10대가 만든 AI — 로직크래프트" />
+<meta property="og:description" content="10대가 AI로 무언가를 만들어 세상에 내놓은 사례집. 나이·계기·쓴 데이터·알려진 경로." />
+<meta property="og:url" content="https://logiccraft.co.kr/teen-ai/" />
+<meta property="og:image" content="https://logiccraft.co.kr/og.png" />
+<meta name="theme-color" content="#f7f6f2" />
+<link rel="icon" type="image/png" href="/favicon.png" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --ink:#11183a; --ink-2:#1a2754; --ink-soft:#34406b;
+  --muted:#6a7392; --muted-2:#9aa1ba;
+  --line:#e7e6df; --line-strong:#d9d8cf;
+  --blue:#2f63f4; --blue-deep:#1f49c4; --blue-tint:#eef2ff;
+  --clay:#cf8350; --clay-soft:#f3e6da;
+  --paper:#f7f6f2; --paper-2:#f1efe8; --card:#fff;
+  --radius:18px;
+  --shadow-sm:0 1px 2px rgba(17,24,58,.04), 0 2px 8px rgba(17,24,58,.04);
+  --shadow-md:0 2px 6px rgba(17,24,58,.05), 0 18px 40px -22px rgba(17,24,58,.28);
+  --maxw:1120px; --gutter:clamp(18px,5vw,56px);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:'Pretendard Variable',Pretendard,-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  line-height:1.65; word-break:keep-all; overflow-wrap:anywhere;
+}
+.mono{font-family:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace}
+.wrap{max-width:var(--maxw); margin:0 auto; padding-inline:var(--gutter)}
+a{color:var(--blue); text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* ---------- top bar ---------- */
+.topbar{border-bottom:1px solid var(--line); background:rgba(247,246,242,.86); backdrop-filter:blur(8px); position:sticky; top:0; z-index:20}
+.topbar .wrap{display:flex; align-items:center; justify-content:space-between; gap:16px; height:60px}
+.brand{display:flex; align-items:center; gap:9px; color:var(--ink); font-weight:700; font-size:15px}
+.brand img{width:24px; height:24px; border-radius:6px}
+.brand:hover{text-decoration:none}
+.topbar .back{font-size:13px; color:var(--muted); font-weight:600}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(44px,7vw,84px) 0 clamp(26px,4vw,40px)}
+.eyebrow{font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; color:var(--muted); margin:0 0 14px; text-transform:uppercase}
+h1{font-size:clamp(30px,5.4vw,52px); line-height:1.16; letter-spacing:-.02em; margin:0 0 18px; font-weight:800}
+.lead{font-size:clamp(16px,2vw,19px); color:var(--ink-soft); max-width:64ch; margin:0}
+.hero .stat{margin-top:26px; display:flex; flex-wrap:wrap; gap:10px}
+.stat b{
+  font-family:'IBM Plex Mono',monospace; font-size:12.5px; font-weight:500;
+  background:var(--card); border:1px solid var(--line); border-radius:999px;
+  padding:7px 14px; color:var(--ink-soft);
+}
+.stat b i{font-style:normal; color:var(--blue); font-weight:600}
+
+/* ---------- controls ---------- */
+.controls{position:sticky; top:60px; z-index:15; background:var(--paper); padding:14px 0 12px; border-bottom:1px solid var(--line)}
+.controls .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
+.chips{display:flex; flex-wrap:wrap; gap:7px; flex:1 1 auto; min-width:0}
+.chip{
+  font-size:13px; font-weight:600; padding:6px 13px; border-radius:999px; cursor:pointer;
+  border:1px solid var(--line-strong); background:var(--card); color:var(--ink-soft);
+  transition:background .15s,border-color .15s,color .15s;
+}
+.chip:hover{border-color:var(--blue); color:var(--blue)}
+.chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fff}
+.tools{display:flex; gap:8px; flex:0 0 auto}
+input[type="search"],select{
+  font:inherit; font-size:13.5px; padding:7px 12px; border-radius:10px;
+  border:1px solid var(--line-strong); background:var(--card); color:var(--ink);
+}
+input[type="search"]{width:min(220px,46vw)}
+input[type="search"]:focus,select:focus{outline:2px solid var(--blue-tint); border-color:var(--blue)}
+
+/* ---------- grid ---------- */
+.grid{
+  display:grid; gap:16px; padding:26px 0 10px; align-items:start;
+  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+}
+.case{
+  background:var(--card); border:1px solid var(--line); border-radius:var(--radius);
+  box-shadow:var(--shadow-sm); overflow:hidden; display:flex; flex-direction:column;
+}
+.case > summary{list-style:none; cursor:pointer; padding:20px 20px 18px; display:block}
+.case > summary::-webkit-details-marker{display:none}
+.case[open]{box-shadow:var(--shadow-md); border-color:var(--line-strong)}
+.head{display:flex; align-items:flex-start; gap:12px}
+.age{
+  flex:0 0 auto; width:52px; height:52px; border-radius:14px;
+  background:var(--blue-tint); color:var(--blue-deep);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:0;
+  font-family:'IBM Plex Mono',monospace;
+}
+.age .n{font-size:21px; font-weight:600; line-height:1}
+.age .u{
+  font-size:10.5px; color:var(--blue); letter-spacing:0; margin-top:2px;
+  font-family:'Pretendard Variable',Pretendard,sans-serif; font-weight:600;
+}
+.who{min-width:0; flex:1}
+.who h2{margin:0; font-size:17px; font-weight:700; letter-spacing:-.01em; line-height:1.35}
+.who .meta{margin:3px 0 0; font-size:12.5px; color:var(--muted); font-family:'IBM Plex Mono',monospace}
+.tags{display:flex; flex-wrap:wrap; gap:6px; margin-top:12px}
+.tag{font-size:11.5px; font-weight:600; padding:3px 9px; border-radius:999px; background:var(--paper-2); color:var(--ink-soft); border:1px solid var(--line)}
+.tag.kind{background:var(--clay-soft); color:#8a4f26; border-color:#e8d3bf}
+.what{margin:13px 0 0; font-size:14.5px; color:var(--ink-soft)}
+.more{margin:12px 0 0; font-size:12.5px; font-weight:600; color:var(--blue); font-family:'IBM Plex Mono',monospace}
+.case[open] .more{display:none}
+
+.body{padding:0 20px 20px; border-top:1px solid var(--line); margin-top:2px}
+.slot{padding:14px 0; border-bottom:1px dashed var(--line)}
+.slot:last-of-type{border-bottom:0}
+.slot h3{
+  margin:0 0 5px; font-size:11.5px; letter-spacing:.1em; color:var(--muted);
+  font-family:'IBM Plex Mono',monospace; text-transform:uppercase; font-weight:500;
+}
+.slot p{margin:0; font-size:14.5px; color:var(--ink-soft)}
+.note{margin-top:12px; padding:11px 13px; border-radius:12px; background:var(--paper-2); font-size:13px; color:var(--ink-soft)}
+.srcs{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px}
+.srcs a{font-size:12.5px; font-weight:600; padding:5px 11px; border-radius:999px; border:1px solid var(--line-strong); color:var(--ink-soft); background:var(--paper)}
+.srcs a:hover{border-color:var(--blue); color:var(--blue); text-decoration:none}
+
+.empty{padding:60px 0; text-align:center; color:var(--muted); font-size:15px}
+
+/* ---------- patterns ---------- */
+.reading{margin:clamp(44px,6vw,72px) 0 0; padding:clamp(30px,4vw,46px) 0; border-top:1px solid var(--line); background:var(--paper-2)}
+.reading h2{margin:0 0 8px; font-size:clamp(22px,3vw,30px); letter-spacing:-.02em; font-weight:800}
+.reading .sub{margin:0 0 26px; color:var(--ink-soft); font-size:15.5px; max-width:62ch}
+.pats{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.pat{background:var(--card); border:1px solid var(--line); border-radius:var(--radius); padding:20px}
+.pat .num{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--clay); letter-spacing:.1em; font-weight:600}
+.pat h3{margin:8px 0 8px; font-size:16.5px; font-weight:700; letter-spacing:-.01em}
+.pat p{margin:0; font-size:14px; color:var(--ink-soft)}
+.pat .fig{margin-top:12px; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--blue-deep); font-weight:600}
+
+/* ---------- footer ---------- */
+footer{padding:clamp(34px,4vw,52px) 0; border-top:1px solid var(--line); font-size:13px; color:var(--muted)}
+footer p{margin:0 0 10px; max-width:74ch}
+footer .fine{font-size:12.5px; color:var(--muted-2)}
+footer a{font-weight:600}
+
+/* ---------- 발표 모드 ---------- */
+.present-btn{
+  font:inherit; font-size:13.5px; font-weight:700; padding:7px 14px; border-radius:10px;
+  border:1px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer; white-space:nowrap;
+}
+.present-btn:hover{background:var(--ink-2); border-color:var(--ink-2)}
+
+.present{
+  position:fixed; inset:0; z-index:100; display:none;
+  background:var(--ink); color:#f3f2ee;
+  padding:clamp(28px,4vw,60px) clamp(24px,5vw,80px) clamp(70px,7vw,96px);
+  flex-direction:column; cursor:pointer; user-select:none;
+}
+.present.on{display:flex}
+.p-top{
+  display:flex; align-items:center; gap:14px; flex:0 0 auto;
+  font-family:'IBM Plex Mono',monospace; font-size:clamp(12px,1.3vw,17px); color:#8f97b8;
+}
+.p-top .now{color:#fff; font-weight:600}
+.p-top .field{
+  padding:3px 12px; border-radius:999px; border:1px solid #39426e; color:#c3c9e4;
+  font-family:'Pretendard Variable',Pretendard,sans-serif; font-weight:600; font-size:.92em;
+}
+.p-mid{flex:1 1 auto; display:flex; flex-direction:column; justify-content:center; gap:clamp(14px,2vw,28px); min-height:0; overflow:auto}
+.p-what{font-size:clamp(21px,3.1vw,50px); line-height:1.42; letter-spacing:-.02em; font-weight:700; margin:0; max-width:26ch}
+.p-what.small{font-size:clamp(16px,1.9vw,30px); font-weight:600; color:#c9cee6; max-width:44ch}
+.p-ask{margin:0; font-size:clamp(17px,2.1vw,34px); color:#8f97b8; font-weight:600}
+.p-who{display:flex; align-items:baseline; gap:clamp(12px,1.6vw,26px); flex-wrap:wrap}
+.p-age{font-family:'IBM Plex Mono',monospace; font-size:clamp(52px,8.6vw,148px); line-height:.9; font-weight:600; color:#7ea2ff}
+.p-age small{font-size:.3em; color:#8f97b8; margin-left:.15em; font-family:'Pretendard Variable',Pretendard,sans-serif}
+.p-name{font-size:clamp(24px,3vw,48px); font-weight:800; letter-spacing:-.02em}
+.p-name span{display:block; font-size:.52em; font-weight:600; color:#8f97b8; margin-top:6px; font-family:'IBM Plex Mono',monospace}
+.p-slots{display:grid; gap:clamp(12px,1.6vw,24px); grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.p-slot h4{
+  margin:0 0 6px; font-family:'IBM Plex Mono',monospace; font-weight:500;
+  font-size:clamp(11px,1.05vw,15px); letter-spacing:.1em; color:#7c85ab; text-transform:uppercase;
+}
+.p-slot p{margin:0; font-size:clamp(14.5px,1.5vw,24px); line-height:1.55; color:#e7e6ef}
+.p-bar{
+  position:absolute; left:0; right:0; bottom:0; padding:14px clamp(24px,5vw,80px);
+  display:flex; align-items:center; justify-content:space-between; gap:14px;
+  border-top:1px solid #2a3159; font-family:'IBM Plex Mono',monospace;
+  font-size:clamp(11px,1.1vw,14px); color:#7c85ab;
+}
+.p-bar .keys b{color:#c3c9e4; font-weight:500}
+.p-bar button{
+  font:inherit; font-size:inherit; background:transparent; color:#c3c9e4; cursor:pointer;
+  border:1px solid #39426e; border-radius:8px; padding:6px 13px; margin-left:8px;
+}
+.p-bar button:hover{border-color:#7ea2ff; color:#fff}
+.p-dots{position:absolute; left:0; right:0; bottom:0; height:3px; background:#252c50}
+.p-dots i{display:block; height:100%; background:#7ea2ff; transition:width .2s var(--ease, ease)}
+
+@media (max-width:560px){
+  .controls{top:60px}
+  .tools{width:100%}
+  input[type="search"]{flex:1; width:auto}
+  .present{padding-left:20px; padding-right:20px}
+  .p-bar .keys{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="/"><img src="/logo-mark.png" alt="" />로직크래프트</a>
+    <a class="back" href="/apps">← 전체 제품</a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="wrap">
+    <p class="eyebrow">BETA LAB · 사례집</p>
+    <h1>10대가 만든 AI.</h1>
+    <p class="lead">열넷에서 열아홉 사이에 AI로 무언가를 만들어 세상에 내놓은 사람들을 모았습니다. 한 사람마다 같은 네 칸을 채웠습니다. 몇 살이었는지, 왜 시작했는지, 무엇으로 만들었는지, 어떻게 알려졌는지.</p>
+    <div class="stat" id="stat"></div>
+  </div>
+</section>
+
+<section class="controls">
+  <div class="wrap row">
+    <div class="chips" id="chips" role="group" aria-label="분야 고르기"></div>
+    <div class="tools">
+      <input type="search" id="q" placeholder="이름·내용 검색" aria-label="검색" />
+      <select id="sort" aria-label="정렬">
+        <option value="year">최근 순</option>
+        <option value="age">나이 어린 순</option>
+      </select>
+      <button type="button" class="present-btn" id="presentBtn">발표 모드</button>
+    </div>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="grid" id="grid"></div>
+  <p class="empty" id="empty" hidden>찾는 사례가 없습니다.</p>
+</main>
+
+<section class="reading">
+  <div class="wrap">
+    <h2>모아 놓고 보면 보이는 것</h2>
+    <p class="sub">한 건씩 읽으면 천재의 이야기로 보이고, 모아서 읽으면 방법의 이야기로 보입니다. 아래 숫자는 이 페이지에 실린 사례에서 그때그때 세어 나옵니다.</p>
+    <div class="pats" id="pats"></div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p>사례는 언론 보도와 주최 기관 발표를 근거로 정리했습니다. 각 카드를 펼치면 출처 링크가 있습니다. 기업가치·매출 수치는 해당 시점의 발표나 보도를 그대로 옮긴 값이라 이후 상황과 다를 수 있습니다.</p>
+    <p class="fine">표본에 관해 한 가지. 여기 실린 대부분은 미국의 대회·미디어 생태계 안에서 발견된 사람들입니다. 그 생태계에 닿을 수 있었던 10대에 가깝고, 같은 일을 하고도 알려지지 않은 사람이 훨씬 많다는 전제로 읽는 편이 정확합니다.</p>
+    <p class="fine" style="margin-top:16px">© 로직크래프트 · <a href="/">logiccraft.co.kr</a> · <a href="/apps">전체 제품</a></p>
+  </div>
+</footer>
+
+<div class="present" id="present" role="dialog" aria-modal="true" aria-label="발표 모드">
+  <div class="p-top"><span class="now" id="pNow"></span><span class="field" id="pField"></span></div>
+  <div class="p-mid" id="pMid"></div>
+  <div class="p-bar">
+    <span class="keys">← → <b>넘기기</b> · SPACE <b>다음</b> · ESC <b>닫기</b></span>
+    <span><button type="button" id="pFull">전체화면</button><button type="button" id="pClose">닫기</button></span>
+  </div>
+  <div class="p-dots"><i id="pProg"></i></div>
+</div>
+
+<script>
+/* 사례 데이터. 새 사례 추가 = 여기에 객체 하나.
+   triggerKind/dataKind/channel 은 아래 "모아 놓고 보면 보이는 것"의 숫자를 만든다. */
+const CASES = [
+  {
+    name: 'Kavya Kopparapu', ko: '카비아 코파라푸', age: 16, year: 2017, country: '미국',
+    field: '의료·건강', kind: '대회',
+    what: '스마트폰 카메라와 3D 프린팅 렌즈만으로 당뇨망막병증을 가려내는 Eyeagnosis를 만들었다. 두 시간짜리 검사와 수천 달러짜리 장비가 필요하던 일을 사진 한 장으로 옮겼다.',
+    trigger: '할아버지가 당뇨망막병증으로 시력을 잃을 뻔했다. 검사 장비가 있는 병원까지 가는 일 자체가 장벽이라는 걸 그때 알았다.',
+    triggerKind: 'family',
+    how: '미국 국립보건원(NIH)이 공개한 EyeGene 안저 이미지 DB로 분류 모델을 학습시켰다. 렌즈는 3D 프린터로 찍어 스마트폰에 끼웠다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: '한 병원에서 안과 전문의 판독과 맞대어 시험했고 다섯 건 전부 일치했다. 이후 Regeneron 과학경시(STS) 결선에 올랐고 데이비드슨 영재재단 장학금 5만 달러를 받았다. 비영리 Girls Computing League를 세워 백악관에서 발표했다.',
+    sources: [
+      { t: 'ScienceAlert', u: 'https://www.sciencealert.com/this-teenage-girl-invented-a-brilliant-ai-based-app-that-can-quickly-diagnose-eye-disease' },
+      { t: '본인 사이트', u: 'https://www.kavyakopparapu.com/' }
+    ]
+  },
+  {
+    name: 'Emma Yang', ko: '에마 양', age: 14, year: 2018, country: '홍콩·미국',
+    field: '의료·건강', kind: '서비스',
+    what: '알츠하이머 환자가 카메라를 사람에게 비추면 누구인지, 어떤 관계인지 알려주는 앱 Timeless를 2년에 걸쳐 만들었다.',
+    trigger: '일고여덟 살 무렵부터 할머니가 자꾸 잊기 시작했다. 초기 알츠하이머였다. 가족과 계속 이어져 있게 해줄 무언가를 만들고 싶었다.',
+    triggerKind: 'family',
+    how: '얼굴 인식으로 앞에 있는 사람을 실시간으로 알아본다. 가족·친구가 올려주는 사진이 계속 쌓이고, 오늘 할 일 알림과 사진으로 된 전화번호부가 함께 붙어 있다.',
+    dataKind: 'public',
+    channel: 'press',
+    channelText: 'CBS·Fast Company·SCMP가 다뤘고 MIT Solve에 참여했다. 개발 자금은 인디고고 모금으로 이었다.',
+    sources: [
+      { t: 'Fast Company', u: 'https://www.fastcompany.com/40519094/a-14-year-old-made-an-app-to-help-alzheimers-patients-recognize-their-loved-ones' },
+      { t: 'CBS News', u: 'https://www.cbsnews.com/news/young-coder-sparks-timeless-memories-for-people-with-alzheimers/' }
+    ]
+  },
+  {
+    name: 'Gitanjali Rao', ko: '기탄잘리 라오', age: 15, year: 2020, country: '미국',
+    field: '안전·사회', kind: '서비스',
+    what: '올리려는 문장이 누군가에게 상처가 될 것 같으면 게시 직전에 알려주는 사이버불링 방지 서비스 Kindly를 만들었다.',
+    trigger: '온라인에서 오가는 말이 또래를 어디까지 무너뜨리는지 봤다. 이미 벌어진 일을 지우는 대신 올리기 직전에 한 번 멈추게 하는 쪽을 택했다.',
+    triggerKind: 'community',
+    how: '문장을 분류해 해로울 가능성이 높은 표현을 잡아내고, 지우라고 명령하는 대신 다시 생각할 기회를 준다.',
+    dataKind: 'public',
+    channel: 'press',
+    channelText: '5,000명 넘는 후보 가운데 TIME이 뽑은 최초의 "올해의 어린이"가 됐다. Kindly는 이후 유니세프가 채택해 여러 나라에서 쓰인다.',
+    sources: [
+      { t: 'IEEE TryEngineering', u: 'https://tryengineering.org/news/time-magazines-kid-of-the-year-designs-anti-cyberbullying-app/' }
+    ]
+  },
+  {
+    name: 'Anika Chebrolu', ko: '아니카 체브롤루', age: 14, year: 2020, country: '미국',
+    field: '의료·건강', kind: '대회',
+    what: '6억 9,800만 개 분자 데이터베이스를 컴퓨터로 훑어, 코로나19 바이러스의 스파이크 단백질에 달라붙어 기능을 막을 후보 물질을 찾아냈다.',
+    trigger: '원래 독감 치료제를 주제로 잡고 있었다. 그 사이 팬데믹이 왔고, 같은 방법을 코로나19로 돌렸다.',
+    triggerKind: 'self',
+    how: '분자 도킹 시뮬레이션으로 결합 위치와 세기를 계산해 후보를 좁혔다. 실험실 합성 없이 계산만으로 선도 물질 하나까지 내려갔다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: '3M Young Scientist Challenge에서 우승해 2만 5,000달러를 받고 "미국 최고의 청소년 과학자"로 소개됐다.',
+    note: '엄밀히는 학습 모델보다 계산 스크리닝(in-silico)에 가깝습니다. 당시 여러 매체가 AI로 묶어 보도해 함께 실었습니다.',
+    sources: [
+      { t: 'CNN', u: 'https://edition.cnn.com/2020/10/18/us/anika-chebrolu-covid-treatment-award-scn-trnd/index.html' },
+      { t: 'Wikipedia', u: 'https://en.wikipedia.org/wiki/Anika_Chebrolu' }
+    ]
+  },
+  {
+    name: 'Michelle Hua', ko: '미셸 화', age: 16, year: 2021, country: '미국',
+    field: '우주·과학', kind: '대회',
+    what: '영상 속 사람의 동작을 알아보는 새로운 행동 인식 알고리즘을 설계했다.',
+    trigger: '사람의 움직임을 기계가 읽어내는 문제 자체에 붙었다.',
+    triggerKind: 'self',
+    how: '공개된 행동 인식 벤치마크 위에서 기존 방식보다 나은 성능을 내는 구조를 직접 짰다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: '세계 최대 고등학생 과학경진대회인 Regeneron ISEF에서 최고상 7만 5,000달러를 받았다.',
+    sources: [
+      { t: 'Society for Science', u: 'https://www.societyforscience.org/press-release/2021-regeneron-isef-top-winners/' }
+    ]
+  },
+  {
+    name: 'Pranjali Awasthi', ko: '프란잘리 아와스티', age: 15, year: 2022, country: '미국',
+    field: '창업·서비스', kind: '창업',
+    what: '흩어진 논문과 문서에서 필요한 데이터만 끌어내 요약해 주는 Delv.AI를 창업했다.',
+    trigger: '열세 살부터 대학 연구실에서 머신러닝 일을 돕다가, 연구자들이 자료를 찾는 데 쓰는 시간이 얼마나 큰지 옆에서 봤다.',
+    triggerKind: 'self',
+    how: '언어 모델을 문서 검색·추출 쪽으로 붙여, 검색어가 아니라 질문으로 자료를 파고들게 했다.',
+    dataKind: 'public',
+    channel: 'market',
+    channelText: '투자를 받아 열여섯에 기업가치 1,200만 달러대로 평가받았고, Forbes가 "17세 CEO"로 다뤘다.',
+    note: '기업가치는 투자 라운드 발표를 옮긴 값입니다. 실제 매출·이후 회사 상황과는 별개로 봐야 합니다.',
+    sources: [
+      { t: 'Forbes', u: 'https://www.forbes.com/sites/josipamajic/2024/11/02/meet-the-17-year-old-ceo-behind-a-12m-ai-powered-nutrition-app/' },
+      { t: 'Indian Eagle', u: 'https://www.indianeagle.com/travelbeats/ai-startup-founder-pranjali-awasthi/' }
+    ]
+  },
+  {
+    name: 'Angela Chen', ko: '앤절라 첸', age: 17, year: 2023, country: '미국',
+    field: '기후·환경', kind: '대회',
+    what: '캘리포니아 산불이 얼마나 심각해질지를 머신러닝으로 평가하고 예측하는 모델을 만들었다.',
+    trigger: '해마다 커지는 캘리포니아 산불이 사는 지역의 일상이었다.',
+    triggerKind: 'community',
+    how: '위성 원격탐사와 기상 재분석 데이터를 학습 데이터로 삼아 심각도를 예측했다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: 'Regeneron ISEF에서 미국 해양대기청(NOAA) 특별상을 받았다.',
+    sources: [
+      { t: 'NOAA', u: 'https://www.noaa.gov/office-education/outreach-communication/international-science-and-engineering-fair/special-award-winners' }
+    ]
+  },
+  {
+    name: 'Sophia Liu', ko: '소피아 리우', age: 17, year: 2024, country: '미국',
+    field: '의료·건강', kind: '대회',
+    what: '스마트워치 같은 웨어러블 신호만으로 심근경색을 잡아내는 모델을 만들었다. 모두에게 같은 기준을 쓰는 모델과 개인에 맞춰 가는 모델을 함께 비교했다.',
+    trigger: '심장 이상은 병원 밖에서 먼저 시작되는데, 감지는 병원 안에서만 이뤄진다는 간극에 붙었다.',
+    triggerKind: 'self',
+    how: '공개 웨어러블 생체신호 데이터셋으로 일반 모델과 개인화 모델을 각각 학습시켜 성능을 갈랐다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: 'Regeneron 과학경시(STS) 스칼라에 선정됐다.',
+    sources: [
+      { t: 'Society for Science', u: 'https://www.societyforscience.org/regeneron-sts/2024-scholars/' }
+    ]
+  },
+  {
+    name: 'Nikita Agrawal', ko: '니키타 아그라왈', age: 17, year: 2024, country: '미국',
+    field: '기후·환경', kind: '대회',
+    what: '대형 산불을 미리 예측하는 머신러닝 모델을 만들되, 피해가 어느 동네에 몰리는지를 함께 놓고 봤다.',
+    trigger: '같은 산불이라도 대비할 자원이 없는 지역에 훨씬 크게 남는다는 점에서 시작했다.',
+    triggerKind: 'community',
+    how: '미국 전역의 원격탐사 이미지와 대기 재분석 데이터를 묶어 대형 산불 발생을 예측했다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: 'Regeneron 과학경시(STS) 스칼라에 선정됐다.',
+    sources: [
+      { t: 'Society for Science', u: 'https://www.societyforscience.org/regeneron-sts/2024-scholars/' }
+    ]
+  },
+  {
+    name: 'Zach Yadegari', ko: '잭 야데가리', age: 17, year: 2024, country: '미국',
+    field: '창업·서비스', kind: '창업',
+    what: '음식 사진을 찍으면 칼로리를 추정해 주는 앱 Cal AI를 고등학생 때 만들어 냈다. 2024년 5월 출시 뒤 2025년 7월까지 830만 번 내려받혔다.',
+    trigger: '중학생 때 학교 와이파이에서도 게임을 할 수 있는 사이트를 만들어 10만 달러에 팔았다. 다음 판을 찾고 있었다.',
+    triggerKind: 'self',
+    how: '음식 사진을 인식해 종류와 양을 추정하는 비전 모델을 앱에 얹었다. 제품보다 유통에 힘을 실어 소셜에서 밀어붙였다.',
+    dataKind: 'public',
+    channel: 'market',
+    channelText: '2025년 매출 3,000만 달러 규모로 올라섰고, 그해 12월 MyFitnessPal에 회사를 넘겼다.',
+    note: '학교 성적은 4.0 만점이었지만 지원한 18개 대학 중 15곳에서 떨어졌습니다. 이 사례가 대회·입시 경로와 얼마나 다르게 흘렀는지 보여주는 대목입니다.',
+    sources: [
+      { t: 'CNBC', u: 'https://www.cnbc.com/2025/09/06/cal-ai-how-a-teenage-ceo-built-a-fast-growing-calorie-tracking-app.html' },
+      { t: 'TechCrunch', u: 'https://techcrunch.com/2025/04/03/teen-with-4-0-gpa-who-built-the-viral-cal-ai-app-was-rejected-by-15-top-universities' }
+    ]
+  },
+  {
+    name: 'Tejasvi Manoj', ko: '테자스비 마노지', age: 16, year: 2024, country: '미국',
+    field: '안전·사회', kind: '서비스',
+    what: '노인이 수상한 메일이나 문자를 올리면 사기인지 판별해 주고 신고 경로까지 안내하는 Shield Seniors를 만들었다.',
+    trigger: '여든다섯 살 할아버지가 2,000달러를 요구하는 메일 사기에 당할 뻔했다. 찾아보니 노인 대상 사기 피해가 한 해 50억 달러에 가까웠다.',
+    triggerKind: 'family',
+    how: '올라온 메시지를 분석해 사기 여부를 가른다. 본인이 밝힌 정확도는 95% 수준이고, 지금도 다듬는 중이다.',
+    dataKind: 'public',
+    channel: 'press',
+    channelText: '미국 어린이 7,400만 명 가운데 TIME이 뽑은 2025년 "올해의 어린이"가 됐다.',
+    sources: [
+      { t: 'TIME', u: 'https://time.com/7315024/kid-of-the-year-2025/' },
+      { t: 'AARP', u: 'https://www.aarp.org/money/scams-fraud/time-kid-of-the-year-shield-seniors-app/' }
+    ]
+  },
+  {
+    name: 'Matteo Paz', ko: '마테오 파스', age: 18, year: 2025, country: '미국',
+    field: '우주·과학', kind: '대회',
+    what: '적외선 전천 탐사 데이터 2,000억 건을 훑어 천체를 열 종류로 분류하는 머신러닝 알고리즘을 설계했다.',
+    trigger: '천문 데이터는 이미 쌓여 있는데 사람 손으로는 다 볼 수 없다는 지점에서 출발했다.',
+    triggerKind: 'self',
+    how: '공개된 적외선 탐사 아카이브를 대상으로, 방대한 관측 기록을 효율적으로 훑는 알고리즘을 짰다.',
+    dataKind: 'public',
+    channel: 'contest',
+    channelText: 'Regeneron 과학경시(STS)에서 1등상 25만 달러를 받았다.',
+    sources: [
+      { t: 'Regeneron', u: 'https://investor.regeneron.com/news-releases/news-release-details/regeneron-science-talent-search-2025-awards-more-18-million-high' }
+    ]
+  },
+  {
+    name: 'Christine Zhang', ko: '크리스틴 장', age: 19, year: 2025, country: '미국',
+    field: '창업·서비스', kind: '창업',
+    what: '하버드 1학년을 휴학하고 룸메이트와 함께 샌프란시스코로 옮겨 AI 스타트업 Veil을 세웠다.',
+    trigger: '학교를 계속 다니면서 미룰 수 있는 일과 지금 해야 하는 일을 갈랐다.',
+    triggerKind: 'self',
+    how: '공동창업자와 둘이 살림집에 들어가 제품을 만들며 여름 한 철을 보냈다.',
+    dataKind: 'public',
+    channel: 'market',
+    channelText: '그해 여름이 끝나기 전 100만 달러 넘는 투자를 받았다.',
+    sources: [
+      { t: 'VnExpress International', u: 'https://e.vnexpress.net/news/tech/personalities/from-harvard-to-silicon-valley-teenage-girl-bets-big-on-ai-startup-4963174.html' }
+    ]
+  },
+  {
+    name: 'Ishani Singh', ko: '이샤니 싱', age: 14, year: 2021, country: '미국',
+    field: '교육·커뮤니티', kind: '비영리',
+    what: '또래 여학생이 AI를 배울 자리를 직접 만들려고 Girls Rule AI를 세웠다.',
+    trigger: '고등학교 1학년 때 나간 주 컴퓨터과학 대회에서 여학생이 거의 없었다. 자기가 그 몇 안 되는 참가자 중 하나라는 걸 그 자리에서 알았다.',
+    triggerKind: 'community',
+    how: '기술을 만드는 대신 배울 통로를 조직으로 만들었다. 관찰 하나를 프로그램으로 옮긴 경우다.',
+    dataKind: 'own',
+    channel: 'press',
+    channelText: 'ABC·Good Morning America가 다루면서 알려졌다.',
+    sources: [
+      { t: 'Good Morning America', u: 'https://www.goodmorningamerica.com/living/story/high-schooler-girls-studying-ai-built-company-116960875' }
+    ]
+  },
+  {
+    name: 'Null 팀 (정지효·강현·김수아)', ko: '', age: 17, year: 2025, country: '한국',
+    field: '안전·사회', kind: '대회',
+    what: '시각장애인의 보행을 돕는 대화형 AI 주행 로봇을 만들었다.',
+    trigger: '길을 걷는 일이 누구에게나 같은 난이도가 아니라는 데서 출발했다.',
+    triggerKind: 'community',
+    how: '주행 로봇에 대화형 인터페이스를 붙여, 화면 대신 말로 길을 안내하게 했다.',
+    dataKind: 'own',
+    channel: 'contest',
+    channelText: '전국 청소년 AI창의 경진대회(AI Youth Challenge)에서 포스코DX 사장상을 받았다. 교육부가 후원하고 한국인공지능산업협회가 공동 주최하는 대회다.',
+    note: '한국에서는 개인 창업가 서사보다 대회 팀 단위로 기록이 남는 편입니다. 국내 사례가 이 한 건뿐인 것은 실제로 드물어서라기보다 개인 단위로 보도되는 통로가 얇기 때문으로 보입니다.',
+    sources: [
+      { t: '포스코DX 뉴스룸', u: 'https://www.poscodx.com/kor/pr/newsRoomView.do?num=7075' }
+    ]
+  }
+];
+
+/* ---------- 렌더 ---------- */
+const grid = document.getElementById('grid');
+const empty = document.getElementById('empty');
+const chipsEl = document.getElementById('chips');
+const qEl = document.getElementById('q');
+const sortEl = document.getElementById('sort');
+
+const FIELDS = ['전체', ...[...new Set(CASES.map(c => c.field))]];
+let activeField = '전체';
+
+chipsEl.innerHTML = FIELDS.map(f =>
+  `<button class="chip" type="button" data-f="${f}" aria-pressed="${f === '전체'}">${f}${f === '전체' ? '' : ` <span style="opacity:.5">${CASES.filter(c => c.field === f).length}</span>`}</button>`
+).join('');
+
+chipsEl.addEventListener('click', e => {
+  const b = e.target.closest('.chip');
+  if (!b) return;
+  activeField = b.dataset.f;
+  [...chipsEl.querySelectorAll('.chip')].forEach(c => c.setAttribute('aria-pressed', String(c.dataset.f === activeField)));
+  render();
+});
+qEl.addEventListener('input', render);
+sortEl.addEventListener('change', render);
+
+function esc(s) {
+  return String(s).replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
+}
+
+function card(c) {
+  const title = c.ko ? `${esc(c.ko)} <span style="color:var(--muted);font-weight:600">${esc(c.name)}</span>` : esc(c.name);
+  return `
+  <details class="case">
+    <summary>
+      <div class="head">
+        <div class="age"><span class="n">${c.age}</span><span class="u">세</span></div>
+        <div class="who">
+          <h2>${title}</h2>
+          <p class="meta">${c.year} · ${esc(c.country)}</p>
+        </div>
+      </div>
+      <div class="tags">
+        <span class="tag kind">${esc(c.kind)}</span>
+        <span class="tag">${esc(c.field)}</span>
+      </div>
+      <p class="what">${esc(c.what)}</p>
+      <p class="more">펼쳐 보기 ↓</p>
+    </summary>
+    <div class="body">
+      <div class="slot"><h3>왜 시작했나</h3><p>${esc(c.trigger)}</p></div>
+      <div class="slot"><h3>무엇으로 만들었나</h3><p>${esc(c.how)}</p></div>
+      <div class="slot"><h3>어떻게 알려졌나</h3><p>${esc(c.channelText)}</p></div>
+      ${c.note ? `<p class="note">${esc(c.note)}</p>` : ''}
+      <div class="srcs">${c.sources.map(s => `<a href="${esc(s.u)}" target="_blank" rel="noopener">${esc(s.t)} ↗</a>`).join('')}</div>
+    </div>
+  </details>`;
+}
+
+function render() {
+  const q = qEl.value.trim().toLowerCase();
+  let list = CASES.filter(c => activeField === '전체' || c.field === activeField);
+  if (q) {
+    list = list.filter(c =>
+      [c.name, c.ko, c.what, c.trigger, c.how, c.channelText, c.country, c.field].join(' ').toLowerCase().includes(q)
+    );
+  }
+  list.sort(sortEl.value === 'age' ? (a, b) => a.age - b.age || a.year - b.year : (a, b) => b.year - a.year || a.age - b.age);
+  shown = list;
+  grid.innerHTML = list.map(card).join('');
+  empty.hidden = list.length > 0;
+}
+
+/* ---------- 발표 모드 ----------
+   화면에 걸린 필터·정렬을 그대로 들고 간다. 한 사례가 세 단계로 열린다:
+   0) 무엇을 만들었나만 보이고 나이·이름은 가려 둔다 (교실에서 나이를 맞히게)
+   1) 나이와 이름 공개
+   2) 왜 시작했나 / 무엇으로 만들었나 / 어떻게 알려졌나 */
+let shown = CASES;
+const pEl = document.getElementById('present');
+const pMid = document.getElementById('pMid');
+const pNow = document.getElementById('pNow');
+const pField = document.getElementById('pField');
+const pProg = document.getElementById('pProg');
+let deck = [], pi = 0, ps = 0;
+
+function drawSlide() {
+  const c = deck[pi];
+  if (!c) return;
+  pNow.textContent = `${String(pi + 1).padStart(2, '0')} / ${String(deck.length).padStart(2, '0')}`;
+  pField.textContent = c.field;
+  const steps = deck.length * 3;
+  pProg.style.width = `${((pi * 3 + ps + 1) / steps) * 100}%`;
+
+  let html = '';
+  if (ps === 0) {
+    html += `<p class="p-what">${esc(c.what)}</p><p class="p-ask">몇 살이었을까?</p>`;
+  } else {
+    html += `<div class="p-who">
+      <span class="p-age">${c.age}<small>세</small></span>
+      <span class="p-name">${esc(c.ko || c.name)}<span>${[c.ko ? c.name : '', c.year, c.country].filter(Boolean).map(esc).join(' · ')}</span></span>
+    </div>`;
+    html += `<p class="p-what${ps === 2 ? ' small' : ''}">${esc(c.what)}</p>`;
+  }
+  if (ps === 2) {
+    html += `<div class="p-slots">
+      <div class="p-slot"><h4>왜 시작했나</h4><p>${esc(c.trigger)}</p></div>
+      <div class="p-slot"><h4>무엇으로 만들었나</h4><p>${esc(c.how)}</p></div>
+      <div class="p-slot"><h4>어떻게 알려졌나</h4><p>${esc(c.channelText)}</p></div>
+    </div>`;
+  }
+  pMid.innerHTML = html;
+  pMid.scrollTop = 0;
+}
+
+function step(d) {
+  let n = pi * 3 + ps + d;
+  if (n < 0) n = 0;
+  if (n > deck.length * 3 - 1) { closePresent(); return; }
+  pi = Math.floor(n / 3);
+  ps = n % 3;
+  drawSlide();
+}
+
+function openPresent() {
+  if (!shown.length) return;
+  deck = shown.slice();
+  pi = 0; ps = 0;
+  pEl.classList.add('on');
+  document.body.style.overflow = 'hidden';
+  drawSlide();
+}
+
+function closePresent() {
+  pEl.classList.remove('on');
+  document.body.style.overflow = '';
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+}
+
+document.getElementById('presentBtn').addEventListener('click', openPresent);
+document.getElementById('pClose').addEventListener('click', e => { e.stopPropagation(); closePresent(); });
+document.getElementById('pFull').addEventListener('click', e => {
+  e.stopPropagation();
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else document.documentElement.requestFullscreen().catch(() => {});
+});
+pEl.addEventListener('click', () => step(1));
+document.addEventListener('keydown', e => {
+  if (!pEl.classList.contains('on')) return;
+  if (e.key === 'Escape') { closePresent(); }
+  else if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); step(1); }
+  else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); step(-1); }
+});
+
+/* ---------- 상단 요약 · 패턴 (숫자는 전부 데이터에서 센다) ---------- */
+function buildStats() {
+  const ages = CASES.map(c => c.age);
+  const years = CASES.map(c => c.year);
+  document.getElementById('stat').innerHTML = [
+    `사례 <i>${CASES.length}</i>건`,
+    `최연소 <i>${Math.min(...ages)}</i>세`,
+    `${Math.min(...years)}–${Math.max(...years)}`,
+    `분야 <i>${new Set(CASES.map(c => c.field)).size}</i>개`
+  ].map(s => `<b>${s}</b>`).join('');
+
+  const n = CASES.length;
+  const cnt = (k, v) => CASES.filter(c => c[k] === v).length;
+  const [self, community, family] = ['self', 'community', 'family'].map(v => cnt('triggerKind', v));
+  const pub = cnt('dataKind', 'public');
+  const [contest, press, market] = ['contest', 'press', 'market'].map(v => cnt('channel', v));
+
+  const pats = [
+    {
+      num: 'PATTERN 01',
+      h: '문제는 팔 닿는 거리에 있었다',
+      p: '할아버지의 눈, 할머니의 기억, 우리 동네에 해마다 오는 산불, 대회장에 여학생이 나뿐이던 순간. 무엇을 만들지 고르는 일이 전부 직접 겪거나 눈으로 본 범위 안에서 풀렸다. 멀리 있는 시장 조사에서 출발한 경우는 한 건도 없다.',
+      fig: `본인이 붙은 문제 ${self} · 가까운 공동체 ${community} · 가족 ${family}`
+    },
+    {
+      num: 'PATTERN 02',
+      h: '데이터는 남이 열어둔 것을 썼다',
+      p: 'NIH의 안저 이미지, 공개 분자 데이터베이스, 위성 원격탐사 기록, 적외선 전천 탐사 아카이브. 새로 데이터를 모아 승부한 경우는 드물다. 10대가 닿을 수 있는 자원 안에서 결판이 났다.',
+      fig: `${n}건 중 ${pub}건이 공개 데이터 기반`
+    },
+    {
+      num: 'PATTERN 03',
+      h: '대회가 유통 채널이었다',
+      p: 'ISEF, Regeneron STS, 3M Young Scientist Challenge, TIME 올해의 어린이. 만든 것을 세상에 연결한 통로는 대체로 대회와 미디어였다. 앱 마켓으로 곧장 간 쪽은 소수다.',
+      fig: `대회 ${contest} · 언론 ${press} · 시장 ${market}`
+    }
+  ];
+  document.getElementById('pats').innerHTML = pats.map(p => `
+    <div class="pat">
+      <div class="num">${p.num}</div>
+      <h3>${p.h}</h3>
+      <p>${p.p}</p>
+      <div class="fig">${p.fig}</div>
+    </div>`).join('');
+}
+
+buildStats();
+render();
+</script>
+</body>
+</html>
