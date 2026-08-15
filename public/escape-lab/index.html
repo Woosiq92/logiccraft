@@ -31,6 +31,17 @@
   .diff-card:active{transform:scale(.99)}
   .diff-card .dt{font-size:17px;font-weight:700;margin-bottom:4px}
   .diff-card .dd{font-size:13px;color:var(--dim);line-height:1.5}
+  .teacher-entry{
+    display:flex;align-items:center;gap:12px;margin-top:18px;padding:14px 16px;
+    border:1px solid var(--line);border-radius:12px;background:var(--panel);
+    text-decoration:none;color:var(--text);word-break:keep-all;overflow-wrap:break-word;
+  }
+  .teacher-entry:hover{border-color:var(--amber2)}
+  .teacher-entry .te-ic{font-size:20px;align-self:flex-start;line-height:1.4}
+  .teacher-entry .te-body{display:flex;flex-direction:column;gap:3px;flex:1;min-width:0}
+  .teacher-entry .te-body b{font-size:14px}
+  .teacher-entry .te-body span{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .teacher-entry .te-go{color:var(--dim);font-size:16px}
   .diff-card .tag{font-size:11px;color:var(--amber);margin-left:8px;font-weight:500}
   #resume-banner{display:flex;gap:10px;align-items:center;margin-bottom:16px}
   .resume-card{flex:1;display:flex;align-items:center;gap:14px;background:#1a2340;border:1px solid var(--amber);border-radius:14px;padding:14px 18px;cursor:pointer;color:var(--text);font-family:inherit;text-align:left}
@@ -235,6 +246,7 @@
   .win-stats b{color:var(--amber);font-weight:700}
 
   footer{max-width:760px;margin:0 auto;padding:0 16px 28px;font-size:11.5px;color:#525b73}
+  footer a{color:#7b869f}
 
   /* selftest */
   .st-list{font-family:ui-monospace,monospace;font-size:13px;line-height:1.9;padding:24px}
@@ -273,6 +285,14 @@
       <div class="dd">모래폭풍이 지나간 기지. 선임이 남긴 절차 카드로 시스템을 복구하고 발사 윈도우에 올라타자.</div>
     </button>
   </div>
+  <a class="teacher-entry" id="teacher-entry" href="teacher.html">
+    <span class="te-ic">🏫</span>
+    <span class="te-body">
+      <b>선생님이신가요? 수업 운영 팩</b>
+      <span>학년을 고르면 성취기준에 맞는 방이 만들어집니다. 지도안·학습지·답지까지 인쇄됩니다.</span>
+    </span>
+    <span class="te-go">→</span>
+  </a>
   <div id="diff-section" style="display:none">
     <p class="intro-story" id="opening-lines" style="margin-top:26px"></p>
     <div class="diff-grid">
@@ -336,7 +356,7 @@
 <div id="blackout"><span>· · · 비상 전원 가동 중 · · ·</span></div>
 <div id="flash"></div>
 
-<footer>수학·과학 방탈출 · 방 4종 × 잠금 6종 × 초등/중등/심화(교육과정 연계) · 룰베이스(오프라인 동작) · 교사용 조립기: builder.html</footer>
+<footer>수학·과학 방탈출 · 방 4종 × 잠금 6종 × 초등/중등/심화(교육과정 연계) · 룰베이스(오프라인 동작) · 교사용: <a href="teacher.html">수업 운영 팩</a> · <a href="builder.html">조립기</a></footer>
 
 <script src="vendor/three.min.js"></script>
 <script>
@@ -780,7 +800,7 @@ function mountBalance(el, cfg, api){
 function cipherConfig(diff){
   if(diff==='easy') return {
     seqs:[ {terms:[1,3,5,7],ans:9}, {terms:[9,8,7,6],ans:5}, {terms:[0,2,4,6],ans:8} ],
-    curri:'수학 4 규칙 찾기 · 수의 배열에서 규칙',
+    curri:'수학 심화 · 수의 배열에서 규칙 찾기',
     desc:'자물쇠에 다이얼이 세 개. 기록의 숫자 줄마다 마지막 칸이 비어 있다. 각 줄의 규칙을 찾아 다이얼을 맞추고 레버를 당기자.',
     hints:[
       '숫자들이 한 칸마다 얼마씩 커지거나 작아지는지 살펴보자.',
@@ -789,7 +809,7 @@ function cipherConfig(diff){
   };
   if(diff==='mid') return {
     seqs:[ {terms:[1,1,2,3,5],ans:8}, {terms:[16,8,4,2],ans:1}, {terms:[81,27,9],ans:3} ],
-    curri:'수학 5-6 규칙과 대응 · 곱셈·나눗셈 규칙',
+    curri:'수학 심화 · 곱셈·나눗셈 규칙의 수열',
     desc:'이번 숫자 줄의 규칙은 더하기·빼기만이 아니다. 각 줄의 숨은 규칙을 찾아 다이얼을 맞추자.',
     hints:[
       '앞의 두 수를 더해 보거나, 이웃한 수를 나눠 보자.',
@@ -1262,19 +1282,19 @@ function fracEq(a,b){ const x=fracReduce(a[0],a[1]), y=fracReduce(b[0],b[1]); re
 function fractionConfig(diff){
   if(diff==='easy') return {
     target:[3,4], dials:[{d:4},{d:4}], solution:[[1,4],[2,4]],
-    curri:'수학 5 분수의 덧셈 · 같은 분모',
+    curri:'초3~4 수학 · 분모가 같은 분수의 덧셈 [4수01-15]',
     desc:'두 원판이 있다. 각 원판을 나눠 색칠해 분수를 만들고, 두 분수의 합이 목표와 같아지면 자물쇠가 풀린다. 두 원판은 4등분.',
     hints:['분모가 같으니 색칠한 칸수(분자)만 더하면 된다.','목표는 3/4. 1/4 + 2/4 = 3/4.'],
   };
   if(diff==='mid') return {
     target:[5,6], dials:[{d:2},{d:3}], solution:[[1,2],[1,3]],
-    curri:'수학 5-6 분수의 덧셈 · 다른 분모(통분)',
+    curri:'초5~6 수학 · 분모가 다른 분수의 덧셈 [6수01-08]',
     desc:'두 원판의 등분이 다르다. 분모가 다른 분수를 더하려면 통분이 필요하다. 두 분수의 합을 목표에 맞추자.',
     hints:['분모가 다르면 공통분모로 바꿔 더한다. 1/2 = 3/6, 1/3 = 2/6.','목표는 5/6. 1/2 + 1/3 = 3/6 + 2/6 = 5/6.'],
   };
   return {
     target:[1,1], dials:[{d:3},{d:6}], solution:[[2,3],[2,6]],
-    curri:'수학 심화 · 분수와 1(비와 비율)',
+    curri:'초5~6 수학 · 분모가 다른 분수의 덧셈(합이 1) [6수01-08]',
     desc:'두 분수를 더해 정확히 1(원판을 가득)로 만들어야 한다. 등분이 다른 두 원판의 비를 생각하자.',
     hints:['1은 3/3, 또는 6/6이다. 두 분수의 합이 1이 되려면?','2/3 + 2/6 = 4/6 + 2/6 = 6/6 = 1.'],
   };
@@ -1344,21 +1364,21 @@ function equationConfig(diff){
   if(diff==='easy') return {
     // x + 3 = 8  → x=5
     a:1, b:3, c:0, d:8, answer:5, xmax:10,
-    curri:'수학 6 · 간단한 방정식(□ 구하기)',
+    curri:'초1~2 수학 · □가 있는 덧셈식 [2수01-09]',
     desc:'양팔 저울이 등식이다. 왼쪽 접시엔 상자 x와 추 3개, 오른쪽엔 추 8개. 저울이 수평이 되도록 상자 x의 무게(다이얼)를 맞추자.',
     hints:['양쪽이 같아야 수평이다. x + 3 = 8.','8에서 3을 빼면 x가 보인다. x = 5.'],
   };
   if(diff==='mid') return {
     // 2x + 3 = 11 → x=4
     a:2, b:3, c:0, d:11, answer:4, xmax:10,
-    curri:'중1 수학 · 일차방정식(이항)',
+    curri:'중1~3 수학 · 일차방정식 [9수02-04]',
     desc:'왼쪽엔 상자 x 두 개와 추 3개, 오른쪽엔 추 11개. 저울이 수평이 되는 x를 찾자.',
     hints:['2x + 3 = 11. 먼저 양쪽에서 3을 덜어낸다.','2x = 8 이니 x = 4.'],
   };
   return {
     // 3x + 2 = x + 10 → x=4
     a:3, b:2, c:1, d:10, answer:4, xmax:12,
-    curri:'중1 수학 심화 · 미지수가 양변에 있는 방정식',
+    curri:'중1~3 수학 · 일차방정식(양변에 미지수) [9수02-04]',
     desc:'양쪽 접시에 모두 상자 x가 있다. 왼쪽은 x 세 개와 추 2개, 오른쪽은 x 한 개와 추 10개. 수평이 되는 x를 찾자.',
     hints:['3x + 2 = x + 10. 양변에서 x를 하나씩 덜어내 본다.','2x + 2 = 10 → 2x = 8 → x = 4.'],
   };
@@ -1415,21 +1435,21 @@ function symmetryConfig(diff){
   if(diff==='easy') return {
     rows:4, cols:6, mode:'line', // 세로 거울선(가운데)
     left:[[0,1],[1,0],[1,2],[2,1],[3,2]],
-    curri:'수학 4 · 선대칭 도형',
+    curri:'초5~6 수학 · 선대칭도형 [6수03-02]',
     desc:'가운데 거울선을 기준으로 왼쪽에 무늬가 있다. 오른쪽 칸을 눌러 좌우가 똑같은 대칭 무늬를 완성하자.',
     hints:['거울선에서 같은 거리의 칸을 칠하면 된다.','왼쪽에서 거울선까지 n칸 떨어진 칸은, 오른쪽에서도 n칸 떨어진 칸.'],
   };
   if(diff==='mid') return {
     rows:5, cols:8, mode:'line',
     left:[[0,0],[0,3],[1,1],[2,2],[2,0],[3,1],[4,3]],
-    curri:'수학 5 · 선대칭의 성질',
+    curri:'초5~6 수학 · 선대칭도형의 성질 [6수03-02]',
     desc:'거울선 왼쪽 무늬가 복잡해졌다. 오른쪽을 채워 완벽한 좌우대칭을 만들자.',
     hints:['한 칸씩, 왼쪽 칸의 거울선 반대편 짝을 찾아 칠한다.','거울선에서 열 거리(1,2,3,4…)가 같은 칸끼리 짝이다.'],
   };
   return {
     rows:6, cols:6, mode:'point', // 점대칭(중심 180° 회전)
     left:[[0,0],[0,1],[1,0],[2,1],[2,2],[1,4]],
-    curri:'수학 5 · 점대칭 도형(180° 회전)',
+    curri:'초5~6 수학 · 점대칭도형 [6수03-02]',
     desc:'이번엔 점대칭이다. 판의 중심을 기준으로 180° 돌렸을 때 똑같아지도록 나머지 칸을 채우자.',
     hints:['점대칭은 중심을 기준으로 반 바퀴 돌린 모양. (r,c)의 짝은 (행수-1-r, 열수-1-c).','왼쪽 위 칸의 짝은 오른쪽 아래 대각선 끝 칸이다.'],
   };
@@ -1609,7 +1629,7 @@ function show(id){
 function startRoom(diff){
   state.diff = diff; state.start = Date.now();
   $('#diff-label').textContent = DIFF_LABEL[diff] || '맞춤 방';
-  $('#room-title').textContent = '🔦 ' + ROOM.title;
+  $('#room-title').textContent = ((THEME && THEME.icon) || '🔦') + ' ' + ROOM.title;
   $('#room-story').textContent = ROOM.story;
   show('screen-room');
   camYaw = 0; camPitch = 0; targetYaw = null;
@@ -1734,7 +1754,7 @@ function marsGlyph(ord, size){
 
 const THEMES = {
   lab:{
-    id:'lab', icon:'🔦', title:'블랙아웃 실험실',
+    id:'lab', icon:'🔦', title:'블랙아웃 실험실', blurb:'과학실 미스터리',
     opening:[
       '과학의 밤 행사가 끝나 갈 무렵, 학교 전체가 어둠에 잠겼다.',
       '비상등이 켜진 과학실. 문은 잠기고, 키패드만 붉게 깜빡인다.',
@@ -1754,7 +1774,7 @@ const THEMES = {
     scene:()=>buildLabScene(),
   },
   mansion:{
-    id:'mansion', icon:'🎩', title:'사라진 마술사의 저택',
+    id:'mansion', icon:'🎩', title:'사라진 마술사의 저택', blurb:'유령 소문 · 트릭 폭로',
     opening:[
       '언덕 위 낡은 저택. 마술사가 사라진 뒤, 밤마다 이상한 일이 벌어진다는 소문이 돌았다.',
       '촛불이 저절로 켜지고, 문이 혼자 열리고, 허공에 유령이 떠다닌다고.',
@@ -1824,7 +1844,7 @@ const THEMES = {
     scene:()=>buildMansionScene(),
   },
   frequency:{
-    id:'frequency', icon:'📡', title:'오래된 주파수',
+    id:'frequency', icon:'📡', title:'오래된 주파수', blurb:'폐쇄된 관측소 · 시간을 건너온 교신',
     opening:[
       '소나기를 피해 들어선 산꼭대기의 낡은 관측소. 철문이 등 뒤에서 닫혔다.',
       '먼지 낀 수신기가 저절로 켜지더니, 지직, 오래된 목소리가 흘러나온다.',
@@ -1894,7 +1914,7 @@ const THEMES = {
     scene:()=>buildFrequencyScene(),
   },
   mars:{
-    id:'mars', icon:'🚀', title:'붉은 행성 기지',
+    id:'mars', icon:'🚀', title:'붉은 행성 기지', blurb:'화성 생존 · 카운트다운',
     opening:[
       '모래폭풍이 지나간 아침, 붉은 행성의 기지가 조용하다. 전력은 내려앉고, 교신은 지직거린다.',
       '귀환선 발사 윈도우까지 남은 시간은 오늘 저녁까지.',
@@ -2052,18 +2072,18 @@ registerAddon({
   glyph:'🎲', color:0xb98ad0, recolor:0x2a1838,
   discover:'여러 갈래로 갈라지는 회전판 자물쇠. 상황에 맞는 경우의 수를 맞춰야 열린다.',
   reward:'회전판 안쪽에 드러난 숫자',
-  curri:{ easy:'수학 심화 · 곱의 법칙', mid:'중2 수학 · 순열', hard:'중2 수학 · 조합' },
+  curri:{ easy:'고1 수학 · 합의 법칙과 곱의 법칙 [10공수1-03-01]', mid:'고1 수학 · 순열 [10공수1-03-02]', hard:'고1 수학 · 조합 [10공수1-03-03]' },
   config:function(diff){
     if(diff==='easy') return { q:'윗옷 3벌과 아랫옷 2벌로 만들 수 있는 서로 다른 옷차림은 몇 가지일까?',
-      ans:6, max:24, curri:'수학 심화 · 곱의 법칙',
+      ans:6, max:24, unit:'가지', curri:'고1 수학 · 합의 법칙과 곱의 법칙 [10공수1-03-01]',
       desc:'상황을 읽고 경우의 수를 다이얼로 맞춘 뒤 레버를 당기자.',
       hints:['각 윗옷마다 아랫옷 2가지를 고를 수 있다.','3 × 2 = 6.'] };
     if(diff==='mid') return { q:'4명 중에서 회장과 부회장을 한 명씩 뽑는 방법의 수는? (순서가 있다)',
-      ans:12, max:30, curri:'중2 수학 · 순열',
+      ans:12, max:30, unit:'가지', curri:'고1 수학 · 순열 [10공수1-03-02]',
       desc:'뽑아서 나열하는 경우다. 경우의 수를 맞춰 레버를 당기자.',
       hints:['회장 4가지, 그 각각에 부회장은 남은 3가지.','4 × 3 = 12.'] };
     return { q:'5명 중에서 대표 2명을 뽑는 방법의 수는? (순서는 없다)',
-      ans:10, max:30, curri:'중2 수학 · 조합',
+      ans:10, max:30, unit:'가지', curri:'고1 수학 · 조합 [10공수1-03-03]',
       desc:'순서 없이 뽑는 경우다. 경우의 수를 맞춰 레버를 당기자.',
       hints:['순서 있게 뽑으면 5×4=20. 두 명 사이 순서는 세지 않으니 2로 나눈다.','20 ÷ 2 = 10.'] };
   },
@@ -2109,19 +2129,19 @@ registerAddon({
   glyph:'½', color:0x6aa8ff, recolor:0x121c34,
   discover:'분자와 분모가 따로 도는 두 짝 다이얼 자물쇠. 상황에 맞는 확률을 분수로 맞춰야 열린다.',
   reward:'분수막대 아래로 드러난 숫자',
-  curri:{ easy:'중2 수학 · 확률의 뜻', mid:'중2 수학 · 확률의 계산', hard:'중2 수학 · 두 사건의 확률' },
+  curri:{ easy:'중1~3 수학 · 확률의 뜻 [9수04-06]', mid:'중1~3 수학 · 확률의 계산 [9수04-06]', hard:'중1~3 수학 · 두 사건의 확률 [9수04-06]' },
   config:function(diff){
     if(diff==='easy') return {
       q:'주머니에 빨간 공 2개, 파란 공 3개가 있다. 하나를 꺼낼 때 빨간 공일 확률은?',
-      fav:2, total:5, max:12, curri:'중2 수학 · 확률의 뜻',
+      fav:2, total:5, max:12, curri:'중1~3 수학 · 확률의 뜻 [9수04-06]',
       hints:['확률 = (해당 경우) / (전체 경우).','빨간 공 2개, 전체 공 5개. 2/5.'] };
     if(diff==='mid') return {
       q:'주사위 한 개를 던질 때 4 이상(4,5,6)이 나올 확률은?',
-      fav:3, total:6, max:12, curri:'중2 수학 · 확률의 계산',
+      fav:3, total:6, max:12, curri:'중1~3 수학 · 확률의 계산 [9수04-06]',
       hints:['4 이상은 4,5,6 세 가지. 전체는 1~6 여섯 가지.','3/6. 약분하면 1/2 도 같은 값.'] };
     return {
       q:'주사위 두 개를 던져 나온 눈의 합이 7일 확률은?',
-      fav:6, total:36, max:40, curri:'중2 수학 · 두 사건의 확률',
+      fav:6, total:36, max:40, curri:'중1~3 수학 · 두 사건의 확률 [9수04-06]',
       hints:['두 주사위의 모든 경우는 6×6 = 36가지.','합이 7인 경우는 (1,6)(2,5)(3,4)(4,3)(5,2)(6,1) 여섯 가지. 6/36.'] };
   },
   mount:function(el, cfg, api){
@@ -2179,23 +2199,23 @@ registerAddon({
   glyph:'∝', color:0x5fd39a, recolor:0x0f2a20,
   discover:'값들이 표로 배열된 자물쇠. 빈칸 하나가 비어 있다. 정비례 또는 반비례 규칙을 읽어 채워야 한다.',
   reward:'표의 빈칸이 채워지며 켜진 숫자',
-  curri:{ easy:'중1 수학 · 정비례', mid:'중1 수학 · 반비례', hard:'중1 수학 · 반비례 활용' },
+  curri:{ easy:'중1~3 수학 · 정비례 [9수02-07]', mid:'중1~3 수학 · 반비례 [9수02-07]', hard:'중1~3 수학 · 반비례 활용 [9수02-07]' },
   config:function(diff){
     if(diff==='easy') return {
       kind:'정비례', rule:'direct', rows:[[1,4],[3,12],[5,null]], ans:20, max:60,
-      curri:'중1 수학 · 정비례',
+      curri:'중1~3 수학 · 정비례 [9수02-07]',
       q:'y 가 x 에 정비례한다. 표의 빈칸에 들어갈 y 값은?',
       hints:['정비례는 y = a×x. x 가 1일 때 y 가 4이므로 a = 4.','x = 5 이면 y = 4×5 = 20.'] };
     if(diff==='mid') return {
       kind:'반비례', rule:'inverse', rows:[[2,12],[3,8],[6,null]], ans:4, max:60,
-      curri:'중1 수학 · 반비례',
+      curri:'중1~3 수학 · 반비례 [9수02-07]',
       q:'y 가 x 에 반비례한다. 표의 빈칸에 들어갈 y 값은?',
       hints:['반비례는 x×y = a 로 일정하다. 2×12 = 24 이므로 a = 24.','x = 6 이면 y = 24 ÷ 6 = 4.'] };
     return {
-      kind:'반비례', rule:'inverse', rows:[[4,12],[6,8],[8,null]], ans:6, max:60,
-      curri:'중1 수학 · 반비례 활용',
-      q:'y 가 x 에 반비례한다. 표의 빈칸에 들어갈 y 값은?',
-      hints:['x×y 가 일정하다. 4×12 = 48, 6×8 = 48. 곱이 항상 48.','x = 8 이면 y = 48 ÷ 8 = 6.'] };
+      kind:'반비례', rule:'inverse', rows:[[6,20],[8,15],[10,null]], ans:12, max:60,
+      curri:'중1~3 수학 · 반비례 활용 [9수02-07]',
+      q:'같은 양의 물을 컵에 나눠 담는다. 컵 수 x 와 컵당 물의 양 y 는 반비례한다. 빈칸의 y 값은?',
+      hints:['전체 물의 양이 x×y 로 일정하다. 6×20 = 120, 8×15 = 120.','x = 10 이면 y = 120 ÷ 10 = 12.'] };
   },
   mount:function(el, cfg, api){
     var stage=document.createElement('div'); stage.className='stage';
@@ -2676,11 +2696,11 @@ registerAddon({
   curri:{ easy:'중1~3 · 소리의 진동수·진폭 [9과10-04]', mid:'중1~3 · 소리의 진동수·진폭 [9과10-04]', hard:'중1~3 · 파장과 진동수 [9과10-04]' },
   config:function(diff){
     if(diff==='easy') return {
-      q:'목표 소리: 1초에 4번 진동하고, 진폭(크기)은 50. 진동수와 진폭을 맞추자.',
-      startFreq:2, startAmp:20, tFreq:4, tAmp:50, freqMax:8, ampMax:80,
+      q:'지금 소리(진동수 2, 진폭 25)를 두 배 높고 두 배 크게 만들자.',
+      startFreq:2, startAmp:25, tFreq:4, tAmp:50, freqMax:8, ampMax:80,
       curri:'중1~3 · 소리의 진동수·진폭 [9과10-04]',
       desc:'진동수가 클수록 높은 소리, 진폭이 클수록 큰 소리다.',
-      hints:['높낮이는 진동수, 소리 크기는 진폭이 정한다.','목표는 진동수 4, 진폭 50.'] };
+      hints:['높낮이는 진동수, 소리 크기는 진폭이 정한다.','두 배 높게는 진동수 2→4, 두 배 크게는 진폭 25→50.'] };
     if(diff==='mid') return {
       q:'지금 소리(진동수 2)보다 두 배 높은 소리를 만들자. 크기(진폭 40)는 그대로 둔다.',
       startFreq:2, startAmp:40, tFreq:4, tAmp:40, freqMax:8, ampMax:80,
@@ -2766,20 +2786,20 @@ registerAddon({
   glyph:'a:b', color:0xffd76a, recolor:0x2a2410,
   discover:'네 칸으로 나뉜 비례식 자물쇠. 빈 항을 십자곱으로 맞추면 열린다.',
   reward:'비례식이 균형을 이룬 자리에 드러난 숫자',
-  curri:{ easy:'초6 수학 · 비와 비율', mid:'초6 수학 · 비례식', hard:'중2 수학 · 닮음비 응용' },
+  curri:{ easy:'초5~6 수학 · 비례식 [6수02-04]', mid:'초5~6 수학 · 비례식의 성질 [6수02-04]', hard:'중1~3 수학 · 도형의 닮음과 닮음비 [9수03-12]' },
   config:function(diff){
     function make(a,b,c,curri,q,hints,max){
       var ans=b*c/a;
       return { a:a, b:b, c:c, ans:ans, max:max, q:q, curri:curri, hints:hints,
         check:function(v){ return a*v===b*c; } };
     }
-    if(diff==='easy') return make(2,3,4,'초6 수학 · 비와 비율',
+    if(diff==='easy') return make(2,3,4,'초5~6 수학 · 비례식 [6수02-04]',
       '2 : 3 = 4 : ? 를 만족하는 ? 를 맞춰라.',
       ['십자로 곱해 서로 같게 만든다. 2 × ? = 3 × 4.','3 × 4 = 12, 12 ÷ 2 = 6.'], 20);
-    if(diff==='mid') return make(5,8,15,'초6 수학 · 비례식',
+    if(diff==='mid') return make(5,8,15,'초5~6 수학 · 비례식의 성질 [6수02-04]',
       '비례식 5 : 8 = 15 : ? 의 빈 항을 찾아라.',
       ['바깥쪽 곱과 안쪽 곱이 같다. 5 × ? = 8 × 15.','8 × 15 = 120, 120 ÷ 5 = 24.'], 40);
-    return make(3,5,12,'중2 수학 · 닮음비 응용',
+    return make(3,5,12,'중1~3 수학 · 도형의 닮음과 닮음비 [9수03-12]',
       '닮은 두 도형의 닮음비가 3 : 5 이다. 작은 도형의 한 변이 12일 때 큰 도형의 대응변은? (3 : 5 = 12 : ?)',
       ['대응변의 비가 곧 닮음비다. 3 : 5 = 12 : ?.','3 × ? = 5 × 12 = 60, 60 ÷ 3 = 20.'], 40);
   },
@@ -2831,23 +2851,23 @@ registerAddon({
   glyph:'x,y', color:0x6aa8ff, recolor:0x101a30,
   discover:'격자무늬가 그려진 좌표 패널. 정확한 점을 찍어야 잠금이 풀린다.',
   reward:'점이 맞아떨어진 격자 위에 뜬 숫자',
-  curri:{ easy:'중1 수학 · 좌표평면', mid:'중2 수학 · 일차함수', hard:'중2 수학 · 일차함수 그래프' },
+  curri:{ easy:'중1~3 수학 · 순서쌍과 좌표 [9수02-05]', mid:'중1~3 수학 · 일차함수의 그래프 [9수02-15]', hard:'중1~3 수학 · 두 일차함수의 그래프 [9수02-18]' },
   config:function(diff){
     if(diff==='easy'){ var tx=2, ty=3;
-      return { mode:'point', tgt:{x:tx,y:ty}, min:-5, max:5, curri:'중1 수학 · 좌표평면',
+      return { mode:'point', tgt:{x:tx,y:ty}, min:-5, max:5, curri:'중1~3 수학 · 순서쌍과 좌표 [9수02-05]',
         q:'점 P(2, 3) 의 자리에 점을 찍어라. 가로가 x, 세로가 y.',
         hints:['원점에서 오른쪽으로 x칸(2), 위로 y칸(3) 간 자리다.','오른쪽 2, 위 3 이 만나는 점.'],
         check:function(p){ return p.x===tx && p.y===ty; } };
     }
     if(diff==='mid'){ var a=2, b=-1, rx=3, ry=a*rx+b;
-      return { mode:'line', a:a, b:b, tgt:{x:rx,y:ry}, min:-5, max:5, curri:'중2 수학 · 일차함수',
+      return { mode:'line', a:a, b:b, tgt:{x:rx,y:ry}, min:-5, max:5, curri:'중1~3 수학 · 일차함수의 그래프 [9수02-15]',
         q:'직선 y = 2x − 1 위의 점 가운데 x가 3인 점을 찍어라.',
         hints:['x에 3을 넣는다. y = 2×3 − 1.','y = 6 − 1 = 5 이므로 (3, 5).'],
         lines:[{a:a,b:b}],
         check:function(p){ return p.x===rx && p.y===a*p.x+b; } };
     }
     var a1=1, b1=1, a2=-1, b2=5; var ix=(b2-b1)/(a1-a2), iy=a1*ix+b1;
-    return { mode:'cross', tgt:{x:ix,y:iy}, min:-5, max:5, curri:'중2 수학 · 일차함수 그래프',
+    return { mode:'cross', tgt:{x:ix,y:iy}, min:-5, max:5, curri:'중1~3 수학 · 두 일차함수의 그래프 [9수02-18]',
       q:'두 직선 y = x + 1 과 y = −x + 5 가 만나는 점을 찍어라.',
       hints:['두 직선의 y가 같아지는 x를 찾는다. x + 1 = −x + 5.','2x = 4, x = 2 이므로 y = 3. 교점 (2, 3).'],
       lines:[{a:a1,b:b1},{a:a2,b:b2}],
@@ -2914,24 +2934,24 @@ registerAddon({
   glyph:'⚙', color:0x5fd39a, recolor:0x0f2a20,
   discover:'맞물린 두 톱니바퀴 자물쇠. 다시 처음처럼 맞물리는 주기를 알아야 열린다.',
   reward:'톱니가 다시 맞물린 축에 새겨진 숫자',
-  curri:{ easy:'초5 수학 · 최대공약수', mid:'초5 수학 · 최소공배수', hard:'초5 수학 · 최소공배수 활용' },
+  curri:{ easy:'초5~6 수학 · 최대공약수 [6수01-04]', mid:'초5~6 수학 · 최소공배수 [6수01-05]', hard:'초5~6 수학 · 최소공배수 활용 [6수01-05]' },
   config:function(diff){
     function gcd(a,b){ while(b){ var t=a%b; a=b; b=t; } return a; }
     function lcm(a,b){ return a*b/gcd(a,b); }
     if(diff==='easy'){ var m=12, n=18, ans=gcd(m,n);
-      return { kind:'gcd', m:m, n:n, ans:ans, max:20, curri:'초5 수학 · 최대공약수',
+      return { kind:'gcd', m:m, n:n, ans:ans, max:20, curri:'초5~6 수학 · 최대공약수 [6수01-04]',
         q:'두 수 12 와 18 의 최대공약수를 다이얼로 맞춰라.',
         hints:['두 수를 함께 나누는 가장 큰 수다. 12=2×2×3, 18=2×3×3.','공통은 2×3 = 6.'],
         check:function(v){ return v===ans; } };
     }
     if(diff==='mid'){ var A=8, B=12, L=lcm(A,B), ans2=L/A;
-      return { kind:'gear', A:A, B:B, L:L, ans:ans2, max:12, curri:'초5 수학 · 최소공배수',
+      return { kind:'gear', A:A, B:B, L:L, ans:ans2, max:12, unit:'바퀴', curri:'초5~6 수학 · 최소공배수 [6수01-05]',
         q:'톱니 8 개와 12 개인 두 톱니바퀴다. 처음처럼 다시 맞물리려면 작은(8개) 톱니바퀴는 몇 바퀴 돌아야 할까?',
         hints:['맞물린 톱니 수가 8과 12의 공배수가 되어야 한다. 최소공배수는 24.','24 ÷ 8 = 3 바퀴.'],
         check:function(v){ return v===ans2; } };
     }
     var A2=6, B2=9, L2=lcm(A2,B2);
-    return { kind:'gear', A:A2, B:B2, L:L2, ans:L2, max:40, curri:'초5 수학 · 최소공배수 활용',
+    return { kind:'gear', A:A2, B:B2, L:L2, ans:L2, max:40, unit:'개', curri:'초5~6 수학 · 최소공배수 활용 [6수01-05]',
       q:'톱니 6 개와 9 개인 두 톱니바퀴가 처음 자리에서 다시 맞물릴 때까지, 지나가는 톱니는 모두 몇 개일까?',
       hints:['6과 9의 공배수만큼 맞물려야 한다. 최소공배수를 찾자.','6=2×3, 9=3×3 → 최소공배수 18.'],
       check:function(v){ return v===L2; } };
@@ -2992,18 +3012,18 @@ registerAddon({
   glyph:'×', color:0xb98ad0, recolor:0x2a1838,
   discover:'소수 다이얼이 늘어선 자물쇠. 목표 수를 소수의 곱으로 분해해야 열린다.',
   reward:'소인수의 곱이 맞물린 자리에 드러난 숫자',
-  curri:{ easy:'중1 수학 · 소인수분해', mid:'중1 수학 · 소인수분해', hard:'중1 수학 · 소인수분해' },
+  curri:{ easy:'중1~3 수학 · 소인수분해 [9수01-01]', mid:'중1~3 수학 · 소인수분해 [9수01-01]', hard:'중1~3 수학 · 소인수분해 [9수01-01]' },
   config:function(diff){
     var opts=[1,2,3,5,7,11];
-    if(diff==='easy') return { N:12, slots:4, opts:opts, curri:'중1 수학 · 소인수분해',
+    if(diff==='easy') return { N:12, slots:4, opts:opts, curri:'중1~3 수학 · 소인수분해 [9수01-01]',
       q:'12 를 소수의 곱으로 분해하라. 칸을 눌러 소수를 바꾸고, 곱이 12 가 되게 하라.',
       hints:['12 = 2 × 6 = 2 × 2 × 3.','2, 2, 3 을 고르고 남는 칸은 1 로 둔다.'],
       check:function(a){ return a.reduce(function(p,x){return p*x;},1)===12; } };
-    if(diff==='mid') return { N:60, slots:5, opts:opts, curri:'중1 수학 · 소인수분해',
+    if(diff==='mid') return { N:60, slots:5, opts:opts, curri:'중1~3 수학 · 소인수분해 [9수01-01]',
       q:'60 을 소수의 곱으로 분해하라. 곱이 60 이 되게 소수를 고르자.',
       hints:['60 = 2 × 30 = 2 × 2 × 15 = 2 × 2 × 3 × 5.','2, 2, 3, 5 를 고르고 남는 칸은 1.'],
       check:function(a){ return a.reduce(function(p,x){return p*x;},1)===60; } };
-    return { N:180, slots:6, opts:opts, curri:'중1 수학 · 소인수분해',
+    return { N:180, slots:6, opts:opts, curri:'중1~3 수학 · 소인수분해 [9수01-01]',
       q:'180 을 소수의 곱으로 분해하라. 곱이 180 이 되게 소수를 고르자.',
       hints:['180 = 2 × 90 = 2 × 2 × 45 = 2 × 2 × 9 × 5.','2, 2, 3, 3, 5 를 고른다.'],
       check:function(a){ return a.reduce(function(p,x){return p*x;},1)===180; } };
@@ -3184,17 +3204,17 @@ registerAddon({
     var pts=[[0,15],[20,30],[40,60],[60,110],[80,170]]; // g / 물 100g
     if(diff==='easy') return {
       q:'물 100g에 이 물질을 40°C에서 최대로 녹이면 몇 g이 녹을까?',
-      pts:pts, marks:[40], ans:60, max:200, step:[10,1],
+      pts:pts, marks:[40], ans:60, max:200, step:[10,1], unit:'g',
       curri:'중1~3 · 용해도(물질의 특성) [9과08-01]',
       hints:['40°C에서 곡선의 높이를 읽는다.','물 100g 기준 40°C 용해도는 60g이다.'] };
     if(diff==='mid') return {
       q:'60°C 물 100g에 최대로 녹인 포화용액을 20°C로 식히면 몇 g이 석출될까?',
-      pts:pts, marks:[20,60], ans:80, max:200, step:[10,1],
+      pts:pts, marks:[20,60], ans:80, max:200, step:[10,1], unit:'g',
       curri:'중1~3 · 용해도와 석출(심화) [9과08-01]',
       hints:['석출량 = 60°C 용해도 − 20°C 용해도.','110 − 30 = 80(g).'] };
     return {
       q:'물 200g에 80°C에서 최대로 녹인 뒤 40°C로 식히면 몇 g이 석출될까?',
-      pts:pts, marks:[40,80], ans:220, max:400, step:[10,1],
+      pts:pts, marks:[40,80], ans:220, max:400, step:[10,1], unit:'g',
       curri:'중1~3 · 용해도와 석출(심화) [9과08-01]',
       hints:['물 100g당 석출량은 (80°C 용해도 − 40°C 용해도) = 170 − 60 = 110g.','물이 200g이면 110 × 2 = 220(g).'] };
   },
@@ -3276,7 +3296,7 @@ registerAddon({
   config:function(diff){
     if(diff==='easy') return {
       mode:'calc', q:'어떤 금속의 질량은 24g, 부피는 3cm³이다. 밀도는 몇 g/cm³일까?',
-      mass:24, vol:3, ans:8, max:20, curri:'중1~3 · 밀도(물질의 특성) [9과08-01]',
+      mass:24, vol:3, ans:8, max:20, unit:'g/cm³', curri:'중1~3 · 밀도(물질의 특성) [9과08-01]',
       hints:['밀도 = 질량 ÷ 부피.','24 ÷ 3 = 8 (g/cm³).'] };
     if(diff==='mid') return {
       mode:'float', q:'각 물체가 물(밀도 1 g/cm³)에 뜰지 가라앉을지 정하자.',
@@ -3519,22 +3539,22 @@ registerAddon({
   glyph:'📐', color:0x6aa8ff, recolor:0x14233d,
   discover:'벽에 새겨진 직각삼각형 자물쇠. 두 변을 알면 나머지 한 변의 길이가 잠금 숫자가 된다.',
   reward:'구한 변 옆에 떠오르는 숫자',
-  curri:{ easy:'중2 수학 · 피타고라스 정리(빗변)', mid:'중2 수학 · 피타고라스 정리(3:4:5 배수)', hard:'중2 수학 · 피타고라스 정리(한 변 구하기)' },
+  curri:{ easy:'중1~3 수학 · 피타고라스 정리 [9수03-15]', mid:'중1~3 수학 · 피타고라스 정리(3:4:5 배수) [9수03-15]', hard:'중1~3 수학 · 피타고라스 정리(한 변 구하기) [9수03-15]' },
   config:function(diff){
-    if(diff==='easy') return { q:'직각을 낀 두 변이 3과 4다. 빗변의 길이를 구해 다이얼에 맞추자.',
-      legA:3, legB:4, hyp:5, unknown:'hyp', ans:5, max:20,
+    if(diff==='easy') return { q:'직각을 낀 두 변이 3cm 와 4cm 다. 빗변의 길이를 구해 다이얼에 맞추자.',
+      legA:3, legB:4, hyp:5, unknown:'hyp', ans:5, max:20, unit:'cm',
       success:'딸깍 — 세 변이 피타고라스 정리에 들어맞으며 자물쇠가 풀렸다!',
-      curri:'중2 수학 · 피타고라스 정리(빗변)',
+      curri:'중1~3 수학 · 피타고라스 정리 [9수03-15]',
       hints:['직각을 낀 두 변을 각각 제곱해서 더한다.','3² + 4² = 9 + 16 = 25. 25의 제곱근은 5.'] };
-    if(diff==='mid') return { q:'직각을 낀 두 변이 6과 8이다. 빗변의 길이를 구하자.',
-      legA:6, legB:8, hyp:10, unknown:'hyp', ans:10, max:20,
+    if(diff==='mid') return { q:'직각을 낀 두 변이 6cm 와 8cm 이다. 빗변의 길이를 구하자.',
+      legA:6, legB:8, hyp:10, unknown:'hyp', ans:10, max:20, unit:'cm',
       success:'딸깍 — 6·8·10이 정리에 맞아떨어졌다!',
-      curri:'중2 수학 · 피타고라스 정리(3:4:5 배수)',
+      curri:'중1~3 수학 · 피타고라스 정리(3:4:5 배수) [9수03-15]',
       hints:['6² + 8² 을 구한 뒤 제곱근을 찾는다.','36 + 64 = 100. √100 = 10.'] };
-    return { q:'빗변이 13, 한 직각변이 5다. 나머지 직각변의 길이를 구하자.',
-      legA:5, legB:12, hyp:13, unknown:'legB', ans:12, max:20,
+    return { q:'빗변이 13cm, 한 직각변이 5cm 다. 나머지 직각변의 길이를 구하자.',
+      legA:5, legB:12, hyp:13, unknown:'legB', ans:12, max:20, unit:'cm',
       success:'딸깍 — 나머지 변이 딱 맞아 자물쇠가 열렸다!',
-      curri:'중2 수학 · 피타고라스 정리(한 변 구하기)',
+      curri:'중1~3 수학 · 피타고라스 정리(한 변 구하기) [9수03-15]',
       hints:['빗변의 제곱에서 아는 변의 제곱을 뺀다.','13² − 5² = 169 − 25 = 144. √144 = 12.'] };
   },
   mount:function(el, cfg, api){
@@ -3595,22 +3615,22 @@ registerAddon({
   glyph:'📦', color:0x5fd39a, recolor:0x123024,
   discover:'도형의 넓이와 부피를 재는 측정 자물쇠. 치수를 곱해 값을 맞추면 열린다.',
   reward:'도형 안쪽에 새겨진 숫자',
-  curri:{ easy:'초5 수학 · 직사각형의 넓이', mid:'초5 수학 · 삼각형의 넓이', hard:'초6 수학 · 직육면체의 부피' },
+  curri:{ easy:'초5~6 수학 · 직사각형의 넓이 [6수03-13]', mid:'초5~6 수학 · 삼각형의 넓이 [6수03-14]', hard:'초5~6 수학 · 직육면체의 부피 [6수03-19]' },
   config:function(diff){
-    if(diff==='easy') return { shape:'rect', q:'가로 8, 세로 5인 직사각형의 넓이를 구하자.',
+    if(diff==='easy') return { shape:'rect', q:'가로 8cm, 세로 5cm 인 직사각형의 넓이를 구하자.',
       w:8, h:5, ans:40, max:90, unit:'cm²',
       success:'딸깍 — 넓이가 맞아떨어지며 자물쇠가 열렸다!',
-      curri:'초5 수학 · 직사각형의 넓이',
+      curri:'초5~6 수학 · 직사각형의 넓이 [6수03-13]',
       hints:['직사각형 넓이는 가로 × 세로.','8 × 5 = 40.'] };
-    if(diff==='mid') return { shape:'tri', q:'밑변 6, 높이 4인 삼각형의 넓이를 구하자.',
+    if(diff==='mid') return { shape:'tri', q:'밑변 6cm, 높이 4cm 인 삼각형의 넓이를 구하자.',
       base:6, ht:4, ans:12, max:40, unit:'cm²',
       success:'딸깍 — 삼각형 넓이가 맞았다!',
-      curri:'초5 수학 · 삼각형의 넓이',
+      curri:'초5~6 수학 · 삼각형의 넓이 [6수03-14]',
       hints:['삼각형 넓이는 밑변 × 높이 ÷ 2.','6 × 4 ÷ 2 = 24 ÷ 2 = 12.'] };
-    return { shape:'box', q:'가로 4, 세로 3, 높이 5인 직육면체의 부피를 구하자.',
+    return { shape:'box', q:'가로 4cm, 세로 3cm, 높이 5cm 인 직육면체의 부피를 구하자.',
       bw:4, bd:3, bh:5, ans:60, max:120, unit:'cm³',
       success:'딸깍 — 부피가 맞아떨어져 자물쇠가 열렸다!',
-      curri:'초6 수학 · 직육면체의 부피',
+      curri:'초5~6 수학 · 직육면체의 부피 [6수03-19]',
       hints:['직육면체 부피는 가로 × 세로 × 높이.','4 × 3 × 5 = 60.'] };
   },
   mount:function(el, cfg, api){
@@ -3682,23 +3702,23 @@ registerAddon({
   glyph:'📊', color:0xffd76a, recolor:0x2a2410,
   discover:'막대들의 평균을 재는 저울 자물쇠. 대푯값을 맞추면 잠금이 풀린다.',
   reward:'평균선 위에 뜨는 숫자',
-  curri:{ easy:'초5 수학 · 평균', mid:'초6 수학 · 평균', hard:'중1 수학 · 평균과 대푯값' },
+  curri:{ easy:'초5~6 수학 · 평균 [6수04-01]', mid:'초5~6 수학 · 평균 [6수04-01]', hard:'초5~6 수학 · 평균 구하기의 역산 [6수04-01]' },
   config:function(diff){
     if(diff==='easy') return { mode:'find', q:'막대 네 개의 평균을 구해 평균선을 맞추자.',
       bars:[10,20,30,40], ans:25, max:60,
       success:'딸깍 — 평균선이 딱 맞으며 자물쇠가 열렸다!',
-      curri:'초5 수학 · 평균',
+      curri:'초5~6 수학 · 평균 [6수04-01]',
       hints:['모두 더한 뒤 개수로 나눈다.','(10+20+30+40) ÷ 4 = 100 ÷ 4 = 25.'] };
     if(diff==='mid') return { mode:'find', q:'막대 다섯 개의 평균을 구하자.',
       bars:[6,8,10,12,14], ans:10, max:30,
       success:'딸깍 — 평균이 맞아떨어졌다!',
-      curri:'초6 수학 · 평균',
+      curri:'초5~6 수학 · 평균 [6수04-01]',
       hints:['다섯 값을 더해 5로 나눈다.','(6+8+10+12+14) ÷ 5 = 50 ÷ 5 = 10.'] };
     return { mode:'target', q:'마지막 막대를 조절해 다섯 막대의 평균이 15가 되게 하자.',
-      bars:[10,12,18,20], target:15, ans:15, max:40,
+      bars:[8,12,18,20], target:15, ans:17, max:40,
       success:'딸깍 — 평균이 목표에 닿으며 자물쇠가 열렸다!',
-      curri:'중1 수학 · 평균과 대푯값',
-      hints:['평균 15가 되려면 전체 합은 15 × 5 = 75여야 한다.','75 − (10+12+18+20) = 75 − 60 = 15. 마지막 막대는 15.'] };
+      curri:'초5~6 수학 · 평균 구하기의 역산 [6수04-01]',
+      hints:['평균 15가 되려면 전체 합은 15 × 5 = 75여야 한다.','75 − (8+12+18+20) = 75 − 58 = 17. 마지막 막대는 17.'] };
   },
   mount:function(el, cfg, api){
     var stage=document.createElement('div'); stage.className='stage';
@@ -3784,7 +3804,7 @@ registerAddon({
   glyph:'🧊', color:0xb98ad0, recolor:0x2a1838,
   discover:'전개도를 접으면 정육면체가 되는 자물쇠. 기준 면과 마주보는 면을 짚어야 열린다.',
   reward:'맞은 면에 드러나는 숫자',
-  curri:{ easy:'초5 수학 · 정육면체의 전개도', mid:'초5 수학 · 전개도의 마주보는 면', hard:'초5 수학 · 전개도 겨냥(심화)' },
+  curri:{ easy:'초5~6 수학 · 정육면체의 전개도 [6수03-04]', mid:'초5~6 수학 · 전개도의 마주보는 면 [6수03-04]', hard:'초5~6 수학 · 전개도와 겨냥도 [6수03-04]' },
   config:function(diff){
     if(diff==='easy') return {
       q:'접으면 정육면체가 된다. ■ 면과 마주보는 면을 누르자.',
@@ -3792,7 +3812,7 @@ registerAddon({
               {id:'D',col:2,row:1,sym:'▲'}, {id:'E',col:3,row:1,sym:'◆'}, {id:'F',col:1,row:2,sym:'✚'} ],
       pairs:[['A','F'],['B','D'],['C','E']], marked:'C', answer:'E',
       success:'딸깍 — 접었을 때 마주보는 면을 정확히 짚었다!',
-      curri:'초5 수학 · 정육면체의 전개도',
+      curri:'초5~6 수학 · 정육면체의 전개도 [6수03-04]',
       hints:['일자로 늘어선 네 면에서는 한 칸 건너뛴 면끼리 마주본다.','■ 의 양옆은 옆면이 된다. 한 칸 건너뛴 ◆ 가 마주보는 면.'] };
     if(diff==='mid') return {
       q:'접으면 정육면체가 된다. ★ 면과 마주보는 면을 누르자.',
@@ -3800,7 +3820,7 @@ registerAddon({
               {id:'D',col:2,row:1,sym:'▲'}, {id:'E',col:3,row:1,sym:'◆'}, {id:'F',col:2,row:2,sym:'✚'} ],
       pairs:[['A','F'],['B','D'],['C','E']], marked:'A', answer:'F',
       success:'딸깍 — 뚜껑과 바닥이 맞아떨어졌다!',
-      curri:'초5 수학 · 전개도의 마주보는 면',
+      curri:'초5~6 수학 · 전개도의 마주보는 면 [6수03-04]',
       hints:['위아래로 튀어나온 두 조각은 접으면 뚜껑과 바닥이 되어 마주본다.','★ 은 위로 튀어나온 조각, 반대편은 아래로 튀어나온 ✚.'] };
     return {
       q:'접으면 정육면체가 된다. ▲ 면과 마주보는 면을 누르자.',
@@ -3808,7 +3828,7 @@ registerAddon({
               {id:'D',col:2,row:1,sym:'▲'}, {id:'E',col:3,row:1,sym:'◆'}, {id:'F',col:1,row:2,sym:'✚'} ],
       pairs:[['A','F'],['B','D'],['C','E']], marked:'D', answer:'B',
       success:'딸깍 — 헷갈리는 면 사이에서 마주보는 짝을 찾아냈다!',
-      curri:'초5 수학 · 전개도 겨냥(심화)',
+      curri:'초5~6 수학 · 전개도와 겨냥도 [6수03-04]',
       hints:['일자 네 면에서 한 칸 건너뛴 면끼리 마주본다.','▲ 에서 한 칸 건너뛴 ● 가 마주보는 면.'] };
   },
   mount:function(el, cfg, api){
@@ -5556,6 +5576,7 @@ document.querySelectorAll('#room-grid .diff-card').forEach(b=>{
     DOOR_CODE = ROOM.locks.map(l=>l.digit).join('');
     $('#opening-lines').innerHTML = THEME.opening.join('<br>');
     $('#diff-section').style.display = '';
+    const te = $('#teacher-entry'); if(te) te.style.display = 'none';   // 방을 고른 뒤엔 학생 흐름만 남긴다
     document.querySelectorAll('#room-grid .diff-card').forEach(c=>{
       c.style.borderColor = (c===b) ? 'var(--amber2)' : '';
     });
@@ -5594,6 +5615,14 @@ function applyCustomCfg(c){
 function runSelftest(){
   const results = [];
   const T = (name, ok)=>results.push([name, !!ok]);
+
+  // 도달성: 만들어 놓고 앱에서 갈 수 없으면 없는 것과 같다
+  (function(){
+    const te = document.getElementById('teacher-entry');
+    T('인트로에 교사용 진입로가 있다', !!te);
+    T('교사용 진입로가 teacher.html 을 가리킨다', !!te && /teacher\.html/.test(te.getAttribute('href')||''));
+    T('교사용 진입로에 안내 문구가 있다', !!te && (te.textContent||'').trim().length > 20);
+  })();
 
   ['easy','mid','hard'].forEach(diff=>{
     // 초기 상태는 미해결이어야 한다
@@ -5782,9 +5811,48 @@ function runSelftest(){
     results.map(r=>`<div class="${r[1]?'pass':'fail'}">${r[1]?'✓':'✗'} ${r[0]}</div>`).join('') + `</div>`;
 }
 
+/* 카탈로그 덤프 — 교사용 수업팩(teacher.html)이 쓰는 단일 진실.
+   실행 중인 앱에서 config(diff)를 직접 호출해 뽑는다. 손으로 옮겨 적지 않는다. */
+function dumpCatalog(){
+  const out = { builtFrom:'index.html', locks:[], themes:[] };
+  Object.keys(THEMES).forEach(id=>{
+    const t = THEMES[id];
+    // 기본 테마(lab)는 오버라이드가 없다 — 그 경우 PUZZLES 원본 이름을 채워 네 테마를 같은 모양으로 만든다
+    const dev = {};
+    (t.lockOrder || Object.keys(t.locks||{})).forEach(k=>{
+      const v = (t.locks && t.locks[k]) || PUZZLES[k];
+      if(v) dev[k] = { name:v.name, icon:v.icon, digit:String(v.digit) };
+    });
+    out.themes.push({ id, title:t.title||id, icon:t.icon||'', blurb:t.blurb||'',
+      order:(t.lockOrder||Object.keys(t.locks||{})), locks:Object.keys(t.locks||{}), dev });
+  });
+  const metaById = {};
+  ADDON_META.forEach(m=>metaById[m.id]=m);
+  Object.keys(PUZZLES).forEach(id=>{
+    const p = PUZZLES[id];
+    const row = { id, name:p.name, icon:p.icon, digit:p.digit, reward:p.reward||'',
+      discover:p.discover||'', addon:!!metaById[id], diffs:{} };
+    ['easy','mid','hard'].forEach(d=>{
+      let c = null;
+      try{ c = p.config(d); }catch(e){ row.diffs[d] = { error:String(e && e.message || e) }; return; }
+      let plain = null;
+      try{ plain = JSON.parse(JSON.stringify(c)); }catch(e){ plain = {}; }
+      row.diffs[d] = plain;
+    });
+    out.locks.push(row);
+  });
+  document.title = 'CATALOG ' + out.locks.length;
+  const pre = document.createElement('pre');
+  pre.id = 'catalog-dump';
+  pre.textContent = JSON.stringify(out);
+  document.body.innerHTML = '';
+  document.body.appendChild(pre);
+}
+
 (function boot(){
   const q = new URLSearchParams(location.search);
   if(q.get('selftest')) return runSelftest();
+  if(q.get('dump')==='catalog') return dumpCatalog();
   // 조립기가 만든 맞춤 방: #cfg=...
   const h = location.hash.match(/cfg=([^&]+)/);
   if(h){

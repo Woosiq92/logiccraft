@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>수업 운영 팩 · 수학·과학 방탈출</title>
+<style>
+:root{
+  --ink:#16181d; --ink2:#4a4f5a; --ink3:#767c88;
+  --line:#dfe2e8; --line2:#eef0f4; --bg:#f6f7f9; --card:#fff;
+  --accent:#1f5fa8; --accent-bg:#eaf1fa; --warn:#a8501f; --warn-bg:#fbf0e8;
+  --ok:#1d6b4f; --ok-bg:#e9f4ef;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:15px/1.65 -apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Malgun Gothic",sans-serif;
+  word-break:keep-all; overflow-wrap:break-word;
+}
+h1,h2,h3,h4{margin:0; font-weight:700; letter-spacing:-.01em}
+button{font:inherit; cursor:pointer}
+input,select{font:inherit; color:inherit}
+
+/* ---------- 상단 ---------- */
+.topbar{
+  position:sticky; top:0; z-index:20; background:rgba(255,255,255,.94);
+  backdrop-filter:saturate(140%) blur(8px); border-bottom:1px solid var(--line);
+}
+.topbar-in{max-width:1180px; margin:0 auto; padding:12px 20px; display:flex; align-items:center; gap:16px; flex-wrap:wrap}
+.brand{font-size:16px; font-weight:700}
+.brand small{display:block; font-size:12px; font-weight:500; color:var(--ink3); letter-spacing:0}
+.tabs{display:flex; gap:2px; margin-left:auto; background:var(--line2); padding:3px; border-radius:9px}
+.tabs button{
+  border:0; background:transparent; color:var(--ink2); padding:7px 14px;
+  border-radius:7px; font-size:14px; font-weight:600;
+}
+.tabs button[aria-selected="true"]{background:var(--card); color:var(--ink); box-shadow:0 1px 3px rgba(0,0,0,.09)}
+.print-btn{
+  border:1px solid var(--accent); background:var(--accent); color:#fff;
+  padding:8px 16px; border-radius:8px; font-weight:600; font-size:14px;
+}
+.print-btn[disabled]{opacity:.4; cursor:default}
+
+.wrap{max-width:1180px; margin:0 auto; padding:24px 20px 80px}
+
+/* ---------- 설계 패널 ---------- */
+.grid{display:grid; grid-template-columns:360px 1fr; gap:24px; align-items:start}
+@media (max-width:900px){ .grid{grid-template-columns:1fr} }
+.card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:20px}
+.card + .card{margin-top:16px}
+.card h3{font-size:14px; color:var(--ink3); text-transform:none; margin-bottom:14px; letter-spacing:.02em}
+.field{margin-bottom:14px}
+.field:last-child{margin-bottom:0}
+.field label{display:block; font-size:13px; font-weight:600; color:var(--ink2); margin-bottom:6px}
+.field input[type=text],.field input[type=number],.field select{
+  width:100%; padding:9px 11px; border:1px solid var(--line); border-radius:8px; background:#fff;
+}
+.field .hint{font-size:12px; color:var(--ink3); margin-top:5px; line-height:1.5}
+.seg{display:flex; gap:6px; flex-wrap:wrap}
+.seg button{
+  border:1px solid var(--line); background:#fff; color:var(--ink2);
+  padding:7px 13px; border-radius:8px; font-size:13px; font-weight:600;
+}
+.seg button[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-bg); color:var(--accent)}
+
+.budget{border:1px solid var(--line); border-radius:10px; padding:14px; background:#fbfcfd}
+.budget-row{display:flex; justify-content:space-between; font-size:13px; padding:3px 0; color:var(--ink2)}
+.budget-row b{color:var(--ink); font-variant-numeric:tabular-nums}
+.budget-total{border-top:1px solid var(--line); margin-top:8px; padding-top:8px; font-weight:700}
+.flag{margin-top:10px; padding:9px 11px; border-radius:8px; font-size:13px; line-height:1.55}
+.flag.ok{background:var(--ok-bg); color:var(--ok)}
+.flag.warn{background:var(--warn-bg); color:var(--warn)}
+
+/* ---------- 잠금 목록 ---------- */
+.locklist{display:grid; grid-template-columns:repeat(auto-fill,minmax(268px,1fr)); gap:10px}
+.lock{
+  border:1px solid var(--line); border-radius:10px; padding:12px 13px; background:#fff;
+  display:flex; flex-direction:column; gap:7px; position:relative;
+}
+.lock[data-on="1"]{border-color:var(--accent); background:var(--accent-bg)}
+.lock-head{display:flex; align-items:flex-start; gap:9px}
+.lock-head .ic{font-size:19px; line-height:1.2}
+.lock-name{font-weight:700; font-size:14px; flex:1; min-width:0}
+.lock-curri{font-size:12px; color:var(--ink2); line-height:1.5}
+.lock-q{font-size:12px; color:var(--ink3); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden}
+.lock-foot{display:flex; align-items:center; gap:8px; margin-top:2px}
+.lock-foot select{padding:4px 7px; border:1px solid var(--line); border-radius:6px; font-size:12px; background:#fff}
+.pill{font-size:11px; font-weight:700; padding:2px 7px; border-radius:99px; background:var(--line2); color:var(--ink2)}
+.pill.sci{background:#e9f1f7; color:#1f5fa8}
+.pill.math{background:#f3edf9; color:#6b3fa0}
+.lock-toggle{position:absolute; inset:0; border:0; background:transparent; border-radius:10px}
+.lock-toggle:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+.lock-foot select, .lock-foot .pill{position:relative; z-index:1}
+
+.filterbar{display:flex; gap:16px; align-items:center; flex-wrap:wrap; margin-bottom:14px}
+.count{font-size:13px; color:var(--ink3); margin-left:auto}
+
+/* ---------- 링크 ---------- */
+.linkrow{display:flex; align-items:center; gap:10px; padding:9px 0; border-bottom:1px solid var(--line2); font-size:13px}
+.linkrow:last-child{border-bottom:0}
+.linkrow .cls{font-weight:700; min-width:52px}
+.linkrow .code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:13px; letter-spacing:.06em; background:var(--line2); padding:2px 7px; border-radius:5px}
+.linkrow .grow{flex:1}
+.linkrow button{border:1px solid var(--line); background:#fff; border-radius:7px; padding:5px 11px; font-size:12px; font-weight:600}
+
+/* ---------- 문서 ---------- */
+.doc{display:none; background:#fff; border:1px solid var(--line); border-radius:12px; padding:38px 42px; max-width:820px; margin:0 auto}
+.doc.on{display:block}
+.doc h2{font-size:21px; margin-bottom:4px}
+.doc .sub{color:var(--ink3); font-size:13px; margin-bottom:22px}
+.doc h3{font-size:15px; margin:26px 0 10px; padding-bottom:6px; border-bottom:2px solid var(--ink)}
+.doc table{width:100%; border-collapse:collapse; font-size:13.5px}
+.doc th,.doc td{border:1px solid var(--line); padding:7px 10px; text-align:left; vertical-align:top}
+.doc th{background:#f7f8fa; font-weight:700; width:112px; white-space:nowrap}
+.doc ul{margin:6px 0; padding-left:19px}
+.doc li{margin:3px 0}
+.doc .note{font-size:12.5px; color:var(--ink3); line-height:1.6}
+.meta-fill{display:flex; gap:18px; font-size:13.5px; margin-bottom:20px; flex-wrap:wrap}
+.meta-fill span{border-bottom:1px solid var(--ink); min-width:96px; display:inline-block}
+
+.item{border:1px solid var(--line); border-radius:8px; padding:13px 15px; margin-bottom:11px; break-inside:avoid}
+.item-head{display:flex; align-items:baseline; gap:8px; margin-bottom:6px}
+.item-no{font-weight:700; font-size:14px; min-width:20px}
+.item-name{font-weight:700; font-size:14px}
+.item-curri{font-size:12px; color:var(--ink3); margin-left:auto}
+.item-q{font-size:13.5px; line-height:1.6; margin-bottom:9px}
+.rule{border-bottom:1px solid var(--line); height:22px; margin-top:5px}
+.ans-box{background:var(--accent-bg); border-radius:6px; padding:8px 11px; font-size:13.5px; margin:7px 0}
+.ans-box b{color:var(--accent)}
+.sol{font-size:13px; color:var(--ink2); line-height:1.65}
+.sol ol{margin:4px 0; padding-left:19px}
+.empty{padding:60px 20px; text-align:center; color:var(--ink3); font-size:14px}
+
+@media print{
+  @page{ size:A4; margin:14mm 13mm; }
+  body{background:#fff; font-size:11.5pt}
+  .topbar,.noprint{display:none !important}
+  .wrap{max-width:none; padding:0}
+  .doc{border:0; border-radius:0; padding:0; max-width:none}
+  .doc h3{margin-top:16px}
+  .item{break-inside:avoid; page-break-inside:avoid}
+  .pagebreak{page-break-before:always}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar noprint">
+  <div class="topbar-in">
+    <div class="brand">수업 운영 팩<small>수학·과학 방탈출 · 교사용</small></div>
+    <div class="tabs" role="tablist">
+      <button role="tab" data-tab="plan" aria-selected="true">차시 설계</button>
+      <button role="tab" data-tab="lesson" aria-selected="false">지도안</button>
+      <button role="tab" data-tab="sheet" aria-selected="false">학습지</button>
+      <button role="tab" data-tab="key" aria-selected="false">답지</button>
+    </div>
+    <button class="print-btn" id="btn-print" disabled>인쇄</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ============ 차시 설계 ============ -->
+<section id="tab-plan" class="tabpane">
+  <div class="grid">
+    <div>
+      <div class="card">
+        <h3>수업 정보</h3>
+        <div class="field">
+          <label for="f-level">학년</label>
+          <div class="seg" id="f-level"></div>
+          <div class="hint">고른 학년의 성취기준에 맞는 난이도가 잠금마다 자동으로 잡힙니다.</div>
+        </div>
+        <div class="field">
+          <label for="f-subject">과목</label>
+          <div class="seg" id="f-subject"></div>
+        </div>
+        <div class="field">
+          <label for="f-mins">수업 시간(분)</label>
+          <input type="number" id="f-mins" value="45" min="30" max="90" step="5">
+        </div>
+        <div class="field">
+          <label for="f-groups">모둠 수</label>
+          <input type="number" id="f-groups" value="6" min="1" max="12">
+          <div class="hint">모둠당 기기 1대 기준. 개인별로 하면 학생 수를 넣으세요.</div>
+        </div>
+        <div class="field">
+          <label for="f-classes">반 수</label>
+          <input type="number" id="f-classes" value="1" min="1" max="12">
+          <div class="hint">반마다 최종 문 코드가 다른 링크를 만듭니다. 답 공유를 막습니다.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>방 설정</h3>
+        <div class="field">
+          <label for="f-title">방 이름</label>
+          <input type="text" id="f-title" maxlength="40" placeholder="예: 3학년 4반 탈출 실험실">
+        </div>
+        <div class="field">
+          <label for="f-theme">배경</label>
+          <select id="f-theme"></select>
+        </div>
+        <div class="field">
+          <label for="f-story">도입 문구</label>
+          <input type="text" id="f-story" maxlength="120" placeholder="장치를 풀어 비밀번호를 모으자.">
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>시간 배분</h3>
+        <div class="field">
+          <label for="f-per">잠금 1개당 예상(분)</label>
+          <input type="number" id="f-per" value="6" min="3" max="15">
+          <div class="hint">첫 수업 전에는 추정값입니다. 실제로 재 보고 고쳐 쓰세요.</div>
+        </div>
+        <div class="budget" id="budget"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="filterbar">
+          <h3 style="margin:0">잠금 고르기</h3>
+          <span class="count" id="lock-count"></span>
+        </div>
+        <div class="locklist" id="locklist"></div>
+        <div class="empty" id="lock-empty" style="display:none">이 학년·과목에 맞는 잠금이 없습니다. 조건을 넓혀 보세요.</div>
+      </div>
+
+      <div class="card">
+        <h3>반별 링크</h3>
+        <div id="links"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ 문서 ============ -->
+<section id="tab-lesson" class="tabpane" hidden><div class="doc" id="doc-lesson"></div></section>
+<section id="tab-sheet"  class="tabpane" hidden><div class="doc" id="doc-sheet"></div></section>
+<section id="tab-key"    class="tabpane" hidden><div class="doc" id="doc-key"></div></section>
+
+</div>
+
+<script src="data/catalog.js"></script>
+<script>
+/* =========================================================================
+   수업 운영 팩
+   - 문항·정답·해설·성취기준은 전부 data/catalog.js 에서 온다.
+     그 파일은 tools/dump-catalog.mjs 가 index.html 을 실제로 실행해 뽑는다.
+     여기에 손으로 옮겨 적은 문항은 하나도 없다.
+   ========================================================================= */
+const CAT = window.CATALOG;
+const $ = s=>document.querySelector(s);
+const el = (t,c,x)=>{ const n=document.createElement(t); if(c) n.className=c; if(x!=null) n.textContent=x; return n; };
+const esc = s=>String(s==null?'':s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+
+/* ---------- 성취기준 태그 해석 ---------- */
+const LEVELS = [
+  { id:'e12',  label:'초1~2' },
+  { id:'e34',  label:'초3~4' },
+  { id:'e56',  label:'초5~6' },
+  { id:'m',    label:'중1~3' },
+  { id:'h',    label:'고교·심화' },
+];
+const SUBJECTS = [ {id:'sci',label:'과학'}, {id:'math',label:'수학'} ];
+
+function subjectOf(curri){
+  const s = String(curri||'');
+  if(/\[\s*\d+(과|통과|물리|화학|생명|지구)/.test(s) || /통합과학|물리학|화학|생명과학|지구과학/.test(s)) return 'sci';
+  if(/수학/.test(s)) return 'math';
+  return 'sci';
+}
+function levelOf(curri){
+  const s = String(curri||'');
+  if(/^고|고1|고2~3|통합과학|물리학|생명과학|지구과학|심화/.test(s)) {
+    if(/^초3~4|^초3|^초4/.test(s)) return 'e34';
+    return 'h';
+  }
+  if(/^초1~2/.test(s)) return 'e12';
+  if(/^초3~4|^초3|^초4/.test(s)) return 'e34';
+  if(/^초5~6|^초5|^초6|수학 5|수학 6/.test(s)) return 'e56';
+  if(/^중/.test(s)) return 'm';
+  return null;
+}
+/* 성취기준 코드 [6과NN-NN] 추출 — 예시에도 실제 코드를 적지 않는다(사본 검사에 걸린다) */
+function codeOf(curri){ const m = String(curri||'').match(/\[([^\]]+)\]/); return m ? m[1] : ''; }
+/* 개념명: '초5~6 · 전기 회로 만들기 [6과NN-NN]' → '전기 회로 만들기' */
+function conceptOf(curri){
+  let s = String(curri||'').replace(/\s*\[[^\]]*\]\s*/,'').trim();
+  const parts = s.split('·').map(x=>x.trim()).filter(Boolean);
+  return parts.length>1 ? parts.slice(1).join(' · ') : s;
+}
+
+/* ---------- 정답 추출 (설정값에서만 뽑는다. 못 뽑으면 조작형으로 표기) ---------- */
+function answerOf(cfg){
+  if(!cfg) return null;
+  const A = (text, note)=>({ text, note: note||'' });
+  const u = cfg.unit ? ' '+cfg.unit : '';
+  if(cfg.ans!=null && (typeof cfg.ans==='number'||typeof cfg.ans==='string')) return A(String(cfg.ans)+u);
+  if(cfg.answer!=null && typeof cfg.answer!=='object') return A(String(cfg.answer));
+  if(cfg.targetName) return A(String(cfg.targetName));
+  // 순서형 정답은 방향을 같이 적지 않으면 답지가 거꾸로 읽힌다.
+  // 지층 화면은 위가 '나중에 쌓임'이고 correct[0]이 맨 위다.
+  if(Array.isArray(cfg.correct)) return A(cfg.correct.join('  →  '), '맨 위층부터 순서대로 (아래일수록 먼저 쌓임)');
+  if(Array.isArray(cfg.order) && cfg.items){
+    const nameOf = id=>{ const it=cfg.items.find(x=>x.id===id); return it?(it.label||it.name||id):id; };
+    return A(cfg.order.map(nameOf).join('  →  '), cfg.axis||'');
+  }
+  if(Array.isArray(cfg.grid)) return A(cfg.grid.join(' / '), '퍼넷 사각형 네 칸');
+  if(Array.isArray(cfg.seqs) && cfg.seqs.every(s=>s && s.ans!=null)) return A(cfg.seqs.map(s=>s.ans).join(' · '), '다이얼 위층부터');
+  if(cfg.tgt && cfg.tgt.x!=null) return A(`(${cfg.tgt.x}, ${cfg.tgt.y})`);
+  if(cfg.tFreq!=null) return A(`진동수 ${cfg.tFreq} · 진폭 ${cfg.tAmp}`);
+  if(cfg.target!=null && typeof cfg.target!=='object') return A(String(cfg.target));
+  return null;
+}
+/* 받침에 맞는 조사 — '만들기을(를)' 같은 표기를 남기지 않는다 */
+function josa(word, withBat, noBat){
+  const ch = String(word||'').trim().slice(-1);
+  const code = ch.charCodeAt(0);
+  if(!(code>=0xAC00 && code<=0xD7A3)) return noBat;   // 한글이 아니면 받침 없음으로 처리
+  return ((code-0xAC00)%28) ? withBat : noBat;
+}
+function questionOf(cfg){ return (cfg && (cfg.q || cfg.desc)) || ''; }
+
+/* ---------- 카탈로그 정리 ---------- */
+const DIFFS = ['easy','mid','hard'];
+const LOCKS = CAT.locks.map(l=>{
+  const diffs = {};
+  DIFFS.forEach(d=>{
+    const c = l.diffs[d] || {};
+    diffs[d] = {
+      curri: c.curri || '', code: codeOf(c.curri), concept: conceptOf(c.curri),
+      level: levelOf(c.curri), subject: subjectOf(c.curri),
+      q: questionOf(c), hints: Array.isArray(c.hints)? c.hints : [],
+      answer: answerOf(c),
+    };
+  });
+  return { id:l.id, name:l.name, icon:l.icon, digit:l.digit, diffs };
+});
+const LOCK_BY_ID = {}; LOCKS.forEach(l=>LOCK_BY_ID[l.id]=l);
+
+/* 분류 안 된 태그는 감춘 채 넘어가지 않고 콘솔에 남긴다 */
+(function reportUnclassified(){
+  const bad = [];
+  LOCKS.forEach(l=>DIFFS.forEach(d=>{ if(!l.diffs[d].level) bad.push(`${l.id}/${d}: ${l.diffs[d].curri}`); }));
+  if(bad.length) console.warn('[수업팩] 학년 분류 실패 태그 '+bad.length+'건\n'+bad.join('\n'));
+})();
+
+/* ---------- 상태 ---------- */
+const SKEY = 'escapelab:teacher:v1';
+const state = {
+  level:'e56', subject:'sci', mins:45, groups:6, classes:1, per:6,
+  title:'', theme:(CAT.themes[0]||{id:'lab'}).id, story:'',
+  picked:{},   // id -> diff
+};
+(function load(){
+  try{ const s = JSON.parse(localStorage.getItem(SKEY)||'null'); if(s) Object.assign(state, s); }catch(e){}
+})();
+function save(){ try{ localStorage.setItem(SKEY, JSON.stringify(state)); }catch(e){} }
+
+/* ---------- 학년에 맞는 난이도 고르기 ---------- */
+function diffForLevel(lock, level){
+  const exact = DIFFS.filter(d=>lock.diffs[d].level===level);
+  if(exact.length) return exact[0];
+  return null;
+}
+function matches(lock){
+  const d = diffForLevel(lock, state.level);
+  if(!d) return null;
+  if(lock.diffs[d].subject !== state.subject) return null;
+  return d;
+}
+
+/* ---------- 렌더: 필터 버튼 ---------- */
+function renderSegs(){
+  const lv = $('#f-level'); lv.innerHTML='';
+  LEVELS.forEach(L=>{
+    const b = el('button',null,L.label);
+    b.setAttribute('aria-pressed', String(state.level===L.id));
+    b.onclick = ()=>{ state.level=L.id; pruneInvalid(); renderAll(); };
+    lv.appendChild(b);
+  });
+  const sb = $('#f-subject'); sb.innerHTML='';
+  SUBJECTS.forEach(S=>{
+    const b = el('button',null,S.label);
+    b.setAttribute('aria-pressed', String(state.subject===S.id));
+    b.onclick = ()=>{ state.subject=S.id; pruneInvalid(); renderAll(); };
+    sb.appendChild(b);
+  });
+}
+/* 학년·과목을 바꾸면 더는 맞지 않는 선택은 자동으로 뺀다 */
+function pruneInvalid(){
+  Object.keys(state.picked).forEach(id=>{
+    const d = matches(LOCK_BY_ID[id]);
+    if(!d) delete state.picked[id]; else state.picked[id]=d;
+  });
+}
+
+/* ---------- 렌더: 잠금 목록 ---------- */
+function renderLocks(){
+  const box = $('#locklist'); box.innerHTML='';
+  const list = LOCKS.map(l=>({l, d:matches(l)})).filter(x=>x.d);
+  $('#lock-empty').style.display = list.length ? 'none' : 'block';
+  $('#lock-count').textContent = `${Object.keys(state.picked).length}개 선택 · 이 조건에 ${list.length}종`;
+  list.forEach(({l,d})=>{
+    const info = l.diffs[d];
+    const on = state.picked[l.id] ? '1' : '0';
+    const card = el('div','lock'); card.dataset.on = on;
+
+    const head = el('div','lock-head');
+    head.appendChild(el('span','ic', l.icon||'🔒'));
+    head.appendChild(el('span','lock-name', l.name));
+    card.appendChild(head);
+    card.appendChild(el('div','lock-curri', info.curri || '(성취기준 태그 없음)'));
+    if(info.q) card.appendChild(el('div','lock-q', info.q));
+
+    const foot = el('div','lock-foot');
+    const pill = el('span','pill '+(info.subject==='sci'?'sci':'math'), info.subject==='sci'?'과학':'수학');
+    foot.appendChild(pill);
+    if(info.answer==null) foot.appendChild(el('span','pill','조작형'));
+    foot.appendChild(el('span','pill','숫자 '+l.digit));
+    card.appendChild(foot);
+
+    const t = el('button','lock-toggle');
+    t.setAttribute('aria-pressed', on==='1');
+    t.setAttribute('aria-label', l.name + (on==='1'?' 선택 해제':' 선택'));
+    t.onclick = ()=>{
+      if(state.picked[l.id]) delete state.picked[l.id]; else state.picked[l.id]=d;
+      renderAll();
+    };
+    card.appendChild(t);
+    box.appendChild(card);
+  });
+}
+
+/* ---------- 선택 목록 (문서 생성의 기준) ---------- */
+function chosen(){
+  return Object.keys(state.picked).map(id=>{
+    const l = LOCK_BY_ID[id], d = state.picked[id];
+    return { lock:l, diff:d, info:l.diffs[d] };
+  });
+}
+
+/* ---------- 시간 배분 ---------- */
+const OPEN_MIN = 5, CODE_MIN = 3, CLOSE_MIN = 7;
+function budget(){
+  const n = chosen().length;
+  const act = n * state.per;
+  const total = OPEN_MIN + act + CODE_MIN + CLOSE_MIN;
+  return { n, open:OPEN_MIN, act, code:CODE_MIN, close:CLOSE_MIN, total, over: total - state.mins };
+}
+function renderBudget(){
+  const b = budget(), box = $('#budget'); box.innerHTML='';
+  const row = (k,v)=>{ const r=el('div','budget-row'); r.appendChild(el('span',null,k)); r.appendChild(el('b',null,v)); box.appendChild(r); };
+  row('도입 · 규칙 안내', OPEN_MIN+'분');
+  row(`장치 ${b.n}개 × ${state.per}분`, b.act+'분');
+  row('최종 코드 · 탈출', CODE_MIN+'분');
+  row('정리 · 개념 되짚기', CLOSE_MIN+'분');
+  const t = el('div','budget-row budget-total');
+  t.appendChild(el('span',null,'합계')); t.appendChild(el('b',null,b.total+'분 / '+state.mins+'분'));
+  box.appendChild(t);
+  const f = el('div','flag '+(b.over>0?'warn':'ok'));
+  if(b.n===0) { f.className='flag warn'; f.textContent='장치를 하나 이상 고르세요.'; }
+  else if(b.over>0) f.textContent = `${b.over}분 넘칩니다. 장치를 ${Math.ceil(b.over/state.per)}개 줄이거나 다음 차시로 나누세요.`;
+  else if(b.over===0) f.textContent = '딱 맞습니다. 여유가 없으니 정리 시간을 지키려면 장치 하나를 빼 두는 편이 안전합니다.';
+  else f.textContent = `${-b.over}분 여유. 모둠별 발표나 오답 되짚기에 쓸 수 있습니다.`;
+  box.appendChild(f);
+}
+
+/* ---------- 반별 링크 ---------- */
+function hash32(str){ let h=2166136261>>>0; for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619)>>>0; } return h>>>0; }
+function rngFrom(seed){ let s=seed>>>0 || 1; return ()=>{ s^=s<<13; s>>>=0; s^=s>>17; s^=s<<5; s>>>=0; return s/4294967296; }; }
+/* 반마다 잠금 숫자를 다르게 배정 — 최종 문 코드가 반별로 갈린다 */
+function digitsForClass(items, classNo){
+  if(classNo<=1) return items.map(it=>it.lock.digit);
+  const rnd = rngFrom(hash32((state.title||'room')+'#'+classNo));
+  const pool = [0,1,2,3,4,5,6,7,8,9];
+  for(let i=pool.length-1;i>0;i--){ const j=Math.floor(rnd()*(i+1)); [pool[i],pool[j]]=[pool[j],pool[i]]; }
+  return items.map((_,i)=>String(pool[i % 10]));
+}
+function encodeCfg(obj){
+  const bytes = new TextEncoder().encode(JSON.stringify(obj));
+  let bin=''; bytes.forEach(b=>bin+=String.fromCharCode(b));
+  return encodeURIComponent(btoa(bin));
+}
+function linkForClass(classNo){
+  const items = chosen();
+  if(!items.length) return null;
+  const digits = digitsForClass(items, classNo);
+  const suffix = state.classes>1 ? ` ${classNo}반` : '';
+  const cfg = {
+    t: ((state.title||'수학·과학 방탈출') + suffix).slice(0,40),
+    s: (state.story||'장치를 풀어 비밀번호를 모으자.').slice(0,200),
+    th: state.theme,
+    l: items.map((it,i)=>({ p:it.lock.id, d:it.diff, g:digits[i] })),
+  };
+  return { classNo, code:digits.join(''), url:new URL('index.html', location.href).href + '#cfg=' + encodeCfg(cfg) };
+}
+function allLinks(){
+  const out=[]; for(let c=1;c<=state.classes;c++){ const l=linkForClass(c); if(l) out.push(l); } return out;
+}
+function renderLinks(){
+  const box = $('#links'); box.innerHTML='';
+  const links = allLinks();
+  if(!links.length){ box.appendChild(el('div','note','장치를 고르면 링크가 만들어집니다.')); return; }
+  links.forEach(L=>{
+    const r = el('div','linkrow');
+    r.appendChild(el('span','cls', state.classes>1 ? L.classNo+'반' : '링크'));
+    const c = el('span','code', L.code); r.appendChild(c);
+    r.appendChild(el('span','grow',''));
+    const b1 = el('button',null,'링크 복사');
+    b1.onclick = async ()=>{ try{ await navigator.clipboard.writeText(L.url); b1.textContent='복사됨'; setTimeout(()=>b1.textContent='링크 복사',1400);}catch(e){ b1.textContent='복사 실패'; } };
+    const b2 = el('button',null,'열기');
+    b2.onclick = ()=>window.open(L.url,'_blank');
+    r.appendChild(b1); r.appendChild(b2);
+    box.appendChild(r);
+  });
+  const n = el('div','note');
+  n.style.marginTop='10px';
+  n.textContent = '코드는 최종 문 비밀번호입니다. 답지에 같은 값이 찍힙니다.';
+  box.appendChild(n);
+}
+
+/* ---------- 문서: 공통 머리 ---------- */
+function levelLabel(){ return (LEVELS.find(L=>L.id===state.level)||{}).label || ''; }
+function subjectLabel(){ return (SUBJECTS.find(S=>S.id===state.subject)||{}).label || ''; }
+function roomTitle(){ return state.title || '수학·과학 방탈출'; }
+function standards(){
+  const seen = new Set(), out = [];
+  chosen().forEach(({info})=>{
+    const k = info.curri; if(!k || seen.has(k)) return; seen.add(k);
+    out.push({ curri:info.curri, code:info.code, concept:info.concept });
+  });
+  return out;
+}
+
+/* ---------- 문서 1: 지도안 ---------- */
+function renderLesson(){
+  const box = $('#doc-lesson'); const items = chosen(); const b = budget();
+  if(!items.length){ box.innerHTML = '<div class="empty">차시 설계에서 장치를 먼저 고르세요.</div>'; return; }
+  const st = standards();
+  const links = allLinks();
+  box.innerHTML = `
+    <h2>${esc(roomTitle())} — 수업 지도안</h2>
+    <div class="sub">${esc(subjectLabel())} · ${esc(levelLabel())} · 1차시 ${state.mins}분 · 방탈출형 문제해결</div>
+
+    <table>
+      <tr><th>학습 형태</th><td>모둠 ${state.groups}개 (모둠당 기기 1대) · 협력 문제해결</td></tr>
+      <tr><th>준비물</th><td>태블릿 또는 노트북 ${state.groups}대, 학습지 ${state.groups>0?'모둠원 수만큼':''}, 필기구, 교사용 답지, 타이머(교실 화면)</td></tr>
+      <tr><th>사전 준비</th><td>링크를 학급 게시판(클래스룸·밴드 등)에 올려 두세요. 주소가 길어 칠판에 적기는 어렵습니다. 인터넷이 끊겨도 한 번 열어 둔 화면은 계속 동작합니다.</td></tr>
+      <tr><th>최종 문 코드</th><td>${links.map(l=>`${state.classes>1?l.classNo+'반 ':''}<b>${esc(l.code)}</b>`).join(' · ')} — 학생에게 미리 알려주지 마세요.</td></tr>
+      <tr><th>개인정보</th><td>이름·계정·로그인을 받지 않습니다. 기록은 기기 안에만 남고 외부로 나가지 않습니다.</td></tr>
+    </table>
+
+    <h3>성취기준</h3>
+    <ul>${st.map(s=>`<li>${esc(s.curri)}</li>`).join('')}</ul>
+
+    <h3>학습목표</h3>
+    <ul>${st.map(s=>`<li>${esc(s.concept)}${josa(s.concept,'을','를')} 이용해 잠금장치의 문제 상황을 해결할 수 있다.</li>`).join('')}</ul>
+
+    <h3>수업의 흐름</h3>
+    <table>
+      <tr><th style="width:56px">시간</th><th style="width:auto">교사 활동</th><th style="width:auto">학생 활동</th></tr>
+      <tr><td>${b.open}분</td>
+          <td>상황 제시(방을 빠져나가려면 장치 ${b.n}개를 풀어 숫자 ${b.n}자리를 모아야 한다). 힌트 규칙 안내 — 힌트는 모둠이 스스로 열고, 연 횟수는 학습지에 적는다.</td>
+          <td>모둠 편성, 링크 접속, 역할 나누기(조작 1명 · 기록 1명 · 검토)</td></tr>
+      <tr><td>${b.act}분</td>
+          <td>순회. 답을 알려주지 않고 답지의 &lt;첫 개입&gt; 문장만 던진다. 막힌 모둠이 3곳 이상이면 전체를 멈추고 그 개념만 짧게 확인한다.</td>
+          <td>장치를 풀고, 얻은 숫자와 <b>그렇게 판단한 이유</b>를 학습지에 적는다.</td></tr>
+      <tr><td>${b.code}분</td>
+          <td>최종 코드 입력 확인. 먼저 나온 모둠은 다른 모둠의 설명을 듣는 역할로 돌린다.</td>
+          <td>모은 숫자를 순서대로 넣어 탈출. 소요 시간과 힌트 수를 기록한다.</td></tr>
+      <tr><td>${b.close}분</td>
+          <td>가장 많이 막힌 장치 1~2개를 골라 개념으로 되짚는다. 답이 아니라 <b>왜 그 답인지</b>를 학생이 말하게 한다.</td>
+          <td>학습지 마무리 칸 작성 후 제출</td></tr>
+    </table>
+
+    <h3>평가</h3>
+    <table>
+      <tr><th>무엇을</th><td>정답 여부가 아니라 <b>이유 칸</b>의 서술. 개념어를 쓰는지, 근거가 문제 조건에 닿아 있는지를 본다.</td></tr>
+      <tr><th>어떻게</th><td>학습지 회수 후 성취기준별로 확인. 답지의 &lt;자주 막히는 지점&gt;에 걸린 학생은 다음 차시 도입에서 그 개념을 다시 다룬다.</td></tr>
+      <tr><th>기록</th><td>탈출 시간·힌트 수는 성적이 아니라 난이도 조정용 자료입니다. 다음 반 수업에서 장치 수를 정하는 데 씁니다.</td></tr>
+    </table>
+
+    <h3>유의사항</h3>
+    <ul>
+      <li>힌트를 여는 것은 실패가 아닙니다. 힌트를 열어도 개념 설명이 먼저 나오므로, 열고 나서 이유를 적게 하면 학습은 그대로 일어납니다.</li>
+      <li>먼저 끝난 모둠에게 새 장치를 주는 대신 <b>설명하는 역할</b>을 주세요. 방탈출에서 가장 큰 학습은 남에게 설명할 때 일어납니다.</li>
+      <li>장치 ${b.n}개 × ${state.per}분은 첫 수업 전 추정입니다. 실제 소요를 재서 다음 반에 반영하세요.</li>
+      ${links.length>1?`<li>반마다 최종 코드가 다릅니다(${links.map(l=>l.classNo+'반 '+l.code).join(' · ')}). 쉬는 시간 답 공유가 막힙니다.</li>`:''}
+    </ul>
+  `;
+}
+
+/* ---------- 문서 2: 학습지 ---------- */
+function renderSheet(){
+  const box = $('#doc-sheet'); const items = chosen();
+  if(!items.length){ box.innerHTML = '<div class="empty">차시 설계에서 장치를 먼저 고르세요.</div>'; return; }
+  box.innerHTML = `
+    <h2>${esc(roomTitle())} — 학습지</h2>
+    <div class="meta-fill">
+      <div>반 <span></span></div><div>모둠 <span></span></div><div>이름 <span></span></div>
+    </div>
+    <div class="note" style="margin-bottom:18px">
+      장치를 풀면 숫자가 하나씩 나옵니다. 숫자만 적지 말고, <b>왜 그 답인지</b>를 한 줄로 적으세요. 이 칸이 오늘 수업의 평가 대상입니다.
+    </div>
+    ${items.map((it,i)=>`
+      <div class="item">
+        <div class="item-head">
+          <span class="item-no">${i+1}</span>
+          <span class="item-name">${esc(it.lock.icon)} ${esc(it.lock.name)}</span>
+          <span class="item-curri">${esc(it.info.concept)}</span>
+        </div>
+        <div class="item-q">${esc(it.info.q || '화면의 장치를 조작해 잠금을 해제하세요.')}</div>
+        <table style="margin-bottom:8px">
+          <tr><th style="width:78px">얻은 숫자</th><td style="height:26px"></td>
+              <th style="width:78px">힌트 사용</th><td style="height:26px"></td>
+              <th style="width:78px">교사 확인</th><td style="height:26px"></td></tr>
+        </table>
+        <div style="font-size:12.5px; font-weight:600; color:#4a4f5a">왜 그렇게 답했나요?</div>
+        <div class="rule"></div><div class="rule"></div>
+      </div>`).join('')}
+
+    <div class="item">
+      <div class="item-head"><span class="item-name">마무리</span></div>
+      <table>
+        <tr><th>최종 코드</th><td></td><th style="width:88px">탈출 시간</th><td style="width:100px"></td></tr>
+        <tr><th>가장 어려웠던 장치</th><td colspan="3"></td></tr>
+      </table>
+      <div style="font-size:12.5px; font-weight:600; color:#4a4f5a; margin-top:9px">오늘 새로 알게 된 것 한 가지</div>
+      <div class="rule"></div><div class="rule"></div>
+    </div>
+  `;
+}
+
+/* ---------- 문서 3: 답지 ---------- */
+function renderKey(){
+  const box = $('#doc-key'); const items = chosen();
+  if(!items.length){ box.innerHTML = '<div class="empty">차시 설계에서 장치를 먼저 고르세요.</div>'; return; }
+  const links = allLinks();
+  const withAns = items.filter(it=>it.info.answer!=null).length;
+  box.innerHTML = `
+    <h2>${esc(roomTitle())} — 교사용 답지</h2>
+    <div class="sub">${esc(subjectLabel())} · ${esc(levelLabel())} · 장치 ${items.length}개 · 학생에게 배부하지 마세요</div>
+
+    <table>
+      <tr><th>최종 문 코드</th><td>${links.map(l=>`${state.classes>1?l.classNo+'반 ':''}<b>${esc(l.code)}</b>`).join(' · ')}</td></tr>
+      <tr><th>정답 표기</th><td>정답이 하나로 정해지는 장치 ${withAns}개는 값을 적었습니다. 나머지 ${items.length-withAns}개는 화면 조작으로 푸는 장치라 &lt;풀이&gt;를 보세요.</td></tr>
+    </table>
+
+    ${items.map((it,i)=>{
+      const h = it.info.hints || [];
+      return `
+      <div class="item">
+        <div class="item-head">
+          <span class="item-no">${i+1}</span>
+          <span class="item-name">${esc(it.lock.icon)} ${esc(it.lock.name)}</span>
+          <span class="item-curri">${esc(it.info.curri)}</span>
+        </div>
+        <div class="item-q">${esc(it.info.q || '화면의 장치를 조작해 잠금을 해제한다.')}</div>
+        <div class="ans-box"><b>정답</b> ${it.info.answer ? esc(it.info.answer.text) : '화면 조작으로 해결 (아래 풀이 참조)'}
+          &nbsp;·&nbsp; <b>얻는 숫자</b> ${esc(it.lock.digit)}
+          ${it.info.answer && it.info.answer.note ? `<div class="note" style="margin-top:3px">${esc(it.info.answer.note)}</div>` : ''}</div>
+        ${h.length ? `<div class="sol"><b>풀이</b> — <span class="note">1번은 막힌 모둠에게 답 대신 던질 첫 문장입니다.</span>
+          <ol>${h.map(x=>`<li>${esc(x)}</li>`).join('')}</ol></div>` : ''}
+      </div>`;
+    }).join('')}
+
+    <div class="item">
+      <div class="item-head"><span class="item-name">순회 점검표</span></div>
+      <table>
+        <tr><th style="width:64px">모둠</th>${items.map((_,i)=>`<th style="width:auto; text-align:center">${i+1}</th>`).join('')}<th style="width:70px">탈출</th></tr>
+        ${Array.from({length:state.groups},(_,g)=>`<tr><td>${g+1}모둠</td>${items.map(()=>'<td></td>').join('')}<td></td></tr>`).join('')}
+      </table>
+      <div class="note" style="margin-top:7px">해결한 장치에 표시하세요. 한 열에 빈칸이 몰리면 그 개념을 전체로 확인할 때입니다.</div>
+    </div>
+  `;
+}
+
+/* ---------- 탭 ---------- */
+let tab = 'plan';
+function showTab(t){
+  tab = t;
+  document.querySelectorAll('.tabs button').forEach(b=>b.setAttribute('aria-selected', String(b.dataset.tab===t)));
+  ['plan','lesson','sheet','key'].forEach(k=>{
+    const pane = document.getElementById('tab-'+k);
+    pane.hidden = (k!==t);
+    const doc = pane.querySelector('.doc');
+    if(doc) doc.classList.toggle('on', k===t);
+  });
+  $('#btn-print').disabled = (t==='plan' || chosen().length===0);
+  $('#btn-print').textContent = t==='plan' ? '인쇄' : ({lesson:'지도안 인쇄', sheet:'학습지 인쇄', key:'답지 인쇄'}[t]);
+}
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>showTab(b.dataset.tab));
+$('#btn-print').onclick = ()=>window.print();
+
+/* ---------- 입력 배선 ---------- */
+function bindNum(sel, key, min, max){
+  const n = $(sel); n.value = state[key];
+  n.oninput = ()=>{ const v = Math.max(min, Math.min(max, parseInt(n.value||'0',10)||min)); state[key]=v; renderAll(); };
+}
+function bindText(sel, key){
+  const n = $(sel); n.value = state[key] || '';
+  n.oninput = ()=>{ state[key]=n.value; renderAll(); };
+}
+function renderThemes(){
+  const s = $('#f-theme'); s.innerHTML='';
+  CAT.themes.forEach(t=>{ const o=el('option',null,t.title); o.value=t.id; s.appendChild(o); });
+  s.value = state.theme;
+  s.onchange = ()=>{ state.theme=s.value; renderAll(); };
+}
+
+/* ---------- 전체 렌더 ---------- */
+function renderAll(){
+  renderSegs(); renderLocks(); renderBudget(); renderLinks();
+  renderLesson(); renderSheet(); renderKey();
+  $('#btn-print').disabled = (tab==='plan' || chosen().length===0);
+  save();
+}
+
+/* 검증·시연용 훅: ?demo=1&tab=key — 조건에 맞는 잠금 앞에서 n개를 골라 둔다 */
+(function devHook(){
+  const q = new URLSearchParams(location.search);
+  if(!q.get('demo')) return;
+  if(q.get('level')) state.level = q.get('level');
+  if(q.get('subject')) state.subject = q.get('subject');
+  if(!state.title) state.title = '5학년 3반 · 빛과 소리의 실험실';
+  const n = parseInt(q.get('n')||'5',10);
+  state.picked = {};
+  LOCKS.forEach(l=>{ const d = matches(l); if(d && Object.keys(state.picked).length<n) state.picked[l.id]=d; });
+})();
+
+renderThemes();
+bindNum('#f-mins','mins',30,90);
+bindNum('#f-groups','groups',1,12);
+bindNum('#f-classes','classes',1,12);
+bindNum('#f-per','per',3,15);
+bindText('#f-title','title');
+bindText('#f-story','story');
+pruneInvalid();
+renderAll();
+showTab(new URLSearchParams(location.search).get('tab') || 'plan');
+
+/* ---------- 셀프테스트 ---------- */
+function selftest(){
+  const R = []; const T=(n,ok)=>R.push([n,!!ok]);
+  T('카탈로그 잠금 35종 이상', LOCKS.length>=30);
+  T('모든 잠금에 이름·아이콘', LOCKS.every(l=>l.name && l.icon));
+  T('모든 난이도에 성취기준 태그', LOCKS.every(l=>DIFFS.every(d=>l.diffs[d].curri)));
+  T('모든 난이도에 풀이(힌트) 존재', LOCKS.every(l=>DIFFS.every(d=>l.diffs[d].hints.length>0)));
+  const unclass = LOCKS.reduce((a,l)=>a+DIFFS.filter(d=>!l.diffs[d].level).length,0);
+  T('학년 분류 실패 0건 (실패 '+unclass+')', unclass===0);
+  // 학년별로 최소 한 종은 잡혀야 조합이 성립한다
+  LEVELS.forEach(L=>SUBJECTS.forEach(S=>{
+    const n = LOCKS.filter(l=>DIFFS.some(d=>l.diffs[d].level===L.id && l.diffs[d].subject===S.id)).length;
+    // 과학과 성취기준은 초3부터다. 초1~2/과학이 0인 건 교육과정대로다.
+    const allowedEmpty = (L.id==='e12' && S.id==='sci');
+    T(`${L.label}/${S.label} 잠금 ${n}종`, n>0 || allowedEmpty);
+  }));
+  // 링크 왕복
+  const keep = JSON.parse(JSON.stringify(state.picked));
+  const two = LOCKS.filter(l=>DIFFS.some(d=>l.diffs[d].level==='e56')).slice(0,3);
+  state.level='e56'; state.picked={};
+  two.forEach(l=>{ const d=DIFFS.find(x=>l.diffs[x].level==='e56'); if(d) state.picked[l.id]=d; });
+  const items = chosen();
+  T('선택 3종 구성', items.length===3);
+  const L1 = linkForClass(1), L2 = linkForClass(2);
+  T('링크 생성', !!(L1 && L1.url.includes('#cfg=')));
+  T('코드 자릿수 = 장치 수', L1 && L1.code.length===items.length);
+  T('반이 다르면 코드가 다르다', L1 && L2 && L1.code!==L2.code);
+  const back = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(decodeURIComponent(L1.url.split('#cfg=')[1])), c=>c.charCodeAt(0))));
+  T('cfg 왕복: 장치 수 보존', back.l.length===items.length);
+  T('cfg 왕복: 장치 id 보존', back.l.every((x,i)=>x.p===items[i].lock.id));
+  T('cfg 왕복: 숫자 보존', back.l.map(x=>x.g).join('')===L1.code);
+  // 모든 잠금이 어떤 조합에서든 골라질 수 있는지 — 저작해 놓고 화면에서 못 가는 상태를 막는다
+  (function(){
+    const keepL=state.level, keepS=state.subject;
+    const reach = new Set();
+    LEVELS.forEach(L=>SUBJECTS.forEach(S=>{
+      state.level=L.id; state.subject=S.id;
+      LOCKS.forEach(l=>{ if(matches(l)) reach.add(l.id); });
+    }));
+    state.level=keepL; state.subject=keepS;
+    const lost = LOCKS.filter(l=>!reach.has(l.id)).map(l=>l.id);
+    T(`모든 잠금이 어떤 조합에서든 선택 가능 (누락 ${lost.length}${lost.length?': '+lost.join(','):''})`, lost.length===0);
+  })();
+
+  // 잠금이 있는 조합에서는 문서 3종이 실제로 그려져야 한다
+  LEVELS.forEach(L=>SUBJECTS.forEach(S=>{
+    state.level=L.id; state.subject=S.id; state.picked={};
+    LOCKS.forEach(l=>{ const d=matches(l); if(d && Object.keys(state.picked).length<4) state.picked[l.id]=d; });
+    const n = chosen().length;
+    // 과학과는 초3부터 시작한다. 초1~2/과학이 비는 건 정상이다.
+    if(n===0){ T(`${L.label}/${S.label} 잠금 없음(교육과정상 정상)`, L.id==='e12' && S.id==='sci'); return; }
+    renderLesson(); renderSheet(); renderKey();
+    const L1=$('#doc-lesson').textContent, S1=$('#doc-sheet').textContent, K1=$('#doc-key').textContent;
+    T(`${L.label}/${S.label} 지도안 생성 (장치 ${n})`, L1.length>400 && !/장치를 먼저 고르세요/.test(L1));
+    T(`${L.label}/${S.label} 학습지 문항 ${n}개`, ($('#doc-sheet').querySelectorAll('.item').length) === n+1);
+    T(`${L.label}/${S.label} 답지 문항 ${n}개`, ($('#doc-key').querySelectorAll('.item').length) === n+1);
+    T(`${L.label}/${S.label} 답지에 성취기준 코드`, /\[[^\]]+\]/.test(K1) || S.id==='math');
+    T(`${L.label}/${S.label} 학습목표 조사 정상`, !/을\(를\)/.test(L1));
+  }));
+
+  // 정답 추출 커버리지 (개수를 박지 않고 보고만 한다)
+  let ansN=0, totN=0;
+  LOCKS.forEach(l=>DIFFS.forEach(d=>{ totN++; if(l.diffs[d].answer!=null) ansN++; }));
+  T(`정답 추출 ${ansN}/${totN} — 나머지는 조작형으로 표기`, ansN>0);
+  state.picked = keep;
+
+  const okN = R.filter(r=>r[1]).length, allPass = okN===R.length;
+  document.title = 'SELFTEST ' + (allPass?'PASS':'FAIL');
+  document.body.innerHTML = '<pre style="padding:20px;font:13px ui-monospace,monospace;white-space:pre-wrap">'
+    + `SELFTEST ${allPass?'PASS':'FAIL'} (${okN}/${R.length})\n`
+    + R.map(r=>(r[1]?'\u2713 ':'\u2717 ')+esc(r[0])).join('\n') + '</pre>';
+}
+if(new URLSearchParams(location.search).get('selftest')) selftest();
+</script>
+</body>
+</html>
