@@ -135,9 +135,17 @@
   function t(ko, en) { return LANG === 'en' ? en : ko; }
   ENGINE.setLang(LANG);
 
-  // 앱 URL — 공유 루프 CTA. 출시 후 실제 스토어 링크로 교체 가능.
-  var STORE = 'https://apps.apple.com/app/id6785131602';   // iOS 라이브 (1.1, 2026-07 승인)
-  var PLAY = 'https://play.google.com/store/apps/details?id=kr.logiccraft.matrixiq';
+  // 앱 URL — 공유 루프 CTA.
+  // ★유입 계측: 이 앱엔 서버도 애널리틱스도 없다. "공유 링크를 받고 설치까지 갔나"를 볼 수 있는 건
+  //   스토어 콘솔뿐이고, 그러려면 링크에 캠페인 꼬리표가 붙어 있어야 한다.
+  //     Apple  = ?ct=<캠페인> → App Store Connect > 앱 분석 > 획득 > 캠페인
+  //              (pt=제공자 토큰을 같이 붙이면 더 정확하다. ASC 에서 캠페인 링크를 만들면 나온다.)
+  //     Google = &referrer=utm_* → Play Console > 사용자 확보 > 사용자 확보 소스
+  //   회차 링크(?ch=N)로 들어온 사람과 그냥 들어온 사람을 갈라서 센다.
+  var CAMPAIGN = /[?&]ch=/.test(location.search) ? 'web-challenge' : 'web-quicktest';
+  var STORE = 'https://apps.apple.com/app/id6785131602?ct=' + CAMPAIGN + '&mt=8';   // iOS 라이브
+  var PLAY = 'https://play.google.com/store/apps/details?id=kr.logiccraft.matrixiq&referrer=' +
+             encodeURIComponent('utm_source=matrixiq-web&utm_medium=share&utm_campaign=' + CAMPAIGN);
   var LANDING = 'https://logiccraft.co.kr/apps/matrixiq/';
 
   // ── 오늘의 도전 (?ch=N) ──
