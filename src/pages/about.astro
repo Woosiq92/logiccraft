@@ -30,15 +30,40 @@ import Layout from '../layouts/Layout.astro';
     </div>
   </section>
 
-  <!-- ============ BELIEF ============ -->
+  <!-- ============ BELIEF + MANIFESTO ============ -->
   <section class="section" style="padding-top: 0">
-    <div class="wrap">
+    <div class="wrap mf-stack">
       <div class="info-card reveal">
         <p class="eyebrow" style="margin:0">BELIEF · 무엇을 키우나</p>
         <h2>사고력에서 문제해결력으로.</h2>
         <p>우리가 키우려는 건 정답을 외우는 능력이 아니라, 처음 보는 문제를 스스로 풀어내는 힘입니다. 생각하는 힘을 기르는 데서 멈추지 않고, 그 힘이 실제 문제 해결로 이어지는 공간을 만듭니다.</p>
       </div>
+      <div class="info-card reveal">
+        <p class="eyebrow" style="margin:0">QUESTION · 어떻게 가르치나</p>
+        <h2>질문이 넘치는 교육으로.</h2>
+        <p>정답을 알려주는 것으로 학습을 끝내지 않습니다. 아이가 다음에 무엇을 물어야 할지 알게 된 상태로 끝냅니다. 아이 대신 답을 말해주는 기능을 넣는 순간 실패로 봅니다.</p>
+      </div>
+
+
+      <div class="info-card reveal">
+        <p class="eyebrow" style="margin:0">OUTPUT · 무엇이 손에 남나</p>
+        <h2>지식 생산국으로.</h2>
+        <p>학기가 끝나면 만든 것이 남습니다. 포스터 한 장, 전시 한 칸이라도 아이 손에 남도록 설계합니다. 다 끝냈는데 남는 게 진도율뿐이면 실패로 봅니다.</p>
+      </div>
+
+      <div class="info-card reveal">
+        <p class="eyebrow" style="margin:0">RULES · 실험을 어떻게 만드나</p>
+        <h2>과학기술 창의 국가로.</h2>
+        <p>시뮬레이션은 실제 원리에서 값을 계산합니다. 결과가 미리 정해진 애니메이션을 실험이라 부르지 않습니다. 값을 바꿨는데 결과가 같으면 실패로 봅니다.</p>
+      </div>
+
     </div>
+
   </section>
 
 </Layout>
+
+<style>
+  .mf-stack { display: grid; gap: clamp(20px, 2.6vw, 28px); }
+
+</style>
