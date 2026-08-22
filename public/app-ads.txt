@@ -1,3 +1,2 @@
 google.com, pub-3294548622048697, DIRECT, f08c47fec0942fa0
-google.com, pub-1101214656402146, DIRECT, f08c47fec0942fa0
-# updated 2026-07-06 — migrated to pub-3294548622048697 (pub-1101 계정 해지됨)
+# updated 2026-08-22 — 해지된 pub-1101214656402146 항목 삭제
