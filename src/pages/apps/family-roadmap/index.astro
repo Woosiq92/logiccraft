@@ -1,0 +1,87 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="가족 로드맵 · 결혼부터 세 살까지 기한 있는 일 · 로직크래프트"
+  description="예식일·출산예정일·아이 생일 중 아는 날짜만 넣으면 결혼부터 36개월까지 기한이 있는 지원금·신청·휴가·검진을 출처와 함께 순서대로 보여 줍니다. 식장 지도·견적 비교표, 아빠자격시험, 임신·육아 읽을거리까지 한곳에. 가입·설치 없이 무료."
+  image="/og/family-roadmap.png"
+>
+  <section class="fr-hero">
+    <div class="wrap fr-inner">
+      <div class="fr-copy">
+        <p class="fr-eyebrow">PRODUCT · 가족 로드맵</p>
+        <h1>결혼부터 세 살까지,<br />기한 있는 일만 순서대로.</h1>
+        <p class="fr-lede">
+          아는 날짜만 넣으면 지원금·신청·휴가·검진처럼 때를 놓치면 잃는 것을 날짜 순서로 보여 줘요.
+          카드마다 출처 기관과 확인한 날이 붙어 있어요.
+        </p>
+        <div class="fr-cta"><a class="cta" href="https://logiccraft.co.kr/family-roadmap/">가족 로드맵 열기 →</a></div>
+        <p class="fr-note">
+          날짜와 체크는 내 브라우저에만 저장되고, 배우자에게는 링크로 나눠요.
+          의료 판단을 대신하지 않고, 검사와 접종은 공공기관 안내의 시기만 옮겨요.
+        </p>
+      </div>
+      <div class="fr-shot">
+        <img src="/screens/family-roadmap/hero.png" alt="가족 로드맵 화면 — 우리 날짜 입력, 지금 챙길 것 목록, 구간별 탭" width="1100" height="752" loading="eager" />
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap fr-feat">
+    <div class="fr-cards">
+      <a class="fr-card" href="https://logiccraft.co.kr/family-roadmap/">
+        <h3>기한표</h3>
+        <p>결혼·신혼, 임신 준비, 임신 초·중·후기, 출생~12개월, 12~36개월. 구간마다 기한이 있는 것과 알아 둘 것을 나눠 보여 줘요.</p>
+      </a>
+      <a class="fr-card" href="https://logiccraft.co.kr/family-roadmap/wedding/">
+        <h3>식장 지도·견적 비교표</h3>
+        <p>전국 민간·공공·호텔 예식장을 지도에서 보고, 상담에서 받은 숫자를 표로 나란히 비교해요. 예전 웨딩맵이에요.</p>
+      </a>
+      <a class="fr-card" href="https://logiccraft.co.kr/family-roadmap/dad-exam/">
+        <h3>아빠자격시험</h3>
+        <p>임신·출산부터 영유아 안전·응급까지 30과목을 시험처럼 점검하고 틀린 문제는 근거와 함께 다시 봐요. 국가공인 자격이 아니에요.</p>
+      </a>
+      <a class="fr-card" href="https://logiccraft.co.kr/family-roadmap/guides/newborn-fever/">
+        <h3>읽을거리</h3>
+        <p>출산 신호와 병원 가는 때, 아기가 열이 날 때의 순서, 아이와 나누는 대화와 놀이. 해당 구간 탭에서 바로 이어져요.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="wrap fr-links">
+    <p class="links"><a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .fr-hero { background: radial-gradient(120% 120% at 78% 8%, #c2477a 0%, #9d2f5c 42%, #6e1f41 82%); color: #fff; overflow: hidden; }
+  .fr-inner { display: grid; grid-template-columns: 0.95fr 1.05fr; gap: clamp(1.5rem, 5vw, 3.5rem); align-items: center; padding-block: clamp(2.5rem, 6vw, 4.5rem); }
+  .fr-eyebrow { font-family: 'IBM Plex Mono', monospace; font-size: 0.8rem; letter-spacing: 0.08em; color: #f6c6da; margin: 0; }
+  .fr-copy h1 { font-size: clamp(2rem, 5.2vw, 2.9rem); margin: 0.5rem 0 0; line-height: 1.18; letter-spacing: -0.02em; color: #fff; word-break: keep-all; }
+  .fr-lede { color: #fbe3ed; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; word-break: keep-all; }
+  .fr-cta { margin-top: 1.7rem; }
+  .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: #fff; color: #9d2f5c; box-shadow: 0 12px 28px rgba(0,0,0,.22); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(0,0,0,.3); }
+  .fr-note { color: #f3c9da; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; word-break: keep-all; }
+  .fr-shot { display: flex; justify-content: center; }
+  .fr-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.18); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+
+  .fr-feat { padding-block: clamp(2.5rem, 6vw, 4rem); }
+  .fr-cards { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(1rem, 2.5vw, 1.5rem); }
+  .fr-card { display: block; background: var(--card, #fff); border: 1px solid var(--border, #e7dfd3); border-radius: 18px; padding: 1.6rem 1.5rem; color: inherit; text-decoration: none; }
+  .fr-card h3 { margin: 0; font-size: 1.15rem; }
+  .fr-card p { margin: 0.5rem 0 0; line-height: 1.7; color: var(--sub, #6a7392); font-size: 0.95rem; word-break: keep-all; }
+
+  .fr-links { padding-block: 1rem 4rem; }
+  .links { font-size: 0.95rem; }
+
+  @media (max-width: 860px) {
+    .fr-inner { grid-template-columns: 1fr; }
+    .fr-shot { order: -1; }
+    .fr-copy { text-align: center; }
+    .fr-lede, .fr-note { margin-inline: auto; }
+    .fr-cta { display: flex; justify-content: center; }
+    .fr-cards { grid-template-columns: 1fr; }
+  }
+</style>

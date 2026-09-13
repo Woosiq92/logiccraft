@@ -1,0 +1,12 @@
+{
+  "name": "아빠자격시험",
+  "short_name": "아빠시험",
+  "description": "예비·초보 아빠가 육아 상식을 시험처럼 점검하는 앱",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#F4EFE7",
+  "theme_color": "#2F6E5B",
+  "icons": [
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
