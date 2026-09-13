@@ -18,9 +18,6 @@ export default defineConfig({
   integrations: [sitemap({
     customPages: [
       'https://logiccraft.co.kr/prompt-dojo/',
-      'https://logiccraft.co.kr/family-roadmap/',
-      'https://logiccraft.co.kr/family-roadmap/wedding/',
-      'https://logiccraft.co.kr/family-roadmap/dad-exam/',
       'https://logiccraft.co.kr/goalcast/',
       'https://logiccraft.co.kr/rocket-lab/',
       'https://logiccraft.co.kr/semiconductor-lab/',
