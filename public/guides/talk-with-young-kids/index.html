@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>가이드가 가족 로드맵으로 옮겼어요</title>
+<meta name="robots" content="noindex" />
+<!-- 회사 사이트 /guides/<글>/ 과 /family-roadmap/guides/<글>/ 에 같은 파일을 둔다. 경로 끝의 글 이름으로 Railway 가이드를 찾는다 -->
+<script>
+  (function () {
+    var m = location.pathname.match(/\/guides\/([a-z-]+)\/?$/);
+    location.replace('https://family-roadmap-production-5c9c.up.railway.app/' + (m ? 'guides/' + m[1] + '/' : '') + location.hash);
+  })();
+</script>
+<noscript><meta http-equiv="refresh" content="0; url=https://family-roadmap-production-5c9c.up.railway.app/" /></noscript>
+</head>
+<body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;padding:32px 20px;line-height:1.6">
+  <p>이 글은 가족 로드맵으로 옮겼어요.</p>
+  <p><a href="https://family-roadmap-production-5c9c.up.railway.app/">가족 로드맵 열기</a></p>
+</body>
+</html>
