@@ -34,5 +34,5 @@ export const products = [
   // ⚠️홈 타임라인의 Synergeion 05 Village(15–18세, 예정)와 이름이 겹친다. 다른 제품이다.
   //   여기서는 학교·모임이 쓰는 진행 도구고, 저기는 나이대 라인이다. 이름 정리는 아직 안 됐다.
   { section: 'edu', group: 'practical', icon: 'synergeion-village', name: '시너지언 빌리지', chip: '팀 프로젝트 진행', lab: true, type: 'web', desc: '한 학기 팀 프로젝트를 굴리고 그 과정이 개인의 성장기록으로 남는 도구. 학생은 계정 없이 참여 코드와 이름만으로 들어오고, 주마다 쓴 보고서에 선생님이 답합니다. 개수나 등수를 어디에도 만들지 않아요. 코드 없이 예시 공간을 둘러볼 수 있습니다.', web: 'https://synergeion-village-production-92ed.up.railway.app' },
-  { section: 'edu', group: 'practical', icon: 'vibe-shelf', name: '바이브 코딩 저장소', chip: '교사 도구 공유', lab: true, type: 'web', desc: '선생님이 AI로 만든 수업 도구를 학교 안에서 함께 모아 쓰는 곳. 필요한 걸 한 문장으로 요청하고, 만든 도구는 분류별로 찾아 바로 엽니다. 가입·설치 없이 조직 이름만으로 들어와요. 코드 없이 예시 학교를 둘러볼 수 있습니다.', web: 'https://seojin-tools-production.up.railway.app/s/demo/' },
+  { section: 'edu', group: 'practical', icon: 'vibe-shelf', name: '바이브 코딩 저장소', chip: '교사 도구 공유', lab: true, type: 'web', desc: '선생님이 AI로 만든 수업 도구를 학교 안에서 함께 모아 쓰는 곳. 필요한 걸 한 문장으로 요청하고, 만든 도구는 분류별로 찾아 바로 엽니다. 가입·설치 없이 학교 이름만으로 들어와요. 예시 학교도 둘러볼 수 있습니다.', web: 'https://seojin-tools-production.up.railway.app/s/' },
 ];
