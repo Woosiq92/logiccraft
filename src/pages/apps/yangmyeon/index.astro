@@ -3,33 +3,33 @@ import Layout from '../../../layouts/Layout.astro';
 ---
 
 <Layout
-  title="양면 — 한 쟁점, 양쪽의 가장 강한 논거를 나란히 · 로직크래프트"
-  description="양면은 하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한 논거를 나란히 보여 줍니다. 어느 쪽이 옳은지 정해 주지 않고, 사실과 해석을 구분하도록 돕습니다."
+  title="양면 — 뉴스 한 장, 양쪽 입장 한 줄 · 로직크래프트"
+  description="양면은 정치 쟁점 하나를 카드 한 장에 담은 앱입니다. 확인된 사실을 먼저 보여 주고, 찬성과 반대의 이유를 한 줄씩 나란히 놓습니다. 출시 준비 중입니다."
   image="/og/yangmyeon.png"
 >
   <section class="edu-hero">
     <div class="wrap web-hero-inner">
       <div class="web-hero-copy">
         <p class="edu-eyebrow">PRODUCT · 양면</p>
-        <h1>한 쟁점, 양쪽의<br />가장 강한 논거.</h1>
+        <h1>뉴스 한 장,<br />양쪽 입장 한 줄.</h1>
         <p class="web-lede">
-          하나의 정치 쟁점을 가운데 사실관계 위에 놓고, 양옆에 찬성과 반대의 가장 강한
-          근거를 나란히 둡니다. 판단은 읽는 사람의 몫으로 남깁니다.
+          정치 쟁점 하나를 카드 한 장에 담았습니다. 무슨 일이 있었는지와 확인된 사실을 먼저
+          보여 주고, 찬성과 반대가 왜 그렇게 생각하는지 한 줄씩 나란히 놓습니다.
         </p>
-        <div class="web-cta"><a class="cta" href="https://중도정치.kr">살펴보기 →</a></div>
+        <div class="web-cta"><span class="cta soon">App Store · Google Play 출시 준비 중</span></div>
         <p class="web-note">
-          어느 쪽이 옳은지 정해 주지 않습니다. 무엇이 사실이고 무엇이 해석인지 구분하도록
-          돕고, 양쪽의 가장 설득력 있는 논거를 있는 그대로 마주하게 합니다.
+          사안마다 찬성·반대를 누르면 내가 어느 쪽에 가까운지 보여 줍니다. 누른 기록은 폰
+          안에만 남고 서버로 가지 않습니다. 어느 쪽이 옳은지는 정해 주지 않습니다.
         </p>
       </div>
       <div class="web-hero-shot">
-        <img src="/screens/yangmyeon/hero.png" alt="양면 화면 — 정치·사법/경제/사회 쟁점 목록과 찬성·반대 논거 비율" width="1120" height="752" loading="eager" />
+        <img src="/screens/yangmyeon/app-open.png" alt="양면 앱 화면 — 쟁점 카드를 누르면 핵심 사실과 찬성·반대 입장이 나란히 나온다" width="780" height="1688" loading="eager" />
       </div>
     </div>
   </section>
 
   <section class="wrap web-links">
-    <p class="links"><a href="/apps">← 제품 목록</a></p>
+    <p class="links"><a href="/apps/yangmyeon/support">고객 지원</a> · <a href="/apps/yangmyeon/privacy">개인정보 처리방침</a> · <a href="/apps/yangmyeon/terms">이용약관</a> · <a href="/apps">← 제품 목록</a></p>
   </section>
 </Layout>
 
@@ -41,10 +41,12 @@ import Layout from '../../../layouts/Layout.astro';
   .web-lede { color: #c4cdef; margin: 1.1rem 0 0; line-height: 1.8; max-width: 44ch; }
   .web-cta { margin-top: 1.7rem; }
   .cta { display: inline-flex; align-items: center; min-height: 56px; padding: 0 30px; border-radius: 14px; font-weight: 700; font-size: 1.06rem; background: var(--accent); color: #fff; box-shadow: 0 12px 28px rgba(47,99,244,.32); transition: transform .2s var(--ease), box-shadow .2s; }
+  .cta.soon { background: rgba(255,255,255,.12); box-shadow: none; font-size: 0.98rem; cursor: default; }
+  .cta.soon:hover { transform: none; box-shadow: none; }
   .cta:hover { transform: translateY(-2px); box-shadow: 0 16px 34px rgba(47,99,244,.4); }
   .web-note { color: #aab4dc; margin: 1.4rem 0 0; line-height: 1.75; font-size: 0.95rem; max-width: 46ch; }
   .web-hero-shot { display: flex; justify-content: center; }
-  .web-hero-shot img { width: 100%; max-width: 600px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
+  .web-hero-shot img { width: 100%; max-width: 320px; height: auto; display: block; border-radius: 14px; border: 1px solid rgba(255,255,255,.14); box-shadow: 0 40px 80px -30px rgba(0,0,0,.6); }
   .web-links { padding-block: 2rem 4rem; }
   .links { font-size: 0.95rem; }
   @media (max-width: 860px) {

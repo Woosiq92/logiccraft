@@ -1,0 +1,83 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '양면은 어떤 앱인가요?',
+    a: '정치 쟁점 하나를 카드 한 장에 담은 앱입니다. 카드를 누르면 핵심 사실 하나와 찬성·반대의 입장, 이유 두 개씩이 나란히 나옵니다. 어느 쪽이 옳은지는 정해 주지 않습니다.',
+  },
+  {
+    q: '사실과 논거는 어디서 가져오나요?',
+    a: '정부·국회·법원 같은 1차 자료와 통신사 기사를 먼저 보고, 성향이 다른 언론사 기사를 양쪽에서 비슷한 수로 함께 봅니다. 사안마다 출처 목록을 무료로 열어 볼 수 있습니다.',
+  },
+  {
+    q: '"내 성향"은 어떻게 계산하나요?',
+    a: '사안마다 찬성이 어느 진영의 입장에 가까운지 미리 정해 두고, 누른 의견을 모아 계산합니다. "모르겠어요"와 진영과 상관없는 사안은 빼고, 계산에 들어가는 답이 8개 이상일 때 결과를 보여 줍니다.',
+  },
+  {
+    q: '내가 누른 의견이 어디로 전송되나요?',
+    a: '아니요. 누른 의견과 성향 결과는 폰 안에만 저장되고 서버로 가지 않습니다. "내 성향" 화면에서 초기화하거나 앱을 지우면 사라집니다.',
+  },
+  {
+    q: '무료로 볼 수 있는 것과 구독으로 보는 것은 무엇인가요?',
+    a: '무료로 무슨 일인지, 핵심 사실, 양쪽 입장과 이유 두 개, 출처, 의견 누르기와 성향 보기를 쓸 수 있습니다. 월 2,900원 구독으로 사실관계 전부, 사실 다툼과 가치 다툼을 나눈 쟁점 정리, 양쪽 논거 전부, 스스로 점검할 질문을 봅니다.',
+  },
+  {
+    q: '구독은 어떻게 해지하나요?',
+    a: 'iPhone은 설정 → 내 이름 → 구독, Android는 Google Play → 프로필 → 결제 및 정기 결제에서 해지합니다. 결제와 환불은 각 스토어 정책을 따릅니다.',
+  },
+  {
+    q: '사실이 틀렸거나 한쪽으로 기운 곳을 발견했어요.',
+    a: '사안 제목과 어느 문장인지 적어 아래 메일로 보내 주세요. 출처를 다시 확인해 고칩니다.',
+  },
+];
+---
+
+<Layout
+  title="양면 — 고객 지원 · 로직크래프트"
+  description="양면 고객 지원. 자주 묻는 질문과 문의 안내. 정치 쟁점 하나를 카드 한 장에 담은 앱."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>양면</h1>
+    <p>뉴스 한 장, 양쪽 입장 한 줄.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">사실 오류 제보, 버그 신고, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:logiccraftmarketing@gmail.com?subject=[양면] 문의">logiccraftmarketing@gmail.com</a>
+    <p class="muted small">평일 24시간 내 회신 드립니다.</p>
+    <p class="links"><a href="/apps/yangmyeon/privacy">개인정보 처리방침</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
