@@ -1,0 +1,90 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+
+const faqs = [
+  {
+    q: '어원 스와이프는 어떤 앱인가요?',
+    a: '영단어와 한자어를 한 화면에 하나씩 밀어 넘기면서 외우는 앱입니다. 어근이 있는 영단어는 조각마다 뜻을 보여 주고, 한자어는 글자별 뜻을 보여 줍니다. 아는 단어는 왼쪽으로, 다시 볼 단어는 오른쪽으로 밀면 됩니다.',
+  },
+  {
+    q: '로그인이 필요한가요?',
+    a: '아니요. 회원가입도 로그인도 없습니다. 설치하면 바로 쓸 수 있고, 학습 기록은 기기에만 저장됩니다.',
+  },
+  {
+    q: '무료로 어디까지 쓸 수 있나요?',
+    a: '단어 카드, 어근 묶음, 단어 저장, 백업은 무료입니다. 퀴즈는 하루 10문제까지, 이야기 팩은 앞 3장까지 무료입니다.',
+  },
+  {
+    q: '심화 이용권을 사면 무엇이 열리나요?',
+    a: '퀴즈를 횟수 제한 없이 풀 수 있습니다. 복습 일정, 어근 묶음에서 바로 하는 퀴즈와 복습, 단어장과 메모, 내보내기, 이야기 팩 전부도 쓸 수 있습니다. 한 번만 결제하면 되고 정기 결제는 없습니다.',
+  },
+  {
+    q: '기기를 바꿨더니 이용권이 사라졌어요.',
+    a: '앱 오른쪽 위 ⋯ 메뉴에서 「심화 이용권 · 구매 복원」을 열고 「구매 복원」을 누르세요. 결제할 때 쓴 Apple ID나 Google 계정으로 로그인되어 있어야 합니다.',
+  },
+  {
+    q: '학습 기록을 새 기기로 옮기고 싶어요.',
+    a: '⋯ 메뉴의 「백업 · 기기 옮기기」에서 백업 파일을 만들어 새 기기로 보낸 뒤, 새 기기의 같은 메뉴에서 불러오세요. 기록은 서버에 저장되지 않아서 백업 없이 앱을 지우면 되살릴 수 없습니다.',
+  },
+  {
+    q: '자녀 기기에서 결제하려면 어떻게 하나요?',
+    a: '가족 공유의 구매 승인 같은 보호자 설정이 스토어에 켜져 있으면, 구매를 누를 때 스토어가 보호자에게 승인 요청을 보냅니다. 보호자가 승인하면 다음에 앱을 열 때부터 이용권을 쓸 수 있고, 거절하면 결제되지 않습니다.',
+  },
+  {
+    q: '환불은 어떻게 받나요?',
+    a: 'App Store 구매는 reportaproblem.apple.com에서, Google Play 구매는 Google Play의 주문 내역에서 요청하면 됩니다. 결제와 환불은 각 스토어에서 처리합니다.',
+  },
+  {
+    q: '뜻이나 어원이 틀린 카드를 봤어요.',
+    a: '어떤 단어의 무엇이 틀렸는지 아래 메일로 보내 주세요. 확인한 뒤 다음 업데이트 때 고치겠습니다.',
+  },
+];
+---
+
+<Layout
+  title="어원 스와이프 — 고객 지원 · 로직크래프트"
+  description="어원 스와이프 고객 지원. 자주 묻는 질문과 문의 안내. 영단어와 한자어를 어근과 글자 뜻으로 나눠 넘겨 보는 어휘 앱."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">고객 지원</p>
+    <h1>어원 스와이프</h1>
+    <p>영단어와 한자어를 어근과 글자 뜻으로 나눠 넘겨 봅니다.</p>
+  </section>
+
+  <section class="wrap faq">
+    <h2>자주 묻는 질문</h2>
+    {faqs.map((f) => (
+      <div class="qa">
+        <p class="q">Q. {f.q}</p>
+        <p class="a">{f.a}</p>
+      </div>
+    ))}
+  </section>
+
+  <section class="wrap contact">
+    <h2>문의하기</h2>
+    <p class="muted">버그 신고, 카드 오류 제보, 기능 제안, 그 외 모든 문의</p>
+    <a class="mail" href="mailto:logiccraftmarketing@gmail.com?subject=[어원 스와이프] 문의">logiccraftmarketing@gmail.com</a>
+    <p class="links"><a href="/apps/etymo-swipe/privacy">개인정보 처리방침</a> · <a href="/apps/etymo-swipe/terms">이용약관</a> · <a href="/apps/etymo-swipe/delete-data">데이터 삭제</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.8rem, 5vw, 2.6rem); margin: 0.3rem 0 0; }
+  .page-head p { color: var(--sub); margin: 0.8rem 0 0; }
+  .faq { padding-top: 1rem; max-width: 760px; }
+  .faq h2, .contact h2 { font-size: 1.3rem; }
+  .qa { padding: 1rem 0; border-bottom: 1px solid #eee; }
+  .qa:last-child { border-bottom: none; }
+  .q { font-weight: 700; margin: 0 0 0.4rem; }
+  .a { color: var(--sub); margin: 0; line-height: 1.7; }
+  .contact { padding-top: 2rem; padding-bottom: 4rem; max-width: 760px; }
+  .contact .mail {
+    display: inline-block; margin: 0.4rem 0; padding: 0.7rem 1.5rem;
+    background: var(--accent); color: #fff; border-radius: 999px; font-weight: 700;
+  }
+  .muted { color: var(--sub); }
+  .small { font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>

@@ -1,0 +1,47 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="어원 스와이프 — 데이터 삭제 안내 · 로직크래프트"
+  description="어원 스와이프 데이터 삭제 안내. 계정과 서버 저장 데이터가 없으며 학습 기록은 기기 안에만 저장되어 앱을 삭제하면 함께 지워집니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">데이터 삭제 안내</p>
+    <h1>어원 스와이프 데이터 삭제</h1>
+    <p class="meta">
+      앱 이름: 어원 스와이프<br />
+      개발/운영: 로직크래프트 (사업자등록번호 302-11-03141, 대표 최우식)<br />
+      연락처: logiccraftmarketing@gmail.com
+    </p>
+  </section>
+
+  <section class="wrap doc">
+    <p>어원 스와이프에는 <b>회원가입·로그인이 없고, 회사 서버에 저장되는 정보도 없습니다.</b> 그래서 삭제할 계정이나 서버 데이터가 없습니다.</p>
+
+    <h2>기기에 저장된 기록 삭제</h2>
+    <p>저장한 단어, 단어장, 메모, 복습 일정, 퀴즈 결과는 기기에만 저장됩니다. 앱에는 전체 기록을 지우는 단추가 없으므로, 기기에서 앱을 삭제하면 이 기록이 모두 지워집니다.</p>
+
+    <h2>백업 파일</h2>
+    <p>앱의 「백업 · 기기 옮기기」로 만든 백업 파일은 이용자가 고른 곳에 저장됩니다. 앱을 삭제해도 그 파일은 남으므로, 저장한 곳에서 직접 지워 주세요.</p>
+
+    <h2>구매 내역</h2>
+    <p>결제 내역은 Apple 또는 Google 계정에 남으며 회사는 이를 지울 수 없습니다. 앱을 삭제해도 심화 이용권은 사라지지 않고, 다시 설치한 뒤 「구매 복원」으로 받을 수 있습니다.</p>
+
+    <h2>문의</h2>
+    <p>추가 문의: <a href="mailto:logiccraftmarketing@gmail.com">logiccraftmarketing@gmail.com</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.6rem, 4.5vw, 2.3rem); margin: 0.3rem 0 0.8rem; }
+  .meta { color: var(--sub); font-size: 0.95rem; line-height: 1.8; }
+  .doc { padding-top: 1rem; padding-bottom: 4rem; max-width: 760px; }
+  .doc h2 { font-size: 1.2rem; margin: 2rem 0 0.6rem; }
+  .doc p { line-height: 1.75; margin: 0.5rem 0; }
+  .doc ul { line-height: 1.75; margin: 0.5rem 0; padding-left: 1.4rem; }
+  .doc li { margin: 0.3rem 0; }
+  .en-summary { margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid #eee; color: var(--sub); font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
