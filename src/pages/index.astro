@@ -1,269 +1,45 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import ListRow from '../components/ListRow.astro';
-import { products } from '../data/products.js';
-
-const eduItems = products.filter((p) => p.section === 'edu' && !p.lab);
-/* 홈은 교육을 앞세우는 자리라 일상은 대표 하나(불안한개미)만 건다.
-   베타 실험실 섹션도 홈에서는 접었다. 둘 다 /apps 전체 목록에는 그대로 있다. */
-const dailyItems = products.filter((p) => p.section === 'daily' && p.slug === 'stockwatch');
-// Wonder 는 피처 카드로 별도 렌더(아래 마크업). Build 는 series(카운트용)라 데이터에 카드 필드가 없어 인라인 정의.
-const buildCard = { group: 'thinking', slug: 'build', icon: 'build', name: 'Synergeion Build', chip: '6–9세', type: 'app', desc: '직접 만들고 부수며 원리를 익히는 사고력 놀이.' };
-
-// 교육 하위 분류 — 어린이 사고력은 Wonder(피처) + Build + thinking 항목.
-const thinkingRows = [buildCard, ...eduItems.filter((p) => p.group === 'thinking')];
-const examItems = eduItems.filter((p) => p.group === 'exam');
-const practicalItems = eduItems.filter((p) => p.group === 'practical');
-const eduGroups = [
-  { label: '어린이 사고력', rows: thinkingRows, count: 1 + thinkingRows.length }, // +Wonder 피처
-  { label: '시험·자격', rows: examItems, count: examItems.length },
-  { label: '실용·자기주도', rows: practicalItems, count: practicalItems.length },
-];
-const eduCount = eduGroups.reduce((n, g) => n + g.count, 0);
+/* 첫 화면 = What We Left Behind(NASA Space Apps 2026 출품작, Railway).
+   주소창은 logiccraft.co.kr 로 두고 앱을 화면 가득 띄운다. 기존 회사 홈은 /home.
+   공통 Layout 은 내비·푸터를 늘 그리므로 이 페이지는 따로 선다. */
+const APP = 'https://a17-frame-production.up.railway.app';
+const title = '로직크래프트 LogicCraft — What We Left Behind: Surviving on the Moon';
+const description = '로직크래프트(LogicCraft)가 NASA Space Apps Challenge 2026에 낸 달 생존 교육 게임. 아폴로 17호가 남긴 장비로 달에서 살아남는다.';
+const canonical = new URL('/', Astro.site).href;
+const ogImage = new URL('/og.png', Astro.site).href;
 ---
 
-<Layout>
-  <!-- ============ HERO ============ -->
-  <section class="hero">
-    <canvas class="hero-net" id="heroNet" aria-hidden="true"></canvas>
-    <div class="wrap">
-      <div class="hero-inner">
-        <div class="hero-text reveal">
-          <p class="eyebrow on-dark">LOGICCRAFT · 사고력 EdTech 스튜디오</p>
-          <h1>생각하는 힘을 키우는 <em>공간</em>을 만듭니다.</h1>
-          <div class="hero-cta">
-            <a href="/apps" class="btn btn-primary">제품 보기 <span class="arr">→</span></a>
-            <a href="/about" class="btn btn-ghost">스튜디오 소개</a>
-          </div>
-        </div>
-        <a class="tile youtube light reveal" href="https://www.youtube.com/@NaruandNeti" target="_blank" rel="noopener">
-          <div class="yt-thumb">
-            <img src="/mascots/naru-neti-scene.png" alt="나루와 느티" />
-            <div class="yt-mark"></div>
-          </div>
-          <div class="yt-row">
-            <div>
-              <h3>나루와 느티 YouTube</h3>
-              <p class="handle">@NaruandNeti</p>
-            </div>
-            <span class="go">채널 보기 <span class="arr">→</span></span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ SYNERGEION ============ -->
-  <section class="synergeion" id="synergeion" style="padding-block: clamp(35px, 4.5vw, 60px)">
-    <div class="wrap">
-      <div class="syn-copy reveal" style="text-align:center; max-width:720px; margin:0 auto">
-        <p class="eyebrow">SYNERGEION · 대표 시리즈</p>
-        <h2 class="section-title">3세부터 18세까지, 하나의 여정으로 이어집니다.</h2>
-      </div>
-      <div class="syn-strip-wrap reveal">
-        <div class="syn-strip" id="synStrip">
-          <div class="syn-step" style="--st: var(--st-wonder)">
-            <span class="dot">01</span><span class="ln">Wonder</span><span class="ag">3–6세</span><span class="tag live">출시</span>
-          </div>
-          <div class="syn-step" style="--st: var(--st-build)">
-            <span class="dot">02</span><span class="ln">Build</span><span class="ag">6–9세</span><span class="tag live">출시</span>
-          </div>
-          <div class="syn-step" style="--st: var(--st-voyage)">
-            <span class="dot">03</span><span class="ln">Voyage</span><span class="ag">9–12세</span><span class="tag soon">예정</span>
-          </div>
-          <div class="syn-step" style="--st: var(--st-forge)">
-            <span class="dot">04</span><span class="ln">Forge</span><span class="ag">12–15세</span><span class="tag soon">예정</span>
-          </div>
-          <div class="syn-step" style="--st: var(--st-village)">
-            <span class="dot">05</span><span class="ln">Village</span><span class="ag">15–18세</span><span class="tag soon">예정</span>
-          </div>
-        </div>
-      </div>
-      <div class="reveal" style="text-align:center; margin-top: clamp(32px,4vw,44px)">
-        <a href="/apps" class="btn btn-dark">시리즈 자세히 보기 <span class="arr">→</span></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ CAMPUS ============ -->
-  <section class="campus" id="campus">
-    <div class="wrap">
-      <div class="campus-card reveal">
-        <div class="campus-map">
-          <video
-            src="/campus-flyover.mp4"
-            poster="/campus-flyover-poster.jpg"
-            autoplay muted loop playsinline preload="none"
-            aria-label="시너지언 캠퍼스 전경 — 가운데 광장의 나무집을 중심으로 북쪽 빌리지, 서쪽 학교와 과목, 동쪽 성장의 호 다섯 하우스, 남쪽 일상 제품관이 놓인 섬을 위에서 둘러보는 영상"
-          ></video>
-          <span class="campus-badge">웹 · 구독제</span>
-        </div>
-        <div class="campus-body">
-          <p class="eyebrow">SYNERGEION CAMPUS · 웹에서 둘러보기</p>
-          <h2 class="section-title">걸어서 둘러보는 배움의 캠퍼스.</h2>
-          <div class="campus-cta">
-            <button class="btn btn-primary" type="button" id="campus-enter">캠퍼스 입장하기</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 캠퍼스는 다른 도메인(logicschool.co.kr)에 있고 CORS 도 없다. 여기서 바로 로그인시킬 수는
-         없으므로 코드만 받아 캠퍼스로 넘긴다 — 세션은 캠퍼스가 자기 오리진에서 세운다.
-         코드는 해시로 넘어간다(서버 로그·Referer 에 안 남는다). -->
-    <dialog class="code-modal" id="campus-modal">
-      <form method="dialog" class="code-form" id="campus-form">
-        <h3>구독 코드</h3>
-        <input id="campus-code" name="code" inputmode="latin" autocapitalize="characters"
-               placeholder="XXXX-XXXX-XXXX" maxlength="14" autocomplete="off" />
-        <div class="code-row">
-          <button class="btn btn-ghost" type="button" id="campus-cancel">닫기</button>
-          <button class="btn btn-primary" type="submit">들어가기</button>
-        </div>
-      </form>
-    </dialog>
-  </section>
-
-  <script is:inline>
-    (function () {
-      var dlg = document.getElementById('campus-modal');
-      var open = document.getElementById('campus-enter');
-      if (!dlg || !open) return;
-      var input = document.getElementById('campus-code');
-      open.addEventListener('click', function () {
-        dlg.showModal();
-        input.focus();
-      });
-      document.getElementById('campus-cancel').addEventListener('click', function () { dlg.close(); });
-      document.getElementById('campus-form').addEventListener('submit', function () {
-        var code = (input.value || '').trim();
-        if (!code) return;
-        location.href = 'https://logicschool.co.kr/#code=' + encodeURIComponent(code);
-      });
-    })();
-  </script>
-
-  <!-- ============ PRODUCTS ============ -->
-  <section class="products" id="products" style="padding-top:clamp(20px,3vw,36px)">
-    <div class="wrap">
-      <div class="reveal">
-        <p class="eyebrow">PRODUCTS · 우리가 만든 도구</p>
-      </div>
-
-      <!-- 교육 -->
-      <div class="section-block" style="margin-top: clamp(32px,4vw,52px)">
-        <div class="cat-head reveal">
-          <span class="label">교육</span>
-          <span class="rule"></span>
-          <span class="count">{String(eduCount).padStart(2, '0')}</span>
-        </div>
-
-        <!-- 어린이 사고력 -->
-        <div class="subgroup">
-          <div class="subcat reveal">
-            <span class="label">어린이 사고력</span>
-            <span class="rule"></span>
-            <span class="count">{String(eduGroups[0].count).padStart(2, '0')}</span>
-          </div>
-          <!-- Featured: Wonder -->
-          <article class="pcard feature reveal" style="margin-bottom: 14px">
-            <div class="feat-art">
-              <div class="mascot-float">
-                <a class="mascot-panel" id="mascotPanel" href="https://www.youtube.com/@NaruandNeti" target="_blank" rel="noopener" aria-label="나루와 느티 유튜브 채널 열기">
-                  <div class="glare"></div>
-                  <div class="mascot-row">
-                    <img class="naru" src="/mascots/naru.png" alt="나루 — 아기 비버 마스코트" />
-                    <img class="neti" src="/mascots/neti.png" alt="느티 — 새싹 정령 마스코트" />
-                  </div>
-                  <div class="mascot-caption">
-                    <div class="m"><b>나루</b><span>NARU</span></div>
-                    <div class="m"><b>느티</b><span>NETI</span></div>
-                  </div>
-                </a>
-              </div>
-            </div>
-            <div class="feat-body">
-              <p class="eyebrow warm">SYNERGEION 시리즈 · 출시</p>
-              <div class="name-row"><h3>Synergeion Wonder</h3><span class="chip">3–6세</span></div>
-              <p class="desc">아이와 부모가 함께 자라는 사고력 정원. 매일 씨앗 한 알, 부모도 같이 자랍니다.</p>
-              <div class="links">
-                <a href="https://apps.apple.com/kr/app/synergeion-wonder/id6774041352">App Store</a>
-                <a href="https://play.google.com/store/apps/details?id=kr.logiccraft.wonder">Google Play</a>
-              <div class="legal">
-                <a class="muted" href="/apps/wonder/">자세히</a>
-                <a class="muted" href="/apps/wonder/support">지원</a>
-                <a class="muted" href="/apps/wonder/privacy">개인정보</a>
-                <a class="muted" href="/apps/wonder/terms">약관</a>
-              </div>
-              </div>
-            </div>
-          </article>
-
-          <div class="list-rows">
-            {thinkingRows.map((p) => <ListRow p={p} />)}
-          </div>
-        </div>
-
-        {eduGroups.slice(1).map((g) => (
-          <div class="subgroup">
-            <div class="subcat reveal">
-              <span class="label">{g.label}</span>
-              <span class="rule"></span>
-              <span class="count">{String(g.count).padStart(2, '0')}</span>
-            </div>
-            <div class="list-rows">
-              {g.rows.map((p) => <ListRow p={p} />)}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      <!-- 일상 -->
-      <div class="section-block">
-        <div class="cat-head daily reveal">
-          <span class="label">일상</span>
-          <span class="rule"></span>
-          <span class="count">{String(dailyItems.length).padStart(2, '0')}</span>
-        </div>
-        <div class="list-rows">
-          {dailyItems.map((p) => <ListRow p={p} />)}
-        </div>
-      </div>
-
-      <div class="reveal" style="text-align:center; margin-top: clamp(36px,4.5vw,52px)">
-        <a href="/apps" class="btn btn-dark">전체 제품 자세히 보기 <span class="arr">→</span></a>
-      </div>
-    </div>
-  </section>
-
-  <!-- ============ MEDIA + BOOK ============ -->
-  <section class="media-band">
-    <div class="wrap">
-      <div class="reveal" style="margin-bottom: 30px">
-        <p class="eyebrow">MORE · 영상과 글</p>
-        <h2 class="section-title" style="color:#fff">제품 너머의 이야기.</h2>
-      </div>
-      <div class="media-grid">
-        <a class="tile youtube reveal" href="https://www.youtube.com/@logiccraftmovie">
-          <div class="yt-mark"></div>
-          <h3>로직크래프트 YouTube</h3>
-          <p class="handle">@logiccraftmovie</p>
-          <p>제품 이야기와 사고력 콘텐츠를 영상으로 만나보세요.</p>
-          <span class="go">채널 보기 <span class="arr">→</span></span>
-        </a>
-        <a class="tile book reveal" href="https://product.kyobobook.co.kr/detail/S000219252300">
-          <div class="book-cover">
-            <img src="/book-cover.jpg" alt="당연함을 의심하는 연습 표지" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
-            <div class="cover-fallback" style="display:none"><b>당연함을<br />의심하는 연습</b><span>최우식 지음</span></div>
-          </div>
-          <div>
-            <p class="meta">최우식 지음 · 수필·자기계발 · 2026 · 132쪽</p>
-            <h3>당연함을 의심하는 연습</h3>
-            <p>자기·사랑·사회·일상·배움 — 5가지 영역의 당연함을 49편의 짧은 에세이로 의심합니다.</p>
-            <span class="go">교보문고에서 보기 <span class="arr">→</span></span>
-          </div>
-        </a>
-      </div>
-    </div>
-  </section>
-</Layout>
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="naver-site-verification" content="b7885929178d4fd414be2ec0c64781930b23c3c9" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+      .front-app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+      .front-home {
+        position: fixed; right: 12px; bottom: 12px; z-index: 10;
+        min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px;
+        border-radius: 999px; background: rgba(0, 0, 0, .55); color: #fff;
+        font: 14px/1 system-ui, sans-serif; text-decoration: none; backdrop-filter: blur(6px);
+      }
+      .front-home:hover, .front-home:focus-visible { background: rgba(0, 0, 0, .8); }
+    </style>
+  </head>
+  <body>
+    <iframe class="front-app" src={APP} title="What We Left Behind: Surviving on the Moon"
+      allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <a class="front-home" href="/home">로직크래프트 소개 →</a>
+  </body>
+</html>
