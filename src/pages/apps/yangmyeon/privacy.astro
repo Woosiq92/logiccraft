@@ -1,0 +1,76 @@
+---
+import Layout from '../../../layouts/Layout.astro';
+---
+
+<Layout
+  title="양면 — 개인정보 처리방침 · 로직크래프트"
+  description="양면 개인정보 처리방침. 회원가입이 없고 개인 식별 정보를 모으지 않습니다. 사안마다 누른 의견과 성향 결과는 기기 안에만 저장되며, 광고와 사용 분석 도구를 쓰지 않습니다."
+>
+  <section class="wrap page-head">
+    <p class="eyebrow">개인정보 처리방침</p>
+    <h1>양면 개인정보처리방침</h1>
+    <p class="meta">
+      앱 이름: 양면<br />
+      개발/운영: 로직크래프트 (사업자등록번호 302-11-03141, 대표 최우식)<br />
+      연락처: logiccraftmarketing@gmail.com<br />
+      최종 개정일: 2026년 11월 8일
+    </p>
+  </section>
+
+  <section class="wrap doc">
+    <p>로직크래프트(이하 "회사")는 양면(이하 "본 앱") 이용자의 개인정보를 「개인정보 보호법」 및 관련 법령에 따라 다룹니다. 본 방침은 앱이 어떤 정보를 처리하는지 설명합니다.</p>
+
+    <h2>1. 수집하는 개인정보</h2>
+    <p><b>본 앱은 개인을 식별할 수 있는 정보를 수집하지 않습니다.</b> 회원가입·로그인이 없으며, 이름·이메일·전화번호·주소·생년월일·위치를 받지 않습니다.</p>
+
+    <h2>2. 기기에만 저장되는 정보</h2>
+    <p>다음 정보는 이용자의 기기에만 저장되며 회사 서버나 제3자에게 전송되지 않습니다. 회사도 이 정보를 볼 수 없습니다.</p>
+    <ul>
+      <li>사안마다 누른 의견(찬성·반대·모르겠어요)</li>
+      <li>그 의견으로 기기 안에서 계산한 정치 성향 결과</li>
+    </ul>
+    <p>정치적 견해는 민감한 정보라서 기기 밖으로 보내지 않도록 설계했습니다. "내 성향" 화면의 초기화 단추를 누르거나 앱을 삭제하면 모두 지워집니다.</p>
+
+    <h2>3. 외부 서비스 호출</h2>
+    <ul>
+      <li><b>사안 내려받기(중도정치.kr)</b>: 새 사안을 받기 위해 앱이 회사가 운영하는 주소에서 사안 파일을 내려받습니다. 이때 어떤 의견을 눌렀는지는 보내지 않습니다. 호스팅 업체(Cloudflare)가 보안과 장애 대응을 위해 접속 기록(IP 주소, 접속 시각)을 일정 기간 보관할 수 있으며, 회사는 이 기록으로 이용자를 식별하지 않습니다.</li>
+      <li><b>구독 결제(Apple App Store, Google Play)</b>: 구독 결제는 각 스토어가 처리합니다. 회사는 카드 번호 등 결제 정보를 받지 않으며, 구독 여부만 스토어를 통해 확인합니다.</li>
+      <li><b>출처 기사</b>: 사안의 출처 링크를 누르면 해당 언론사·기관 사이트가 열립니다. 그 사이트의 개인정보 처리는 각 사이트의 방침을 따릅니다.</li>
+    </ul>
+
+    <h2>4. 광고 및 추적</h2>
+    <p>본 앱은 광고를 표시하지 않고, 사용 분석 도구나 광고 식별자(IDFA·AAID)를 쓰지 않습니다. 이용자를 추적하거나 프로파일링하지 않습니다.</p>
+
+    <h2>5. 제3자 제공</h2>
+    <p>본 앱이 수집하는 개인정보가 없으므로 제3자에게 제공하는 개인정보도 없습니다.</p>
+
+    <h2>6. 만 14세 미만 아동</h2>
+    <p>본 앱은 만 14세 미만 아동의 개인정보를 의도적으로 수집하지 않습니다.</p>
+
+    <h2>7. 이용자의 권리</h2>
+    <p>본 앱은 식별 정보를 수집하지 않으므로 별도의 열람·정정·삭제 요청 대상이 없습니다. 기기에 저장된 의견과 성향 결과는 앱 안에서 초기화하거나 앱을 삭제해 지울 수 있습니다.</p>
+
+    <h2>8. 정책 변경</h2>
+    <p>본 방침이 바뀌면 이 페이지에 바뀐 내용과 개정일을 게시합니다.</p>
+
+    <h2>9. 문의</h2>
+    <p>개인정보 관련 문의: <a href="mailto:logiccraftmarketing@gmail.com">logiccraftmarketing@gmail.com</a></p>
+
+    <p class="en-summary">English summary: Yangmyeon is a Korean political-issue explainer app. It has no account or login and collects no personal or identifying information. Your agree/disagree answers and the political-leaning result computed from them are stored only on your device and are never sent to our servers or anyone else. The app downloads issue files from our own address (중도정치.kr); our host (Cloudflare) may keep standard access logs (IP address, time) for security. Subscriptions are processed by Apple App Store and Google Play; we do not receive payment details. No ads, no analytics SDKs, no advertising identifiers, no tracking. Contact: logiccraftmarketing@gmail.com</p>
+
+    <p class="links"><a href="/apps/yangmyeon/support">고객 지원</a> · <a href="/apps">← 제품 목록</a></p>
+  </section>
+</Layout>
+
+<style>
+  .page-head { padding-top: 3.5rem; padding-bottom: 0.5rem; }
+  .page-head h1 { font-size: clamp(1.6rem, 4.5vw, 2.3rem); margin: 0.3rem 0 0.8rem; }
+  .meta { color: var(--sub); font-size: 0.95rem; line-height: 1.8; }
+  .doc { padding-top: 1rem; padding-bottom: 4rem; max-width: 760px; }
+  .doc h2 { font-size: 1.2rem; margin: 2rem 0 0.6rem; }
+  .doc p { line-height: 1.75; margin: 0.5rem 0; }
+  .doc ul { line-height: 1.75; margin: 0.5rem 0; padding-left: 1.4rem; }
+  .doc li { margin: 0.3rem 0; }
+  .en-summary { margin-top: 2.5rem; padding-top: 1.2rem; border-top: 1px solid #eee; color: var(--sub); font-size: 0.9rem; }
+  .links { margin-top: 1.5rem; font-size: 0.95rem; }
+</style>
