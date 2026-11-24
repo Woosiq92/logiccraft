@@ -1,8 +1,6 @@
 ---
 import Layout from '../../../layouts/Layout.astro';
 
-const DOWNLOAD = 'https://github.com/Woosiq92/windeck/releases/latest/download/WinDeck.dmg';
-const VERSION = '0.1.0';
 ---
 
 <Layout
@@ -21,12 +19,6 @@ const VERSION = '0.1.0';
         오른쪽 스트립에는 덱에 없는 창까지 라이브 미러로 띄웁니다. 미러를 클릭하면
         그 창이 원하는 칸으로 들어옵니다.
       </p>
-      <div class="cta-row">
-        <a class="cta" href={DOWNLOAD}>
-          <span class="cta-sub">macOS 11 이상 · 무료</span>
-          <span class="cta-main">WinDeck {VERSION} 다운로드</span>
-        </a>
-      </div>
       <p class="note">
         Apple Silicon과 Intel 맥 모두 돌아갑니다. 서명과 공증을 마쳐서 받자마자 열립니다.
       </p>
@@ -112,8 +104,6 @@ const VERSION = '0.1.0';
     </ul>
     <nav class="edu-links">
       <span class="edu-doclinks">
-        <a href={DOWNLOAD}>다운로드</a>
-        <a href="https://github.com/Woosiq92/windeck">GitHub</a>
         <a href="mailto:logiccraftmarketing@gmail.com">고객 지원</a>
       </span>
       <a class="edu-back" href="/apps">← 제품 목록</a>
