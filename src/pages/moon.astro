@@ -1,0 +1,45 @@
+---
+/* /moon = What We Left Behind(NASA Space Apps 2026 출품작, Railway).
+   앱을 화면 가득 띄운다. 2026-11-24 첫 화면(/)에서 이 주소로 옮겼다.
+   공통 Layout 은 내비·푸터를 늘 그리므로 이 페이지는 따로 선다. */
+const APP = 'https://a17-frame-production.up.railway.app';
+const title = '로직크래프트 LogicCraft — What We Left Behind: Surviving on the Moon';
+const description = '로직크래프트(LogicCraft)가 NASA Space Apps Challenge 2026에 낸 달 생존 교육 게임. 아폴로 17호가 남긴 장비로 달에서 살아남는다.';
+const canonical = new URL('/moon', Astro.site).href;
+const ogImage = new URL('/og.png', Astro.site).href;
+---
+
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="naver-site-verification" content="b7885929178d4fd414be2ec0c64781930b23c3c9" />
+    <meta name="theme-color" content="#000000" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <style>
+      html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
+      .front-app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+      .front-home {
+        position: fixed; right: 12px; bottom: 12px; z-index: 10;
+        min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px;
+        border-radius: 999px; background: rgba(0, 0, 0, .55); color: #fff;
+        font: 14px/1 system-ui, sans-serif; text-decoration: none; backdrop-filter: blur(6px);
+      }
+      .front-home:hover, .front-home:focus-visible { background: rgba(0, 0, 0, .8); }
+    </style>
+  </head>
+  <body>
+    <iframe class="front-app" src={APP} title="What We Left Behind: Surviving on the Moon"
+      allow="autoplay; fullscreen" allowfullscreen></iframe>
+    <a class="front-home" href="/">로직크래프트 소개 →</a>
+  </body>
+</html>

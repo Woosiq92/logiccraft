@@ -1,45 +1,32 @@
 ---
-/* 첫 화면 = What We Left Behind(NASA Space Apps 2026 출품작, Railway).
-   주소창은 logiccraft.co.kr 로 두고 앱을 화면 가득 띄운다. 기존 회사 홈은 /home.
-   공통 Layout 은 내비·푸터를 늘 그리므로 이 페이지는 따로 선다. */
-const APP = 'https://a17-frame-production.up.railway.app';
-const title = '로직크래프트 LogicCraft — What We Left Behind: Surviving on the Moon';
-const description = '로직크래프트(LogicCraft)가 NASA Space Apps Challenge 2026에 낸 달 생존 교육 게임. 아폴로 17호가 남긴 장비로 달에서 살아남는다.';
-const canonical = new URL('/', Astro.site).href;
-const ogImage = new URL('/og.png', Astro.site).href;
+/* 첫 화면 = 무엇을 하는 회사인지 한 문장만. 제품 목록·캠퍼스·영상은 /home 과 /apps 에 그대로 있다.
+   앱 랜딩(/apps/*)·법적 페이지·app-ads.txt 주소는 바꾸지 않았다. */
+import Layout from '../layouts/Layout.astro';
 ---
 
-<!doctype html>
-<html lang="ko">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="canonical" href={canonical} />
-    <meta property="og:type" content="website" />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content={description} />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={ogImage} />
-    <meta name="naver-site-verification" content="b7885929178d4fd414be2ec0c64781930b23c3c9" />
-    <meta name="theme-color" content="#000000" />
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <style>
-      html, body { margin: 0; height: 100%; overflow: hidden; background: #000; }
-      .front-app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-      .front-home {
-        position: fixed; right: 12px; bottom: 12px; z-index: 10;
-        min-height: 44px; display: inline-flex; align-items: center; padding: 0 16px;
-        border-radius: 999px; background: rgba(0, 0, 0, .55); color: #fff;
-        font: 14px/1 system-ui, sans-serif; text-decoration: none; backdrop-filter: blur(6px);
-      }
-      .front-home:hover, .front-home:focus-visible { background: rgba(0, 0, 0, .8); }
-    </style>
-  </head>
-  <body>
-    <iframe class="front-app" src={APP} title="What We Left Behind: Surviving on the Moon"
-      allow="autoplay; fullscreen" allowfullscreen></iframe>
-    <a class="front-home" href="/home">로직크래프트 소개 →</a>
-  </body>
-</html>
+<Layout>
+  <section class="hero front">
+    <canvas class="hero-net" id="heroNet" aria-hidden="true"></canvas>
+    <div class="wrap">
+      <div class="hero-text">
+        <p class="eyebrow on-dark">LOGICCRAFT · 사고력 EdTech 스튜디오</p>
+        <h1>생각하는 힘을 키우는 <em>공간</em>을 만듭니다.</h1>
+        <div class="hero-cta">
+          <a href="/apps" class="btn btn-primary">제품 보기 <span class="arr">→</span></a>
+          <a href="/about" class="btn btn-ghost">스튜디오 소개</a>
+        </div>
+        <a class="front-more" href="/home#campus">시너지언 캠퍼스 입장하기 →</a>
+      </div>
+    </div>
+  </section>
+</Layout>
+
+<style>
+  .front { min-height: calc(100svh - 72px); display: flex; align-items: center; }
+  .front .wrap { width: 100%; }
+  .front-more {
+    display: inline-flex; align-items: center; min-height: 44px; margin-top: 20px;
+    color: rgba(255, 255, 255, .78); font-size: 15px; text-decoration: underline; text-underline-offset: 4px;
+  }
+  .front-more:hover, .front-more:focus-visible { color: #fff; }
+</style>
