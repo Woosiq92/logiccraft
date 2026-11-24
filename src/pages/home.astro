@@ -106,6 +106,21 @@ const eduCount = eduGroups.reduce((n, g) => n + g.count, 0);
           </div>
         </div>
       </div>
+
+      <!-- NASA Space Apps 2026 출품작. 게임 본체는 Railway, 사이트에서는 /moon 에 화면 가득 띄운다. -->
+      <div class="campus-card moon-card reveal">
+        <a class="campus-map" href="/moon/">
+          <img src="/moon-card.jpg" alt="What We Left Behind: Surviving on the Moon 제목 화면" width="1280" height="720" loading="lazy" />
+          <span class="campus-badge">웹 · 무료</span>
+        </a>
+        <div class="campus-body">
+          <p class="eyebrow">NASA SPACE APPS CHALLENGE 2026 · 출품작</p>
+          <h2 class="section-title">아폴로 17호가 남긴 장비로 달에서 살아남기.</h2>
+          <div class="campus-cta">
+            <a class="btn btn-primary" href="/moon/">게임 하러 가기</a>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- 캠퍼스는 다른 도메인(logicschool.co.kr)에 있고 CORS 도 없다. 여기서 바로 로그인시킬 수는
@@ -240,17 +255,10 @@ const eduCount = eduGroups.reduce((n, g) => n + g.count, 0);
   <section class="media-band">
     <div class="wrap">
       <div class="reveal" style="margin-bottom: 30px">
-        <p class="eyebrow">MORE · 영상과 글</p>
+        <p class="eyebrow">MORE · 책</p>
         <h2 class="section-title" style="color:#fff">제품 너머의 이야기.</h2>
       </div>
       <div class="media-grid">
-        <a class="tile youtube reveal" href="https://www.youtube.com/@logiccraftmovie">
-          <div class="yt-mark"></div>
-          <h3>로직크래프트 YouTube</h3>
-          <p class="handle">@logiccraftmovie</p>
-          <p>제품 이야기와 사고력 콘텐츠를 영상으로 만나보세요.</p>
-          <span class="go">채널 보기 <span class="arr">→</span></span>
-        </a>
         <a class="tile book reveal" href="https://product.kyobobook.co.kr/detail/S000219252300">
           <div class="book-cover">
             <img src="/book-cover.jpg" alt="당연함을 의심하는 연습 표지" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
@@ -267,3 +275,7 @@ const eduCount = eduGroups.reduce((n, g) => n + g.count, 0);
     </div>
   </section>
 </Layout>
+
+<style>
+  .moon-card { margin-top: clamp(20px, 3vw, 32px); }
+</style>
